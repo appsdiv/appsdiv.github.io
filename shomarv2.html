@@ -3,15 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>شمار</title>
+    <meta name="description" content="حسابداری شخصی شمار">
+    <meta name="application-name" content="شمار">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="شمار">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/SsQqcM30/App-Icon-2x.png">
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/SsQqcM30/App-Icon-2x.png">
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
+        &quot;name&quot;: &quot;شمار&quot;,
+        &quot;short_name&quot;: &quot;شمار&quot;,
+        &quot;description&quot;: &quot;حسابداری شخصی شمار&quot;,
+        &quot;start_url&quot;: &quot;.&quot;,
+        &quot;display&quot;: &quot;standalone&quot;,
+        &quot;background_color&quot;: &quot;#f2f2f7&quot;,
+        &quot;theme_color&quot;: &quot;#007AFF&quot;,
+        &quot;icons&quot;: [
+            { &quot;src&quot;: &quot;https://i.postimg.cc/SsQqcM30/App-Icon-2x.png&quot;, &quot;sizes&quot;: &quot;192x192&quot;, &quot;type&quot;: &quot;image/png&quot; },
+            { &quot;src&quot;: &quot;https://i.postimg.cc/SsQqcM30/App-Icon-2x.png&quot;, &quot;sizes&quot;: &quot;512x512&quot;, &quot;type&quot;: &quot;image/png&quot; }
+        ]
+    }">
+    <link rel="apple-touch-startup-image" href="https://i.postimg.cc/SsQqcM30/App-Icon-2x.png">
 
-    <title>مدیریت مالی شخصی جامع</title>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://unpkg.com/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css"/>
-    
     <style>
         :root {
             /* Color Palette (iOS Inspired) */
@@ -23,10 +40,8 @@
             --purple-ios: #AF52DE;
             --cyan-ios: #32ADEA;
             --gray-100: #f8f9fa; --gray-200: #e9ecef; --gray-300: #dee2e6; --gray-400: #ced4da; --gray-500: #adb5bd; --gray-600: #6c757d; --gray-700: #495057; --gray-800: #343a40; --gray-900: #212529;
-            
             --bg-light: #f2f2f7; --card-light: #ffffff; --text-light: #000000; --subtext-light: #6e6e73; --border-light: rgba(60, 60, 67, 0.29);
             --bg-dark: #000000; --card-dark: #1c1c1e; --text-dark: #ffffff; --subtext-dark: #8e8e93; --border-dark: rgba(84, 84, 88, 0.65);
-            
             --primary: var(--blue-ios);
             --primary-hover: var(--blue-ios-hover);
             --income: var(--green-ios);
@@ -36,50 +51,55 @@
             --receivable: var(--green-ios);
             --loan: var(--purple-ios);
             --goal: var(--cyan-ios);
-            
             --income-bg-light: rgba(52, 199, 89, 0.15);
             --expense-bg-light: rgba(255, 59, 48, 0.15);
             --income-bg-dark: rgba(52, 199, 89, 0.2);
             --expense-bg-dark: rgba(255, 69, 58, 0.2);
-
             --font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             --radius: 12px;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --transition-fast: all 0.2s ease-out;
+            --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-medium: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            
             /* Safe Area Insets for iPhone X+ */
             --safe-area-top: env(safe-area-inset-top, 0px);
             --safe-area-bottom: env(safe-area-inset-bottom, 0px);
-            --header-height: 50px;
-            --nav-height: 70px;
+            --header-height: 48px;
+            --nav-height: 60px;
         }
-        
-        /* --- CHANGE 2: PWA Fullscreen Layout Fix --- */
+        /* === UI/UX ENHANCEMENTS START === */
+        html {
+            scroll-behavior: smooth;
+        }
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
-            overscroll-behavior-y: contain; /* Prevents pull-to-refresh in PWA */
+            overscroll-behavior-y: contain;
         }
-
         body {
             font-family: var(--font-family);
             background-color: var(--bg-light);
             color: var(--text-light);
             transition: background-color 0.3s, color 0.3s;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-        
-        .app-wrapper { 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh; /* Fallback */
+        /* Active/Press states for better feedback */
+        .btn:active, .action-card:active, .nav-btn:active, .list-container li:active {
+            transform: scale(0.97);
+            filter: brightness(0.95);
+            transition: transform 0.1s, filter 0.1s;
+        }
+        /* === UI/UX ENHANCEMENTS END === */
+
+        .app-wrapper {
+             display: flex;
+             flex-direction: column;
+             height: 100vh; /* Fallback */
             height: -webkit-fill-available; /* Critical for iOS PWA */
             overflow: hidden; /* Prevent wrapper from scrolling */
         }
-        /* --- END CHANGE 2 --- */
-
         body.dark-mode {
             --bg-light: var(--bg-dark);
             --card-light: var(--card-dark);
@@ -89,11 +109,9 @@
             --income-bg-light: var(--income-bg-dark);
             --expense-bg-light: var(--expense-bg-dark);
         }
-
         body.modal-open {
             overflow: hidden;
         }
-
         /* --- APP STRUCTURE --- */
         .app-header {
             position: fixed; top: 0; left: 0; right: 0;
@@ -108,8 +126,6 @@
         }
         body.dark-mode .app-header { background-color: rgba(28, 28, 30, 0.75); }
         #app-header-title { font-size: 1.1rem; font-weight: 600; padding: 0 1rem; }
-        
-        /* --- CHANGE 1 START: Header Icon Alignment --- */
         .header-controls {
             display: flex;
             align-items: center;
@@ -129,46 +145,35 @@
          .header-controls > .fas:hover, .header-controls .theme-switcher:hover {
             color: var(--primary);
          }
-        /* --- CHANGE 1 END --- */
-
         .app-content {
             flex: 1;
             overflow-y: auto; -webkit-overflow-scrolling: touch;
             padding: calc(var(--header-height) + var(--safe-area-top) + 1.25rem) 1rem calc(var(--nav-height) + var(--safe-area-bottom) + 1.25rem);
         }
-        
-        /* --- PAGE TRANSITIONS --- */
-        .page { display: none; animation-duration: 0.4s; animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
-        .page.active { display: block; animation-name: fadeIn; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
-
-        /* --- UI COMPONENTS --- */
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.4s var(--transition-medium); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .card-section { background-color: var(--card-light); padding: 1.25rem; border-radius: var(--radius); margin-bottom: 1.25rem; }
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
         .section-header h3 { margin: 0; font-size: 1.2rem; font-weight: 600; }
-        
         .btn { padding: 0.75rem 1.25rem; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: var(--transition-fast); font-family: var(--font-family); display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
         .btn-primary { background-color: var(--primary); color: white; }
         .btn-danger { background-color: var(--expense); color: white; }
         .btn-secondary { background-color: var(--gray-200); color: var(--text-light); }
         body.dark-mode .btn-secondary { background-color: var(--gray-800); color: var(--text-dark); }
         .btn-success { background-color: var(--income); color: white; }
-        
-        /* DASHBOARD & SUMMARY */
         .main-balance { background: linear-gradient(135deg, var(--blue-ios), #5856d6); color: white; padding: 1.5rem; text-align: center; }
         .main-balance .balance-title { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 0.5rem;}
         .main-balance h4 { margin: 0; font-weight: 500; opacity: 0.8; font-size: 0.9rem; }
-        .main-balance h1 { margin: 0; font-size: 2.5rem; letter-spacing: -1px; min-height: 48px; } /* Added min-height for stability */
+        .main-balance h1 { margin: 0; font-size: 2.5rem; letter-spacing: -1px; min-height: 48px; }
         #toggle-balance-visibility { cursor: pointer; opacity: 0.8; transition: var(--transition-fast); }
-        
-        /* --- CHANGE 3 START: Summary Box Redesign --- */
         .summary-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* Enforce two columns */
+            grid-template-columns: 1fr 1fr;
             gap: 1rem;
         }
         .summary-card {
-            background-color: var(--bg-light); /* Lighter background */
+            background-color: var(--bg-light);
             border-radius: var(--radius);
             padding: 1rem;
             display: flex;
@@ -186,13 +191,13 @@
             margin-bottom: 0;
         }
         .summary-card .card-icon {
-            font-size: 0.9rem; /* Smaller icon */
+            font-size: 0.9rem;
             width: 2rem;
             height: 2rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: var(--radius); /* Consistent radius */
+            border-radius: var(--radius);
         }
         .summary-card .card-title {
             font-weight: 500;
@@ -206,73 +211,62 @@
             text-align: right;
             width: 100%;
         }
-        /* --- CHANGE 3 END --- */
-
         .summary-card.income .card-icon { background-color: var(--income-bg-light); color: var(--income); }
         .summary-card.expense .card-icon { background-color: var(--expense-bg-light); color: var(--expense); }
         .summary-card.debt .card-icon { background-color: var(--expense-bg-light); color: var(--debt); }
         .summary-card.receivable .card-icon { background-color: var(--income-bg-light); color: var(--receivable); }
         .summary-card.loan .card-icon { background-color: rgba(175, 82, 222, 0.15); color: var(--loan); }
-
-
         .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-        .action-card { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; border-radius: var(--radius); cursor: pointer; transition: var(--transition-fast); }
-        .action-card:active { background-color: var(--gray-200); }
-        body.dark-mode .action-card:active { background-color: var(--gray-800); }
+        .action-card { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; border-radius: var(--radius); cursor: pointer; transition: background-color 0.2s, transform 0.2s, filter 0.2s; }
         .action-card i { font-size: 1.5rem; } .action-card span { font-size: 0.8rem; font-weight: 500; }
         .action-card.income i { color: var(--income); } .action-card.expense i { color: var(--expense); }
         .action-card.debt i { color: var(--debt); } .action-card.receivable i { color: var(--receivable); }
-
-        /* FORMS & FILTERS */
         .form-control { width: 100%; padding: 0.8rem; border: 1px solid var(--border-light); border-radius: 8px; background-color: var(--gray-200); color: var(--text-light); box-sizing: border-box; transition: var(--transition-fast); font-family: var(--font-family); font-size: 16px; }
         body.dark-mode .form-control { background-color: var(--gray-800); }
         .form-control:focus { border-color: var(--primary); outline: none; background-color: var(--card-light); }
         .form-group { margin-bottom: 1.25rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 500; color: var(--subtext-light); }
         .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.5rem 1rem; }
-        .filter-summary { background-color: var(--bg-light); padding: 1rem; border-radius: var(--radius); }
+        /* === NEW & IMPROVED SUMMARY BOX === */
+        .filter-summary {
+            background-color: var(--bg-light);
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.25rem;
+            border-left: 4px solid var(--primary);
+        }
         body.dark-mode .filter-summary { background-color: var(--card-dark); }
         .filter-summary h4 { margin: 0 0 1rem; font-size: 1rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.75rem; }
-        .filter-summary .summary-details { display: flex; justify-content: space-around; text-align: center; }
-        .filter-summary .summary-details span { font-size: 0.9rem; color: var(--subtext-light); }
-        .filter-summary .summary-details strong { display: block; font-size: 1.25rem; color: var(--text-light); margin-top: 0.25rem; }
-
-
-        /* LISTS */
+        .filter-summary .summary-details { display: flex; justify-content: space-around; text-align: center; flex-wrap: wrap; gap: 1rem;}
+        .filter-summary .summary-details > div { display: flex; flex-direction: column; }
+        .filter-summary .summary-details span { font-size: 0.9rem; color: var(--subtext-light); margin-bottom: 0.25rem; }
+        .filter-summary .summary-details strong { display: block; font-size: 1.25rem; color: var(--text-light); font-weight: 600; }
         .list-status { text-align: center; color: var(--subtext-light); padding: 3rem 1rem; }
         .list-container { list-style: none; padding: 0; margin: 0 -1.25rem; }
-        .list-container li { display: flex; align-items: center; gap: 1rem; padding: 0.8rem 1.25rem; transition: background-color var(--transition-fast); border-bottom: 1px solid var(--border-light); cursor: pointer; }
+        .list-container li { display: flex; align-items: center; gap: 1rem; padding: 0.8rem 1.25rem; transition: background-color 0.2s, transform 0.2s, filter 0.2s; border-bottom: 1px solid var(--border-light); cursor: pointer; }
         .list-container li:last-child { border-bottom: none; }
-        .list-container li:active { background-color: var(--gray-200); }
-        body.dark-mode .list-container li:active { background-color: var(--gray-800); }
-        
+
         .item-icon { font-size: 1rem; width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; flex-shrink: 0; }
         .item-icon.income { background-color: var(--income-bg-light); color: var(--income); }
         .item-icon.expense, .item-icon.debt, .item-icon.issuedCheck { background-color: var(--expense-bg-light); color: var(--expense); }
         .item-icon.transfer { background-color: rgba(255, 149, 0, 0.15); color: var(--transfer); }
         .item-icon.receivable, .item-icon.receivedCheck { background-color: var(--income-bg-light); color: var(--income); }
         .item-icon.installmentPayment { background-color: rgba(175, 82, 222, 0.15); color: var(--loan); }
-        
         .item-info { flex-grow: 1; min-width: 0; }
         .item-info p { margin: 0 0 0.2rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .item-info .meta-data { font-size: 0.8rem; color: var(--subtext-light); display: flex; flex-wrap: wrap; gap: 0.2rem 0.8rem;}
         .item-amount { font-weight: 600; font-size: 1.1rem; direction: ltr; margin-left: 0.5rem; }
         .item-amount.income { color: var(--income); }
         .item-amount.expense { color: var(--expense); }
-
         .item-actions { display: flex; margin-left: auto; align-items: center; gap: 0.2rem; }
         .action-btn { background: none; border: none; color: var(--subtext-light); cursor: pointer; font-size: 0.9rem; transition: var(--transition-fast); padding: 0.5rem; }
-        .action-btn.edit-btn:hover { color: var(--primary); } 
+        .action-btn.edit-btn:hover { color: var(--primary); }
         .action-btn.delete-btn:hover { color: var(--expense); }
-        
         .due-date-info.overdue { color: var(--expense); font-weight: bold; }
         .meta-data .meta-status { font-weight: 600; }
         .meta-data .meta-status.success { color: var(--income); }
         .meta-data .meta-status.danger { color: var(--expense); }
         .check-badge { font-size: 0.7rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; background-color: var(--primary); color: white; vertical-align: middle; margin-right: 5px; }
-
-
-        /* PROGRESS BARS (LOANS & GOALS) */
         .progress-item { margin-bottom: 1.5rem; }
         .progress-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
         .progress-header h4 { margin: 0; font-size: 1.1rem; }
@@ -282,8 +276,6 @@
         .progress-bar { height: 100%; border-radius: 4px; transition: width 0.5s ease-in-out; }
         .progress-bar.loan { background-color: var(--loan); } .progress-bar.goal { background-color: var(--goal); }
         .progress-text { text-align: center; color: var(--subtext-light); font-size: 0.85rem; }
-        
-        /* REPORTS PAGE */
         #daily-reports-list { display: flex; flex-direction: column; gap: 1rem; }
         .daily-report-item { background: var(--card-light); border-radius: var(--radius); overflow: hidden; border-left: 4px solid; transition: var(--transition-medium); }
         .daily-report-item[data-net-flow='0'] { border-left-color: var(--subtext-light); }
@@ -295,26 +287,23 @@
         .daily-report-item.active .expand-arrow { transform: rotate(180deg); }
         .date-info .day-of-week { font-weight: 600; font-size: 1rem; color: var(--text-light); }
         .date-info .date-full { font-size: 0.8rem; color: var(--subtext-light); }
-        .flow-summary { display: none; } /* Hidden on mobile by default */
-        .expand-arrow { color: var(--subtext-light); font-size: 1rem; transition: var(--transition-fast); }
+        .flow-summary { display: none; }
+        .expand-arrow { color: var(--subtext-light); font-size: 1rem; transition: transform 0.3s; }
         .daily-report-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
         .daily-report-item.active .daily-report-body { max-height: 2000px; }
         .daily-report-body .list-container { margin: 0; background-color: var(--bg-light); }
         body.dark-mode .daily-report-body .list-container { background-color: var(--bg-dark); }
-
-
-        /* BOTTOM NAV & FAB */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: calc(var(--nav-height) + var(--safe-area-bottom)); background-color: rgba(249, 249, 249, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border-light); display: flex; justify-content: space-around; padding: 5px 0 var(--safe-area-bottom); z-index: 100; }
         body.dark-mode .bottom-nav { background-color: rgba(28, 28, 30, 0.85); }
-        .nav-btn { background: none; border: none; color: var(--subtext-light); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; font-family: var(--font-family); cursor: pointer; transition: var(--transition-fast); flex: 1; height: 100%; padding-top: 5px; }
+        .nav-btn { background: none; border: none; color: var(--subtext-light); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; font-family: var(--font-family); cursor: pointer; transition: color 0.2s, transform 0.2s, filter 0.2s; flex: 1; height: 100%; padding-top: 5px; }
         .nav-btn i { font-size: 1.3rem; } .nav-btn span { font-size: 0.65rem; font-weight: 500;}
         .nav-btn.active { color: var(--primary); }
-
-        .fab { position: fixed; bottom: calc(var(--nav-height) + var(--safe-area-bottom) - 30px); left: 50%; transform: translateX(-50%); width: 56px; height: 56px; background-color: var(--primary); color: white; border: 4px solid var(--bg-light); border-radius: 50%; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(0, 122, 255, 0.4); cursor: pointer; transition: var(--transition-medium); z-index: 101; }
+        .fab { position: fixed; bottom: calc(var(--nav-height) + var(--safe-area-bottom) - 30px); left: 50%; transform: translateX(-50%); width: 56px; height: 56px; background-color: var(--primary); color: white; border: 4px solid var(--bg-light); border-radius: 50%; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(0, 122, 255, 0.4); cursor: pointer; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s; z-index: 101; }
         body.dark-mode .fab { border-color: var(--bg-dark); }
-        
-        /* MODALS */
-        .modal-overlay { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.4); opacity: 0; visibility: hidden; transition: var(--transition-medium); z-index: 1000; display: flex; justify-content: center; align-items: flex-end; }
+        .fab:active {
+            transform: translateX(-50%) scale(0.95);
+        }
+        .modal-overlay { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px); opacity: 0; visibility: hidden; transition: opacity var(--transition-medium), visibility var(--transition-medium); z-index: 1000; display: flex; justify-content: center; align-items: flex-end; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .modal-content { background-color: var(--bg-light); width: 100%; max-width: 100%; padding: 1rem 1rem calc(1rem + var(--safe-area-bottom)); border-radius: 20px 20px 0 0; transform: translateY(100%); transition: transform var(--transition-medium); max-height: 90vh; overflow-y: auto; }
         .modal-overlay.active .modal-content { transform: translateY(0); }
@@ -324,16 +313,13 @@
         .modal-content h3 { margin: 0; font-size: 1.25rem; }
         .form-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
         .form-actions .btn { flex: 1; padding: 1rem; }
-
         #toast { position: fixed; top: calc(var(--header-height) + var(--safe-area-top) + 1rem); left: 50%; background-color: var(--gray-800); color: white; padding: 0.75rem 1.5rem; border-radius: 8px; box-shadow: var(--shadow); z-index: 2000; opacity: 0; visibility: hidden; transform: translate(-50%, -20px); transition: var(--transition-medium); }
         body.dark-mode #toast { background-color: var(--gray-200); color: var(--gray-900); }
         #toast.show { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
-        
-        /* DESKTOP / LARGE SCREEN OVERRIDES */
         @media (min-width: 641px) {
             .modal-overlay { align-items: center; }
-            .modal-content { width: 90%; max-width: 480px; border-radius: var(--radius); transform: scale(0.9); padding-bottom: 1.5rem; }
-            .modal-overlay.active .modal-content { transform: scale(1); }
+            .modal-content { width: 90%; max-width: 480px; border-radius: var(--radius); transform: translateY(20px) scale(0.95); padding-bottom: 1.5rem; }
+            .modal-overlay.active .modal-content { transform: translateY(0) scale(1); }
             .modal-content .modal-header::before { display: none; }
             .flow-summary { display: flex; gap: 1rem; align-items: center; }
             .flow-item { display: flex; align-items: center; gap: 0.5rem; font-weight: 500; font-size: 0.9rem; }
@@ -341,16 +327,14 @@
     </style>
 </head>
 <body>
-
     <div class="app-wrapper">
         <header class="app-header">
-            <h1 id="app-header-title">داشبورد</h1>
+            <h1 id="app-header-title">حسابداری شخصی شمار</h1>
             <div class="header-controls">
                  <i class="fas fa-cog" id="settings-btn"></i>
                 <div class="theme-switcher"><i class="fas fa-sun" id="theme-toggle"></i></div>
             </div>
         </header>
-
         <main class="app-content">
             <section id="dashboard-page" class="page active">
                 <div class="card-section main-balance">
@@ -410,9 +394,7 @@
             <section id="loans-page" class="page"></section>
             <section id="accounts-page" class="page"></section>
         </main>
-
         <button class="fab" data-action="add-transaction"><i class="fas fa-plus"></i></button>
-
         <nav class="bottom-nav">
             <button class="nav-btn active" data-page="dashboard-page" data-title="داشبورد"><i class="fas fa-tachometer-alt"></i><span>داشبورد</span></button>
             <button class="nav-btn" data-page="transactions-page" data-title="تراکنش‌ها"><i class="fas fa-exchange-alt"></i><span>تراکنش‌ها</span></button>
@@ -420,7 +402,6 @@
             <button class="nav-btn" data-action="open-more-menu"><i class="fas fa-ellipsis-h"></i><span>بیشتر</span></button>
         </nav>
     </div>
-
     <div class="modal-overlay" id="transaction-modal-overlay"></div>
     <div class="modal-overlay" id="account-modal-overlay"></div>
     <div class="modal-overlay" id="loan-modal-overlay"></div>
@@ -436,11 +417,37 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment-jalaali@0.9.2/build/moment-jalaali.js"></script>
     <script src="https://unpkg.com/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
-
 <script>
-// The JavaScript code remains the same as your provided script.
-// The changes needed were only in the HTML and CSS.
-// You can paste your entire original <script> block here.
+// === PWA Service Worker Registration (for install prompt) ===
+if ('serviceWorker' in navigator) {
+  const swCode = `self.addEventListener('fetch', () => {});`;
+  const swBlob = new Blob([swCode], {type: 'application/javascript'});
+  const swUrl = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swUrl)
+    .then(registration => {
+      console.log('Service Worker registered successfully:', registration);
+    })
+    .catch(error => {
+      console.error('Service Worker registration failed:', error);
+    });
+}
+// === End of PWA script ===
+
+// === PWA Install Prompt Handling ===
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    console.log('`beforeinstallprompt` event was fired.');
+});
+
+window.addEventListener('appinstalled', () => {
+    deferredPrompt = null;
+    console.log('PWA was installed');
+});
+// === End of PWA Install Handling ===
+
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- SELECTORS ---
     const qs = (selector, parent = document) => parent.querySelector(selector);
@@ -451,7 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
     moment.updateLocale('fa', { jMonths: "فروردین_اردیبهشت_خرداد_تیر_مرداد_شهریور_مهر_آبان_آذر_دی_بهمن_اسفند".split("_"), weekdays: "یک‌شنبه_دوشنبه_سه‌شنبه_چهارشنبه_پنج‌شنبه_جمعه_شنبه".split("_"), weekdaysMin: "ی_د_s_چ_پ_ج_ش".split("_"),});
     const MOMENT_FORMAT = 'YYYY/MM/DD';
     const JALALI_DISPLAY_FORMAT = 'jYYYY/jMM/jDD';
-    const STORAGE_KEY = 'accountingApp_ios_v4_fixed';
+    const STORAGE_KEY = 'accountingApp_ios_v5_enhanced';
     const TRANSACTION_TYPES = { income: '✅ دریافتی', expense: '❌ هزینه', transfer: '⤴️ انتقال به پس انداز', receivable: '💰 طلب', debt: '➖ بدهی', receivedCheck: '📄 چک دریافتی', issuedCheck: '📄 چک صادره', installmentPayment: '💳 پرداخت قسط' };
     const STATUS_TYPES = { debt: { paid: 'پرداخت شد', pending: 'در انتظار', not_paid: 'پرداخت نشد' }, receivable: { received: 'دریافت شد', pending: 'در انتظار', not_received: 'دریافت نشد' }, issuedCheck: { cleared: 'پاس شده', pending: 'در انتظار', bounced: 'پاس نشد' }, receivedCheck: { cleared: 'پاس شده', pending: 'در انتظار', bounced: 'پاس نشد' } };
 
@@ -460,7 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let itemToDelete = { id: null, type: null };
     let preChangeSelectValue = null;
     let currentPageId = 'dashboard-page';
-    
+
     // --- HELPERS ---
     const formatCurrency = (amount) => `${(Number(amount) || 0).toLocaleString('fa-IR')}`;
     const getUnformattedAmount = (value) => { if (typeof value !== 'string') return ''; return normalizeDigits(value).replace(/[,٬]/g, ''); };
@@ -477,7 +484,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (originalCursor !== null) { input.setSelectionRange(originalCursor + (newLength - originalLength), originalCursor + (newLength - originalLength)); }
     };
     const showToast = (message) => { const t = qs('#toast'); t.textContent = message; t.classList.add('show'); setTimeout(() => { t.classList.remove('show'); }, 3000); };
-    
+    // === NEW: Haptic Feedback Helper ===
+    const triggerHapticFeedback = (duration = 1) => { if (navigator.vibrate) { try { navigator.vibrate(duration); } catch(e) { /* Fail silently */ } } };
+
     const openModal = (modalId) => {
         qs(modalId)?.classList.add('active');
         document.body.classList.add('modal-open');
@@ -493,25 +502,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const switchPage = (pageId, title) => {
         const oldPage = qs(`#${currentPageId}`);
         const newPage = qs(`#${pageId}`);
-        
+
         if (oldPage && newPage) {
             oldPage.classList.remove('active');
         }
-        
+
         newPage.classList.add('active');
         currentPageId = pageId;
         qs('#app-header-title').textContent = title;
-        
+
         qsa('.nav-btn').forEach(b => {
              b.classList.toggle('active', b.dataset.page === pageId);
         });
-
         const moreMenuPages = ['reports-page', 'savings-page', 'debts-page', 'receivables-page', 'loans-page'];
         const moreMenuBtn = qs('.nav-btn[data-action="open-more-menu"]');
         if (moreMenuBtn) {
             moreMenuBtn.classList.toggle('active', moreMenuPages.includes(pageId));
         }
-        
+
         const pageRenderers = { 'dashboard-page': renderDashboardPage, 'transactions-page': renderTransactionsPage, 'reports-page': renderReportsPage, 'savings-page': renderSavingsPage, 'accounts-page': renderAccountsPage, 'debts-page': renderDebtsPage, 'receivables-page': renderReceivablesPage, 'loans-page': renderLoansPage };
         pageRenderers[pageId]?.();
         qs('.app-content').scrollTo(0, 0);
@@ -521,11 +529,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- DATA PERSISTENCE ---
     const saveData = () => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); localStorage.setItem(STORAGE_KEY + '_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); } catch (e) { console.error("Failed to save data", e); } };
     const loadData = () => { try { const data = localStorage.getItem(STORAGE_KEY); if (data) { const parsedData = JSON.parse(data); const defaultFilters = { transactions: { searchTerm: '', from: null, to: null, type: 'all', accountId: 'all', category: 'all' }, reports: { from: null, to: null, accountId: 'all' }, debts: { from: null, to: null, accountId: 'all', status: 'all' }, receivables: { from: null, to: null, accountId: 'all', status: 'all' } }; parsedData.filters = { ...defaultFilters, ...(parsedData.filters || {}) }; state = { ...state, ...parsedData }; } if (state.accounts.length === 0) { state.accounts.push({ id: Date.now(), name: 'حساب اصلی' }); } if (!Array.isArray(state.savingsGoals)) state.savingsGoals = []; if (localStorage.getItem(STORAGE_KEY + '_theme') === 'dark') { document.body.classList.add('dark-mode'); updateThemeIcon(); } } catch (e) { console.error("Failed to load data", e); } };
-    
+
     // --- UI RENDERING ---
     const updateAllUI = () => {
-        const activeNavBtn = qs('.nav-btn.active');
-        if (activeNavBtn) switchPage(activeNavBtn.dataset.page, activeNavBtn.dataset.title);
+        const currentPageTitle = qs('#app-header-title').textContent;
+        if (currentPageId) {
+            switchPage(currentPageId, currentPageTitle);
+        }
     };
 
     const calculateBalance = (transactions) => {
@@ -576,12 +586,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <i class="fas fa-chevron-left" style="color: var(--subtext-light); margin-right: auto;"></i>`;
     };
 
-
-    // --- PAGE RENDERERS ---
     function renderDashboardPage() {
         const page = qs('#dashboard-page');
         if (!page) return;
-
         const accountId = state.activeAccountId;
         const baseTxs = accountId === 'all' ? state.transactions : state.transactions.filter(tx => tx.accountId == accountId);
         const period = state.dashboardPeriod;
@@ -593,26 +600,23 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (period === 'month') startDate = moment().startOf('jMonth');
             filteredTxs = baseTxs.filter(tx => moment(tx.date, MOMENT_FORMAT).isAfter(startDate));
         }
-
         const balance = calculateBalance(baseTxs);
         const income = filteredTxs.filter(tx => tx.type === 'income').reduce((acc, tx) => acc + tx.amount, 0);
         const expenses = filteredTxs.filter(tx => tx.type === 'expense').reduce((acc, tx) => acc + tx.amount, 0);
         const totalDebt = filteredTxs.filter(t => (t.type === 'debt' || t.type === 'issuedCheck') && t.status === 'pending').reduce((s, t) => s + t.amount, 0);
         const totalReceivable = filteredTxs.filter(t => (t.type === 'receivable' || t.type === 'receivedCheck') && t.status === 'pending').reduce((s, t) => s + t.amount, 0);
         const totalLoanRemaining = state.loans.reduce((s, l) => { const paidCount = state.transactions.filter(t => t.loanId == l.id).length; const remaining = (l.totalInstallments - paidCount) * l.installmentAmount; return s + (remaining > 0 ? remaining : 0); }, 0);
-        
+
         qs('#balance-amount', page).textContent = state.isBalanceVisible ? `${formatCurrency(balance)} تومان` : '******';
         qs('#dashboard-period-filter', page).value = period;
-        
+
         qs('.summary-card.income .card-amount', page).textContent = formatCurrency(income);
         qs('.summary-card.expense .card-amount', page).textContent = formatCurrency(expenses);
         qs('.summary-card.receivable .card-amount', page).textContent = formatCurrency(totalReceivable);
         qs('.summary-card.debt .card-amount', page).textContent = formatCurrency(totalDebt);
         qs('.summary-card.loan .card-amount', page).textContent = formatCurrency(totalLoanRemaining);
-
         populateDropdown(qs('#account-filter-dashboard', page), state.accounts, 'id', 'name', { value: 'all', text: 'همه حساب‌ها' });
         qs('#account-filter-dashboard', page).value = state.activeAccountId;
-
         const recentsList = qs('#dashboard-recents .list-container', page);
         const recents = [...baseTxs].sort((a, b) => b.id - a.id).slice(0, 5);
         if (recents.length === 0) {
@@ -620,7 +624,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             recentsList.innerHTML = recents.map(tx => `<li data-id="${tx.id}">${getTransactionListItemHTML(tx)}</li>`).join('');
         }
-
         const remindersList = qs('#reminders-list', page);
         const today = moment().startOf('day');
         const sevenDaysLater = moment().add(7, 'days').endOf('day');
@@ -664,25 +667,24 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
         populateDropdown(qs('#account-filter', page), state.accounts, 'id', 'name', { value: 'all', text: 'همه حساب‌ها' });
         populateDropdown(qs('#type-filter', page), Object.entries(TRANSACTION_TYPES).map(([k, v]) => ({key: k, val: v})), 'key', 'val', {value: 'all', text: 'همه انواع'});
-        
+
         const filters = state.filters.transactions;
         qs('#search-input').value = filters.searchTerm || '';
         qs('#from-date-filter-tx').value = filters.from ? moment(filters.from, MOMENT_FORMAT).format(JALALI_DISPLAY_FORMAT) : '';
         qs('#to-date-filter-tx').value = filters.to ? moment(filters.to, MOMENT_FORMAT).format(JALALI_DISPLAY_FORMAT) : '';
         qs('#account-filter', page).value = filters.accountId;
         qs('#type-filter', page).value = filters.type;
-        
+
         renderCategoryFilter();
         qs('#category-filter').value = filters.category;
         renderTransactionList();
     }
-    
+
     function renderTransactionList() {
         const listEl = qs('#transaction-list'), statusEl = qs('#transaction-list-status');
         if (!listEl) return;
-        
-        const filters = state.filters.transactions;
 
+        const filters = state.filters.transactions;
         const filtered = state.transactions.filter(tx => {
             const txDate = moment(tx.date, MOMENT_FORMAT);
             if (filters.from && txDate.isBefore(moment(filters.from, MOMENT_FORMAT), 'day')) return false;
@@ -693,9 +695,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (filters.searchTerm && !tx.description.toLowerCase().includes(filters.searchTerm)) return false;
             return true;
         });
-
         const sorted = filtered.sort((a, b) => moment(b.date, MOMENT_FORMAT).diff(moment(a.date, MOMENT_FORMAT)) || b.id - a.id);
-        
+
         listEl.innerHTML = ''; statusEl.textContent = '';
         if (sorted.length === 0) {
             statusEl.textContent = state.transactions.length === 0 ? 'هیچ تراکنشی ثبت نشده است.' : 'موردی با این مشخصات یافت نشد.';
@@ -729,7 +730,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div id="accounts-list" class="list-container" style="margin: 0;"></div>
                 <div id="accounts-status" class="list-status"></div>
             </div>`;
-
         const listEl = qs('#accounts-list', page), statusEl = qs('#accounts-status', page);
         if (state.accounts.length === 0) {
             statusEl.textContent = 'هیچ حسابی تعریف نشده است.';
@@ -738,7 +738,7 @@ document.addEventListener('DOMContentLoaded', () => {
             listEl.innerHTML = state.accounts.map(acc => `<li data-id="${acc.id}" data-type="account">${getAccountListItemHTML(acc)}</li>`).join('');
         }
     }
-    
+
     const applyGenericFilters = (transactions, pageKey) => {
         const filters = state.filters[pageKey];
         return transactions.filter(tx => {
@@ -756,7 +756,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const page = qs(`#${pageId}`);
         if(!page) return;
         const pageKey = pageId.replace('-page', '');
-        
+
         page.innerHTML = `
             <div class="card-section">
                 <div class="section-header"><h3>${title}</h3></div>
@@ -769,35 +769,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             </div>
-            <div class="filter-summary card-section" style="display: none;"></div>
+            <div class="filter-summary" style="display: none;"></div>
             <div class="card-section">
                 <ul class="list-container" id="${pageKey}-list"></ul>
                 <div class="list-status" id="${pageKey}-status"></div>
             </div>
         `;
-        
+
         const listEl = qs(`#${pageKey}-list`);
         const statusEl = qs(`#${pageKey}-status`);
-        
+
         populateDropdown(qs('.account-filter', page), state.accounts, 'id', 'name', { value: 'all', text: 'همه حساب‌ها' });
         qs('.account-filter', page).value = state.filters[pageKey].accountId;
-
         const statusFilterEl = qs('.status-filter', page);
         let statusesToShow = {};
         if (pageKey === 'debts') statusesToShow = { ...STATUS_TYPES.debt, ...STATUS_TYPES.issuedCheck };
         else if (pageKey === 'receivables') statusesToShow = { ...STATUS_TYPES.receivable, ...STATUS_TYPES.receivedCheck };
         populateDropdown(statusFilterEl, Object.entries(statusesToShow).map(([k,v]) => ({key:k, val:v})), 'key', 'val', { value: 'all', text: 'همه وضعیت‌ها' });
         statusFilterEl.value = state.filters[pageKey].status;
-
         qs('.from-date-filter', page).value = state.filters[pageKey].from ? moment(state.filters[pageKey].from, MOMENT_FORMAT).format(JALALI_DISPLAY_FORMAT) : '';
         qs('.to-date-filter', page).value = state.filters[pageKey].to ? moment(state.filters[pageKey].to, MOMENT_FORMAT).format(JALALI_DISPLAY_FORMAT) : '';
-
         const baseTxs = state.transactions.filter(t => txTypes.includes(t.type));
         const filteredTxs = applyGenericFilters(baseTxs, pageKey);
-        
-        const summaryEl = qs('.filter-summary', page);
-        const hasActiveFilters = state.filters[pageKey].from || state.filters[pageKey].to || state.filters[pageKey].accountId !== 'all' || state.filters[pageKey].status !== 'all';
 
+        const summaryEl = qs('.filter-summary', page);
+        const filters = state.filters[pageKey];
+        const hasActiveFilters = filters.from || filters.to || filters.accountId !== 'all' || filters.status !== 'all';
         if (filteredTxs.length > 0 && hasActiveFilters) {
             summaryEl.style.display = 'block';
             const totalAmount = filteredTxs.reduce((sum, tx) => sum + tx.amount, 0);
@@ -805,7 +802,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             summaryEl.style.display = 'none';
         }
-
         const sorted = filteredTxs.sort((a, b) => (a.status === 'paid' || a.status === 'cleared' || a.status === 'received' ? 1 : -1) - (b.status === 'paid' || b.status === 'cleared' || b.status === 'received' ? 1 : -1) || moment(a.dueDate || a.date, MOMENT_FORMAT).diff(moment(b.dueDate || b.date, MOMENT_FORMAT)));
         listEl.innerHTML = ''; statusEl.textContent = '';
         if (sorted.length === 0) {
@@ -814,7 +810,7 @@ document.addEventListener('DOMContentLoaded', () => {
             listEl.innerHTML = sorted.map(tx => `<li data-id="${tx.id}">${getTransactionListItemHTML(tx, { showAccount: true })}</li>`).join('');
         }
     };
-    
+
     const renderDebtsPage = () => renderFilteredListPage('debts-page', 'بدهی‌ها و چک‌های صادره', ['debt', 'issuedCheck']);
     const renderReceivablesPage = () => renderFilteredListPage('receivables-page', 'طلب‌ها و چک‌های دریافتی', ['receivable', 'receivedCheck']);
 
@@ -862,7 +858,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div id="savings-goals-status" class="list-status"></div>
             </div>
         `;
-
         const listEl = qs('#savings-goals-list'), statusEl = qs('#savings-goals-status');
         listEl.innerHTML = ''; statusEl.textContent = '';
         if (state.savingsGoals.length === 0) {
@@ -891,20 +886,44 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             </div>
-             <div class="filter-summary card-section" style="display: none;"></div>
+             <div class="filter-summary" style="display: none;"></div>
             <div id="daily-reports-list"></div>
             <div id="reports-status" class="list-status"></div>
         `;
-        
+
         populateDropdown(qs('.account-filter', page), state.accounts, 'id', 'name', { value: 'all', text: 'همه حساب‌ها' });
         qs('.account-filter', page).value = state.filters.reports.accountId;
         qs('.from-date-filter', page).value = state.filters.reports.from ? moment(state.filters.reports.from, MOMENT_FORMAT).format(JALALI_DISPLAY_FORMAT) : '';
         qs('.to-date-filter', page).value = state.filters.reports.to ? moment(state.filters.reports.to, MOMENT_FORMAT).format(JALALI_DISPLAY_FORMAT) : '';
-        
+
         const filteredTxs = applyGenericFilters(state.transactions, 'reports');
         const dailyListEl = qs('#daily-reports-list', page), statusEl = qs('#reports-status', page);
         dailyListEl.innerHTML = '';
         statusEl.innerHTML = '';
+
+        // === MODIFIED: This section is changed to always show the summary ===
+        const summaryEl = qs('.filter-summary', page);
+        if (filteredTxs.length > 0) {
+            summaryEl.style.display = 'block';
+            let totalIncome = 0;
+            let totalExpense = 0;
+            filteredTxs.forEach(tx => {
+                const amount = tx.amount;
+                if (tx.type === 'income' || (tx.type === 'receivable' && tx.status === 'received') || (tx.type === 'receivedCheck' && tx.status === 'cleared')) totalIncome += amount;
+                if (tx.type === 'expense' || tx.type === 'transfer' || tx.type === 'installmentPayment' || (tx.type === 'debt' && tx.status === 'paid') || (tx.type === 'issuedCheck' && tx.status === 'cleared')) totalExpense += amount;
+            });
+            const netFlow = totalIncome - totalExpense;
+            summaryEl.innerHTML = `<h4>خلاصه فیلتر</h4>
+                <div class="summary-details">
+                    <div><span>مجموع دریافتی</span><strong style="color:var(--income);">${formatCurrency(totalIncome)}</strong></div>
+                    <div><span>مجموع پرداختی</span><strong style="color:var(--expense);">${formatCurrency(totalExpense)}</strong></div>
+                    <div><span>جریان خالص</span><strong style="color:${netFlow >= 0 ? 'var(--income)' : 'var(--expense)'};">${formatCurrency(netFlow)}</strong></div>
+                </div>`;
+        } else {
+            summaryEl.style.display = 'none';
+        }
+        // === END OF MODIFICATION ===
+
         if (state.transactions.length === 0) {
             statusEl.innerHTML = 'برای نمایش گزارش، ابتدا تراکنشی ثبت کنید.'; return;
         }
@@ -920,7 +939,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return acc;
         }, {});
-        
+
         const sortedDays = Object.keys(groupedByDay).sort((a, b) => moment(b, MOMENT_FORMAT).diff(moment(a, MOMENT_FORMAT)));
         if (sortedDays.length === 0) statusEl.textContent = 'هیچ موردی با این فیلتر یافت نشد.';
         dailyListEl.innerHTML = sortedDays.map(day => {
@@ -946,18 +965,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
+    const populateDropdown = (selectEl, data, valueField, textField, addOption) => {
+         if (!selectEl) return;
+        let currentValue = selectEl.value;
+         selectEl.innerHTML = '';
+         if (addOption) { const opt = document.createElement('option'); opt.value = addOption.value; opt.textContent = addOption.text; selectEl.appendChild(opt); }
+         data.forEach(item => { const option = document.createElement('option'); option.value = item[valueField]; option.textContent = item[textField]; selectEl.appendChild(option); });
+         if (selectEl.classList.contains('account-dropdown')) { selectEl.innerHTML += `<option value="add_new_account" style="font-weight: bold; color: var(--primary);">+ افزودن حساب جدید...</option>`; }
+         selectEl.value = currentValue;
+     };
 
-    // --- MODAL CONTENT RENDERERS ---
-    const populateDropdown = (selectEl, data, valueField, textField, addOption) => { 
-        if (!selectEl) return;
-        let currentValue = selectEl.value; 
-        selectEl.innerHTML = ''; 
-        if (addOption) { const opt = document.createElement('option'); opt.value = addOption.value; opt.textContent = addOption.text; selectEl.appendChild(opt); } 
-        data.forEach(item => { const option = document.createElement('option'); option.value = item[valueField]; option.textContent = item[textField]; selectEl.appendChild(option); }); 
-        if (selectEl.classList.contains('account-dropdown')) { selectEl.innerHTML += `<option value="add_new_account" style="font-weight: bold; color: var(--primary);">+ افزودن حساب جدید...</option>`; } 
-        selectEl.value = currentValue; 
-    };
-    
     const renderTransactionModal = (txId = null, type = null) => {
         const modal = qs('#transaction-modal-overlay');
         modal.innerHTML = `
@@ -978,16 +995,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="form-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">انصراف</button><button type="submit" class="btn btn-primary">ثبت</button></div>
                 </form>
             </div>`;
-        
+
         const form = qs('#transaction-form', modal);
         qs('#transaction-modal-title', modal).textContent = txId ? 'ویرایش تراکنش' : 'تراکنش جدید';
         qs('#transaction-id', form).value = txId || '';
-        
+
         populateDropdown(qs('#type', form), Object.entries(TRANSACTION_TYPES).map(([k, v]) => ({key: k, val: v})), 'key', 'val');
         populateDropdown(qs('#account-select', form), state.accounts, 'id', 'name');
-
         if (type) qs('#type', form).value = type;
-        
+
         if (txId) {
             const tx = state.transactions.find(t => t.id == txId);
             qs('#type', form).value = tx.type;
@@ -1000,12 +1016,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (tx.status) qs('#status-select', form).value = tx.status;
             if (tx.category) qs('#category-select', form).value = tx.category;
             if (tx.loanId) qs('#loan-select', form).value = tx.loanId;
-
         } else {
             qs('#transaction-date', form).value = moment().format(JALALI_DISPLAY_FORMAT);
             qs('#status-select', form).value = 'pending';
         }
-        
+
         handleTransactionFormChange();
         initDatepickers(modal);
         openModal('#transaction-modal-overlay');
@@ -1016,13 +1031,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!form) return;
         const typeVal = qs('#type', form).value;
         const statusTypes = ['debt', 'receivable', 'issuedCheck', 'receivedCheck'];
-        
+
         qs('#status-group', form).style.display = statusTypes.includes(typeVal) ? 'block' : 'none';
         qs('#due-date-group', form).style.display = statusTypes.includes(typeVal) ? 'block' : 'none';
         qs('#category-group', form).style.display = ['income', 'expense'].includes(typeVal) ? 'block' : 'none';
         qs('#loan-payment-group', form).style.display = typeVal === 'installmentPayment' ? 'block' : 'none';
         qs('#new-category-group', form).style.display = 'none';
-
         if (statusTypes.includes(typeVal)) {
             populateDropdown(qs('#status-select', form), Object.entries(STATUS_TYPES[typeVal] || {}).map(([k, v]) => ({key: k, val: v})), 'key', 'val');
         }
@@ -1061,7 +1075,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </form>
             </div>`;
-
         if (accId) {
             const acc = state.accounts.find(a => a.id == accId);
             if (acc) {
@@ -1074,7 +1087,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         openModal('#account-modal-overlay');
     };
-    
+
     const renderMoreMenuModal = () => {
         const modal = qs('#more-menu-modal-overlay');
         modal.innerHTML = `
@@ -1088,7 +1101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <li class="more-menu-item" data-page="savings-page" data-title="پس‌انداز"><div class="item-icon goal" style="background-color:rgba(50, 173, 234, 0.15); color:var(--cyan-ios);"><i class="fas fa-piggy-bank"></i></div><div class="item-info"><p>اهداف و پس‌انداز</p></div><i class="fas fa-chevron-left"></i></li>
                 </ul>
                      <div style="text-align: center; padding: 15px 10px 5px; font-size: 0.75rem; color: var(--subtext-light);">
-                       وب اپلیکیشن حسابداری نسخه 0.02 | طراحی و کدنویسی شده توسط پیمان عابدین پور
+                       وب اپلیکیشن حسابداری شخصی شمار نسخه 0.3 | طراحی و کدنویسی شده توسط پیمان عابدین پور
                        </div>
             </div>`;
         openModal('#more-menu-modal-overlay');
@@ -1111,7 +1124,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderSettingsModal = () => {
         qs('#settings-modal-overlay').innerHTML = `
             <div class="modal-content">
-                <div class="modal-header"><h3>پشتیبان‌گیری و بازگردانی</h3></div>
+                <div class="modal-header"><h3>تنظیمات و پشتیبان‌گیری</h3></div>
                 <p style="text-align: center; color: var(--subtext-light); margin-bottom: 2rem;">از اطلاعات خود فایل پشتیبان تهیه کنید یا اطلاعات قبلی خود را بازیابی نمایید.</p>
                 <div class="form-actions" style="flex-direction: column; gap: 1rem;">
                     <button class="btn btn-success" id="backup-btn" style="width: 100%;">
@@ -1122,10 +1135,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     </button>
                     <input type="file" id="restore-file-input" accept=".db,.json" style="display: none;">
                 </div>
+                <div class="form-actions" style="margin-top: 1.5rem; flex-direction: column; gap: 1rem;">
+                     <button class="btn btn-primary" id="install-pwa-btn" style="width:100%; display: none; background-color: var(--purple-ios);">
+                        <i class="fas fa-cloud-download-alt" style="margin-left: 8px;"></i> نصب برنامه
+                     </button>
+                </div>
                 <div class="form-actions" style="margin-top: 2rem; justify-content: center;">
                     <button type="button" class="btn btn-secondary" data-action="close-modal">بستن</button>
                 </div>
             </div>`;
+
+        if (deferredPrompt) {
+            const installBtn = qs('#install-pwa-btn');
+            if (installBtn) installBtn.style.display = 'flex';
+        }
         openModal('#settings-modal-overlay');
     };
 
@@ -1169,7 +1192,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         openModal('#goal-modal-overlay');
     };
-    
+
     const renderAccountDetailsModal = (accId) => {
         const acc = state.accounts.find(a => a.id == accId);
         if(!acc) return;
@@ -1191,14 +1214,16 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal('#account-details-modal-overlay');
     };
 
-
-    // --- EVENT HANDLERS ---
     const setupEventListeners = () => {
         document.body.addEventListener('click', (e) => {
             const target = e.target;
             const closest = (selector) => target.closest(selector);
 
-            // Navigation
+            // Add haptic feedback to common interactions
+            if (closest('.nav-btn, .fab, .action-card, .btn, .more-menu-item, #theme-toggle, #toggle-balance-visibility')) {
+                triggerHapticFeedback();
+            }
+
             const navBtn = closest('.nav-btn');
             if (navBtn && navBtn.dataset.page) { switchPage(navBtn.dataset.page, navBtn.dataset.title); return; }
             if (closest('[data-action="open-more-menu"]')) { renderMoreMenuModal(); return; }
@@ -1210,14 +1235,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 150);
                 return;
             }
-
-            // Modal Actions
             if (target.matches('.modal-overlay') || closest('[data-action="close-modal"]')) { closeModal('#' + closest('.modal-overlay').id); return; }
             if (closest('.fab')) { renderTransactionModal(); return; }
             if (closest('[data-action="add-account"]')) { renderAccountModal(); return; }
             if (closest('#settings-btn')) { renderSettingsModal(); return; }
-            
-            // Quick Actions & Page Buttons
+
             const quickAction = closest('.action-card');
             if(quickAction) {
                 const action = quickAction.dataset.action;
@@ -1227,13 +1249,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(action === 'quick-add-receivable') renderTransactionModal(null, 'receivable');
                 return;
             }
+
             if(closest('[data-action="add-to-fund"]')) { renderTransactionModal(null, 'transfer'); return; }
             if(closest('[data-action="add-loan"]')) { renderLoanModal(); return; }
             if(closest('[data-action="add-goal"]')) { renderGoalModal(); return; }
             if(closest('[data-action="go-to-loans"]')) { e.preventDefault(); closeModal('#transaction-modal-overlay'); switchPage('loans-page', 'اقساط'); return; }
             if(closest('[data-action="edit-account"]')) { closeModal('#account-details-modal-overlay'); renderAccountModal(closest('[data-action="edit-account"]').dataset.id); return; }
 
-            // List Item Clicks
             const listItem = closest('.list-container li[data-id]');
             if(listItem && !closest('.action-btn')) {
                 const id = listItem.dataset.id;
@@ -1243,13 +1265,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Action Buttons within lists (Edit, Delete)
             const actionBtn = closest('.action-btn');
             if (actionBtn) {
                 e.stopPropagation();
                 const id = actionBtn.dataset.id;
                 const type = actionBtn.dataset.type;
-
                 if (actionBtn.classList.contains('edit-btn')) {
                     if (type === 'goal') renderGoalModal(id);
                     else if (type === 'transaction') renderTransactionModal(id);
@@ -1260,7 +1280,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Delete from modals
             const deleteBtn = closest('[data-action="delete-item"]');
             if(deleteBtn){
                 itemToDelete = {id: parseInt(deleteBtn.dataset.id), type: deleteBtn.dataset.type};
@@ -1272,43 +1291,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 return;
             }
-
             if(closest('#confirm-delete-btn')) { handleDelete(); return; }
-
-            // Theme & Balance Visibility
             if (closest('#theme-toggle')) { document.body.classList.toggle('dark-mode'); updateThemeIcon(); saveData(); }
             if (closest('#toggle-balance-visibility')) { state.isBalanceVisible = !state.isBalanceVisible; saveData(); renderDashboardPage(); }
-
-            // Reports Page
             if (closest('.daily-report-header')) { closest('.daily-report-item').classList.toggle('active'); }
-
-            // Data Management
             if (closest('#backup-btn')) { handleBackup(); return; }
             if (closest('#restore-btn')) { qs('#restore-file-input').click(); return; }
             if (closest('#export-csv-btn')) { exportTransactionsToCSV(); return; }
             if (closest('#clear-tx-filters-btn')) { state.filters.transactions = { searchTerm: '', from: null, to: null, type: 'all', accountId: 'all', category: 'all' }; renderTransactionsPage(); saveData(); return; }
+
+            if (closest('#install-pwa-btn')) {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            showToast('برنامه با موفقیت نصب شد.');
+                        } else {
+                            showToast('نصب برنامه لغو شد.');
+                        }
+                        deferredPrompt = null;
+                        closeModal('#settings-modal-overlay');
+                    });
+                }
+                return;
+            }
         });
-        
-        // Form Submissions
+
         document.body.addEventListener('submit', (e) => {
             e.preventDefault();
+            triggerHapticFeedback(5); // Stronger feedback on submit
             if(e.target.id === 'transaction-form'){ handleTransactionSubmit(e.target); }
             if(e.target.id === 'account-form'){ handleAccountSubmit(e.target); }
             if(e.target.id === 'loan-form'){ handleLoanSubmit(e.target); }
             if(e.target.id === 'goal-form'){ handleGoalSubmit(e.target); }
         });
 
-        // Filters Listeners
         document.body.addEventListener('change', (e) => {
             const target = e.target;
             if(target.id === 'dashboard-period-filter') { state.dashboardPeriod = target.value; saveData(); renderDashboardPage(); }
             if(target.id === 'account-filter-dashboard') { if(target.value !== 'add_new_account') { state.activeAccountId = target.value; saveData(); renderDashboardPage(); } }
-            
+
             const txFilters = target.closest('#transactions-page .transaction-filters');
             if(txFilters){
                 if(target.id === 'type-filter') {
-                    state.filters.transactions.category = 'all'; // Reset category when type changes
-                    renderCategoryFilter();
+                    state.filters.transactions.category = 'all';
+                     renderCategoryFilter();
                 }
                 state.filters.transactions.accountId = qs('#account-filter', txFilters).value;
                 state.filters.transactions.type = qs('#type-filter', txFilters).value;
@@ -1338,21 +1365,23 @@ document.addEventListener('DOMContentLoaded', () => {
             if (target.matches('#transaction-form #type')) { handleTransactionFormChange(); }
             if (target.matches('#transaction-form #category-select')) { qs('#new-category-group').style.display = target.value === 'add-new' ? 'block' : 'none'; }
         });
+
         document.body.addEventListener('input', (e) => {
             const txFilters = e.target.closest('#transactions-page .transaction-filters');
-            if(e.target.id === 'search-input' && txFilters) { 
-                state.filters.transactions.searchTerm = e.target.value.toLowerCase();
-                renderTransactionList(); 
-                saveData();
+            if(e.target.id === 'search-input' && txFilters) {
+                 state.filters.transactions.searchTerm = e.target.value.toLowerCase();
+                renderTransactionList();
+                 saveData();
             }
             if(e.target.classList.contains('currency-input')) formatInputAsCurrency(e.target);
         });
+
         document.body.addEventListener('mousedown', e => { if (e.target.tagName === 'SELECT' && e.target.classList.contains('account-dropdown')) { preChangeSelectValue = e.target.value; } });
         document.body.addEventListener('change', e => { if (e.target.tagName === 'SELECT' && e.target.classList.contains('account-dropdown')) { if (e.target.value === 'add_new_account') { const selectEl = e.target; selectEl.value = preChangeSelectValue; let modal = selectEl.closest('.modal-overlay'); if (modal) closeModal('#' + modal.id); switchPage('accounts-page', 'حساب‌ها'); setTimeout(() => renderAccountModal(), 150); } } });
+
         qs('#restore-file-input').addEventListener('change', handleRestore);
     };
 
-    // --- FORM SUBMISSION & DELETE LOGIC ---
     function handleTransactionSubmit(form) {
         const id = qs('#transaction-id', form).value;
         const type = qs('#type', form).value;
@@ -1385,10 +1414,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const id = qs('#account-id', form).value;
         const name = qs('#account-name', form).value.trim();
         if (!name) { showToast('نام حساب الزامی است.'); return; }
-        const accountData = { 
-            name: name,
-            cardNumber: qs('#card-number', form).value.trim(), 
-            accountNumber: qs('#account-number', form).value.trim(),
+        const accountData = {
+             name: name,
+            cardNumber: qs('#card-number', form).value.trim(),
+             accountNumber: qs('#account-number', form).value.trim(),
             shabaNumber: qs('#shaba-number', form).value.trim(),
             notes: qs('#notes', form).value.trim(),
         };
@@ -1424,15 +1453,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleDelete() {
-        if (itemToDelete.type === 'transaction') { state.transactions = state.transactions.filter(i => i.id !== itemToDelete.id); } 
-        else if (itemToDelete.type === 'loan') { state.loans = state.loans.filter(i => i.id !== itemToDelete.id); state.transactions = state.transactions.filter(t => t.loanId != itemToDelete.id); } 
-        else if (itemToDelete.type === 'goal') { state.savingsGoals = state.savingsGoals.filter(i => i.id !== itemToDelete.id); } 
-        else if (itemToDelete.type === 'account') { if (state.transactions.some(t => t.accountId == itemToDelete.id)) { showToast('امکان حذف حساب دارای تراکنش وجود ندارد.'); closeModal('#confirm-modal-overlay'); return; } state.accounts = state.accounts.filter(i => i.id !== itemToDelete.id); }
+        if (itemToDelete.type === 'transaction') { state.transactions = state.transactions.filter(i => i.id !== itemToDelete.id); }
+         else if (itemToDelete.type === 'loan') { state.loans = state.loans.filter(i => i.id !== itemToDelete.id); state.transactions = state.transactions.filter(t => t.loanId != itemToDelete.id); }
+         else if (itemToDelete.type === 'goal') { state.savingsGoals = state.savingsGoals.filter(i => i.id !== itemToDelete.id); }
+         else if (itemToDelete.type === 'account') { if (state.transactions.some(t => t.accountId == itemToDelete.id)) { showToast('امکان حذف حساب دارای تراکنش وجود ندارد.'); closeModal('#confirm-modal-overlay'); return; } state.accounts = state.accounts.filter(i => i.id !== itemToDelete.id); }
         showToast('مورد با موفقیت حذف شد.');
         saveData(); updateAllUI(); closeModal('#confirm-modal-overlay');
     }
 
-    // --- DATA MANAGEMENT ---
     const handleBackup = () => {
         try {
             const dataStr = JSON.stringify(state);
@@ -1440,13 +1468,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'accounting_backup.json';
+            a.download = 'shomar_backup.json';
             a.click();
             URL.revokeObjectURL(url);
             showToast('فایل پشتیبان با موفقیت ایجاد شد.');
             closeModal('#settings-modal-overlay');
         } catch (e) { showToast('خطا در ایجاد فایل پشتیبان.'); }
     };
+
     const handleRestore = (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -1466,6 +1495,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         reader.readAsText(file);
     };
+
     const exportTransactionsToCSV = () => {
         const filters = state.filters.transactions;
         const filteredTxs = state.transactions.filter(tx => {
@@ -1478,7 +1508,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (filters.searchTerm && !tx.description.toLowerCase().includes(filters.searchTerm)) return false;
             return true;
         });
-
         if (filteredTxs.length === 0) { showToast('هیچ تراکنشی (با فیلترهای فعلی) برای خروجی گرفتن وجود ندارد.'); return; }
         const escapeCsvField = (field) => { const str = String(field ?? ''); if (str.includes(',') || str.includes('"') || str.includes('\n')) { return `"${str.replace(/"/g, '""')}"`; } return str; };
         const headers = ['تاریخ', 'نوع', 'توضیحات', 'مبلغ', 'حساب', 'دسته/منبع', 'وضعیت', 'تاریخ سررسید'];
@@ -1510,17 +1539,18 @@ document.addEventListener('DOMContentLoaded', () => {
             $(parent).find(".pdate").pDatepicker({ format: 'YYYY/MM/DD', calendarType: 'persian', autoClose: true, observer: true, initialValue: false, persianDigit: true, calendar: { persian: { locale: 'fa' } }, toolbox: { calendarSwitch: { enabled: false } } });
         } catch(e) { console.error("Datepicker init failed", e); }
     };
-    
-    // --- INITIALIZATION ---
+
     const init = () => {
         loadData();
         setupEventListeners();
-        switchPage('dashboard-page', 'داشبورد');
+        // Defer the initial page load slightly to ensure all elements are rendered before calculating values
+        setTimeout(() => {
+            switchPage('dashboard-page', 'داشبورد');
+        }, 50);
     };
 
     init();
 });
 </script>
-
 </body>
 </html>
