@@ -1550,16 +1550,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     init();
-
-    document.addEventListener("DOMContentLoaded", function() {
+});
+document.addEventListener("DOMContentLoaded", function() {
   setTimeout(function() {
     var dashBtn = document.querySelector('.nav-btn[data-page="dashboard-page"]');
     if (dashBtn) {
       dashBtn.click();
     }
   }, 600); // Increase timeout if needed for heavy pages
-});
-
 });
 </script>
 </body>
