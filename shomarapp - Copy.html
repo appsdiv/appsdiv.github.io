@@ -2455,74 +2455,74 @@
                 openModal('#transaction-modal-overlay');
             };
   const handleTransactionFormChange = () => {
-    const form = qs('#transaction-form');
-    if (!form) return;
-    const typeVal = qs('#type', form).value;
-    const statusTypes = ['debt', 'receivable', 'issuedCheck', 'receivedCheck'];
-    const amountInput = qs('#amount', form);
-    const cashflowGroup = qs('#cashflow-group', form);
-    const regularGroup = qs('#regular-tx-group', form);
-    const accountSelect = qs('#account-select', form); // متغیر برای دسترسی به فیلد حساب
+                 const form = qs('#transaction-form');
+                 if (!form) return;
+                 const typeVal = qs('#type', form).value;
+                 const statusTypes = ['debt', 'receivable', 'issuedCheck', 'receivedCheck'];
+                 const amountInput = qs('#amount', form);
+                 const cashflowGroup = qs('#cashflow-group', form);
+                 const regularGroup = qs('#regular-tx-group', form);
+                const accountSelect = qs('#account-select', form); // <-- متغیر جدید برای دسترسی به فیلد حساب
 
-    amountInput.readOnly = false;
-    amountInput.style.backgroundColor = '';
+                 amountInput.readOnly = false;
+                 amountInput.style.backgroundColor = '';
 
-    if (typeVal === 'cashflow') {
-        cashflowGroup.style.display = 'block';
-        regularGroup.style.display = 'none';
-        accountSelect.required = false; // غیرفعال کردن الزامی بودن فیلد حساب اصلی
-        qs('#status-group', form).style.display = 'none';
-        qs('#due-date-group', form).style.display = 'none';
-        qs('#category-group', form).style.display = 'none';
-        qs('#loan-payment-group', form).style.display = 'none';
-    } else {
-        cashflowGroup.style.display = 'none';
-        regularGroup.style.display = 'block';
-        accountSelect.required = true; // فعال کردن مجدد الزامی بودن فیلد حساب اصلی
-        qs('#status-group', form).style.display = statusTypes.includes(typeVal) ? 'block' : 'none';
-        qs('#due-date-group', form).style.display = statusTypes.includes(typeVal) ? 'block' : 'none';
-        qs('#category-group', form).style.display = ['income', 'expense'].includes(typeVal) ? 'block' : 'none';
-        qs('#loan-payment-group', form).style.display = typeVal === 'installmentPayment' ? 'block' : 'none';
-    }
+                 if (typeVal === 'cashflow') {
+                     cashflowGroup.style.display = 'block';
+                     regularGroup.style.display = 'none';
+                    accountSelect.required = false; // <-- کد اصلاحی: غیرفعال کردن الزامی بودن فیلد حساب
+                     qs('#status-group', form).style.display = 'none';
+                     qs('#due-date-group', form).style.display = 'none';
+                     qs('#category-group', form).style.display = 'none';
+                     qs('#loan-payment-group', form).style.display = 'none';
+                 } else {
+                     cashflowGroup.style.display = 'none';
+                     regularGroup.style.display = 'block';
+                    accountSelect.required = true; // <-- کد اصلاحی: فعال کردن مجدد الزامی بودن فیلد حساب
+                     qs('#status-group', form).style.display = statusTypes.includes(typeVal) ? 'block' : 'none';
+                     qs('#due-date-group', form).style.display = statusTypes.includes(typeVal) ? 'block' : 'none';
+                     qs('#category-group', form).style.display = ['income', 'expense'].includes(typeVal) ? 'block' : 'none';
+                     qs('#loan-payment-group', form).style.display = typeVal === 'installmentPayment' ? 'block' : 'none';
+                 }
 
-    qs('#new-category-group', form).style.display = 'none';
+                 qs('#new-category-group', form).style.display = 'none';
 
-    if (statusTypes.includes(typeVal)) {
-        populateDropdown(qs('#status-select', form), Object.entries(STATUS_TYPES[typeVal] || {}).map(([k, v]) => ({ key: k, val: v })), 'key', 'val');
-    }
+                 if (statusTypes.includes(typeVal)) {
+                     populateDropdown(qs('#status-select', form), Object.entries(STATUS_TYPES[typeVal] || {}).map(([k, v]) => ({ key: k, val: v })), 'key', 'val');
+                 }
 
-    if (['income', 'expense'].includes(typeVal)) {
-        let categories = (typeVal === 'income') ? state.incomeSources : state.expenseCategories;
-        const categorySelect = qs('#category-select', form);
-        const optionsHTML = categories.map(c => {
-            const emoji = ICON_TO_EMOJI_MAP[c.icon] || '▫️';
-            return `<option value="${c.name}">${emoji} ${c.name}</option>`;
-        }).join('');
-        categorySelect.innerHTML = optionsHTML + '<option value="add-new" style="font-weight:bold;">+ افزودن دسته جدید...</option>';
-    }
-    if (typeVal === 'installmentPayment') {
-        const loanSelect = qs('#loan-select', form);
-        if (state.loans.length > 0) {
-            populateDropdown(loanSelect, state.loans, 'id', 'bankName');
-            loanSelect.style.display = 'block';
-            qs('#add-loan-prompt', form).style.display = 'none';
-            loanSelect.onchange = (e) => {
-                const loanId = e.target.value;
-                if (loanId) {
-                    const loan = state.loans.find(l => l.id == loanId);
-                    if (loan) {
-                        amountInput.value = formatCurrency(loan.installmentAmount);
-                        amountInput.readOnly = true;
-                        amountInput.style.backgroundColor = 'var(--gray-200)';
-                    }
-                }
-            };
-        } else {
-            loanSelect.style.display = 'none';
-            qs('#add-loan-prompt', form).style.display = 'block';
-        }
-    }
-};
+                 if (['income', 'expense'].includes(typeVal)) {
+                     let categories = (typeVal === 'income') ? state.incomeSources : state.expenseCategories;
+                     const categorySelect = qs('#category-select', form);
+                     const optionsHTML = categories.map(c => {
+                         const emoji = ICON_TO_EMOJI_MAP[c.icon] || '▫️';
+                         return `<option value="${c.name}">${emoji} ${c.name}</option>`;
+                     }).join('');
+                     categorySelect.innerHTML = optionsHTML + '<option value="add-new" style="font-weight:bold;">+ افزودن دسته جدید...</option>';
+                 }
+                 if (typeVal === 'installmentPayment') {
+                     const loanSelect = qs('#loan-select', form);
+                     if (state.loans.length > 0) {
+                         populateDropdown(loanSelect, state.loans, 'id', 'bankName');
+                         loanSelect.style.display = 'block';
+                         qs('#add-loan-prompt', form).style.display = 'none';
+                         loanSelect.onchange = (e) => {
+                             const loanId = e.target.value;
+                             if (loanId) {
+                                 const loan = state.loans.find(l => l.id == loanId);
+                                 if (loan) {
+                                     amountInput.value = formatCurrency(loan.installmentAmount);
+                                     amountInput.readOnly = true;
+                                     amountInput.style.backgroundColor = 'var(--gray-200)';
+                                 }
+                             }
+                         };
+                     } else {
+                         loanSelect.style.display = 'none';
+                         qs('#add-loan-prompt', form).style.display = 'block';
+                     }
+                 }
+             };
             const renderAccountModal = (accId = null) => {
                 const modal = qs('#account-modal-overlay');
                 modal.innerHTML = `
@@ -2576,7 +2576,7 @@
                             <li class="more-menu-item" data-page="savings-page" data-title="پس‌انداز"><div class="item-icon goal"><i class="fas fa-piggy-bank"></i></div><div class="item-info"><p>اهداف و پس‌انداز</p></div><i class="fas fa-chevron-left"></i></li>
                         </ul>
                                 <div style="text-align: center; padding: 15px 10px 5px; font-size: 0.75rem; color: var(--subtext-light);">
-                                        وب اپلیکیشن حسابداری شخصی شمار نسخه 1.0 | طراحی و کدنویسی شده توسط پیمان عابدین پور
+                                        وب اپلیکیشن حسابداری شخصی شمار نسخه 0.9.1 | طراحی و کدنویسی شده توسط پیمان عابدین پور
                                         </div>
                     </div>`;
                 openModal('#more-menu-modal-overlay');
@@ -2973,94 +2973,84 @@
             };
 
             // ✅ FIXED: Rewrote the cashflow submission logic with validation
-          function handleTransactionSubmit(form) {
-    const id = qs('#transaction-id', form).value;
-    const type = qs('#type', form).value;
+            function handleTransactionSubmit(form) {
+                const id = qs('#transaction-id', form).value;
+                const type = qs('#type', form).value;
 
-    if (type === 'cashflow') {
-        const sourceAccountId = qs('#source-account-select', form).value;
-        const destinationAccountId = qs('#destination-account-select', form).value;
-        const amount = parseInt(getUnformattedAmount(qs('#amount', form).value || '0'));
-        const date = moment(normalizeDigits(qs('#transaction-date', form).value), JALALI_DISPLAY_FORMAT).format(MOMENT_FORMAT);
-        const description = qs('#description', form).value.trim();
+                if (type === 'cashflow') {
+                    const sourceAccountId = qs('#source-account-select', form).value;
+                    const destinationAccountId = qs('#destination-account-select', form).value;
+                    const amount = parseInt(getUnformattedAmount(qs('#amount', form).value || '0'));
+                    const date = moment(normalizeDigits(qs('#transaction-date', form).value), JALALI_DISPLAY_FORMAT).format(MOMENT_FORMAT);
+                    const description = qs('#description', form).value.trim();
 
-        // Validation checks
-        if (!sourceAccountId || !destinationAccountId) {
-            showToast('لطفا حساب مبدأ و مقصد را انتخاب کنید.');
-            return;
-        }
-        if (sourceAccountId === destinationAccountId) {
-            showToast('حساب مبدأ و مقصد نمی‌توانند یکسان باشند.');
-            return;
-        }
-        if (!amount || amount <= 0 || !date || !moment(date, MOMENT_FORMAT).isValid()) {
-            showToast('لطفا مبلغ و تاریخ را به درستی وارد کنید.');
-            return;
-        }
+                    // Validation checks
+                    if (!sourceAccountId || !destinationAccountId) {
+                        showToast('لطفا حساب مبدأ و مقصد را انتخاب کنید.');
+                        return;
+                    }
+                    if (sourceAccountId === destinationAccountId) {
+                        showToast('حساب مبدأ و مقصد نمی‌توانند یکسان باشند.');
+                        return;
+                    }
+                    if (!amount || amount <= 0 || !date || !moment(date, MOMENT_FORMAT).isValid()) {
+                        showToast('لطفا مبلغ و تاریخ را به درستی وارد کنید.');
+                        return;
+                    }
 
-        // START: Balance Validation
-        const sourceAccountTransactions = state.transactions.filter(tx => tx.accountId == sourceAccountId);
-        const sourceAccountBalance = calculateBalance(sourceAccountTransactions);
+                    const sourceAccount = state.accounts.find(a => a.id == sourceAccountId);
+                    const destAccount = state.accounts.find(a => a.id == destinationAccountId);
 
-        if (amount > sourceAccountBalance) {
-            showToast('کمبود موجودی در حساب مبدا.');
-            return; // Stop transaction from being saved
-        }
-        // END: Balance Validation
+                    if (!sourceAccount || !destAccount) {
+                        showToast('خطا در یافتن حساب‌ها. لطفا صفحه را رفرش کنید.');
+                        return;
+                    }
 
-        const sourceAccount = state.accounts.find(a => a.id == sourceAccountId);
-        const destAccount = state.accounts.find(a => a.id == destinationAccountId);
+                    const transferId = Date.now();
+                    const commonDesc = description ? ` بابت: ${description}` : '';
 
-        if (!sourceAccount || !destAccount) {
-            showToast('خطا در یافتن حساب‌ها. لطفا صفحه را رفرش کنید.');
-            return;
-        }
+                    const expenseTx = { id: transferId, type: 'expense', accountId: sourceAccountId, description: `انتقال به ${destAccount.name}${commonDesc}`, amount: amount, date: date, transferId: transferId };
+                    const incomeTx = { id: transferId + 1, type: 'income', accountId: destinationAccountId, description: `انتقال از ${sourceAccount.name}${commonDesc}`, amount: amount, date: date, transferId: transferId };
+                    const cashflowDisplayTx = { id: transferId + 2, type: 'cashflow', accountId: sourceAccountId, description: `جابجایی از ${sourceAccount.name} به ${destAccount.name}${commonDesc}`, amount: amount, date: date, transferId: transferId };
 
-        const transferId = Date.now();
-        const commonDesc = description ? ` بابت: ${description}` : '';
+                    state.transactions.push(expenseTx, incomeTx, cashflowDisplayTx);
+                    showToast('جابجایی وجه ثبت شد.');
 
-        const expenseTx = { id: transferId, type: 'expense', accountId: sourceAccountId, description: `انتقال به ${destAccount.name}${commonDesc}`, amount: amount, date: date, transferId: transferId };
-        const incomeTx = { id: transferId + 1, type: 'income', accountId: destinationAccountId, description: `انتقال از ${sourceAccount.name}${commonDesc}`, amount: amount, date: date, transferId: transferId };
-        const cashflowDisplayTx = { id: transferId + 2, type: 'cashflow', accountId: sourceAccountId, description: `جابجایی از ${sourceAccount.name} به ${destAccount.name}${commonDesc}`, amount: amount, date: date, transferId: transferId };
+                } else {
+                    // --- Logic for other transaction types ---
+                    let category = qs('#category-select', form).value;
+                    const newCategory = qs('#new-category-input', form).value.trim();
 
-        state.transactions.push(expenseTx, incomeTx, cashflowDisplayTx);
-        showToast('جابجایی وجه ثبت شد.');
+                    if (category === 'add-new') {
+                        if (!newCategory) { showToast('لطفا نام دسته جدید را وارد کنید.'); return; }
+                        category = newCategory;
+                        if (type === 'expense' && !state.expenseCategories.some(c => c.name === newCategory)) {
+                            state.expenseCategories.push({ name: newCategory, icon: 'fa-tag' });
+                        }
+                        else if (type === 'income' && !state.incomeSources.some(c => c.name === newCategory)) {
+                            state.incomeSources.push({ name: newCategory, icon: 'fa-tag' });
+                        }
+                    }
 
-    } else {
-        // --- Logic for other transaction types ---
-        let category = qs('#category-select', form).value;
-        const newCategory = qs('#new-category-input', form).value.trim();
+                    const transactionData = {
+                        type: type,
+                        accountId: qs('#account-select', form).value,
+                        description: qs('#description', form).value.trim(),
+                        amount: parseInt(getUnformattedAmount(qs('#amount', form).value || '0')),
+                        date: moment(normalizeDigits(qs('#transaction-date', form).value), JALALI_DISPLAY_FORMAT).format(MOMENT_FORMAT),
+                        category: ['income', 'expense'].includes(type) ? category : null,
+                        dueDate: qs('#due-date-group', form).style.display !== 'none' && qs('#due-date', form).value ? moment(normalizeDigits(qs('#due-date', form).value), JALALI_DISPLAY_FORMAT).format(MOMENT_FORMAT) : null,
+                        status: qs('#status-group', form).style.display !== 'none' ? qs('#status-select', form).value : null,
+                        loanId: type === 'installmentPayment' ? qs('#loan-select', form).value : null,
+                    };
+                    if (!transactionData.amount || !transactionData.date || !transactionData.accountId || !moment(transactionData.date, MOMENT_FORMAT).isValid()) { showToast('لطفا مبلغ، تاریخ و حساب را به درستی وارد کنید.'); return; }
 
-        if (category === 'add-new') {
-            if (!newCategory) { showToast('لطفا نام دسته جدید را وارد کنید.'); return; }
-            category = newCategory;
-            if (type === 'expense' && !state.expenseCategories.some(c => c.name === newCategory)) {
-                state.expenseCategories.push({ name: newCategory, icon: 'fa-tag' });
+                    if (id) { const index = state.transactions.findIndex(tx => tx.id == id); state.transactions[index] = { ...state.transactions[index], ...transactionData }; showToast('تراکنش ویرایش شد.'); }
+                    else { state.transactions.push({ id: Date.now(), ...transactionData }); showToast('تراکنش ثبت شد.'); }
+                }
+                saveData(); updateAllUI(); closeModal('#transaction-modal-overlay');
             }
-            else if (type === 'income' && !state.incomeSources.some(c => c.name === newCategory)) {
-                state.incomeSources.push({ name: newCategory, icon: 'fa-tag' });
-            }
-        }
-
-        const transactionData = {
-            type: type,
-            accountId: qs('#account-select', form).value,
-            description: qs('#description', form).value.trim(),
-            amount: parseInt(getUnformattedAmount(qs('#amount', form).value || '0')),
-            date: moment(normalizeDigits(qs('#transaction-date', form).value), JALALI_DISPLAY_FORMAT).format(MOMENT_FORMAT),
-            category: ['income', 'expense'].includes(type) ? category : null,
-            dueDate: qs('#due-date-group', form).style.display !== 'none' && qs('#due-date', form).value ? moment(normalizeDigits(qs('#due-date', form).value), JALALI_DISPLAY_FORMAT).format(MOMENT_FORMAT) : null,
-            status: qs('#status-group', form).style.display !== 'none' ? qs('#status-select', form).value : null,
-            loanId: type === 'installmentPayment' ? qs('#loan-select', form).value : null,
-        };
-        if (!transactionData.amount || !transactionData.date || !transactionData.accountId || !moment(transactionData.date, MOMENT_FORMAT).isValid()) { showToast('لطفا مبلغ، تاریخ و حساب را به درستی وارد کنید.'); return; }
-
-        if (id) { const index = state.transactions.findIndex(tx => tx.id == id); state.transactions[index] = { ...state.transactions[index], ...transactionData }; showToast('تراکنش ویرایش شد.'); }
-        else { state.transactions.push({ id: Date.now(), ...transactionData }); showToast('تراکنش ثبت شد.'); }
-    }
-    saveData(); updateAllUI(); closeModal('#transaction-modal-overlay');
-}
-         function handleAccountSubmit(form) {
+            function handleAccountSubmit(form) {
                 const id = qs('#account-id', form).value;
                 const name = qs('#account-name', form).value.trim();
                 if (!name) { showToast('نام حساب الزامی است.'); return; }
