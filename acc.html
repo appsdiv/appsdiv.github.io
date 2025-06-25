@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت مالی شخصی جامع</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://unpkg.com/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css"/>
+    <style>
+        :root {
+            --bg-light: #f7f9fc; --card-light: #ffffff; --text-light: #0f172a; --subtext-light: #64748b; --border-light: #e2e8f0;
+            --bg-dark: #0d1117; --card-dark: #161b22; --text-dark: #e2e8f0; --subtext-dark: #8b949e; --border-dark: #30363d;
+            --primary: #6366f1; --primary-hover: #4f46e5; --income: #16a34a; --expense: #dc2626; --transfer: #f59e0b;
+            --debt: #ef4444; --receivable: #22c55e; --loan: #8b5cf6; --goal: #0ea5e9;
+            --income-bg-light: #dcfce7; --expense-bg-light: #fee2e2;
+            --income-bg-dark: rgba(22, 163, 74, 0.1); --expense-bg-dark: rgba(220, 38, 38, 0.1);
+            --font-family: 'Vazirmatn', sans-serif; --radius: 1rem; --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        body { font-family: var(--font-family); background-color: var(--bg-light); color: var(--text-light); margin: 0; padding-bottom: 80px; transition: var(--transition); }
+        body.dark-mode {
+            --bg-light: var(--bg-dark); --card-light: var(--card-dark); --text-light: var(--text-dark);
+            --subtext-light: var(--subtext-dark); --border-light: var(--border-dark);
+            --income-bg-light: var(--income-bg-dark); --expense-bg-light: var(--expense-bg-dark);
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 1.5rem 1rem; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+        header .title h2 { margin: 0; font-size: 1.75rem; }
+        header .title p { margin: 0; color: var(--subtext-light); }
+        .header-controls { display: flex; align-items: center; gap: 1rem; }
+        .theme-switcher { cursor: pointer; font-size: 1.5rem; color: var(--subtext-light); transition: var(--transition); }
+        .page { display: none; animation: fadeIn 0.5s ease-in-out; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .card-section { background-color: var(--card-light); padding: 1.5rem; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; border: 1px solid var(--border-light); }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .section-header h3 { margin: 0; font-size: 1.1rem; font-weight: 600; }
+        .btn { padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: var(--font-family); }
+        .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.8rem; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-danger { background-color: var(--expense); color: white; }
+        .btn-secondary { background-color: var(--border-light); color: var(--text-light); }
+        .btn-success { background-color: var(--income); color: white; }
+        /* Dashboard */
+        .main-balance { background: linear-gradient(45deg, var(--primary), var(--primary-hover)); color: white; padding: 2rem; text-align: center; margin-bottom: 4rem; }
+        .main-balance .balance-title { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin: 0 0 0.5rem; }
+        .main-balance h4 { margin: 0; font-weight: 500; opacity: 0.8; font-size: 1rem; }
+        .main-balance h1 { margin: 0; font-size: 2.75rem; letter-spacing: -1.5px; }
+        #toggle-balance-visibility { cursor: pointer; opacity: 0.8; transition: var(--transition); font-size: 1.1rem; }
+        .summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: -3rem; }
+        @media (min-width: 768px) { .summary-grid { grid-template-columns: repeat(3, 1fr); } }
+        .summary-card { background-color: var(--card-light); padding: 1rem; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border-light); }
+        .summary-card .card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+        .summary-card .card-icon { font-size: 1.25rem; width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+        .summary-card .card-title { font-weight: 500; color: var(--subtext-light); font-size: 0.85rem; }
+        .summary-card.income .card-icon { background-color: var(--income-bg-light); color: var(--income); }
+        .summary-card.expense .card-icon { background-color: var(--expense-bg-light); color: var(--expense); }
+        .summary-card.debt .card-icon { background-color: var(--expense-bg-light); color: var(--debt); }
+        .summary-card.receivable .card-icon { background-color: var(--income-bg-light); color: var(--receivable); }
+        .summary-card.loan .card-icon { background-color: #ede9fe; color: var(--loan); }
+        body.dark-mode .summary-card.loan .card-icon { background-color: rgba(139, 92, 246, 0.1); }
+        .summary-card .card-amount { font-size: 1.3rem; font-weight: 700; color: var(--text-light); }
+        .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .action-card { background-color: var(--card-light); border: 1px solid var(--border-light); padding: 1rem; border-radius: var(--radius); text-align: center; cursor: pointer; transition: var(--transition); }
+        .action-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+        .action-card i { font-size: 1.5rem; margin-bottom: 0.5rem; } .action-card span { font-weight: 600; }
+        .action-card.income i, .action-card.income span { color: var(--income); } .action-card.expense i, .action-card.expense span { color: var(--expense); }
+        /* Forms & Filters */
+        .form-control { width: 100%; padding: 0.75rem; border: 1px solid var(--border-light); border-radius: 0.5rem; background-color: var(--bg-light); color: var(--text-light); box-sizing: border-box; transition: var(--transition); font-family: var(--font-family); }
+        .form-control:focus { border-color: var(--primary); outline: none; }
+        .form-control.pdate { cursor: pointer; }
+        .transaction-filters { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+        @media (min-width: 700px) { .transaction-filters { grid-template-columns: repeat(4, 1fr); } }
+        .transaction-filters .form-group { margin-bottom: 0; }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--subtext-light); }
+        /* Lists (Transactions, Debts, etc) */
+        .list-status { text-align: center; color: var(--subtext-light); padding: 2rem; }
+        .list-container { list-style: none; padding: 0; margin: 0; }
+        .list-container li { display: flex; align-items: center; gap: 1rem; padding: 1rem; transition: var(--transition); border-bottom: 1px solid var(--border-light); cursor: pointer; }
+        .list-container li:last-child { border-bottom: none; }
+        .list-container li:hover { background-color: var(--bg-light); }
+        .item-icon { font-size: 1rem; width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; flex-shrink: 0; }
+        .item-icon.income { background-color: var(--income-bg-light); color: var(--income); }
+        .item-icon.expense, .item-icon.debt, .item-icon.issuedCheck { background-color: var(--expense-bg-light); color: var(--expense); }
+        .item-icon.transfer { background-color: #fef3c7; color: var(--transfer); }
+        .item-icon.receivable, .item-icon.receivedCheck { background-color: var(--income-bg-light); color: var(--income); }
+        .item-info { flex-grow: 1; min-width: 0; }
+        .item-info p { margin: 0 0 0.25rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item-info .meta-data { font-size: 0.8rem; color: var(--subtext-light); display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; }
+        .item-amount { font-weight: 700; font-size: 1.1rem; direction: ltr; margin-left: 0.5rem; }
+        .item-amount.income, .item-amount.receivable, .item-amount.receivedCheck { color: var(--income); }
+        .item-amount.expense, .item-amount.debt, .item-amount.issuedCheck, .item-amount.transfer { color: var(--expense); }
+        .item-actions { display: flex; margin-left: auto; align-items: center; gap: 0.5rem; }
+        .action-btn { background: none; border: none; color: var(--subtext-light); cursor: pointer; font-size: 1rem; transition: var(--transition); padding: 0.5rem; }
+        .list-container li:not(:hover) .action-btn { opacity: 0; }
+        .action-btn:hover { color: var(--primary); } .action-btn.delete-btn:hover { color: var(--expense); }
+        .due-date-info.overdue { color: var(--expense); font-weight: bold; }
+        .meta-data .meta-status { font-weight: 600; }
+        .meta-data .meta-status.success { color: var(--income); }
+        .meta-data .meta-status.danger { color: var(--expense); }
+        .check-badge { font-size: 0.7rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; background-color: var(--primary); color: white; vertical-align: middle; margin-right: 5px; }
+        /* Reports Page -- NEW DESIGN */
+        #daily-reports-list { display: flex; flex-direction: column; gap: 1rem; }
+        .daily-report-item { background: var(--card-light); border: 1px solid var(--border-light); border-radius: var(--radius); overflow: hidden; border-left: 5px solid; transition: var(--transition); }
+        .daily-report-item[data-net-flow='0'] { border-left-color: var(--subtext-light); }
+        .daily-report-item[data-net-flow^="-"] { border-left-color: var(--expense); }
+        .daily-report-item:not([data-net-flow^="-"]):not([data-net-flow='0']) { border-left-color: var(--income); }
+
+        .daily-report-header { padding: 1rem 1.25rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: var(--transition); }
+        .daily-report-header:hover { background-color: var(--bg-light); }
+        .daily-report-item.active .daily-report-header { border-bottom: 1px solid var(--border-light); }
+        .daily-report-item.active .expand-arrow { transform: rotate(180deg); }
+
+        .date-info { display: flex; flex-direction: column; }
+        .date-info .day-of-week { font-weight: 700; font-size: 1.1rem; color: var(--text-light); }
+        .date-info .date-full { font-size: 0.85rem; color: var(--subtext-light); }
+
+        .flow-summary { display: none; }
+        @media(min-width: 500px) { .flow-summary { display: flex; gap: 1.5rem; align-items: center; } }
+        .flow-item { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 1rem; }
+        .flow-item i { font-size: 0.9rem; }
+        .flow-item.income { color: var(--income); }
+        .flow-item.expense { color: var(--expense); }
+        .flow-item.net { color: var(--text-light); font-weight: 700; }
+        body.dark-mode .flow-item.net { color: var(--text-dark); }
+        
+        .expand-arrow { color: var(--subtext-light); font-size: 1rem; transition: var(--transition); margin-left: 0.5rem;}
+
+        .daily-report-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
+        .daily-report-item.active .daily-report-body { max-height: 2000px; }
+        .daily-report-body .list-container { padding: 0.5rem; background-color: var(--bg-light); }
+        
+        /* Advanced Filters & Summary */
+        .advanced-filters .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+        .advanced-filters .form-group { margin-bottom: 0; }
+        .advanced-filters .filter-actions { display: flex; gap: 1rem; margin-top: 1.5rem; border-top: 1px solid var(--border-light); padding-top: 1.5rem; }
+        .filter-summary { background-color: var(--bg-light); }
+        .filter-summary h4 { margin: 0 0 1rem; font-size: 1rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.75rem; }
+        .filter-summary .summary-details { display: flex; justify-content: space-around; text-align: center; }
+        .filter-summary .summary-details span { font-size: 0.9rem; color: var(--subtext-light); }
+        .filter-summary .summary-details strong { display: block; font-size: 1.25rem; color: var(--text-light); margin-top: 0.25rem; }
+
+        /* Loans & Savings Goals Page */
+        .progress-item { margin-bottom: 1.5rem; background: var(--card-light); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 1.5rem; }
+        .progress-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+        .progress-header h4 { margin: 0; font-size: 1.2rem; }
+        .progress-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem; }
+        .progress-bar-container { width: 100%; background-color: var(--bg-light); border-radius: 1rem; overflow: hidden; margin-bottom: 0.5rem; }
+        .progress-bar { height: 10px; transition: width 0.5s ease-in-out; }
+        .progress-bar.loan { background-color: var(--loan); }
+        .progress-bar.goal { background-color: var(--goal); }
+        .progress-text { text-align: center; color: var(--subtext-light); font-size: 0.85rem; }
+        /* Accounts Page */
+        .account-item { display: flex; align-items: center; gap: 1rem; padding: 1.25rem; border: 1px solid var(--border-light); border-radius: var(--radius); cursor: pointer; transition: var(--transition); }
+        .account-item:hover { border-color: var(--primary); background-color: var(--bg-light); }
+        .account-item h4 { margin: 0; flex-grow: 1; }
+        .account-item .balance { font-weight: 700; font-size: 1.1rem; }
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: var(--card-light); display: flex; justify-content: space-around; padding: 0.5rem 0.1rem; box-shadow: 0 -5px 15px -3px rgb(0 0 0 / 0.05); border-top: 1px solid var(--border-light); z-index: 100; }
+        .nav-btn { background: none; border: none; color: var(--subtext-light); display: flex; flex-direction: column; align-items: center; gap: 0.25rem; padding: 0.5rem 0.1rem; font-family: var(--font-family); cursor: pointer; transition: var(--transition); flex-grow: 1; border-radius: var(--radius); position: relative; }
+        .nav-btn i { font-size: 1.1rem; }
+        .nav-btn span { font-size: 0.65rem; }
+        .nav-btn.active { color: var(--primary); }
+        .nav-btn.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 20px; height: 3px; background-color: var(--primary); border-radius: 2px; }
+        /* FAB & Modals */
+        .fab { position: fixed; bottom: 90px; left: 2rem; width: 3.5rem; height: 3.5rem; background-color: var(--primary); color: white; border: none; border-radius: 50%; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.5); cursor: pointer; transition: var(--transition); z-index: 999; }
+        .fab:hover { transform: scale(1.1); background-color: var(--primary-hover); }
+        .modal-overlay { position: fixed; inset: 0; background-color: rgb(0 0 0 / 0.5); display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: var(--transition); z-index: 1000; cursor: pointer; padding: 1rem; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background-color: var(--card-light); padding: 2rem; border-radius: var(--radius); width: 100%; max-width: 450px; transform: scale(0.95) translateY(1rem); transition: var(--transition); cursor: default; max-height: 90vh; overflow-y: auto; }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        .modal-content h3 { margin: 0 0 1.5rem; text-align: center; font-size: 1.25rem; }
+        .form-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+        #toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background-color: #0f172a; color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; box-shadow: var(--shadow); z-index: 2000; opacity: 0; visibility: hidden; transform: translate(-50%, 1rem); transition: var(--transition); }
+        #toast.show { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <section id="dashboard-page" class="page active">
+            <header>
+                <div class="title"><h2>داشبورد</h2><p>خلاصه وضعیت مالی شما</p></div>
+                <div class="header-controls">
+                    <select id="account-filter-dashboard" class="form-control" style="width: auto;"></select>
+                    <div class="theme-switcher"><i class="fas fa-sun" id="theme-toggle"></i></div>
+                </div>
+            </header>
+            <div class="card-section main-balance">
+                <div class="balance-title"><h4>موجودی قابل خرج</h4><i class="fas fa-eye" id="toggle-balance-visibility"></i></div>
+                <h1 id="balance-amount">۰ تومان</h1>
+            </div>
+            <div class="summary-grid">
+                <div class="summary-card income"><div class="card-header"><div class="card-icon"><i class="fas fa-arrow-up"></i></div><span class="card-title">مجموع درآمد</span></div><div class="card-amount" id="total-income">۰ تومان</div></div>
+                <div class="summary-card expense"><div class="card-header"><div class="card-icon"><i class="fas fa-arrow-down"></i></div><span class="card-title">مجموع هزینه</span></div><div class="card-amount" id="total-expense">۰ تومان</div></div>
+                <div class="summary-card receivable"><div class="card-header"><div class="card-icon"><i class="fas fa-hand-holding-dollar"></i></div><span class="card-title">مجموع طلب (وصول نشده)</span></div><div class="card-amount" id="total-receivable">۰ تومان</div></div>
+                <div class="summary-card debt"><div class="card-header"><div class="card-icon"><i class="fas fa-file-invoice-dollar"></i></div><span class="card-title">مجموع بدهی (پرداخت نشده)</span></div><div class="card-amount" id="total-debt">۰ تومان</div></div>
+                <div class="summary-card loan"><div class="card-header"><div class="card-icon"><i class="fas fa-landmark"></i></div><span class="card-title">اقساط باقی‌مانده</span></div><div class="card-amount" id="total-loan">۰ تومان</div></div>
+            </div>
+            <div class="card-section" style="margin-top: 1.5rem;"><div class="section-header"><h3>اقدامات سریع</h3></div><div class="quick-actions"><div class="action-card income" data-action="quick-add-income"><i class="fas fa-plus"></i><span>افزودن درآمد</span></div><div class="action-card expense" data-action="quick-add-expense"><i class="fas fa-minus"></i><span>افزودن هزینه</span></div></div></div>
+            <div class="card-section" id="dashboard-recents"><div class="section-header"><h3>آخرین تراکنش‌ها</h3><a href="#" class="view-all-btn" style="color: var(--primary); text-decoration: none; font-size: 0.9rem;">مشاهده همه</a></div><ul class="list-container"></ul></div>
+        </section>
+
+        <section id="transactions-page" class="page"><div class="card-section"><div class="section-header"><h3>لیست تراکنش‌ها</h3></div><div class="transaction-filters"><div class="form-group"><input type="text" id="search-input" placeholder="جستجو در توضیحات..." class="form-control"></div><div class="form-group"><select id="account-filter" class="form-control"></select></div><div class="form-group"><select id="type-filter" class="form-control"><option value="all">همه انواع</option></select></div><div class="form-group"><select id="category-filter" disabled class="form-control"><option value="all">همه دسته‌بندی‌ها</option></select></div></div><ul id="transaction-list" class="list-container"></ul><div id="transaction-list-status" class="list-status"></div></div></section>
+
+        <section id="reports-page" class="page">
+            <header><div class="title"><h2>گزارش جامع</h2><p>تحلیل و فیلتر عملکرد مالی</p></div></header>
+            <div class="card-section advanced-filters">
+                <div class="filter-grid">
+                    <div class="form-group"><label>از تاریخ</label><input type="text" class="form-control pdate from-date-filter"></div>
+                    <div class="form-group"><label>تا تاریخ</label><input type="text" class="form-control pdate to-date-filter"></div>
+                    <div class="form-group account-filter-group"><label>حساب</label><select class="form-control account-filter"></select></div>
+                </div>
+                <div class="filter-actions"><button class="btn btn-primary apply-filter-btn">اعمال فیلتر</button><button class="btn btn-secondary clear-filter-btn">پاک کردن</button></div>
+            </div>
+            <div class="filter-summary card-section" style="display: none;"></div>
+            <div id="daily-reports-list"></div>
+            <div id="reports-status" class="list-status"></div>
+        </section>
+
+        <section id="savings-page" class="page">
+            <div class="card-section" style="border-color: var(--primary);">
+                <h4>موجودی صندوق پس‌انداز</h4>
+                <h1 id="savings-balance">۰ تومان</h1>
+                <button class="btn btn-primary" data-action="add-to-fund" style="margin-top: 1rem; width: 100%;">+ انتقال به صندوق</button>
+            </div>
+            <div class="card-section">
+                <div class="section-header"><h3>اهداف مالی</h3><button class="btn btn-primary" data-action="add-goal">+ افزودن هدف</button></div>
+                <div id="savings-goals-list"></div>
+                <div id="savings-goals-status" class="list-status"></div>
+            </div>
+        </section>
+
+        <section id="debts-page" class="page">
+             <div class="card-section">
+                <div class="section-header"><h3>بدهی‌ها و چک‌های صادره</h3></div>
+                <div class="advanced-filters">
+                     <div class="filter-grid">
+                        <div class="form-group"><label>از تاریخ</label><input type="text" class="form-control pdate from-date-filter"></div>
+                        <div class="form-group"><label>تا تاریخ</label><input type="text" class="form-control pdate to-date-filter"></div>
+                        <div class="form-group account-filter-group"><label>حساب</label><select class="form-control account-filter"></select></div>
+                        <div class="form-group status-filter-group"><label>وضعیت</label><select class="form-control status-filter"></select></div>
+                    </div>
+                    <div class="filter-actions"><button class="btn btn-primary apply-filter-btn">اعمال فیلتر</button><button class="btn btn-secondary clear-filter-btn">پاک کردن</button></div>
+                </div>
+            </div>
+            <div class="filter-summary card-section" style="display: none;"></div>
+            <ul id="debts-list" class="list-container"></ul>
+            <div id="debts-status" class="list-status"></div>
+        </section>
+
+        <section id="receivables-page" class="page">
+            <div class="card-section">
+                <div class="section-header"><h3>طلب‌ها و چک‌های دریافتی</h3></div>
+                 <div class="advanced-filters">
+                     <div class="filter-grid">
+                        <div class="form-group"><label>از تاریخ</label><input type="text" class="form-control pdate from-date-filter"></div>
+                        <div class="form-group"><label>تا تاریخ</label><input type="text" class="form-control pdate to-date-filter"></div>
+                        <div class="form-group account-filter-group"><label>حساب</label><select class="form-control account-filter"></select></div>
+                        <div class="form-group status-filter-group"><label>وضعیت</label><select class="form-control status-filter"></select></div>
+                    </div>
+                    <div class="filter-actions"><button class="btn btn-primary apply-filter-btn">اعمال فیلتر</button><button class="btn btn-secondary clear-filter-btn">پاک کردن</button></div>
+                </div>
+            </div>
+            <div class="filter-summary card-section" style="display: none;"></div>
+            <ul id="receivables-list" class="list-container"></ul>
+            <div id="receivables-status" class="list-status"></div>
+        </section>
+
+        <section id="loans-page" class="page"><div class="card-section"><div class="section-header"><h3>تسهیلات و اقساط</h3><button class="btn btn-primary" data-action="add-loan">+ تعریف تسهیلات</button></div><div id="loans-list"></div><div id="loans-status" class="list-status"></div></div></section>
+
+        <section id="accounts-page" class="page"><div class="card-section"><div class="section-header"><h3>حساب‌های من</h3><button class="btn btn-primary" data-action="add-account">+ حساب جدید</button></div><div id="accounts-list"></div><div id="accounts-status" class="list-status"></div></div></section>
+    </main>
+
+    <button class="fab" data-action="add-transaction"><i class="fas fa-plus"></i></button>
+
+    <nav class="bottom-nav">
+        <button class="nav-btn active" data-page="dashboard-page"><i class="fas fa-tachometer-alt"></i><span>داشبورد</span></button>
+        <button class="nav-btn" data-page="transactions-page"><i class="fas fa-exchange-alt"></i><span>تراکنش‌ها</span></button>
+        <button class="nav-btn" data-page="reports-page"><i class="fas fa-chart-pie"></i><span>گزارش</span></button>
+        <button class="nav-btn" data-page="savings-page"><i class="fas fa-piggy-bank"></i><span>پس‌انداز</span></button>
+        <button class="nav-btn" data-page="debts-page"><i class="fas fa-file-invoice-dollar"></i><span>بدهی</span></button>
+        <button class="nav-btn" data-page="receivables-page"><i class="fas fa-hand-holding-dollar"></i><span>طلب</span></button>
+        <button class="nav-btn" data-page="loans-page"><i class="fas fa-landmark"></i><span>اقساط</span></button>
+        <button class="nav-btn" data-page="accounts-page"><i class="fas fa-wallet"></i><span>حساب‌ها</span></button>
+    </nav>
+
+    <div class="modal-overlay" id="transaction-modal-overlay"><div class="modal-content"><form id="transaction-form"><h3 id="transaction-modal-title">تراکنش جدید</h3><input type="hidden" id="transaction-id"><div class="form-group"><label for="type">نوع تراکنش</label><select id="type" required class="form-control"></select></div><div class="form-group"><label for="account-select">از/به حساب</label><select id="account-select" required class="form-control"></select></div><div class="form-group" id="loan-payment-group" style="display: none;"><label for="loan-select">پرداخت قسطِ</label><select id="loan-select" class="form-control"></select><div id="add-loan-prompt" style="display: none; margin-top: 0.5rem;"><small>هنوز تسهیلاتی تعریف نشده. <a href="#" data-action="go-to-loans">برای افزودن کلیک کنید.</a></small></div></div><div class="form-group" id="category-group" style="display: none;"><label for="category-select">انتخاب دسته/منبع</label><select id="category-select" class="form-control"></select></div><div class="form-group" id="new-category-group" style="display: none;"><label for="new-category-input">نام دسته/منبع جدید</label><input type="text" id="new-category-input" placeholder="مثال: اجاره خانه" class="form-control"></div><div class="form-group"><label for="description">توضیحات</label><input type="text" id="description" required class="form-control"></div><div class="form-group"><label for="amount">مبلغ (تومان)</label><input type="number" id="amount" required min="1" class="form-control"></div><div class="form-group"><label for="transaction-date">تاریخ تراکنش</label><input type="text" id="transaction-date" required class="form-control pdate"/></div><div class="form-group" id="due-date-group" style="display: none;"><label for="due-date">تاریخ سررسید</label><input type="text" id="due-date" class="form-control pdate"/></div><div class="form-group" id="status-group" style="display: none;"><label for="status-select">وضعیت</label><select id="status-select" class="form-control"></select></div><div class="form-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">انصراف</button><button type="submit" class="btn btn-primary">ثبت</button></div></form></div></div>
+    <div class="modal-overlay" id="account-modal-overlay"><div class="modal-content"><form id="account-form"><h3 id="account-modal-title">تعریف حساب</h3><input type="hidden" id="account-id"><div class="form-group"><label for="account-name">نام حساب (مثال: بانک ملی، کیف پول)</label><input type="text" id="account-name" required class="form-control"></div><div class="form-group"><label for="card-number">شماره کارت (اختیاری)</label><input type="text" id="card-number" placeholder="xxxx-xxxx-xxxx-xxxx" class="form-control"></div><div style="display: flex; gap: 1rem;"><div class="form-group" style="flex: 1;"><label for="expiry-month">ماه انقضا</label><input type="number" id="expiry-month" placeholder="09" min="1" max="12" class="form-control"></div><div class="form-group" style="flex: 1;"><label for="expiry-year">سال انقضا</label><input type="number" id="expiry-year" placeholder="05" min="0" max="99" class="form-control"></div><div class="form-group" style="flex: 1;"><label for="cvv2">CVV2</label><input type="number" id="cvv2" placeholder="123" class="form-control"></div></div><div class="form-group"><label for="account-number">شماره حساب (اختیاری)</label><input type="text" id="account-number" class="form-control"></div><div class="form-group"><label for="shaba-number">شماره شبا (اختیاری)</label><input type="text" id="shaba-number" placeholder="IRxxxxxxxxxxxxxxxxxxxxxxxx" class="form-control"></div><div class="form-group"><label for="notes">یادداشت (اختیاری)</label><textarea id="notes" rows="2" class="form-control"></textarea></div><div class="form-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">انصراف</button><button type="submit" class="btn btn-primary">ذخیره</button></div></form></div></div>
+    <div class="modal-overlay" id="account-details-modal-overlay"><div class="modal-content" id="account-details-content"></div></div>
+    <div class="modal-overlay" id="loan-modal-overlay"><div class="modal-content"><form id="loan-form"><h3 id="loan-modal-title">تعریف تسهیلات</h3><input type="hidden" id="loan-id"><div class="form-group"><label for="bank-name">نام بانک یا موسسه</label><input type="text" id="bank-name" required class="form-control"></div><div class="form-group"><label for="loan-description">توضیح (مثال: وام خرید کالا)</label><input type="text" id="loan-description" required class="form-control"></div><div class="form-group"><label for="total-installments">تعداد کل اقساط</label><input type="number" id="total-installments" required min="1" class="form-control"></div><div class="form-group"><label for="installment-amount">مبلغ هر قسط (تومان)</label><input type="number" id="installment-amount" required min="1" class="form-control"></div><div class="form-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">انصراف</button><button type="submit" class="btn btn-primary">ذخیره</button></div></form></div></div>
+    <div class="modal-overlay" id="goal-modal-overlay"><div class="modal-content"><form id="goal-form"><h3 id="goal-modal-title">تعریف هدف مالی</h3><input type="hidden" id="goal-id"><div class="form-group"><label for="goal-name">عنوان هدف (مثال: سفر به کیش)</label><input type="text" id="goal-name" required class="form-control"></div><div class="form-group"><label for="target-amount">مبلغ هدف (تومان)</label><input type="number" id="target-amount" required min="1" class="form-control"></div><div class="form-group"><label for="saved-amount">مبلغ پس‌انداز شده اولیه (تومان)</label><input type="number" id="saved-amount" value="0" min="0" class="form-control"></div><div class="form-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">انصراف</button><button type="submit" class="btn btn-primary">ذخیره</button></div></form></div></div>
+    <div class="modal-overlay" id="confirm-modal-overlay"><div class="modal-content"><h3>تایید حذف</h3><p id="confirm-delete-message"></p><div class="form-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">خیر</button><button type="button" class="btn btn-danger" id="confirm-delete-btn">بله، حذف کن</button></div></div></div>
+    <div id="toast"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment-jalaali@0.9.2/build/moment-jalaali.js"></script>
+    <script src="https://unpkg.com/persian-date@1.1.0/dist/persian-date.min.js"></script>
+    <script src="https://unpkg.com/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- SELECTORS ---
+        const qs = (selector, parent = document) => parent.querySelector(selector);
+        const qsa = (selector, parent = document) => parent.querySelectorAll(selector);
+
+        // --- CONSTANTS ---
+        moment.locale('fa');
+        moment.updateLocale('fa', { jMonths: "فروردین_اردیبهشت_خرداد_تیر_مرداد_شهریور_مهر_آبان_آذر_دی_بهمن_اسفند".split("_"), weekdays: "یک‌شنبه_دوشنبه_سه‌شنبه_چهارشنبه_پنج‌شنبه_جمعه_شنبه".split("_"), weekdaysMin: "ی_د_s_چ_پ_ج_ش".split("_"),});
+        const MOMENT_FORMAT = 'YYYY/MM/DD';
+        const STORAGE_KEY = 'accountingApp_v29';
+        const TRANSACTION_TYPES = {
+            income: '✅ دریافتی',
+            expense: '❌ هزینه',
+            transfer: '⤴️ انتقال به پس انداز',
+            receivable: '💰 طلب',
+            debt: '➖ بدهی',
+            receivedCheck: '📄 چک دریافتی',
+            issuedCheck: '📄 چک صادره',
+            installmentPayment: '💳 پرداخت قسط'
+        };
+        const STATUS_TYPES = {
+            debt: { paid: 'پرداخت شد', pending: 'در انتظار', not_paid: 'پرداخت نشد' },
+            receivable: { received: 'دریافت شد', pending: 'در انتظار', not_received: 'دریافت نشد' },
+            issuedCheck: { cleared: 'پاس شده', pending: 'در انتظار', bounced: 'پاس نشد' },
+            receivedCheck: { cleared: 'پاس شده', pending: 'در انتظار', bounced: 'پاس نشد' }
+        };
+
+        // --- STATE ---
+        let state = {
+            transactions: [],
+            accounts: [],
+            loans: [],
+            savingsGoals: [],
+            expenseCategories: ['خرید روزمره', 'حمل و نقل', 'غذا', 'پوشاک', 'سرگرمی'],
+            incomeSources: ['حقوق', 'پروژه', 'سود سهام'],
+            isBalanceVisible: true,
+            activeAccountId: 'all',
+            filters: {
+                reports: { from: null, to: null, accountId: 'all' },
+                debts: { from: null, to: null, accountId: 'all', status: 'all' },
+                receivables: { from: null, to: null, accountId: 'all', status: 'all' },
+            }
+        };
+        let itemToDelete = { id: null, type: null };
+
+        // --- HELPERS ---
+        const formatCurrency = (amount) => `${(Number(amount) || 0).toLocaleString('fa-IR')}`;
+        const normalizeDigits = (str) => { if (typeof str !== 'string') return str; return str.replace(/[\u0660-\u0669]/g, c => c.charCodeAt(0) - 0x0660).replace(/[\u06F0-\u06F9]/g, c => c.charCodeAt(0) - 0x06F0); };
+        const showToast = (message) => { const t = qs('#toast'); t.textContent = message; t.classList.add('show'); setTimeout(() => { t.classList.remove('show'); }, 3000); };
+        const openModal = (modalId) => qs(modalId).classList.add('active');
+        const closeModal = (modalId) => qs(modalId).classList.remove('active');
+
+        // --- DATA PERSISTENCE ---
+        const saveData = () => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); localStorage.setItem(STORAGE_KEY + '_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); } catch (e) { console.error("Failed to save data", e); } };
+        const loadData = () => {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY);
+                if (data) { 
+                    const parsedData = JSON.parse(data);
+                    const defaultFilters = {
+                        reports: { from: null, to: null, accountId: 'all' },
+                        debts: { from: null, to: null, accountId: 'all', status: 'all' },
+                        receivables: { from: null, to: null, accountId: 'all', status: 'all' },
+                    };
+                    parsedData.filters = { ...defaultFilters, ...parsedData.filters };
+                    state = { ...state, ...parsedData }; 
+                }
+                
+                let dataWasMigrated = false;
+                state.transactions.forEach(tx => {
+                    const statusTypes = ['debt', 'receivable', 'issuedCheck', 'receivedCheck'];
+                    if (statusTypes.includes(tx.type)) {
+                        if (tx.isPaid !== undefined && tx.status === undefined) {
+                            if (tx.isPaid) {
+                                if (tx.type === 'debt') tx.status = 'paid';
+                                if (tx.type === 'receivable') tx.status = 'received';
+                                if (tx.type === 'issuedCheck' || tx.type === 'receivedCheck') tx.status = 'cleared';
+                            } else {
+                                tx.status = 'pending';
+                            }
+                            delete tx.isPaid;
+                            dataWasMigrated = true;
+                        } else if (tx.status === undefined) {
+                             tx.status = 'pending';
+                        }
+                    }
+                });
+                if(dataWasMigrated) {
+                    showToast('دیتابیس شما به نسخه جدید ارتقا یافت.');
+                    saveData();
+                }
+
+                if (state.accounts.length === 0 && state.transactions.length > 0) {
+                    const defaultAccount = { id: Date.now(), name: 'حساب اصلی' };
+                    state.accounts.push(defaultAccount);
+                    state.transactions.forEach(tx => { if(!tx.accountId) tx.accountId = defaultAccount.id; });
+                    showToast('یک "حساب اصلی" برای تراکنش‌های قدیمی شما ایجاد شد.');
+                }
+                if (!Array.isArray(state.savingsGoals)) {
+                    state.savingsGoals = [];
+                }
+                if (localStorage.getItem(STORAGE_KEY + '_theme') === 'dark') { document.body.classList.add('dark-mode'); }
+            } catch (e) { console.error("Failed to load data", e); }
+        };
+
+        // --- NAVIGATION ---
+        const switchPage = (pageId) => {
+            qsa('.page').forEach(p => p.classList.remove('active'));
+            qs(`#${pageId}`).classList.add('active');
+            qsa('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === pageId));
+            const pageRenderers = {
+                'dashboard-page': updateDashboard, 'transactions-page': renderTransactionListPage, 'reports-page': renderReportsPage,
+                'savings-page': renderSavingsPage, 'accounts-page': renderAccountsPage, 'debts-page': renderDebtsPage,
+                'receivables-page': renderReceivablesPage, 'loans-page': renderLoansPage,
+            };
+            pageRenderers[pageId]?.();
+            initDatepickers(qs(`#${pageId}`));
+        };
+
+        const updateAllUI = () => {
+            const currentPageId = qs('.page.active').id;
+            switchPage(currentPageId);
+        };
+
+        // --- BALANCE CALCULATION (CORE LOGIC) ---
+        const calculateBalance = (transactions) => {
+            return transactions.reduce((balance, tx) => {
+                const amount = tx.amount;
+                if (tx.type === 'income') return balance + amount;
+                if (tx.type === 'expense' || tx.type === 'transfer' || tx.type === 'installmentPayment') return balance - amount;
+                if ((tx.type === 'receivable' && tx.status === 'received') || (tx.type === 'receivedCheck' && tx.status === 'cleared')) return balance + amount;
+                if ((tx.type === 'debt' && tx.status === 'paid') || (tx.type === 'issuedCheck' && tx.status === 'cleared')) return balance - amount;
+                return balance;
+            }, 0);
+        };
+
+        // --- DASHBOARD ---
+        const updateDashboard = () => {
+            const accountId = state.activeAccountId;
+            const txs = accountId === 'all' ? state.transactions : state.transactions.filter(tx => tx.accountId == accountId);
+
+            const balance = calculateBalance(txs);
+            const income = txs.filter(tx => tx.type === 'income').reduce((acc, tx) => acc + tx.amount, 0);
+            const expenses = txs.filter(tx => tx.type === 'expense' || tx.type === 'installmentPayment').reduce((acc, tx) => acc + tx.amount, 0);
+            
+            const totalDebt = state.transactions.filter(t => (t.type === 'debt' || t.type === 'issuedCheck') && t.status === 'pending').reduce((s, t) => s + t.amount, 0);
+            const totalReceivable = state.transactions.filter(t => (t.type === 'receivable' || t.type === 'receivedCheck') && t.status === 'pending').reduce((s, t) => s + t.amount, 0);
+
+            const totalLoan = state.loans.reduce((s, l) => s + (l.totalInstallments - (l.paidInstallments || 0)) * l.installmentAmount, 0);
+
+            qs('#balance-amount').textContent = state.isBalanceVisible ? `${formatCurrency(balance)} تومان` : '****** تومان';
+            qs('#toggle-balance-visibility').className = `fas ${state.isBalanceVisible ? 'fa-eye' : 'fa-eye-slash'}`;
+            qs('#total-income').textContent = `${formatCurrency(income)} تومان`;
+            qs('#total-expense').textContent = `${formatCurrency(expenses)} تومان`;
+            qs('#total-debt').textContent = `${formatCurrency(totalDebt)} تومان`;
+            qs('#total-receivable').textContent = `${formatCurrency(totalReceivable)} تومان`;
+            qs('#total-loan').textContent = `${formatCurrency(totalLoan)} تومان`;
+            qs('#theme-toggle').className = `fas ${document.body.classList.contains('dark-mode') ? 'fa-moon' : 'fa-sun'}`;
+
+            renderAccountFilter('dashboard-page', state.activeAccountId);
+            renderDashboardRecents();
+        };
+
+        const renderDashboardRecents = () => {
+            const listEl = qs('#dashboard-recents ul');
+            listEl.innerHTML = '';
+            const recents = [...state.transactions].sort((a, b) => b.id - a.id).slice(0, 3);
+            if (recents.length === 0) {
+                listEl.innerHTML = '<li style="justify-content:center; color: var(--subtext-light); border: none; cursor: default;">تراکنشی یافت نشد.</li>';
+                return;
+            }
+            recents.forEach(tx => {
+                const li = document.createElement('li');
+                li.dataset.id = tx.id;
+                li.innerHTML = getTransactionListItemHTML(tx);
+                listEl.appendChild(li);
+            });
+        };
+
+        // --- ITEM & LIST RENDERING ---
+        const getTransactionListItemHTML = (tx, options = {}) => {
+            const { showAccount = false } = options;
+            const sign = tx.type === 'income' || tx.type.includes('received') || tx.type === 'receivable' ? '+' : '-';
+            const icons = { income: 'fa-arrow-up', expense: 'fa-arrow-down', transfer: 'fa-exchange-alt', debt: 'fa-file-invoice-dollar', receivable: 'fa-hand-holding-dollar', issuedCheck: 'fa-money-check-alt', receivedCheck: 'fa-money-check-alt', installmentPayment: 'fa-receipt' };
+
+            const displayDate = moment(tx.date, 'YYYY/MM/DD').format(MOMENT_FORMAT);
+            const displayDueDate = tx.dueDate ? moment(tx.dueDate, 'YYYY/MM/DD').format(MOMENT_FORMAT) : null;
+            const isOverdue = tx.dueDate && tx.status === 'pending' && moment(tx.dueDate, 'YYYY/MM/DD').isBefore(moment(), 'day');
+            const account = state.accounts.find(a => a.id == tx.accountId);
+
+            let descriptionHTML = tx.description;
+            if (tx.type === 'receivedCheck' || tx.type === 'issuedCheck') {
+                descriptionHTML += ` <span class="check-badge">چک</span>`;
+            }
+
+            let meta = `<div class="meta-data"><span><i class="fas fa-calendar-day"></i> ${displayDate}</span>`;
+            if (account && showAccount) meta += `<span><i class="fas fa-wallet"></i> ${account.name}</span>`;
+            if (tx.category) meta += `<span> • ${tx.category}</span>`;
+            if (displayDueDate) meta += `<span class="due-date-info ${isOverdue ? 'overdue' : ''}"><i class="fas fa-hourglass-half"></i> سررسید: ${displayDueDate}</span>`;
+            
+            const statusTypes = ['debt', 'receivable', 'issuedCheck', 'receivedCheck'];
+            if (statusTypes.includes(tx.type) && tx.status) {
+                const statuses = STATUS_TYPES[tx.type] || {};
+                const statusText = statuses[tx.status] || tx.status;
+                let statusClass = '';
+                if (['paid', 'received', 'cleared'].includes(tx.status)) statusClass = 'success';
+                else if (['not_paid', 'not_received', 'bounced'].includes(tx.status)) statusClass = 'danger';
+                meta += `<span class="meta-status ${statusClass}"><i class="fas fa-info-circle"></i> ${statusText}</span>`;
+            }
+
+            if (tx.loanId) {
+                const loan = state.loans.find(l => l.id == tx.loanId);
+                if (loan) meta += `<span> • قسط ${loan.bankName}</span>`;
+            }
+            meta += '</div>';
+
+            let actions = `<div class="item-actions">`;
+            actions += `<button class="action-btn edit-btn" data-id="${tx.id}"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn" data-id="${tx.id}" data-type="transaction"><i class="fas fa-trash-alt"></i></button></div>`;
+
+            return `<div class="item-icon ${tx.type}"><i class="fas ${icons[tx.type] || 'fa-dollar-sign'}"></i></div> <div class="item-info"> <p>${descriptionHTML}</p> ${meta} </div> <div class="item-amount ${tx.type}">${tx.type === 'transfer' ? '' : sign} ${formatCurrency(tx.amount)} تومان</div> ${actions}`;
+        };
+
+        // --- PAGE RENDERERS ---
+        const renderTransactionListPage = () => { 
+            renderAccountFilter('transactions-page');
+            renderCategoryFilter(); 
+            renderTransactionList(); 
+        };
+        const renderTransactionList = () => {
+            const listEl = qs('#transaction-list'), statusEl = qs('#transaction-list-status');
+            const searchTerm = qs('#search-input').value.toLowerCase(), accountFilter = qs('#transactions-page #account-filter').value;
+            const typeFilter = qs('#type-filter').value, categoryFilter = qs('#category-filter').value;
+            const filtered = state.transactions.filter(tx => accountFilter === 'all' ? true : tx.accountId == accountFilter).filter(tx => typeFilter === 'all' ? true : tx.type === typeFilter).filter(tx => categoryFilter === 'all' || !tx.category ? true : tx.category === categoryFilter).filter(tx => searchTerm ? tx.description.toLowerCase().includes(searchTerm) : true);
+            const sorted = filtered.sort((a, b) => moment(b.date, MOMENT_FORMAT).diff(moment(a.date, MOMENT_FORMAT)) || b.id - a.id);
+            listEl.innerHTML = ''; statusEl.textContent = '';
+            if (sorted.length === 0) { statusEl.textContent = state.transactions.length === 0 ? 'هنوز هیچ تراکنشی ثبت نشده است.' : 'هیچ تراکنشی با این مشخصات یافت نشد.'; return; }
+            sorted.forEach(tx => { const li = document.createElement('li'); li.dataset.id = tx.id; li.innerHTML = getTransactionListItemHTML(tx, { showAccount: accountFilter === 'all' }); listEl.appendChild(li); });
+        };
+
+        const applyGenericFilters = (transactions, pageKey) => {
+            const filters = state.filters[pageKey];
+            return transactions.filter(tx => {
+                const date = moment(tx.date, MOMENT_FORMAT);
+                if (filters.from && date.isBefore(moment(filters.from, MOMENT_FORMAT), 'day')) return false;
+                if (filters.to && date.isAfter(moment(filters.to, MOMENT_FORMAT), 'day')) return false;
+                if (filters.accountId !== 'all' && tx.accountId != filters.accountId) return false;
+                if (filters.status && filters.status !== 'all' && tx.status !== filters.status) return false;
+                return true;
+            });
+        };
+
+        const renderFilteredListPage = (pageKey, title, listEl, statusEl, txTypes) => {
+            const pageEl = qs(`#${pageKey}-page`);
+            
+            // Populate filters
+            const accountFilterEl = qs('.account-filter', pageEl);
+            populateDropdown(accountFilterEl, state.accounts, 'id', 'name', { value: 'all', text: 'همه حساب‌ها' });
+            accountFilterEl.value = state.filters[pageKey].accountId;
+
+            const statusFilterEl = qs('.status-filter', pageEl);
+            if (statusFilterEl) {
+                let statusesToShow = {};
+                if (pageKey === 'debts') {
+                    statusesToShow = { ...STATUS_TYPES.debt, ...STATUS_TYPES.issuedCheck };
+                } else if (pageKey === 'receivables') {
+                    statusesToShow = { ...STATUS_TYPES.receivable, ...STATUS_TYPES.receivedCheck };
+                }
+                populateDropdown(statusFilterEl, Object.entries(statusesToShow).map(([k,v]) => ({key:k, val:v})), 'key', 'val', { value: 'all', text: 'همه وضعیت‌ها' });
+                statusFilterEl.value = state.filters[pageKey].status;
+            }
+
+            qs('.from-date-filter', pageEl).value = state.filters[pageKey].from || '';
+            qs('.to-date-filter', pageEl).value = state.filters[pageKey].to || '';
+
+            // Filter data
+            const baseTxs = state.transactions.filter(t => txTypes.includes(t.type));
+            const filteredTxs = applyGenericFilters(baseTxs, pageKey);
+
+            // Update summary
+            const summaryEl = qs('.filter-summary', pageEl);
+            if (filteredTxs.length > 0 && (state.filters[pageKey].from || state.filters[pageKey].to || state.filters[pageKey].accountId !=='all' || state.filters[pageKey].status !== 'all') ) {
+                summaryEl.style.display = 'block';
+                const totalAmount = filteredTxs.reduce((sum, tx) => sum + tx.amount, 0);
+                summaryEl.innerHTML = `<h4>خلاصه فیلتر</h4><div class="summary-details"><div><span>تعداد</span><strong>${formatCurrency(filteredTxs.length)}</strong></div><div><span>مجموع</span><strong>${formatCurrency(totalAmount)} تومان</strong></div></div>`;
+            } else {
+                summaryEl.style.display = 'none';
+            }
+
+            // Render list
+            const sorted = filteredTxs.sort((a, b) => (a.status === 'paid' || a.status === 'cleared' || a.status === 'received' ? 1 : -1) - (b.status === 'paid' || b.status === 'cleared' || b.status === 'received' ? 1 : -1) || moment(a.dueDate || a.date, MOMENT_FORMAT).diff(moment(b.dueDate || b.date, MOMENT_FORMAT)));
+            listEl.innerHTML = ''; statusEl.textContent = '';
+            if (sorted.length === 0) { statusEl.textContent = baseTxs.length === 0 ? `هیچ ${title} ثبت نشده است.` : 'هیچ موردی با این فیلتر یافت نشد.'; return; }
+            sorted.forEach(tx => { const li = document.createElement('li'); li.dataset.id = tx.id; li.innerHTML = getTransactionListItemHTML(tx, { showAccount: true }); listEl.appendChild(li); });
+        };
+        
+        const renderDebtsPage = () => renderFilteredListPage('debts', 'بدهی', qs('#debts-list'), qs('#debts-status'), ['debt', 'issuedCheck']);
+        const renderReceivablesPage = () => renderFilteredListPage('receivables', 'طلب', qs('#receivables-list'), qs('#receivables-status'), ['receivable', 'receivedCheck']);
+
+        const renderLoansPage = () => {
+            const listEl = qs('#loans-list'), statusEl = qs('#loans-status');
+            listEl.innerHTML = '';
+            if (state.loans.length === 0) { statusEl.textContent = 'هیچ تسهیلاتی تعریف نشده است.'; return; }
+            statusEl.textContent = '';
+            state.loans.forEach(loan => {
+                const paidCount = state.transactions.filter(t => t.loanId == loan.id).length;
+                loan.paidInstallments = paidCount;
+                const progress = (loan.totalInstallments > 0) ? (paidCount / loan.totalInstallments) * 100 : 0;
+                const remainingAmount = (loan.totalInstallments - paidCount) * loan.installmentAmount;
+                const div = document.createElement('div');
+                div.className = 'progress-item';
+                div.innerHTML = `<div class="progress-header"><div><h4>${loan.bankName}</h4><p style="font-size: 0.9rem; color: var(--subtext-light); margin: 0.25rem 0 0;">${loan.description}</p></div><div class="item-actions"><button class="action-btn delete-btn" data-id="${loan.id}" data-type="loan"><i class="fas fa-trash-alt"></i></button></div></div><div class="progress-details"><div><span>مبلغ هر قسط</span><span>${formatCurrency(loan.installmentAmount)} تومان</span></div><div><span>اقساط پرداخت شده</span><span>${paidCount} از ${loan.totalInstallments}</span></div><div><span>مبلغ باقی‌مانده</span><span>${formatCurrency(remainingAmount)} تومان</span></div></div><div class="progress-bar-container"><div class="progress-bar loan" style="width: ${progress}%"></div></div><div class="progress-text">${Math.round(progress)}% تکمیل شده</div>`;
+                listEl.appendChild(div);
+            });
+        };
+        const renderSavingsPage = () => {
+            const savingsBalance = state.transactions.filter(tx => tx.type === 'transfer').reduce((acc, tx) => acc + tx.amount, 0);
+            qs('#savings-balance').textContent = `${formatCurrency(savingsBalance)} تومان`;
+            renderSavingsGoalsList();
+        };
+        const renderSavingsGoalsList = () => {
+            const listEl = qs('#savings-goals-list'), statusEl = qs('#savings-goals-status');
+            listEl.innerHTML = ''; statusEl.textContent = '';
+            if (state.savingsGoals.length === 0) { statusEl.textContent = 'هنوز هدفی تعریف نکرده‌اید.'; return; }
+            state.savingsGoals.forEach(goal => {
+                const progress = (goal.targetAmount > 0) ? (goal.savedAmount / goal.targetAmount) * 100 : 0;
+                const div = document.createElement('div');
+                div.className = 'progress-item';
+                div.innerHTML = `<div class="progress-header"><div><h4>${goal.name}</h4></div><div class="item-actions"><button class="action-btn edit-btn" data-id="${goal.id}" data-type="goal"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn" data-id="${goal.id}" data-type="goal"><i class="fas fa-trash-alt"></i></button></div></div><div class="progress-details"><div><span>پس انداز شده</span><span>${formatCurrency(goal.savedAmount)} تومان</span></div><div><span>مبلغ هدف</span><span>${formatCurrency(goal.targetAmount)} تومان</span></div></div><div class="progress-bar-container"><div class="progress-bar goal" style="width: ${progress}%"></div></div><div class="progress-text">${Math.round(progress)}% تکمیل شده</div>`;
+                listEl.appendChild(div);
+            });
+        };
+        const renderAccountsPage = () => {
+            const listEl = qs('#accounts-list'), statusEl = qs('#accounts-status');
+            listEl.innerHTML = '';
+            if (state.accounts.length === 0) { statusEl.textContent = 'هیچ حسابی تعریف نشده است. برای شروع یک حساب جدید اضافه کنید.'; return; }
+            statusEl.textContent = '';
+            state.accounts.forEach(acc => {
+                const accountTxs = state.transactions.filter(tx => tx.accountId == acc.id);
+                const balance = calculateBalance(accountTxs);
+                const div = document.createElement('div');
+                div.className = 'account-item'; div.dataset.id = acc.id;
+                div.innerHTML = `<i class="fas fa-university fa-lg" style="color: var(--primary)"></i><h4>${acc.name}</h4><span class="balance">${formatCurrency(balance)} تومان</span><i class="fas fa-chevron-left" style="color: var(--subtext-light)"></i>`;
+                listEl.appendChild(div);
+            });
+        };
+        const renderReportsPage = () => {
+            const pageEl = qs('#reports-page');
+            const dailyListEl = qs('#daily-reports-list', pageEl), statusEl = qs('#reports-status', pageEl);
+            const summaryBox = qs('.filter-summary', pageEl);
+            
+            // Populate filters
+            qs('.account-filter', pageEl).value = state.filters.reports.accountId;
+            qs('.from-date-filter', pageEl).value = state.filters.reports.from || '';
+            qs('.to-date-filter', pageEl).value = state.filters.reports.to || '';
+            
+            // Filter transactions
+            const filteredTxs = applyGenericFilters(state.transactions, 'reports');
+
+            dailyListEl.innerHTML = ''; statusEl.innerHTML = '';
+            if (state.transactions.length === 0) { statusEl.innerHTML = 'برای نمایش گزارش، ابتدا تراکنشی ثبت کنید.'; return; }
+
+            const groupedByDay = filteredTxs.reduce((acc, tx) => {
+                const day = tx.date;
+                if (!acc[day]) acc[day] = { income: 0, expense: 0, transactions: [] };
+                
+                const amount = tx.amount;
+                if (tx.type === 'income' || (tx.type === 'receivable' && tx.status === 'received') || (tx.type === 'receivedCheck' && tx.status === 'cleared')) {
+                    acc[day].income += amount;
+                }
+                if (tx.type === 'expense' || tx.type === 'transfer' || tx.type === 'installmentPayment' || (tx.type === 'debt' && tx.status === 'paid') || (tx.type === 'issuedCheck' && tx.status === 'cleared')) {
+                    acc[day].expense += amount;
+                }
+                acc[day].transactions.push(tx);
+                return acc;
+            }, {});
+            
+            if (filteredTxs.length > 0 && (state.filters.reports.from || state.filters.reports.to || state.filters.reports.accountId !=='all')) {
+                 const totalIncome = Object.values(groupedByDay).reduce((s, d) => s + d.income, 0);
+                 const totalExpense = Object.values(groupedByDay).reduce((s, d) => s + d.expense, 0);
+                 summaryBox.style.display = 'block';
+                 summaryBox.innerHTML = `<h4>خلاصه فیلتر</h4><div class="summary-details"><div><span>تعداد</span><strong>${formatCurrency(filteredTxs.length)}</strong></div><div><span>مجموع دخل</span><strong class="income">${formatCurrency(totalIncome)}</strong></div><div><span>مجموع خرج</span><strong class="expense">${formatCurrency(totalExpense)}</strong></div></div>`;
+            } else {
+                 summaryBox.style.display = 'none';
+            }
+            
+            const sortedDays = Object.keys(groupedByDay).sort((a, b) => moment(b, 'YYYY/MM/DD').diff(moment(a, 'YYYY/MM/DD')));
+            
+            if (sortedDays.length === 0) {
+                 statusEl.textContent = 'هیچ موردی با این فیلتر یافت نشد.';
+            }
+            
+            dailyListEl.innerHTML = sortedDays.map(day => {
+                const data = groupedByDay[day];
+                const dayNet = data.income - data.expense;
+                const pDate = new persianDate(moment(day, 'YYYY/MM/DD').toDate());
+                const dayOfWeek = pDate.format('dddd');
+                const fullDate = pDate.format('D MMMM YYYY');
+
+                return `<div class="daily-report-item" data-net-flow="${dayNet}">
+                            <div class="daily-report-header">
+                                <div class="date-info">
+                                    <span class="day-of-week">${dayOfWeek}</span>
+                                    <span class="date-full">${fullDate}</span>
+                                </div>
+                                <div class="flow-summary">
+                                    <div class="flow-item income"><i class="fas fa-arrow-up"></i><span>${formatCurrency(data.income)}</span></div>
+                                    <div class="flow-item expense"><i class="fas fa-arrow-down"></i><span>${formatCurrency(data.expense)}</span></div>
+                                    <div class="flow-item net"><i class="fas fa-equals"></i><span>${formatCurrency(dayNet)}</span></div>
+                                </div>
+                                <i class="fas fa-chevron-down expand-arrow"></i>
+                            </div>
+                            <div class="daily-report-body"><ul class="list-container">${data.transactions.sort((a,b)=>b.id-a.id).map(tx => `<li data-id="${tx.id}">${getTransactionListItemHTML(tx, {showAccount: true})}</li>`).join('')}</ul></div>
+                        </div>`;
+            }).join('');
+        };
+
+        // --- FILTERS & FORMS ---
+        const populateDropdown = (selectEl, data, valueField, textField, addOption) => {
+            let currentValue = selectEl.value;
+            selectEl.innerHTML = '';
+            if (addOption) { const opt = document.createElement('option'); opt.value = addOption.value; opt.textContent = addOption.text; selectEl.appendChild(opt); }
+            data.forEach(item => { const option = document.createElement('option'); option.value = item[valueField]; option.textContent = item[textField]; selectEl.appendChild(option); });
+            
+            if (selectEl.id.includes('account-select') || selectEl.id.includes('account-filter')) {
+                 selectEl.innerHTML += `<option value="add_new_account" style="font-weight: bold; color: var(--primary);">+ افزودن حساب جدید...</option>`;
+            }
+            if (currentValue) selectEl.value = currentValue;
+        };
+        const renderAccountFilter = (page, selectedValue) => {
+            const filterId = page === 'dashboard-page' ? '#account-filter-dashboard' : '#transactions-page #account-filter';
+            const selectEl = qs(filterId);
+            if (selectEl) { 
+                populateDropdown(selectEl, state.accounts, 'id', 'name', {value: 'all', text: 'همه حساب‌ها'}); 
+                selectEl.value = selectedValue || 'all'; 
+            }
+        };
+        const renderCategoryFilter = () => {
+            const typeFilterVal = qs('#type-filter').value;
+            const categoryFilterEl = qs('#category-filter');
+            let categories = [];
+            if (typeFilterVal === 'income') categories = state.incomeSources;
+            if (typeFilterVal === 'expense') categories = state.expenseCategories;
+            categoryFilterEl.innerHTML = '<option value="all">همه دسته‌بندی‌ها</option>';
+            categories.forEach(cat => categoryFilterEl.innerHTML += `<option value="${cat}">${cat}</option>`);
+            categoryFilterEl.disabled = !['income', 'expense'].includes(typeFilterVal);
+        };
+        const handleTransactionFormChange = () => {
+            const typeVal = qs('#type').value;
+            const loanPaymentGroup = qs('#loan-payment-group'), loanSelect = qs('#loan-select'), addLoanPrompt = qs('#add-loan-prompt');
+            const dateLabel = qs('label[for="transaction-date"]');
+            const statusGroup = qs('#status-group'), statusSelect = qs('#status-select');
+            
+            const statusTypes = ['debt', 'receivable', 'issuedCheck', 'receivedCheck'];
+            if (statusTypes.includes(typeVal)) {
+                statusGroup.style.display = 'block';
+                const statuses = STATUS_TYPES[typeVal] || {};
+                populateDropdown(statusSelect, Object.entries(statuses).map(([k, v]) => ({key: k, val: v})), 'key', 'val');
+            } else {
+                statusGroup.style.display = 'none';
+            }
+
+            qs('#category-group').style.display = ['income', 'expense'].includes(typeVal) ? 'block' : 'none';
+            qs('#due-date-group').style.display = statusTypes.includes(typeVal) ? 'block' : 'none';
+            loanPaymentGroup.style.display = typeVal === 'installmentPayment' ? 'block' : 'none';
+            qs('#new-category-group').style.display = 'none';
+            dateLabel.textContent = (typeVal === 'issuedCheck' || typeVal === 'receivedCheck') ? 'تاریخ دریافت/صدور چک' : 'تاریخ تراکنش';
+
+            if (typeVal === 'installmentPayment') {
+                if(state.loans.length > 0) { populateDropdown(loanSelect, state.loans, 'id', 'bankName'); loanSelect.style.display = 'block'; addLoanPrompt.style.display = 'none'; }
+                else { loanSelect.style.display = 'none'; addLoanPrompt.style.display = 'block'; }
+            } else if (['income', 'expense'].includes(typeVal)) {
+                let categories = (typeVal === 'income') ? state.incomeSources : state.expenseCategories;
+                const categorySelect = qs('#category-select');
+                categorySelect.innerHTML = categories.map(c => `<option value="${c}">${c}</option>`).join('');
+                categorySelect.innerHTML += '<option value="add-new">افزودن دسته جدید...</option>';
+            }
+        };
+
+        // --- MODALS & ACTIONS ---
+        const openTransactionModal = (txId = null, type = null) => {
+            qs('#transaction-form').reset();
+            qs('#transaction-modal-title').textContent = txId ? 'ویرایش تراکنش' : 'تراکنش جدید';
+            qs('#transaction-id').value = txId || '';
+            populateDropdown(qs('#type'), Object.entries(TRANSACTION_TYPES).map(([k, v]) => ({key: k, val: v})), 'key', 'val');
+            populateDropdown(qs('#account-select'), state.accounts, 'id', 'name');
+            if (type) qs('#type').value = type;
+            if (type === 'transfer') qs('#description').value = 'انتقال به صندوق پس‌انداز';
+            
+            handleTransactionFormChange(); 
+
+            if (txId) {
+                const tx = state.transactions.find(t => t.id == txId);
+                qs('#type').value = tx.type;
+                handleTransactionFormChange(); 
+                qs('#account-select').value = tx.accountId;
+                qs('#description').value = tx.description;
+                qs('#amount').value = tx.amount;
+                qs('#transaction-date').value = moment(tx.date, 'YYYY/MM/DD').format(MOMENT_FORMAT);
+                if (tx.dueDate) qs('#due-date').value = moment(tx.dueDate, 'YYYY/MM/DD').format(MOMENT_FORMAT);
+                if (tx.loanId) qs('#loan-select').value = tx.loanId;
+                if (tx.category) qs('#category-select').value = tx.category;
+                if (tx.status) qs('#status-select').value = tx.status;
+            } else {
+                qs('#transaction-date').value = '';
+                qs('#due-date').value = '';
+                qs('#status-select').value = 'pending';
+            }
+            openModal('#transaction-modal-overlay');
+        };
+        const openAccountModal = (accId = null) => {
+            qs('#account-form').reset();
+            qs('#account-modal-title').textContent = accId ? 'ویرایش حساب' : 'حساب جدید';
+            qs('#account-id').value = accId || '';
+            if (accId) {
+                const acc = state.accounts.find(a => a.id == accId);
+                qs('#account-name').value = acc.name;
+                qs('#card-number').value = acc.cardNumber || '';
+                qs('#account-number').value = acc.accountNumber || '';
+                qs('#shaba-number').value = acc.shabaNumber || '';
+                qs('#notes').value = acc.notes || '';
+                qs('#expiry-month').value = acc.expiryMonth || '';
+                qs('#expiry-year').value = acc.expiryYear || '';
+                qs('#cvv2').value = acc.cvv2 || '';
+            }
+            openModal('#account-modal-overlay');
+        };
+        const openGoalModal = (goalId = null) => {
+            qs('#goal-form').reset();
+            qs('#goal-modal-title').textContent = goalId ? 'ویرایش هدف' : 'هدف مالی جدید';
+            qs('#goal-id').value = goalId || '';
+            if(goalId) {
+                const goal = state.savingsGoals.find(g => g.id == goalId);
+                qs('#goal-name').value = goal.name;
+                qs('#target-amount').value = goal.targetAmount;
+                qs('#saved-amount').value = goal.savedAmount;
+            }
+            openModal('#goal-modal-overlay');
+        };
+        
+        const initDatepickers = (parent = document) => {
+            try { $(parent).find(".pdate").pDatepicker({ format: MOMENT_FORMAT, autoClose: true, observer: true, initialValue: false, persianDigit: true, calendar: { persian: { locale: 'fa' }}, toolbox: { calendarSwitch: { enabled: false } } }); } catch(e) { console.error("Datepicker init failed", e); }
+        }
+
+        // --- EVENT HANDLERS ---
+        const setupEventListeners = () => {
+            document.body.addEventListener('click', (e) => {
+                const target = e.target;
+                const closest = (selector) => target.closest(selector);
+
+                if (closest('.nav-btn')) { switchPage(closest('.nav-btn').dataset.page); }
+                else if (closest('.view-all-btn')) { e.preventDefault(); switchPage('transactions-page'); }
+                else if (closest('#theme-toggle')) { document.body.classList.toggle('dark-mode'); updateAllUI(); saveData(); }
+                else if (closest('#toggle-balance-visibility')) { state.isBalanceVisible = !state.isBalanceVisible; updateAllUI(); saveData(); }
+                else if (closest('.fab')) { openTransactionModal(); }
+                else if (closest('[data-action="quick-add-income"]')) { openTransactionModal(null, 'income'); }
+                else if (closest('[data-action="quick-add-expense"]')) { openTransactionModal(null, 'expense'); }
+                else if (closest('[data-action="add-to-fund"]')) { openTransactionModal(null, 'transfer'); }
+                else if (closest('[data-action="add-account"]')) { openAccountModal(); }
+                else if (closest('[data-action="add-loan"]')) { qs('#loan-form').reset(); openModal('#loan-modal-overlay'); }
+                else if (closest('[data-action="add-goal"]')) { openGoalModal(); }
+                else if (closest('[data-action="go-to-loans"]')) { e.preventDefault(); closeModal('#transaction-modal-overlay'); switchPage('loans-page'); }
+                else if (target.matches('.modal-overlay')) { closeModal('#' + target.id); }
+                else if (closest('[data-action="close-modal"]')) { closeModal('#' + closest('.modal-overlay').id); }
+                else if (closest('.edit-btn')) {
+                    e.stopPropagation();
+                    const btn = closest('.edit-btn');
+                    const parentLi = closest('li');
+                    if (btn.dataset.type === 'goal') openGoalModal(btn.dataset.id);
+                    else if (parentLi && parentLi.dataset.id) openTransactionModal(parentLi.dataset.id);
+                    else if (btn.dataset.id) openTransactionModal(btn.dataset.id);
+                }
+                else if (closest('.delete-btn')) {
+                    e.stopPropagation();
+                    const btn = closest('.delete-btn');
+                    const parentLi = closest('li');
+                    itemToDelete.id = parseInt(parentLi ? parentLi.dataset.id : btn.dataset.id);
+                    itemToDelete.type = btn.dataset.type;
+                    qs('#confirm-delete-message').textContent = 'آیا از حذف این مورد مطمئن هستید؟ این عمل غیرقابل بازگشت است.';
+                    openModal('#confirm-modal-overlay');
+                }
+                else if (closest('.list-container li') && !closest('.daily-report-body')) {
+                    const li = closest('.list-container li');
+                    if(li && li.dataset.id) openTransactionModal(li.dataset.id);
+                }
+                 else if (closest('.daily-report-body li')) {
+                    const li = closest('.daily-report-body li');
+                    if(li && li.dataset.id) openTransactionModal(li.dataset.id);
+                }
+                else if (closest('.account-item')) {
+                    const acc = state.accounts.find(a => a.id == closest('.account-item').dataset.id);
+                    let expiryDate = (acc.expiryMonth && acc.expiryYear) ? `${acc.expiryMonth}/${acc.expiryYear}` : '-';
+                    qs('#account-details-content').innerHTML = `<h3>${acc.name}</h3><div style="text-align: right; line-height: 2;"><p><strong>شماره کارت:</strong> ${acc.cardNumber || '-'}</p><p><strong>تاریخ انقضا:</strong> ${expiryDate}</p><p><strong>CVV2:</strong> ${acc.cvv2 || '-'}</p><p><strong>شماره حساب:</strong> ${acc.accountNumber || '-'}</p><p><strong>شماره شبا:</strong> ${acc.shabaNumber || '-'}</p><p><strong>یادداشت:</strong> ${acc.notes || '-'}</p></div><div class="form-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">بستن</button><button type="button" class="btn btn-primary" data-action="edit-account" data-id="${acc.id}">ویرایش</button><button type="button" class="btn btn-danger" data-action="delete-account" data-id="${acc.id}">حذف</button></div>`;
+                    openModal('#account-details-modal-overlay');
+                }
+                else if(closest('[data-action="edit-account"]')) { closeModal('#account-details-modal-overlay'); openAccountModal(closest('[data-action="edit-account"]').dataset.id); }
+                else if(closest('[data-action="delete-account"]')) {
+                    itemToDelete.id = parseInt(closest('[data-action="delete-account"]').dataset.id); itemToDelete.type = 'account';
+                    qs('#confirm-delete-message').textContent = 'هشدار: فقط در صورتی می‌توانید حساب را حذف کنید که هیچ تراکنشی نداشته باشد. آیا ادامه می‌دهید؟';
+                    closeModal('#account-details-modal-overlay'); openModal('#confirm-modal-overlay');
+                }
+                else if (closest('.daily-report-header')) { closest('.daily-report-item').classList.toggle('active'); }
+            });
+            
+            qsa('.advanced-filters .apply-filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const pageEl = e.target.closest('.page');
+                    const pageKey = pageEl.id.replace('-page', '');
+                    state.filters[pageKey] = {
+                        from: normalizeDigits(qs('.from-date-filter', pageEl).value) || null,
+                        to: normalizeDigits(qs('.to-date-filter', pageEl).value) || null,
+                        accountId: qs('.account-filter', pageEl).value,
+                        status: qs('.status-filter', pageEl) ? qs('.status-filter', pageEl).value : 'all',
+                    };
+                    saveData();
+                    switchPage(pageEl.id);
+                });
+            });
+
+            qsa('.advanced-filters .clear-filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const pageEl = e.target.closest('.page');
+                    const pageKey = pageEl.id.replace('-page', '');
+                    state.filters[pageKey] = { from: null, to: null, accountId: 'all', status: 'all' };
+                    saveData();
+                    switchPage(pageEl.id);
+                });
+            });
+
+
+            qs('#transaction-form').addEventListener('submit', (e) => {
+                e.preventDefault(); const form = e.target;
+                const id = form.querySelector('#transaction-id').value;
+                const type = form.querySelector('#type').value;
+                let category = form.querySelector('#category-select').value;
+                const newCategory = form.querySelector('#new-category-input').value.trim();
+                const statusTypes = ['debt', 'receivable', 'issuedCheck', 'receivedCheck'];
+
+                if (category === 'add-new') {
+                    if (!newCategory) { showToast('لطفا نام دسته جدید را وارد کنید.'); return; }
+                    category = newCategory;
+                    if (type === 'expense' && !state.expenseCategories.includes(newCategory)) state.expenseCategories.push(newCategory);
+                    else if (type === 'income' && !state.incomeSources.includes(newCategory)) state.incomeSources.push(newCategory);
+                }
+                const transactionData = {
+                    type: type, accountId: form.querySelector('#account-select').value, description: form.querySelector('#description').value.trim(),
+                    amount: parseInt(normalizeDigits(form.querySelector('#amount').value || '0')), date: normalizeDigits(form.querySelector('#transaction-date').value),
+                    category: ['income', 'expense'].includes(type) ? category : null,
+                    dueDate: statusTypes.includes(type) ? normalizeDigits(form.querySelector('#due-date').value) || null : null,
+                    status: statusTypes.includes(type) ? form.querySelector('#status-select').value : null,
+                    loanId: type === 'installmentPayment' ? form.querySelector('#loan-select').value : null,
+                };
+                if (!transactionData.description || !transactionData.amount || !transactionData.date || !transactionData.accountId) { showToast('لطفا فیلدهای لازم (توضیح، مبلغ، تاریخ و حساب) را پر کنید.'); return; }
+                if (id) {
+                    const index = state.transactions.findIndex(tx => tx.id == id);
+                    state.transactions[index] = { ...state.transactions[index], ...transactionData }; showToast('تراکنش ویرایش شد.');
+                } else {
+                    state.transactions.push({ id: Date.now(), ...transactionData }); showToast('تراکنش ثبت شد.');
+                }
+                saveData(); updateAllUI(); closeModal('#transaction-modal-overlay');
+            });
+            qs('#account-form').addEventListener('submit', (e) => {
+                e.preventDefault(); const form = e.target;
+                const id = form.querySelector('#account-id').value;
+                const name = form.querySelector('#account-name').value.trim();
+                if (!name) { showToast('نام حساب الزامی است.'); return; }
+                const accountData = { 
+                    name: name, 
+                    cardNumber: form.querySelector('#card-number').value.trim(), 
+                    accountNumber: form.querySelector('#account-number').value.trim(), 
+                    shabaNumber: form.querySelector('#shaba-number').value.trim(), 
+                    notes: form.querySelector('#notes').value.trim(),
+                    expiryMonth: form.querySelector('#expiry-month').value.trim(),
+                    expiryYear: form.querySelector('#expiry-year').value.trim(),
+                    cvv2: form.querySelector('#cvv2').value.trim(),
+                };
+                if (id) {
+                    const index = state.accounts.findIndex(a => a.id == id);
+                    state.accounts[index] = { ...state.accounts[index], ...accountData }; showToast('حساب ویرایش شد.');
+                } else {
+                    state.accounts.push({ id: Date.now(), ...accountData }); showToast('حساب جدید اضافه شد.');
+                }
+                saveData(); updateAllUI(); closeModal('#account-modal-overlay');
+            });
+            qs('#loan-form').addEventListener('submit', (e) => {
+                e.preventDefault(); const form = e.target;
+                const loanData = { bankName: form.querySelector('#bank-name').value.trim(), description: form.querySelector('#loan-description').value.trim(), totalInstallments: parseInt(normalizeDigits(form.querySelector('#total-installments').value)), installmentAmount: parseInt(normalizeDigits(form.querySelector('#installment-amount').value)), };
+                if (!loanData.bankName || !loanData.totalInstallments || !loanData.installmentAmount) { showToast('لطفا تمام فیلدها را پر کنید.'); return; }
+                state.loans.push({ id: Date.now(), ...loanData, paidInstallments: 0 }); showToast('تسهیلات جدید تعریف شد.');
+                saveData(); updateAllUI(); closeModal('#loan-modal-overlay');
+            });
+            qs('#goal-form').addEventListener('submit', (e) => {
+                e.preventDefault(); const form = e.target;
+                const id = form.querySelector('#goal-id').value;
+                const goalData = { name: form.querySelector('#goal-name').value.trim(), targetAmount: parseInt(normalizeDigits(form.querySelector('#target-amount').value)), savedAmount: parseInt(normalizeDigits(form.querySelector('#saved-amount').value || '0')), };
+                if (!goalData.name || !goalData.targetAmount) { showToast('لطفا عنوان و مبلغ هدف را مشخص کنید.'); return; }
+                if (id) {
+                    const index = state.savingsGoals.findIndex(g => g.id == id);
+                    state.savingsGoals[index] = { ...state.savingsGoals[index], ...goalData }; showToast('هدف ویرایش شد.');
+                } else {
+                    state.savingsGoals.push({ id: Date.now(), ...goalData }); showToast('هدف جدید اضافه شد.');
+                }
+                saveData(); updateAllUI(); closeModal('#goal-modal-overlay');
+            });
+            qs('#confirm-delete-btn').addEventListener('click', () => {
+                 if (itemToDelete.type === 'transaction') { state.transactions = state.transactions.filter(i => i.id !== itemToDelete.id); }
+                 else if (itemToDelete.type === 'loan') { state.loans = state.loans.filter(i => i.id !== itemToDelete.id); state.transactions = state.transactions.filter(t => t.loanId != itemToDelete.id); }
+                 else if (itemToDelete.type === 'goal') { state.savingsGoals = state.savingsGoals.filter(i => i.id !== itemToDelete.id); }
+                 else if (itemToDelete.type === 'account') {
+                     if (state.transactions.some(t => t.accountId == itemToDelete.id)) { showToast('امکان حذف حساب دارای تراکنش وجود ندارد.'); closeModal('#confirm-modal-overlay'); return; }
+                     state.accounts = state.accounts.filter(i => i.id !== itemToDelete.id);
+                 }
+                 showToast('مورد با موفقیت حذف شد.'); saveData(); updateAllUI(); closeModal('#confirm-modal-overlay');
+            });
+
+            const handleAccountSelectChange = (e, modalToClose = null) => {
+                const select = e.target;
+                if (select.value === 'add_new_account') {
+                    let defaultValue = 'all';
+                    if (select.id === 'account-select') {
+                        defaultValue = state.accounts[0]?.id || '';
+                    }
+                    select.value = defaultValue;
+                    
+                    if (modalToClose) closeModal(modalToClose);
+                    switchPage('accounts-page');
+                    setTimeout(() => openAccountModal(), 50);
+                }
+            };
+
+            qsa('select.account-filter, select#account-select, select#account-filter-dashboard').forEach(sel => {
+                sel.addEventListener('change', (e) => {
+                    if (e.target.value === 'add_new_account') {
+                        let modal = e.target.closest('.modal-overlay');
+                        handleAccountSelectChange(e, modal ? `#${modal.id}`: null);
+                    }
+                });
+            });
+
+            qs('#account-filter-dashboard').addEventListener('change', (e) => {
+                if(e.target.value !== 'add_new_account') {
+                    state.activeAccountId = e.target.value;
+                    updateDashboard();
+                }
+            });
+             qs('#transactions-page #account-filter').addEventListener('change', (e) => {
+                if(e.target.value !== 'add_new_account') renderTransactionList();
+            });
+
+            qs('#type').addEventListener('change', handleTransactionFormChange);
+            qs('#category-select').addEventListener('change', () => { qs('#new-category-group').style.display = qs('#category-select').value === 'add-new' ? 'block' : 'none'; });
+            qs('#search-input').addEventListener('input', renderTransactionList);
+            qs('#transactions-page #type-filter').addEventListener('change', () => { renderCategoryFilter(); renderTransactionList(); });
+            qs('#transactions-page #category-filter').addEventListener('change', renderTransactionList);
+        };
+
+        const init = () => {
+            loadData();
+            initDatepickers();
+            populateDropdown(qs('#type-filter'), Object.entries(TRANSACTION_TYPES).map(([k, v]) => ({key: k, val: v})), 'key', 'val', {value: 'all', text: 'همه انواع'});
+            setupEventListeners();
+            switchPage('dashboard-page');
+        };
+
+        init();
+    });
+    </script>
+</body>
+</html>
