@@ -3471,86 +3471,81 @@ const parseSmsAndOpenModal = async (text) => {
         renderTransactionModal(null, null, { description: text });
     }
 };
-
 /**
-         * Enables "drag-to-dismiss" functionality for a given modal.
-         * The user can drag the modal content down to close it, similar to native iOS apps.
-         * @param {HTMLElement} modalOverlay The overlay element of the modal.
-         */
-        const enableDragToDismiss = (modalOverlay) => {
-            const modalContent = modalOverlay.querySelector('.modal-content');
-            if (!modalContent) return;
+ * Enables "drag-to-dismiss" functionality for a given modal.
+ * The user can drag the modal content down to close it, similar to native iOS apps.
+ * @param {HTMLElement} modalOverlay The overlay element of the modal.
+ */
+const enableDragToDismiss = (modalOverlay) => {
+    const modalContent = modalOverlay.querySelector('.modal-content');
+    if (!modalContent) return;
 
-            let startY = 0;
-            let currentY = 0;
-            let isDragging = false;
-            const dragThreshold = 80; // Min pixels user must drag down to close
+    let startY = 0;
+    let currentY = 0;
+    let isDragging = false;
+    const dragThreshold = 80; // حداقل پیکسلی که کاربر باید به پایین بکشد تا مدال بسته شود
 
-            const onTouchStart = (e) => {
-                // Only start drag on the modal header or the top part of the content
-                // to allow scrolling inside the modal.
-                const touchableArea = e.target.closest('.modal-header') || e.target;
-                const modalRect = modalContent.getBoundingClientRect();
+    const onTouchStart = (e) => {
+        const modalRect = modalContent.getBoundingClientRect();
+        // فقط زمانی درگ را فعال کن که لمس از 60 پیکسل بالای مدال شروع شود
+        // این کار به اسکرول کردن داخل محتوای مدال اجازه می‌دهد
+        if (e.touches[0].clientY > modalRect.top + 60) {
+            isDragging = false;
+            return;
+        }
 
-                // Only allow dragging from the top 60px of the modal content
-                if (e.touches[0].clientY > modalRect.top + 60) {
-                     return;
-                }
+        startY = e.touches[0].pageY;
+        currentY = startY;
+        isDragging = true;
+        modalContent.classList.add('is-dragging');
+    };
 
-                startY = e.touches[0].pageY;
-                isDragging = true;
-                modalContent.classList.add('is-dragging');
+    const onTouchMove = (e) => {
+        if (!isDragging) return;
+
+        currentY = e.touches[0].pageY;
+        const deltaY = currentY - startY;
+
+        // فقط اجازه کشیدن به پایین را بده
+        if (deltaY > 0) {
+            e.preventDefault(); // جلوگیری از اسکرول شدن کل صفحه
+            modalContent.style.transform = `translateY(${deltaY}px)`;
+        }
+    };
+
+    const onTouchEnd = () => {
+        if (!isDragging) return;
+
+        isDragging = false;
+        modalContent.classList.remove('is-dragging');
+        const deltaY = currentY - startY;
+
+        // اگر به اندازه کافی کشیده شده بود، مدال را ببند
+        if (deltaY > dragThreshold) {
+            modalContent.classList.add('modal-content-closing');
+            
+            // منتظر بمان تا انیمیشن بسته شدن تمام شود و سپس مدال را به طور کامل ببند
+            const closeModalAfterAnimation = () => {
+                modalContent.style.transform = '';
+                modalContent.classList.remove('modal-content-closing');
+                closeModal('#' + modalOverlay.id);
+                modalContent.removeEventListener('transitionend', closeModalAfterAnimation);
             };
+            modalContent.addEventListener('transitionend', closeModalAfterAnimation);
 
-            const onTouchMove = (e) => {
-                if (!isDragging) return;
+        } else { // در غیر این صورت، به جای خود برگرد
+            modalContent.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            modalContent.style.transform = 'translateY(0)';
+            modalContent.addEventListener('transitionend', () => {
+                modalContent.style.transition = ''; // استایل انلاین را پاک کن
+            }, { once: true });
+        }
+    };
 
-                currentY = e.touches[0].pageY;
-                const deltaY = currentY - startY;
-
-                // Only allow dragging down
-                if (deltaY > 0) {
-                    // Prevents the whole page from scrolling
-                    e.preventDefault();
-                    modalContent.style.transform = `translateY(${deltaY}px)`;
-                }
-            };
-
-            const onTouchEnd = () => {
-                if (!isDragging) return;
-
-                isDragging = false;
-                modalContent.classList.remove('is-dragging');
-                const deltaY = currentY - startY;
-
-                if (deltaY > dragThreshold) {
-                    // Animate out and close
-                    modalContent.classList.add('modal-content-closing');
-
-                    // Wait for animation to finish before truly closing
-                    modalContent.addEventListener('transitionend', () => {
-                        // Reset styles and classes
-                        modalContent.style.transform = '';
-                        modalContent.classList.remove('modal-content-closing');
-                        closeModal('#' + modalOverlay.id);
-                    }, { once: true });
-
-                } else {
-                    // Snap back to original position
-                    modalContent.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-                    modalContent.style.transform = 'translateY(0)';
-                    modalContent.addEventListener('transitionend', () => {
-                        modalContent.style.transition = ''; // Clean up inline style
-                    }, { once: true });
-                }
-                 // Reset startY
-                startY = 0;
-            };
-
-            modalContent.addEventListener('touchstart', onTouchStart, { passive: true });
-            modalContent.addEventListener('touchmove', onTouchMove, { passive: false });
-            modalContent.addEventListener('touchend', onTouchEnd, { passive: true });
-        };
+    modalContent.addEventListener('touchstart', onTouchStart, { passive: true });
+    modalContent.addEventListener('touchmove', onTouchMove, { passive: false });
+    modalContent.addEventListener('touchend', onTouchEnd, { passive: true });
+};
 
             const setupEventListeners = () => {
                 document.body.addEventListener('click', (e) => {
@@ -4061,16 +4056,18 @@ const parseSmsAndOpenModal = async (text) => {
                     $(parent).find(".pdate").pDatepicker({ format: 'YYYY/MM/DD', calendarType: 'persian', autoClose: true, observer: true, initialValue: false, persianDigit: true, calendar: { persian: { locale: 'fa' } }, toolbox: { calendarSwitch: { enabled: false } } });
                 } catch (e) { console.error("Datepicker init failed", e); }
             };
-       const init = () => {
-            loadData();
-            setupEventListeners();
-            // Enable drag-to-dismiss for all modals
-            qsa('.modal-overlay').forEach(modal => enableDragToDismiss(modal));
-            setTimeout(() => {
-                const initialTitle = qs('.nav-btn.active')?.dataset?.title || "حسابداری شخصی شمار";
-                switchPage('dashboard-page', initialTitle);
-            }, 50);
-        };
+const init = () => {
+    loadData();
+    setupEventListeners();
+    
+    // این خط جدید را اضافه کنید
+    qsa('.modal-overlay').forEach(modal => enableDragToDismiss(modal));
+    
+    setTimeout(() => {
+        const initialTitle = qs('.nav-btn.active')?.dataset?.title || "حسابداری شخصی شمار";
+        switchPage('dashboard-page', initialTitle);
+    }, 50);
+};
             init();
         });
         document.addEventListener("DOMContentLoaded", function () {
