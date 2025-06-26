@@ -3317,7 +3317,7 @@
             };
 
             // === NEW: Smart SMS Parsing Function ===
-           const parseSmsAndOpenModal = async (text) => {
+            const parseSmsAndOpenModal = async (text) => {
                 // If no text is passed, try to read from clipboard
                 if (!text || typeof text !== 'string') {
                     try {
@@ -3342,13 +3342,20 @@
                 // A library of regex patterns for different banks and transaction types.
                 // The order matters: more specific patterns should come before general ones.
                 const patterns = [
-                    // More specific patterns first for new formats
+                    // === NEW PATTERNS (from this request) ===
+                    { bank: 'بلو', type: 'income', regex: /بلو.* ([\d,٬]+) ریال به حساب شما نشست/, desc: 'واریز به بلو' },
+                    { bank: 'خاورمیانه', type: 'income', regex: /بانک خاورمیانه.*\+([\d,٬]+)/, desc: 'واریز به خاورمیانه' },
+                    { bank: 'گردشگری', type: 'expense', regex: /بانك گردشگری.*برداشت از:.*مبلغ:\s*([\d,٬]+)\s*ريال/, desc: 'برداشت از گردشگری' },
+                    { bank: 'گردشگری', type: 'income', regex: /بانك گردشگری.*واريز به:.*مبلغ:\s*([\d,٬]+)\s*ريال/, desc: 'واریز به گردشگری' },
+                    { bank: 'ملی', type: 'income', regex: /بانك ملي ايران\s*انتقالي:\s*([\d,٬]+)\+/, desc: 'انتقال به بانک ملی' },
+                    { bank: 'تجارت', type: 'expense', regex: /بانک تجارت.*برداشت:\s*([\d,٬]+)\s*ریال/, desc: 'برداشت از تجارت' },
+
+                    // === PATTERNS FROM PREVIOUS TURN (re-ordered for specificity) ===
+                    // Specific banks first
                     { bank: 'بلو', type: 'expense', regex: /بلو.* ([\d,٬]+) ریال از حساب شما پرید/, desc: 'برداشت پول بلو' },
                     { bank: 'خاورمیانه', type: 'expense', regex: /بانک خاورمیانه.*برداشت وجه از خودپرداز\s*-?([\d,٬]+)/, desc: 'برداشت وجه خاورمیانه' },
                     { bank: 'سپه', type: 'expense', regex: /بانك سپه.*مبلغ:\s*([\d,٬]+)\s*ريال/, desc: 'تراکنش بانک سپه' },
                     { bank: 'ملی', type: 'expense', regex: /بانك ملي ايران\s*برداشت:\s*([\d,٬]+)-?/, desc: 'برداشت از بانک ملی' },
-                    
-                    // Existing patterns (slightly improved)
                     { bank: 'ملت', type: 'expense', regex: /خريد Auth.*مبلغ:\s*([\d,٬]+)\s*ريال.*بانك ملت/, desc: 'خرید با کارت ملت' },
                     { bank: 'ملت', type: 'expense', regex: /برداشت مبلغ ([\d,٬]+)\s*ريال از .*بانك ملت/, desc: 'برداشت از بانک ملت' },
                     { bank: 'ملت', type: 'income', regex: /واريز مبلغ ([\d,٬]+)\s*ريال به .*بانك ملت/, desc: 'واریز به بانک ملت' },
@@ -3364,6 +3371,8 @@
                     { bank: 'پاسارگاد', type: 'income', regex: /بانک پاسارگاد واريز مبلغ ([\d,٬]+)/, desc: 'واریز به بانک پاسارگاد' },
 
                     // General patterns for when bank name is not available or pattern is unknown
+                    // These should be last
+                    { bank: null, type: 'income', regex: /واریز([\d,٬]+)/, desc: 'واریز وجه' }, // Catches "واریز1,100,000"
                     { bank: null, type: 'expense', regex: /برداشت\s*([\d,٬]+)/, desc: 'برداشت وجه' }, // Catches "برداشت480,700"
                     { bank: null, type: 'expense', regex: /(?:برداشت|خريد|خرید|پرداخت|انتقال|ساتنا|پايا|کارت به کارت).*(?:مبلغ|مبلغ:)\s*([\d,٬]+)/, desc: 'تراکنش هزینه' },
                     { bank: null, type: 'income', regex: /(?:واریز|واريز).*(?:مبلغ|مبلغ:)\s*([\d,٬]+)/, desc: 'تراکنش درآمد' },
@@ -3388,7 +3397,7 @@
                 if (bestMatch) {
                     let amount = parseInt(getUnformattedAmount(bestMatch.amountStr));
                     // Assume amount is in Rials if not specified, and convert to Toman
-                    if (!/تومان/.test(normalizedText) && (/ريال/.test(normalizedText) || bestMatch.bank)) {
+                    if (!/تومان/.test(normalizedText) && (/ريال|ریال/.test(normalizedText) || bestMatch.bank)) {
                         amount = Math.floor(amount / 10);
                     }
 
