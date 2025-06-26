@@ -3317,7 +3317,7 @@
             };
 
             // === NEW: Smart SMS Parsing Function ===
-            const parseSmsAndOpenModal = async (text) => {
+                 const parseSmsAndOpenModal = async (text) => {
                 // If no text is passed, try to read from clipboard
                 if (!text || typeof text !== 'string') {
                     try {
@@ -3348,7 +3348,8 @@
                     { bank: 'گردشگری', type: 'expense', regex: /بانك گردشگری.*برداشت از:.*مبلغ:\s*([\d,٬]+)\s*ريال/, desc: 'برداشت از گردشگری' },
                     { bank: 'گردشگری', type: 'income', regex: /بانك گردشگری.*واريز به:.*مبلغ:\s*([\d,٬]+)\s*ريال/, desc: 'واریز به گردشگری' },
                     { bank: 'ملی', type: 'income', regex: /بانك ملي ايران\s*انتقالي:\s*([\d,٬]+)\+/, desc: 'انتقال به بانک ملی' },
-                    { bank: 'تجارت', type: 'expense', regex: /بانک تجارت.*برداشت:\s*([\d,٬]+)\s*ریال/, desc: 'برداشت از تجارت' },
+                    // **FIXED**: The regex for Bank Tejarat now correctly handles the asterisks *.
+                    { bank: 'تجارت', type: 'expense', regex: /\*بانک تجارت\*\*.*برداشت:\s*([\d,٬]+)\s*ریال/, desc: 'برداشت از تجارت' },
 
                     // === PATTERNS FROM PREVIOUS TURN (re-ordered for specificity) ===
                     // Specific banks first
