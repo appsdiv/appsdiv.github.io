@@ -3117,7 +3117,7 @@
                                                     <li class="more-menu-item" data-page="savings-page" data-title="پس‌انداز"><div class="item-icon goal"><i class="fas fa-piggy-bank"></i></div><div class="item-info"><p>اهداف و پس‌انداز</p></div><i class="fas fa-chevron-left"></i></li>
                                                 </ul>
                                                 <div style="text-align: center; padding: 15px 10px 5px; font-size: 0.75rem; color: var(--subtext-light);">
-                                                    وب اپلیکیشن حسابداری شخصی شمار نسخه 1.2 | طراحی و کدنویسی شده توسط پیمان عابدین پور
+                                                    وب اپلیکیشن حسابداری شخصی شمار نسخه 1.3 | طراحی و کدنویسی شده توسط پیمان عابدین پور
                                                 </div>
                                             </div>`;
                 openModal('#more-menu-modal-overlay');
@@ -3346,53 +3346,47 @@ const parseSmsAndOpenModal = async (text) => {
         }
     }
 
-    // **FIX 1: Enhanced normalization**
+    // FIX 1: Enhanced normalization
     // Replaces newlines AND non-breaking spaces (U+00A0) with regular spaces.
-    // This is crucial for handling text copied from various sources.
     const normalizedText = normalizeDigits(text.replace(/\n/g, ' ').replace(/\u00A0/g, ' '));
 
     // A library of regex patterns for different banks and transaction types.
     // The order matters: more specific patterns should come before general ones.
+    // **FIX 3: Made all regex patterns robust to handle both Persian (ی, ک) and Arabic (ي, ك) characters.**
+    // This significantly improves matching reliability for copied text.
     const patterns = [
-        // === NEW PATTERNS (from previous request) ===
-        { bank: 'بلو', type: 'income', regex: /بلو.* ([\d,٬]+) ریال به حساب شما نشست/, desc: 'واریز به بلو' },
-        { bank: 'خاورمیانه', type: 'income', regex: /بانک خاورمیانه.*\+([\d,٬]+)/, desc: 'واریز به خاورمیانه' },
-        { bank: 'گردشگری', type: 'expense', regex: /بانك گردشگری.*برداشت از:.*مبلغ:\s*([\d,٬]+)\s*ريال/, desc: 'برداشت از گردشگری' },
-        { bank: 'گردشگری', type: 'income', regex: /بانك گردشگری.*واريز به:.*مبلغ:\s*([\d,٬]+)\s*ريال/, desc: 'واریز به گردشگری' },
-        { bank: 'ملی', type: 'income', regex: /بانك ملي ايران\s*انتقالي:\s*([\d,٬]+)\+/, desc: 'انتقال به بانک ملی' },
-
-        // **FIX 2: The regex for Bank Tejarat is now more robust against whitespace.**
-        // Using .*? makes it non-greedy, which is slightly safer, and the normalization handles the space issue.
-        { bank: 'تجارت', type: 'expense', regex: /\*بانک تجارت\*.*?برداشت:\s*([\d,٬]+)\s*ریال/, desc: 'برداشت از تجارت' },
-
-        // === PATTERNS FROM PREVIOUS TURN (re-ordered for specificity) ===
-        // Specific banks first
-        { bank: 'بلو', type: 'expense', regex: /بلو.* ([\d,٬]+) ریال از حساب شما پرید/, desc: 'برداشت پول بلو' },
-        { bank: 'خاورمیانه', type: 'expense', regex: /بانک خاورمیانه.*برداشت وجه از خودپرداز\s*-?([\d,٬]+)/, desc: 'برداشت وجه خاورمیانه' },
-        { bank: 'سپه', type: 'expense', regex: /بانك سپه.*مبلغ:\s*([\d,٬]+)\s*ريال/, desc: 'تراکنش بانک سپه' },
-        { bank: 'ملی', type: 'expense', regex: /بانك ملي ايران\s*برداشت:\s*([\d,٬]+)-?/, desc: 'برداشت از بانک ملی' },
-        { bank: 'ملت', type: 'expense', regex: /خريد Auth.*مبلغ:\s*([\d,٬]+)\s*ريال.*بانك ملت/, desc: 'خرید با کارت ملت' },
-        { bank: 'ملت', type: 'expense', regex: /برداشت مبلغ ([\d,٬]+)\s*ريال از .*بانك ملت/, desc: 'برداشت از بانک ملت' },
-        { bank: 'ملت', type: 'income', regex: /واريز مبلغ ([\d,٬]+)\s*ريال به .*بانك ملت/, desc: 'واریز به بانک ملت' },
-        { bank: 'ملی', type: 'expense', regex: /بانك ملي ايران برداشت مبلغ ([\d,٬]+)\s*ريال/, desc: 'برداشت از بانک ملی' },
-        { bank: 'ملی', type: 'expense', regex: /خريد مبلغ ([\d,٬]+)\s*ريال از كارت بانك ملي/, desc: 'خرید با کارت ملی' },
-        { bank: 'ملی', type: 'income', regex: /واريز چك .* به مبلغ ([\d,٬]+)\s*ريال در بانك ملي/, desc: 'واریز چک به بانک ملی' },
-        { bank: 'ملی', type: 'income', regex: /بانك ملي ايران واريز مبلغ ([\d,٬]+)\s*ريال/, desc: 'واریز به بانک ملی' },
-        { bank: 'صادرات', type: 'expense', regex: /برداشت مبلغ ([\d,٬]+)\s*ريال .* سپهر بانك صادرات/, desc: 'برداشت از بانک صادرات' },
-        { bank: 'صادرات', type: 'expense', regex: /خريد با كارت سپهر مبلغ ([\d,٬]+)\s*ريال .* بانك صادرات/, desc: 'خرید با کارت صادرات' },
-        { bank: 'صادرات', type: 'income', regex: /واريز به سپهر كارت مبلغ ([\d,٬]+)\s*ريال .* بانك صادرات/, desc: 'واریز به بانک صادرات' },
-        { bank: 'پاسارگاد', type: 'expense', regex: /بانک پاسارگاد برداشت مبلغ ([\d,٬]+)/, desc: 'برداشت از بانک پاسارگاد' },
-        { bank: 'پاسارگاد', type: 'expense', regex: /بانک پاسارگاد خريد مبلغ ([\d,٬]+)/, desc: 'خرید با کارت پاسارگاد' },
-        { bank: 'پاسارگاد', type: 'income', regex: /بانک پاسارگاد واريز مبلغ ([\d,٬]+)/, desc: 'واریز به بانک پاسارگاد' },
+        // Using [یي] for "ی" and [کك] for "ک" to handle both Persian and Arabic characters.
+        // Also using ر[یي]ال for "ریال" consistently.
+        { bank: 'تجارت', type: 'expense', regex: /\*بان[کك] تجارت\*.*?برداشت:\s*([\d,٬]+)\s*ر[یي]ال/, desc: 'برداشت از تجارت' },
+        { bank: 'بلو', type: 'income', regex: /بلو.* ([\d,٬]+) ر[یي]ال به حساب شما نشست/, desc: 'وار[یي]ز به بلو' },
+        { bank: 'خاورمیانه', type: 'income', regex: /بان[کك] خاورم[یي]انه.*\+([\d,٬]+)/, desc: 'وار[یي]ز به خاورم[یي]انه' },
+        { bank: 'گردشگری', type: 'expense', regex: /بان[کك] گردشگر[یي].*برداشت از:.*مبلغ:\s*([\d,٬]+)\s*р[یي]ال/, desc: 'برداشت از گردشگر[یي]' },
+        { bank: 'گردشگری', type: 'income', regex: /بان[کك] گردشگر[یي].*وار[یي]ز به:.*مبلغ:\s*([\d,٬]+)\s*р[یي]ال/, desc: 'وار[یي]ز به گردشگر[یي]' },
+        { bank: 'ملی', type: 'income', regex: /بان[کك] مل[یي] ا[یي]ران\s*انتقال[یي]:\s*([\d,٬]+)\+/, desc: 'انتقال به بان[کك] مل[یي]' },
+        { bank: 'بلو', type: 'expense', regex: /بلو.* ([\d,٬]+) ر[یي]ال از حساب شما پرید/, desc: 'برداشت پول بلو' },
+        { bank: 'خاورمیانه', type: 'expense', regex: /بان[کك] خاورم[یي]انه.*برداشت وجه از خودپرداز\s*-?([\d,٬]+)/, desc: 'برداشت وجه خاورم[یي]انه' },
+        { bank: 'سپه', type: 'expense', regex: /بان[کك] سپه.*مبلغ:\s*([\d,٬]+)\s*р[یي]ال/, desc: 'ترا[کك]نش بان[کك] سپه' },
+        { bank: 'ملی', type: 'expense', regex: /بان[کك] مل[یي] ا[یي]ران\s*برداشت:\s*([\d,٬]+)-?/, desc: 'برداشت از بان[کك] مل[یي]' },
+        { bank: 'ملت', type: 'expense', regex: /خر[یي]د Auth.*مبلغ:\s*([\d,٬]+)\s*р[یي]ال.*بان[کك] ملت/, desc: 'خر[یي]د با [کك]ارت ملت' },
+        { bank: 'ملت', type: 'expense', regex: /برداشت مبلغ ([\d,٬]+)\s*р[یي]ال از .*بان[کك] ملت/, desc: 'برداشت از بان[کك] ملت' },
+        { bank: 'ملت', type: 'income', regex: /وار[یي]ز مبلغ ([\d,٬]+)\s*р[یي]ال به .*بان[کك] ملت/, desc: 'وار[یي]ز به بان[کك] ملت' },
+        { bank: 'ملی', type: 'expense', regex: /بان[کك] مل[یي] ا[یي]ران برداشت مبلغ ([\d,٬]+)\s*р[یي]ال/, desc: 'برداشت از بان[کك] مل[یي]' },
+        { bank: 'ملی', type: 'expense', regex: /خر[یي]د مبلغ ([\d,٬]+)\s*р[یي]ال از [کك]ارت بان[کك] مل[یي]/, desc: 'خر[یي]د با [کك]ارت مل[یي]' },
+        { bank: 'ملی', type: 'income', regex: /وار[یي]ز چ[کك] .* به مبلغ ([\d,٬]+)\s*р[یي]ال در بان[کك] مل[یي]/, desc: 'وار[یي]ز چ[کك] به بان[کك] مل[یي]' },
+        { bank: 'ملی', type: 'income', regex: /بان[کك] مل[یي] ا[یي]ران وار[یي]ز مبلغ ([\d,٬]+)\s*р[یي]ال/, desc: 'وار[یي]ز به بان[کك] مل[یي]' },
+        { bank: 'صادرات', type: 'expense', regex: /برداشت مبلغ ([\d,٬]+)\s*р[یي]ال .* سپهر بان[کك] صادرات/, desc: 'برداشت از بان[کك] صادرات' },
+        { bank: 'صادرات', type: 'expense', regex: /خر[یي]د با [کك]ارت سپهر مبلغ ([\d,٬]+)\s*р[یي]ال .* بان[کك] صادرات/, desc: 'خر[یي]د با [کك]ارت صادرات' },
+        { bank: 'صادرات', type: 'income', regex: /وار[یي]ز به سپهر [کك]ارت مبلغ ([\d,٬]+)\s*р[یي]ال .* بان[کك] صادرات/, desc: 'وار[یي]ز به بان[کك] صادرات' },
+        { bank: 'پاسارگاد', type: 'expense', regex: /بان[کك] پاسارگاد برداشت مبلغ ([\d,٬]+)/, desc: 'برداشت از بان[کك] پاسارگاد' },
+        { bank: 'پاسارگاد', type: 'expense', regex: /بان[کك] پاسارگاد خر[یي]د مبلغ ([\d,٬]+)/, desc: 'خر[یي]د با [کك]ارت پاسارگاد' },
+        { bank: 'پاسارگاد', type: 'income', regex: /بان[کك] پاسارگاد وار[یي]ز مبلغ ([\d,٬]+)/, desc: 'وار[یي]ز به بان[کك] پاسارگاد' },
 
         // General patterns for when bank name is not available or pattern is unknown
-        // These should be last
-        { bank: null, type: 'income', regex: /واریز([\d,٬]+)/, desc: 'واریز وجه' },
+        { bank: null, type: 'income', regex: /وار[یي]ز([\d,٬]+)/, desc: 'وار[یي]ز وجه' },
         { bank: null, type: 'expense', regex: /برداشت\s*([\d,٬]+)/, desc: 'برداشت وجه' },
-        { bank: null, type: 'expense', regex: /(?:برداشت|خريد|خرید|پرداخت|انتقال|ساتنا|پايا|کارت به کارت).*(?:مبلغ|مبلغ:)\s*([\d,٬]+)/, desc: 'تراکنش هزینه' },
-        { bank: null, type: 'income', regex: /(?:واریز|واريز).*(?:مبلغ|مبلغ:)\s*([\d,٬]+)/, desc: 'تراکنش درآمد' },
+        { bank: null, type: 'expense', regex: /(?:برداشت|خر[یي]د|خرید|پرداخت|انتقال|ساتنا|پا[یي]ا|[کك]ارت به [کك]ارت).*(?:مبلغ|مبلغ:)\s*([\d,٬]+)/, desc: 'ترا[کك]نش هز[یي]نه' },
+        { bank: null, type: 'income', regex: /(?:وار[یي]ز).*(?:مبلغ|مبلغ:)\s*([\d,٬]+)/, desc: 'ترا[کك]نش درآمد' },
     ];
-
 
     let bestMatch = null;
 
@@ -3412,7 +3406,7 @@ const parseSmsAndOpenModal = async (text) => {
     if (bestMatch) {
         let amount = parseInt(getUnformattedAmount(bestMatch.amountStr));
         // Assume amount is in Rials if not specified, and convert to Toman
-        if (!/تومان/.test(normalizedText) && (/ريال|ریال/.test(normalizedText) || bestMatch.bank)) {
+        if (!/تومان/.test(normalizedText) && (/ر[یي]ال/.test(normalizedText) || bestMatch.bank)) {
             amount = Math.floor(amount / 10);
         }
 
@@ -3460,6 +3454,7 @@ const parseSmsAndOpenModal = async (text) => {
         renderTransactionModal(null, null, { description: text }); // Open modal with pasted text as description
     }
 };
+
 
             const setupEventListeners = () => {
                 document.body.addEventListener('click', (e) => {
