@@ -704,6 +704,10 @@ body.dark-mode .filter-summary {
     -webkit-tap-highlight-color: transparent;
     /* Remove highlight on tap */
 }
+.list-container li .item-info {
+    flex-grow: 1;
+    min-width: 0; /* Crucial for preventing overflow in flex containers */
+}
 
 /* This class wraps the entire content of a list item */
 .transaction-card-redesigned {
@@ -717,10 +721,9 @@ body.dark-mode .filter-summary {
 .tx-main-info {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem; /* Slightly reduced gap */
     flex-grow: 1;
-    min-width: 0;
-    /* Allow the content to shrink */
+    min-width: 0; /* Allow the content to shrink below its preferred width */
 }
 
 /* Container for description and meta data */
@@ -731,45 +734,27 @@ body.dark-mode .filter-summary {
 
 /* Multi-line description for long text */
 .tx-details p {
-    margin: 0 0 0.4rem;
-    font-weight: 600;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    /* Limit the description to 2 lines */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: normal;
-    word-break: break-word;
+    -webkit-line-clamp: 2; /* Keep 2 lines, but ensure it handles overflow gracefully */
+    font-size: 0.9rem; /* Slightly smaller font for description */
+    line-height: 1.3;
 }
 
 /* Grid for metadata with explicit labels */
 .tx-meta-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-    /* Responsive grid for key-value pairs */
-    gap: 0.5rem 1rem;
-    font-size: 0.85rem;
-    color: var(--subtext-light);
+    display: flex; /* Use flexbox for wrapping */
+    flex-wrap: wrap; /* Allow items to wrap to the next line */
+    gap: 0.2rem 0.8rem; /* Vertical and horizontal gap */
+    font-size: 0.75rem; /* Smaller font size for metadata */
 }
 
 .meta-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    flex-shrink: 0; /* Prevent items from shrinking too much */
 }
+
 
 .meta-item label {
-    font-weight: 500;
-    color: var(--text-light);
-    opacity: 0.9;
-    flex-shrink: 0;
+    font-size: 0.75rem;
 }
-
 .meta-item span {
     white-space: nowrap;
     overflow: hidden;
@@ -785,20 +770,18 @@ body.dark-mode .filter-summary {
 
 /* Right side: Amount and actions */
 .tx-amount-actions {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.5rem;
     flex-shrink: 0;
-    margin-left: auto;
+    margin-left: 0.5rem; /* Provide some space */
 }
 
 .item-amount {
-    font-size: 1.15rem;
-    font-weight: 700;
-    direction: ltr;
-    text-align: right;
+    font-size: 1rem; /* Slightly smaller font for amount */
+}
+/* Ensure the due date info doesn't overflow */
+.due-date-info {
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .item-actions {
@@ -809,14 +792,18 @@ body.dark-mode .filter-summary {
 
 /* --- Daily Report Card Redesign --- */
 .daily-report-header {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 1rem;
-    padding: 1rem;
-    /* Increased padding */
-    cursor: pointer;
+    display: flex; /* Changed from grid for better flex behavior */
+    flex-wrap: wrap;
+    justify-content: space-between;
     align-items: center;
-    transition: var(--transition-fast);
+    gap: 0.5rem; /* Reduced gap */
+    padding: 0.8rem 1rem;
+}
+/* Make date info more flexible */
+.daily-report-header .date-info {
+    text-align: right;
+    flex-shrink: 0;
+    min-width: unset; /* Remove fixed width */
 }
 
 .daily-report-item.active .daily-report-header {
@@ -846,26 +833,25 @@ body.dark-mode .daily-report-item.active .daily-report-header {
 
 .date-info .day-of-week {
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: var(--text-light);
     display: block;
 }
 
 .date-info .date-full {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     color: var(--subtext-light);
     display: block;
 }
 
 /* Grid for the income/expense/net summary */
 .flow-summary-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 0.5rem;
+    display: flex; /* Use flexbox for better control */
     flex-grow: 1;
-    text-align: center;
+    gap: 0.2rem; /* Tighter gap */
+    justify-content: space-between;
+    min-width: 120px; /* Ensure it has a minimum width to wrap correctly */
 }
-
 .flow-item {
     display: flex;
     flex-direction: column;
@@ -878,7 +864,7 @@ body.dark-mode .daily-report-item.active .daily-report-header {
 }
 
 .flow-item label {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     font-weight: 500;
     color: var(--subtext-light);
     opacity: 0.9;
@@ -888,6 +874,8 @@ body.dark-mode .daily-report-item.active .daily-report-header {
 .flow-item span {
     font-weight: 700;
     direction: ltr;
+        font-size: 0.8rem; /* Smaller amount font */
+
 }
 
 .expand-arrow {
@@ -3145,9 +3133,14 @@ body.dark-mode #toast {
                     qs('#contact-group', form).style.display = ['debt', 'receivable', 'issuedCheck', 'receivedCheck'].includes(typeVal) ? 'block' : 'none';
                 }
                 qs('#new-category-group', form).style.display = 'none';
-                if (statusTypes.includes(typeVal)) {
-                    populateDropdown(qs('#status-select', form), Object.entries(STATUS_TYPES[typeVal] || {}).map(([k, v]) => ({ key: k, val: v })), 'key', 'val');
-                }
+        if (statusTypes.includes(typeVal)) {
+                     populateDropdown(qs('#status-select', form), Object.entries(STATUS_TYPES[typeVal] || {}).map(([k, v]) => ({ key: k, val: v })), 'key', 'val');
+                     // Set the default value to 'pending' if the transaction is new and the status is not already set.
+                     const transactionId = qs('#transaction-id', form).value;
+                     if (!transactionId) {
+                         qs('#status-select', form).value = 'pending';
+                     }
+                 }
                 if (['income', 'expense'].includes(typeVal)) {
                     let categories = (typeVal === 'income') ? state.incomeSources : state.expenseCategories;
                     const categorySelect = qs('#category-select', form);
