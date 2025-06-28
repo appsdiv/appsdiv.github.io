@@ -1,672 +1,676 @@
 
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>شمار</title>
-    <meta name="description" content="حسابداری شخصی شمار">
-    <meta name="application-name" content="شمار">
+    <title>شمارا</title>
+    <meta name="description" content="مدیریت مالی شخصی شمارا">
+    <meta name="application-name" content="شمارا">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="شمار">
-    <link rel="apple-touch-icon" href="https://i.postimg.cc/pdc7Ksxc/App-Icon-2x.png">
-    <link rel="icon" type="image/png" href="https://i.postimg.cc/pdc7Ksxc/App-Icon-2x.png">
+    <meta name="apple-mobile-web-app-title" content="شمارا">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/pX061LJC/shomara-app.png">
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/pX061LJC/shomara-app.png">
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
-        &quot;name&quot;: &quot;شمار&quot;,
-        &quot;short_name&quot;: &quot;شمار&quot;,
-        &quot;description&quot;: &quot;حسابداری شخصی شمار&quot;,
+        &quot;name&quot;: &quot;شمارا&quot;,
+        &quot;short_name&quot;: &quot;شمارا&quot;,
+        &quot;description&quot;: &quot;مدیریت مالی شخصی شمارا&quot;,
         &quot;start_url&quot;: &quot;.&quot;,
         &quot;display&quot;: &quot;standalone&quot;,
         &quot;background_color&quot;: &quot;#f2f2f7&quot;,
         &quot;theme_color&quot;: &quot;#007AFF&quot;,
         &quot;icons&quot;: [
-            { &quot;src&quot;: &quot;https://i.postimg.cc/pdc7Ksxc/App-Icon-2x.png&quot;, &quot;sizes&quot;: &quot;192x192&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;purpose&quot;: &quot;any&quot; },
-            { &quot;src&quot;: &quot;https://i.postimg.cc/pdc7Ksxc/App-Icon-2x.png&quot;, &quot;sizes&quot;: &quot;512x512&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;purpose&quot;: &quot;any&quot; },
-            { &quot;src&quot;: &quot;https://i.postimg.cc/pdc7Ksxc/App-Icon-2x.png&quot;, &quot;sizes&quot;: &quot;192x192&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;purpose&quot;: &quot;maskable&quot; },
-            { &quot;src&quot;: &quot;https://i.postimg.cc/pdc7Ksxc/App-Icon-2x.png&quot;, &quot;sizes&quot;: &quot;512x512&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;purpose&quot;: &quot;maskable&quot; }
+            { &quot;src&quot;: &quot;https://i.postimg.cc/pX061LJC/shomara-app.png&quot;, &quot;sizes&quot;: &quot;192x192&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;purpose&quot;: &quot;any&quot; },
+            { &quot;src&quot;: &quot;https://i.postimg.cc/pX061LJC/shomara-app.png&quot;, &quot;sizes&quot;: &quot;512x512&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;purpose&quot;: &quot;any&quot; },
+            { &quot;src&quot;: &quot;https://i.postimg.cc/pX061LJC/shomara-app.png&quot;, &quot;sizes&quot;: &quot;192x192&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;purpose&quot;: &quot;maskable&quot; },
+            { &quot;src&quot;: &quot;https://i.postimg.cc/pX061LJC/shomara-app.png&quot;, &quot;sizes&quot;: &quot;512x512&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;purpose&quot;: &quot;maskable&quot; }
         ]
     }">
-    <link rel="apple-touch-startup-image" href="https://i.postimg.cc/pdc7Ksxc/App-Icon-2x.png">
+    <link rel="apple-touch-startup-image" href="https://i.postimg.cc/pX061LJC/shomara-app.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet"
         type="text/css" />
     <link rel="stylesheet" href="https://unpkg.com/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css" />
     <style>
-        :root {
-            /* Color Palette (iOS Inspired) */
-            --blue-ios: #007AFF;
-            --blue-ios-hover: #0056b3;
-            --green-ios: #34C759;
-            --red-ios: #FF3B30;
-            --orange-ios: #FF9500;
-            --purple-ios: #AF52DE;
-            --cyan-ios: #32ADEA;
-            --gray-100: #f8f9fa;
-            --gray-200: #e9ecef;
-            --gray-300: #dee2e6;
-            --gray-400: #ced4da;
-            --gray-500: #adb5bd;
-            --gray-600: #6c757d;
-            --gray-700: #495057;
-            --gray-800: #343a40;
-            --gray-900: #212529;
-            --bg-light: #f2f2f7;
-            --card-light: #ffffff;
-            --text-light: #000000;
-            --subtext-light: #6e6e73;
-            --border-light: rgba(60, 60, 67, 0.29);
-            --bg-dark: #000000;
-            --card-dark: #1c1c1e;
-            --text-dark: #ffffff;
-            --subtext-dark: #8e8e93;
-            --border-dark: rgba(84, 84, 88, 0.65);
-            --primary: var(--blue-ios);
-            --primary-hover: var(--blue-ios-hover);
-            --income: var(--green-ios);
-            --expense: var(--red-ios);
-            --transfer: var(--orange-ios);
-            --debt: var(--red-ios);
-            --receivable: var(--green-ios);
-            --loan: var(--purple-ios);
-            --goal: var(--cyan-ios);
-            --income-bg-light: rgba(52, 199, 89, 0.15);
-            --expense-bg-light: rgba(255, 59, 48, 0.15);
-            --income-bg-dark: rgba(52, 199, 89, 0.2);
-            --expense-bg-dark: rgba(255, 69, 58, 0.2);
-            --font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            --radius: 12px;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-medium: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            /* Safe Area Insets for iPhone X+ */
-            --safe-area-top: env(safe-area-inset-top, 0px);
-            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
-            --header-height: 48px;
-            --nav-height: 60px;
-        }
-
-        /* === UI/UX ENHANCEMENTS START === */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overscroll-behavior-y: contain;
-        }
-
-        body {
-            font-family: var(--font-family);
-            background-color: var(--bg-light);
-            color: var(--text-light);
-            transition: background-color 0.3s, color 0.3s;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        /* Active/Press states for better feedback */
-        .btn:active,
-        .action-card:active,
-        .nav-btn:active,
-        .list-container li:active,
-        .summary-card:active,
-        .contact-card-new:active {
-            transform: scale(0.97);
-            filter: brightness(0.95);
-            transition: transform 0.1s, filter 0.1s;
-        }
-
-        /* === UI/UX ENHANCEMENTS END === */
-        .app-wrapper {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            /* Fallback */
-            height: -webkit-fill-available;
-            /* Critical for iOS PWA */
-            overflow: hidden;
-            /* Prevent wrapper from scrolling */
-        }
-
-        body.dark-mode {
-            --bg-light: var(--bg-dark);
-            --card-light: var(--card-dark);
-            --text-light: var(--text-dark);
-            --subtext-light: var(--subtext-dark);
-            --border-light: var(--border-dark);
-            --income-bg-light: var(--income-bg-dark);
-            --expense-bg-light: var(--expense-bg-dark);
-        }
-
-        body.modal-open {
-            overflow: hidden;
-        }
-
-        /* --- APP STRUCTURE --- */
-        .app-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: var(--header-height);
-            padding: var(--safe-area-top) 1rem 0;
-            /* Adjusted padding-top for safe area */
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            z-index: 100;
-            background-color: rgba(242, 242, 247, 0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-light);
-            transition: var(--transition-fast);
-            box-sizing: content-box;
-            /* Explicitly set for clarity */
-        }
-
-        body.dark-mode .app-header {
-            background-color: rgba(28, 28, 30, 0.7);
-        }
-
-        #app-header-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            padding: 0 1rem;
-        }
-
-        .header-controls {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .header-controls>.fas,
-        .header-controls .theme-switcher,
-        .header-controls .header-icon-btn {
-            color: var(--subtext-light);
-            cursor: pointer;
-            font-size: 1.2rem;
-            width: 44px;
-            height: 44px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: color var(--transition-fast);
-        }
-
-        .header-controls>.fas:hover,
-        .header-controls .theme-switcher:hover,
-        .header-controls .header-icon-btn:hover {
-            color: var(--primary);
-        }
-
-        .app-content {
-            flex: 1;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            /* Ensure content starts below header and ends above nav, accounting for safe areas */
-            padding: calc(var(--header-height) + var(--safe-area-top) + 1.25rem) 1rem calc(var(--nav-height) + var(--safe-area-bottom) + 1.25rem);
-        }
-
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-            animation: fadeIn 0.4s var(--transition-medium);
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .card-section {
-            background-color: var(--card-light);
-            padding: 1.25rem;
-            border-radius: var(--radius);
-            margin-bottom: 1.25rem;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.25rem;
-        }
-
-        .section-header h3 {
-            margin: 0;
-            font-size: 1.2rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .section-header .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .btn {
-            padding: 0.75rem 1.25rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition-fast);
-            font-family: var(--font-family);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            position: relative;
-        }
-
-        .btn[data-action="toggle-filters"].filter-active::after {
-            content: '';
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            width: 8px;
-            height: 8px;
-            background-color: var(--red-ios);
-            border-radius: 50%;
-            border: 1px solid var(--card-light);
-        }
-
-        body.dark-mode .btn[data-action="toggle-filters"].filter-active::after {
-            border-color: var(--card-dark);
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-danger {
-            background-color: var(--expense);
-            color: white;
-        }
-
-        .btn-secondary {
-            background-color: var(--gray-200);
-            color: var(--text-light);
-        }
-
-        body.dark-mode .btn-secondary {
-            background-color: var(--gray-800);
-            color: var(--text-dark);
-        }
-
-        .btn-success {
-            background-color: var(--income);
-            color: white;
-        }
-
-        .main-balance {
-            background: linear-gradient(135deg, var(--blue-ios), #5856d6);
-            color: white;
-            padding: 1.5rem;
-            text-align: center;
-        }
-
-        .main-balance .balance-title {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .main-balance h4 {
-            margin: 0;
-            font-weight: 500;
-            opacity: 0.8;
-            font-size: 0.9rem;
-        }
-
-        .main-balance h1 {
-            margin: 0;
-            font-size: 2.5rem;
-            letter-spacing: -1px;
-            min-height: 48px;
-        }
-
-        #toggle-balance-visibility {
-            cursor: pointer;
-            opacity: 0.8;
-            transition: var(--transition-fast);
-        }
-
-        .summary-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .summary-card {
-            background-color: var(--bg-light);
-            border-radius: var(--radius);
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.5rem;
-            cursor: pointer;
-            transition: var(--transition-fast);
-        }
-
-        .summary-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow);
-        }
-
-        body.dark-mode .summary-card {
-            background-color: var(--gray-900);
-        }
-
-        .summary-card .card-header {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            margin-bottom: 0;
-        }
-
-        .summary-card .card-icon {
-            font-size: 0.9rem;
-            width: 2rem;
-            height: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: var(--radius);
-        }
-
-        .summary-card .card-title {
-            font-weight: 500;
-            color: var(--subtext-light);
-            font-size: 0.85rem;
-        }
-
-        .summary-card .card-amount {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--text-light);
-            text-align: right;
-            width: 100%;
-        }
-
-        .summary-card.income .card-icon {
-            background-color: var(--income-bg-light);
-            color: var(--income);
-        }
-
-        .summary-card.expense .card-icon {
-            background-color: var(--expense-bg-light);
-            color: var(--expense);
-        }
-
-        .summary-card.debt .card-icon {
-            background-color: var(--expense-bg-light);
-            color: var(--debt);
-        }
-
-        .summary-card.receivable .card-icon {
-            background-color: var(--income-bg-light);
-            color: var(--receivable);
-        }
-
-        .summary-card.loan .card-icon {
-            background-color: rgba(175, 82, 222, 0.15);
-            color: var(--loan);
-        }
-
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(65px, 1fr));
-            gap: 0.75rem;
-        }
-
-        .action-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 0.6rem;
-            padding: 0.75rem 0.25rem;
-            border-radius: var(--radius);
-            cursor: pointer;
-            background-color: var(--bg-light);
-            transition: background-color 0.2s, transform 0.2s, filter 0.2s;
-            text-align: center;
-            min-height: 80px; /* Ensure cards have a minimum height */
-        }
-        
-        body.dark-mode .action-card {
-             background-color: var(--card-dark);
-        }
-        
-        .action-card:hover {
-            background-color: var(--gray-200);
-        }
-        
-        body.dark-mode .action-card:hover {
-            background-color: var(--gray-800);
-        }
-
-
-        .action-card i {
-            font-size: 1.5rem;
-        }
-
-        .action-card span {
-            font-size: 0.8rem;
-            font-weight: 500;
-            line-height: 1.2;
-        }
-
-        .action-card.income i {
-            color: var(--income);
-        }
-
-        .action-card.expense i {
-            color: var(--expense);
-        }
-
-        .action-card.debt i {
-            color: var(--debt);
-        }
-
-        .action-card.receivable i {
-            color: var(--receivable);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid var(--border-light);
-            border-radius: 8px;
-            background-color: var(--gray-200);
-            color: var(--text-light);
-            box-sizing: border-box;
-            transition: var(--transition-fast);
-            font-family: var(--font-family);
-            font-size: 16px;
-        }
-
-        .form-control::placeholder {
-            color: var(--subtext-light);
-            opacity: 0.9;
-        }
-
-        body.dark-mode .form-control {
-            background-color: var(--gray-800);
-        }
-
-        .form-control:focus {
-            border-color: var(--primary);
-            outline: none;
-            background-color: var(--card-light);
-        }
-
-        .form-control:read-only {
-            background-color: var(--gray-300);
-            cursor: not-allowed;
-        }
-
-        body.dark-mode .form-control:read-only {
-            background-color: var(--gray-700);
-        }
-
-        /* === NEW: Auto-fill Highlight === */
-        .form-control.auto-filled {
-            background-color: rgba(52, 199, 89, 0.2) !important;
-            border-color: var(--green-ios) !important;
-        }
-
-        body.dark-mode .form-control.auto-filled {
-            background-color: rgba(52, 199, 89, 0.25) !important;
-        }
-
-        /* === END: NEW STYLES === */
-
-        select.form-control {
-            direction: rtl;
-            text-align-last: right;
-            -moz-text-align-last: right;
-        }
-
-        select.form-control option {
-            direction: rtl;
-            text-align: right;
-        }
-
-        .form-group {
-            margin-bottom: 1.25rem;
-            position: relative;
-        }
-
-        .form-group:not(:has(label)) {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--subtext-light);
-        }
-
-        .filters-collapsible-container {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
-            border-radius: var(--radius);
-            margin-top: 1rem;
-            padding: 0 1rem;
-        }
-
-        .filters-collapsible-container.visible {
-            max-height: 1000px;
-            /* Should be larger than content height */
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        body.dark-mode .filters-collapsible-container.visible {
-            background: rgba(28, 28, 30, 0.6);
-            border-color: rgba(84, 84, 88, 0.5);
-        }
-
-        .filter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 0.5rem 1rem;
-        }
-
-        .filter-summary {
-            background-color: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 1rem;
-            border-radius: var(--radius);
-            margin-bottom: 1.25rem;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-        }
-
-        body.dark-mode .filter-summary {
-            background-color: rgba(28, 28, 30, 0.6);
-            border: 1px solid rgba(84, 84, 88, 0.65);
-        }
-
-        .filter-summary h4 {
-            margin: 0 0 1rem;
-            font-size: 1rem;
-            border-bottom: 1px solid var(--border-light);
-            padding-bottom: 0.75rem;
-        }
-
-        .filter-summary .summary-details {
-            display: flex;
-            justify-content: space-around;
-            text-align: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .filter-summary .summary-details>div {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .filter-summary .summary-details span {
-            font-size: 0.9rem;
-            color: var(--subtext-light);
-            margin-bottom: 0.25rem;
-        }
-
-        .filter-summary .summary-details strong {
-            display: block;
-            font-size: 1.25rem;
-            color: var(--text-light);
-            font-weight: 600;
-        }
-
-        .list-status {
-            text-align: center;
-            color: var(--subtext-light);
-            padding: 3rem 1rem;
-        }
-
-        .list-container {
+:root {
+    /* Color Palette (iOS Inspired) */
+    --blue-ios: #007AFF;
+    --blue-ios-hover: #0056b3;
+    --green-ios: #34C759;
+    --red-ios: #FF3B30;
+    --orange-ios: #FF9500;
+    --purple-ios: #AF52DE;
+    --cyan-ios: #32ADEA;
+    --gray-100: #f8f9fa;
+    --gray-200: #e9ecef;
+    --gray-300: #dee2e6;
+    --gray-400: #ced4da;
+    --gray-500: #adb5bd;
+    --gray-600: #6c757d;
+    --gray-700: #495057;
+    --gray-800: #343a40;
+    --gray-900: #212529;
+    --bg-light: #f2f2f7;
+    --card-light: #ffffff;
+    --text-light: #000000;
+    --subtext-light: #6e6e73;
+    --border-light: rgba(60, 60, 67, 0.29);
+    --bg-dark: #000000;
+    --card-dark: #1c1c1e;
+    --text-dark: #ffffff;
+    --subtext-dark: #8e8e93;
+    --border-dark: rgba(84, 84, 88, 0.65);
+    --primary: var(--blue-ios);
+    --primary-hover: var(--blue-ios-hover);
+    --income: var(--green-ios);
+    --expense: var(--red-ios);
+    --transfer: var(--orange-ios);
+    --debt: var(--red-ios);
+    --receivable: var(--green-ios);
+    --loan: var(--purple-ios);
+    --goal: var(--cyan-ios);
+    --income-bg-light: rgba(52, 199, 89, 0.15);
+    --expense-bg-light: rgba(255, 59, 48, 0.15);
+    --income-bg-dark: rgba(52, 199, 89, 0.2);
+    --expense-bg-dark: rgba(255, 69, 58, 0.2);
+    --font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --radius: 12px;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-medium: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Safe Area Insets for iPhone X+ */
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --header-height: 48px;
+    --nav-height: 60px;
+}
+
+/* === UI/UX ENHANCEMENTS START === */
+html {
+    scroll-behavior: smooth;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overscroll-behavior-y: contain;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-light);
+    color: var(--text-light);
+    transition: background-color 0.3s, color 0.3s;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Active/Press states for better feedback */
+.btn:active,
+.action-card:active,
+.nav-btn:active,
+.list-container li:active,
+.summary-card:active,
+.contact-card-new:active {
+    transform: scale(0.97);
+    filter: brightness(0.95);
+    transition: transform 0.1s, filter 0.1s;
+}
+
+/* === UI/UX ENHANCEMENTS END === */
+.app-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    /* Fallback */
+    height: -webkit-fill-available;
+    /* Critical for iOS PWA */
+    overflow: hidden;
+    /* Prevent wrapper from scrolling */
+}
+
+body.dark-mode {
+    --bg-light: var(--bg-dark);
+    --card-light: var(--card-dark);
+    --text-light: var(--text-dark);
+    --subtext-light: var(--subtext-dark);
+    --border-light: var(--border-dark);
+    --income-bg-light: var(--income-bg-dark);
+    --expense-bg-light: var(--expense-bg-dark);
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+/* --- APP STRUCTURE --- */
+.app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-height);
+    padding: var(--safe-area-top) 1rem 0;
+    /* Adjusted padding-top for safe area */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 100;
+    background-color: rgba(242, 242, 247, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-light);
+    transition: var(--transition-fast);
+    box-sizing: content-box;
+    /* Explicitly set for clarity */
+}
+
+body.dark-mode .app-header {
+    background-color: rgba(28, 28, 30, 0.7);
+}
+
+#app-header-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 0 1rem;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.header-controls>.fas,
+.header-controls .theme-switcher,
+.header-controls .header-icon-btn {
+    color: var(--subtext-light);
+    cursor: pointer;
+    font-size: 1.2rem;
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color var(--transition-fast);
+}
+
+.header-controls>.fas:hover,
+.header-controls .theme-switcher:hover,
+.header-controls .header-icon-btn:hover {
+    color: var(--primary);
+}
+
+.app-content {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    /* Ensure content starts below header and ends above nav, accounting for safe areas */
+    padding: calc(var(--header-height) + var(--safe-area-top) + 1.25rem) 1rem calc(var(--nav-height) + var(--safe-area-bottom) + 1.25rem);
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+    animation: fadeIn 0.4s var(--transition-medium);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card-section {
+    background-color: var(--card-light);
+    padding: 1.25rem;
+    border-radius: var(--radius);
+    margin-bottom: 1.25rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.section-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-header .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.btn {
+    padding: 0.75rem 1.25rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    font-family: var(--font-family);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    position: relative;
+}
+
+.btn[data-action="toggle-filters"].filter-active::after {
+    content: '';
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 8px;
+    height: 8px;
+    background-color: var(--red-ios);
+    border-radius: 50%;
+    border: 1px solid var(--card-light);
+}
+
+body.dark-mode .btn[data-action="toggle-filters"].filter-active::after {
+    border-color: var(--card-dark);
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn-danger {
+    background-color: var(--expense);
+    color: white;
+}
+
+.btn-secondary {
+    background-color: var(--gray-200);
+    color: var(--text-light);
+}
+
+body.dark-mode .btn-secondary {
+    background-color: var(--gray-800);
+    color: var(--text-dark);
+}
+
+.btn-success {
+    background-color: var(--income);
+    color: white;
+}
+
+.main-balance {
+    background: linear-gradient(135deg, var(--blue-ios), #5856d6);
+    color: white;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.main-balance .balance-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.main-balance h4 {
+    margin: 0;
+    font-weight: 500;
+    opacity: 0.8;
+    font-size: 0.9rem;
+}
+
+.main-balance h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    letter-spacing: -1px;
+    min-height: 48px;
+}
+
+#toggle-balance-visibility {
+    cursor: pointer;
+    opacity: 0.8;
+    transition: var(--transition-fast);
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.summary-card {
+    background-color: var(--bg-light);
+    border-radius: var(--radius);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.summary-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+}
+
+body.dark-mode .summary-card {
+    background-color: var(--gray-900);
+}
+
+.summary-card .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0;
+}
+
+.summary-card .card-icon {
+    font-size: 0.9rem;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius);
+}
+
+.summary-card .card-title {
+    font-weight: 500;
+    color: var(--subtext-light);
+    font-size: 0.85rem;
+}
+
+.summary-card .card-amount {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-light);
+    text-align: right;
+    width: 100%;
+}
+
+.summary-card.income .card-icon {
+    background-color: var(--income-bg-light);
+    color: var(--income);
+}
+
+.summary-card.expense .card-icon {
+    background-color: var(--expense-bg-light);
+    color: var(--expense);
+}
+
+.summary-card.debt .card-icon {
+    background-color: var(--expense-bg-light);
+    color: var(--debt);
+}
+
+.summary-card.receivable .card-icon {
+    background-color: var(--income-bg-light);
+    color: var(--receivable);
+}
+
+.summary-card.loan .card-icon {
+    background-color: rgba(175, 82, 222, 0.15);
+    color: var(--loan);
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(65px, 1fr));
+    gap: 0.75rem;
+}
+
+.action-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.75rem 0.25rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    background-color: var(--bg-light);
+    transition: background-color 0.2s, transform 0.2s, filter 0.2s;
+    text-align: center;
+    min-height: 80px;
+    /* Ensure cards have a minimum height */
+}
+
+body.dark-mode .action-card {
+    background-color: var(--card-dark);
+}
+
+.action-card:hover {
+    background-color: var(--gray-200);
+}
+
+body.dark-mode .action-card:hover {
+    background-color: var(--gray-800);
+}
+
+
+.action-card i {
+    font-size: 1.5rem;
+}
+
+.action-card span {
+    font-size: 0.8rem;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.action-card.income i {
+    color: var(--income);
+}
+
+.action-card.expense i {
+    color: var(--expense);
+}
+
+.action-card.debt i {
+    color: var(--debt);
+}
+
+.action-card.receivable i {
+    color: var(--receivable);
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    background-color: var(--gray-200);
+    color: var(--text-light);
+    box-sizing: border-box;
+    transition: var(--transition-fast);
+    font-family: var(--font-family);
+    font-size: 16px;
+}
+
+.form-control::placeholder {
+    color: var(--subtext-light);
+    opacity: 0.9;
+}
+
+body.dark-mode .form-control {
+    background-color: var(--gray-800);
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    outline: none;
+    background-color: var(--card-light);
+}
+
+.form-control:read-only {
+    background-color: var(--gray-300);
+    cursor: not-allowed;
+}
+
+body.dark-mode .form-control:read-only {
+    background-color: var(--gray-700);
+}
+
+/* === NEW: Auto-fill Highlight === */
+.form-control.auto-filled {
+    background-color: rgba(52, 199, 89, 0.2) !important;
+    border-color: var(--green-ios) !important;
+}
+
+body.dark-mode .form-control.auto-filled {
+    background-color: rgba(52, 199, 89, 0.25) !important;
+}
+
+/* === END: NEW STYLES === */
+
+select.form-control {
+    direction: rtl;
+    text-align-last: right;
+    -moz-text-align-last: right;
+}
+
+select.form-control option {
+    direction: rtl;
+    text-align: right;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+    position: relative;
+}
+
+.form-group:not(:has(label)) {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--subtext-light);
+}
+
+.filters-collapsible-container {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
+    border-radius: var(--radius);
+    margin-top: 1rem;
+    padding: 0 1rem;
+}
+
+.filters-collapsible-container.visible {
+    max-height: 1000px;
+    /* Should be larger than content height */
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .filters-collapsible-container.visible {
+    background: rgba(28, 28, 30, 0.6);
+    border-color: rgba(84, 84, 88, 0.5);
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.5rem 1rem;
+}
+
+.filter-summary {
+    background-color: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 1rem;
+    border-radius: var(--radius);
+    margin-bottom: 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+body.dark-mode .filter-summary {
+    background-color: rgba(28, 28, 30, 0.6);
+    border: 1px solid rgba(84, 84, 88, 0.65);
+}
+
+.filter-summary h4 {
+    margin: 0 0 1rem;
+    font-size: 1rem;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 0.75rem;
+}
+
+.filter-summary .summary-details {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.filter-summary .summary-details>div {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-summary .summary-details span {
+    font-size: 0.9rem;
+    color: var(--subtext-light);
+    margin-bottom: 0.25rem;
+}
+
+.filter-summary .summary-details strong {
+    display: block;
+    font-size: 1.25rem;
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+.list-status {
+    text-align: center;
+    color: var(--subtext-light);
+    padding: 3rem 1rem;
+}
+
+
+
+        .list-container2 {
             list-style: none;
             padding: 0;
             margin: 0 -1.25rem;
         }
 
-        .list-container li {
+        .list-container2 li {
             display: flex;
             align-items: center;
             gap: 1rem;
@@ -676,1154 +680,1249 @@
             cursor: pointer;
         }
 
-        .list-container li:last-child {
+        .list-container2 li:last-child {
             border-bottom: none;
         }
 
-        .item-icon {
-            font-size: 1rem;
-            width: 2.5rem;
-            height: 2.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .item-icon.income {
-            background-color: var(--income-bg-light);
-            color: var(--income);
-        }
-
-        .item-icon.expense,
-        .item-icon.debt,
-        .item-icon.issuedCheck {
-            background-color: var(--expense-bg-light);
-            color: var(--expense);
-        }
-
-        .item-icon.transfer {
-            background-color: rgba(255, 149, 0, 0.15);
-            color: var(--transfer);
-        }
-
-        .item-icon.cashflow {
-            background-color: rgba(0, 122, 255, 0.15);
-            color: var(--primary);
-        }
-
-        .item-icon.receivable,
-        .item-icon.receivedCheck {
-            background-color: var(--income-bg-light);
-            color: var(--income);
-        }
-
-        .item-icon.installmentPayment,
-        .item-icon.loan {
-            background-color: rgba(175, 82, 222, 0.15);
-            color: var(--loan);
-        }
-
-        .item-icon.goal {
-            background-color: rgba(50, 173, 234, 0.15);
-            color: var(--goal);
-        }
-
-        .item-icon.contact {
-            background-color: var(--gray-200);
-            color: var(--gray-700);
-        }
-
-        body.dark-mode .item-icon.contact {
-            background-color: var(--gray-800);
-            color: var(--gray-300);
-        }
-
-        .item-info {
-            flex-grow: 1;
-            min-width: 0;
-        }
-
-        .item-info p {
-            margin: 0 0 0.2rem;
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .item-info .meta-data {
-            font-size: 0.8rem;
-            color: var(--subtext-light);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.2rem 0.8rem;
-        }
-
-        .item-amount {
-            font-weight: 600;
-            font-size: 1.1rem;
-            direction: ltr;
-            margin-left: 0.5rem;
-        }
-
-        .item-amount.income {
-            color: var(--income);
-        }
-
-        .item-amount.expense {
-            color: var(--expense);
-        }
-
-        .item-actions {
-            display: flex;
-            margin-left: auto;
-            align-items: center;
-            gap: 0.2rem;
-        }
-
-        .action-btn {
-            background: none;
-            border: none;
-            color: var(--subtext-light);
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: var(--transition-fast);
-            padding: 0.5rem;
-        }
-
-        .action-btn.edit-btn:hover {
-            color: var(--primary);
-        }
-
-        .action-btn.delete-btn:hover {
-            color: var(--expense);
-        }
-
-        .due-date-info.overdue {
-            color: var(--expense);
-            font-weight: bold;
-        }
-
-        .meta-data .meta-status {
-            font-weight: 600;
-        }
-
-        .meta-data .meta-status.success {
-            color: var(--income);
-        }
-
-        .meta-data .meta-status.danger {
-            color: var(--expense);
-        }
-
-        .check-badge {
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 2px 6px;
-            border-radius: 4px;
-            background-color: var(--primary);
-            color: white;
-            vertical-align: middle;
-            margin-right: 5px;
-        }
-
-        .goal-item {
-            background: var(--card-light);
-            border-radius: var(--radius);
-            padding: 1.25rem;
-            margin-bottom: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .goal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        .goal-title {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .goal-title h4 {
-            margin: 0;
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
-        .goal-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem 1.5rem;
-            font-size: 0.9rem;
-        }
-
-        .goal-details span {
-            color: var(--subtext-light);
-        }
-
-        .goal-details strong {
-            color: var(--text-light);
-            font-weight: 600;
-        }
-
-        .progress-bar-container {
-            width: 100%;
-            height: 8px;
-            background-color: var(--gray-200);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 0.5rem;
-        }
-
-        body.dark-mode .progress-bar-container {
-            background-color: var(--gray-800);
-        }
-
-        .progress-bar {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.5s ease-in-out;
-        }
-
-        .progress-bar.loan {
-            background-color: var(--loan);
-        }
-
-        .progress-bar.goal {
-            background-color: var(--goal);
-        }
-
-        .progress-text {
-            text-align: center;
-            color: var(--subtext-light);
-            font-size: 0.85rem;
-        }
-
-        .savings-hero-card {
-            background: linear-gradient(135deg, var(--goal), var(--purple-ios));
-            color: white;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 2rem 1.5rem;
-        }
-
-        .savings-hero-card .hero-icon {
-            font-size: 2rem;
-            width: 4rem;
-            height: 4rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .savings-hero-card h4 {
-            margin: 0;
-            font-weight: 500;
-            opacity: 0.9;
-            font-size: 1rem;
-        }
-
-        .savings-hero-card h1 {
-            margin: 0;
-            font-size: 2.5rem;
-            letter-spacing: -1px;
-        }
-
-        .savings-hero-card h1 span {
-            font-size: 1.2rem;
-            font-weight: 400;
-            opacity: 0.8;
-            margin-right: 0.25rem;
-        }
-
-        .savings-hero-card .btn {
-            background: rgba(255, 255, 255, 0.25);
-            color: white;
-            width: 100%;
-            margin-top: 1rem;
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        #daily-reports-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .daily-report-item {
-            background: var(--card-light);
-            border-radius: var(--radius);
-            overflow: hidden;
-            border-left: 4px solid;
-            transition: var(--transition-medium);
-        }
-
-        .daily-report-item[data-net-flow='0'] {
-            border-left-color: var(--subtext-light);
-        }
-
-        .daily-report-item[data-net-flow^="-"] {
-            border-left-color: var(--expense);
-        }
-
-        .daily-report-item:not([data-net-flow^="-"]):not([data-net-flow='0']) {
-            border-left-color: var(--income);
-        }
-
-        .daily-report-header {
-            padding: 0.8rem 1rem;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: var(--transition-fast);
-            gap: 0.5rem;
-        }
-
-        .daily-report-item.active .daily-report-header {
-            background-color: var(--gray-200);
-        }
-
-        body.dark-mode .daily-report-item.active .daily-report-header {
-            background-color: var(--gray-900);
-        }
-
-        .daily-report-item.active .expand-arrow {
-            transform: rotate(180deg);
-        }
-
-        .date-info {
-            flex-shrink: 0;
-            text-align: right;
-            /* Align date to the right */
-        }
-
-        .date-info .day-of-week {
-            font-weight: 600;
-            font-size: 0.95rem;
-            /* Slightly smaller for compactness */
-            color: var(--text-light);
-        }
-
-        .date-info .date-full {
-            font-size: 0.75rem;
-            /* Slightly smaller for compactness */
-            color: var(--subtext-light);
-            display: block;
-        }
-
-        .flow-summary {
-            display: flex;
-            flex-direction: column;
-            /* Stack income/expense/net vertically on small screens */
-            align-items: flex-end;
-            /* Align items to the right */
-            flex-grow: 1;
-            justify-content: center;
-            /* Center items vertically */
-            min-width: 80px;
-            /* Ensure a minimum width for the summary */
-            margin-right: 0.5rem;
-            /* Space between date and summary */
-            text-align: left;
-            /* Align text within flow items to left */
-        }
-
-        @media (min-width: 641px) {
-
-            /* Adjust for larger screens */
-            .flow-summary {
-                flex-direction: row;
-                /* Back to horizontal for larger screens */
-                justify-content: flex-end;
-                /* Keep aligning to the right */
-                flex-wrap: wrap;
-                /* Allow wrapping if space is limited horizontally */
-                align-items: center;
-                margin-right: 0;
-                /* Remove margin if not needed */
-            }
-
-            .flow-item {
-                font-size: 0.9rem;
-                /* Maintain original size for larger screens */
-                white-space: nowrap;
-                flex-shrink: 0;
-                /* Prevent shrinking too much */
-                padding-left: 0.8rem;
-                /* Space between items */
-            }
-        }
-
-
-        .flow-item {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-            /* Reduced gap for compactness */
-            font-weight: 500;
-            font-size: 0.85rem;
-            /* Slightly smaller for compactness */
-            white-space: nowrap;
-        }
-
-        .flow-item span {
-            direction: ltr;
-        }
-
-        .flow-item.income {
-            color: var(--income);
-        }
-
-        .flow-item.expense {
-            color: var(--expense);
-        }
-
-        /* Net flow color based on value */
-        .flow-item.net-positive {
-            color: var(--income);
-        }
-
-        .flow-item.net-negative {
-            color: var(--expense);
-        }
-
-        .flow-item.net-zero {
-            color: var(--subtext-light);
-        }
-
-
-        .expand-arrow {
-            color: var(--subtext-light);
-            font-size: 1rem;
-            transition: transform 0.3s;
-            flex-shrink: 0;
-            margin-left: 0.5rem;
-        }
-
-        .daily-report-body {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease-out;
-        }
-
-        .daily-report-item.active .daily-report-body {
-            max-height: 2000px;
-        }
-
-        .daily-report-body .list-container {
-            margin: 0;
-            background-color: var(--bg-light);
-        }
-
-        body.dark-mode .daily-report-body .list-container {
-            background-color: var(--bg-dark);
-        }
-
-        #expense-reports-page .card-section {
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        #expense-reports-page .report-controls {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-        }
-
-        #expense-reports-page .control-group {
-            display: flex;
-            gap: 0.5rem;
-            background-color: var(--gray-200);
-            border-radius: 8px;
-            padding: 4px;
-        }
-
-        body.dark-mode #expense-reports-page .control-group {
-            background-color: var(--gray-800);
-        }
-
-        #expense-reports-page .header-actions .btn {
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-        }
-
-        #expense-reports-page .report-controls .header-icon-btn {
-            color: var(--subtext-light);
-            width: 36px;
-            height: 36px;
-            font-size: 1rem;
-            background-color: transparent;
-            border-radius: 6px;
-        }
-
-        #expense-reports-page .report-controls .header-icon-btn:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        body.dark-mode #expense-reports-page .report-controls .header-icon-btn:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        #expense-reports-page .category-report-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            margin-top: 1rem;
-        }
-
-        #expense-reports-page .category-report-card-new {
-            display: grid;
-            grid-template-columns: auto 1fr auto auto;
-            gap: 1rem;
-            align-items: center;
-            background-color: var(--card-light);
-            border-radius: var(--radius);
-            padding: 1rem;
-            cursor: pointer;
-            transition: var(--transition-fast);
-        }
-
-        #expense-reports-page .category-report-card-new:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-
-        #expense-reports-page .category-report-card-new .item-icon {
-            width: 44px;
-            height: 44px;
-            font-size: 1.2rem;
-            border-radius: var(--radius);
-            flex-shrink: 0;
-        }
-
-        #expense-reports-page .category-report-card-new .category-info {
-            min-width: 0;
-        }
-
-        #expense-reports-page .category-report-card-new .category-title {
-            font-size: 1.05rem;
-            font-weight: 600;
-            margin: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        #expense-reports-page .category-report-card-new .category-stats {
-            margin-top: 0.25rem;
-        }
-
-        #expense-reports-page .category-report-card-new .tx-count {
-            font-size: 0.8rem;
-            color: var(--subtext-light);
-        }
-
-        #expense-reports-page .category-report-card-new .category-amount-progress {
-            text-align: right;
-        }
-
-        #expense-reports-page .category-report-card-new .total-amount {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.3rem;
-            display: block;
-        }
-
-        #expense-reports-page .category-report-card-new .progress-bar-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            min-width: 100px;
-        }
-
-        #expense-reports-page .category-report-card-new .percentage-text {
-            font-size: 0.75rem;
-            color: var(--subtext-light);
-            font-weight: 500;
-        }
-
-        #expense-reports-page .category-report-card-new .progress-bar-container {
-            flex-grow: 1;
-            height: 6px;
-            border-radius: 3px;
-            background-color: var(--gray-200);
-            overflow: hidden;
-        }
-
-        body.dark-mode #expense-reports-page .category-report-card-new .progress-bar-container {
-            background-color: var(--gray-800);
-        }
-
-        #expense-reports-page .category-report-card-new .progress-bar {
-            height: 100%;
-            border-radius: 3px;
-            transition: width 0.5s ease-in-out;
-        }
-
-        #expense-reports-page .category-report-card-new .item-actions {
-            margin-left: -0.5rem;
-        }
-
-        #expense-reports-page .category-report-card-new .action-btn {
-            font-size: 1rem;
-        }
-
-        .icon-picker {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
-            gap: 0.5rem;
-            margin-top: 1rem;
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid var(--border-light);
-            padding: 0.5rem;
-            border-radius: var(--radius);
-        }
-
-        .icon-picker-item {
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color var(--transition-fast);
-            color: var(--subtext-light);
-        }
-
-        .icon-picker-item:hover {
-            background-color: var(--gray-200);
-        }
-
-        body.dark-mode .icon-picker-item:hover {
-            background-color: var(--gray-800);
-        }
-
-        .icon-picker-item.selected {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        /* --- START: UPDATED CONTACTS PAGE STYLES --- */
-        #contacts-page .page-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-bottom: 1.25rem;
-        }
-
-        #contacts-page .control-group-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            width: 100%;
-        }
-
-        @media (min-width: 768px) {
-            #contacts-page .page-controls {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: flex-end;
-            }
-
-            #contacts-page .control-group-container {
-                flex-direction: row;
-                flex-grow: 1;
-                justify-content: flex-start;
-                gap: 1.5rem;
-            }
-
-            #contacts-page .page-controls .btn-primary {
-                flex-shrink: 0;
-                min-width: fit-content;
-            }
-        }
-
-
-        /* Segmented Control Styling */
-        .segmented-control {
-            display: flex;
-            background-color: var(--gray-200);
-            border-radius: 8px;
-            padding: 4px;
-            box-sizing: border-box;
-            width: 100%;
-        }
-
-        body.dark-mode .segmented-control {
-            background-color: var(--gray-800);
-        }
-
-        .segmented-control .control-button {
-            flex: 1;
-            padding: 0.5rem 0.75rem;
-            border: none;
-            background-color: transparent;
-            color: var(--subtext-light);
-            font-size: 0.9rem;
-            font-weight: 500;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            font-family: var(--font-family);
-            -webkit-appearance: none;
-            /* For iOS Safari */
-            -moz-appearance: none;
-            /* For Firefox */
-            appearance: none;
-            /* Standard property */
-        }
-
-        .segmented-control .control-button.active {
-            background-color: var(--card-light);
-            color: var(--text-light);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            /* Subtle shadow for active segment */
-        }
-
-        body.dark-mode .segmented-control .control-button.active {
-            background-color: var(--card-dark);
-        }
-
-        /* Sort Control Group */
-        .sort-control-group {
-            display: flex;
-            gap: 0.5rem;
-            background-color: var(--gray-200);
-            border-radius: 8px;
-            padding: 4px;
-            box-sizing: border-box;
-        }
-
-        body.dark-mode .sort-control-group {
-            background-color: var(--gray-800);
-        }
-
-        .sort-control-group .form-control {
-            border: none;
-            background-color: transparent;
-            padding: 0.5rem;
-            font-size: 0.9rem;
-            height: auto;
-            min-height: 36px;
-            /* Align with button height */
-        }
-
-        .sort-control-group .header-icon-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 6px;
-            font-size: 1rem;
-            color: var(--subtext-light);
-            background-color: transparent;
-        }
-
-        .sort-control-group .header-icon-btn:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        body.dark-mode .sort-control-group .header-icon-btn:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        /* Contact Card Layout */
-        .contacts-list-vertical {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            /* Reduced gap for slightly more density */
-        }
-
-        .contact-card-new {
-            background-color: var(--card-light);
-            border-radius: var(--radius);
-            padding: 1rem;
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-            transition: var(--transition-fast);
-            cursor: pointer;
-            border-left: 5px solid transparent;
-            /* Added for visual accent on hover/active */
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            /* Subtle shadow for depth */
-        }
-
-        .contact-card-new:active {
-            transform: scale(0.98);
-            /* Slightly less dramatic scale */
-        }
-
-        .contact-card-new:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-            border-left-color: var(--primary);
-            /* Highlight on hover */
-        }
-
-        .contact-card-new-icon .item-icon.contact {
-            width: 48px;
-            height: 48px;
-            font-size: 1.5rem;
-            border-radius: 12px;
-            /* Square with radius for a modern look */
-            background-color: var(--gray-200);
-            /* Consistent icon background */
-            color: var(--gray-700);
-        }
-
-        body.dark-mode .contact-card-new-icon .item-icon.contact {
-            background-color: var(--gray-800);
-            color: var(--gray-300);
-        }
-
-        .contact-card-new-details {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            /* Adjusted gap */
-            min-width: 0;
-            /* Ensures content inside flex items shrinks */
-        }
-
-        .contact-card-new-row-1 {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            /* Align name to top if actions are taller */
-            gap: 0.5rem;
-            width: 100%;
-            /* Ensure it takes full width */
-        }
-
-        .contact-card-new-row-1 .contact-name-tx {
-            min-width: 0;
-            flex-shrink: 1;
-            /* Allow text to shrink */
-        }
-
-        .contact-card-new-row-1 h4 {
-            margin: 0;
-            font-size: 1.05rem;
-            /* Slightly smaller for balance */
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .contact-card-new-row-1 .contact-tx-count {
-            font-size: 0.75rem;
-            /* Smaller for secondary info */
-            color: var(--subtext-light);
-        }
-
-        .contact-card-new-row-1 .item-actions {
-            flex-shrink: 0;
-            /* Prevent actions from shrinking */
-            margin-left: -0.5rem;
-            /* Adjust alignment */
-        }
-
-        .contact-card-new-row-2 {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 0.75rem;
-            /* Adjusted gap */
-            padding-top: 0.75rem;
-            border-top: 1px solid var(--border-light);
-            flex-wrap: wrap;
-            /* Allow wrapping on smaller screens */
-            width: 100%;
-        }
-
-        .contact-card-new-row-2 .balance-item {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            flex: 1;
-            /* Distribute space evenly */
-            min-width: 80px;
-            /* Ensure items don't become too small */
-        }
-
-        .contact-card-new-row-2 .balance-item span {
-            font-size: 0.7rem;
-            /* Smaller label for balance */
-            color: var(--subtext-light);
-            margin-bottom: 0.1rem;
-        }
-
-        .contact-card-new-row-2 .balance-item strong {
-            font-weight: 600;
-            font-size: 0.95rem;
-            /* Slightly smaller for balance figures */
-        }
-
-        .contact-card-new-row-2 .balance-item.net strong {
-            font-size: 1.05rem;
-            /* Slightly larger for net balance */
-            letter-spacing: -0.2px;
-        }
-
-        /* Balance Colors (already defined, just ensure they are applied) */
-        .balance-positive {
-            color: var(--income);
-        }
-
-        .balance-negative {
-            color: var(--expense);
-        }
-
-        .balance-zero {
-            color: var(--subtext-light);
-        }
-
-        /* --- END: UPDATED CONTACTS PAGE STYLES --- */
-
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: var(--nav-height);
-            padding: 5px 0 var(--safe-area-bottom);
-            /* Adjusted padding-bottom for safe area */
-            background-color: rgba(249, 249, 249, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border-light);
-            display: flex;
-            justify-content: space-around;
-            z-index: 100;
-            box-sizing: content-box;
-        }
-
-        body.dark-mode .bottom-nav {
-            background-color: rgba(28, 28, 30, 0.75);
-        }
-
-        .nav-btn {
-            background: none;
-            border: none;
-            color: var(--subtext-light);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 0.2rem;
-            font-family: var(--font-family);
-            cursor: pointer;
-            transition: color 0.2s, transform 0.2s, filter 0.2s;
-            flex: 1;
-            height: 100%;
-            padding-top: 5px;
-        }
-
-        .nav-btn i {
-            font-size: 1.3rem;
-        }
-
-        .nav-btn span {
-            font-size: 0.65rem;
-            font-weight: 500;
-        }
-
-        .nav-btn.active {
-            color: var(--primary);
-        }
-
-        .fab {
-            position: fixed;
-            bottom: calc(var(--nav-height) + var(--safe-area-bottom) - 30px);
-            left: 50%;
-            transform: translateX(-50%);
-            width: 56px;
-            height: 56px;
-            background-color: var(--primary);
-            color: white;
-            border: 4px solid var(--bg-light);
-            border-radius: 50%;
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.4);
-            cursor: pointer;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s;
-            z-index: 101;
-        }
-
-        body.dark-mode .fab {
-            border-color: var(--bg-dark);
-        }
-
-        .fab:active {
-            transform: translateX(-50%) scale(0.95);
-        }
-
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(5px);
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity var(--transition-medium), visibility var(--transition-medium);
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-content {
-            background-color: var(--bg-light);
-            width: 100%;
-            max-width: 100%;
-            padding: 1rem 1rem calc(1rem + var(--safe-area-bottom));
-            border-radius: 20px 20px 0 0;
-            transform: translateY(100%);
-            transition: transform var(--transition-medium);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-overlay.active .modal-content {
-            transform: translateY(0);
-        }
-
-        .modal-content .modal-header {
-            text-align: center;
-            padding: 0.5rem 0 1.5rem;
-            position: relative;
-        }
-
-        .modal-content .modal-header::before {
-            content: '';
-            position: absolute;
-            top: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 5px;
-            background-color: var(--gray-300);
-            border-radius: 2.5px;
-        }
-
-        body.dark-mode .modal-content .modal-header::before {
-            background-color: var(--gray-700);
-        }
-
-        .modal-content h3 {
-            margin: 0;
-            font-size: 1.25rem;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 1.5rem;
-        }
-
-        .form-actions .btn {
-            flex: 1;
-            padding: 1rem;
-        }
-
-        #toast {
-            position: fixed;
-            top: calc(var(--header-height) + var(--safe-area-top) + 1rem);
-            left: 50%;
-            background-color: var(--gray-800);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-            z-index: 2000;
-            opacity: 0;
-            visibility: hidden;
-            transform: translate(-50%, -20px);
-            transition: var(--transition-medium);
-        }
-
-        body.dark-mode #toast {
-            background-color: var(--gray-200);
-            color: var(--gray-900);
-        }
-
-        #toast.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translate(-50%, 0);
-        }
-
-        @media (min-width: 641px) {
-            .modal-overlay {
-                align-items: center;
-            }
-
-            .modal-content {
-                width: 90%;
-                max-width: 480px;
-                border-radius: var(--radius);
-                transform: translateY(20px) scale(0.95);
-                padding-bottom: 1.5rem;
-            }
-
-            .modal-overlay.active .modal-content {
-                transform: translateY(0) scale(1);
-            }
-
-            .modal-content .modal-header::before {
-                display: none;
-            }
-
-            .flow-summary {
-                display: flex;
-                gap: 1rem;
-                align-items: center;
-            }
-
-            .flow-item {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                font-weight: 500;
-                font-size: 0.9rem;
-            }
-        }
+
+.list-container {
+    list-style: none;
+    padding: 0;
+    margin: 0 -1.25rem;
+}
+
+/* --- REDESIGNED TRANSACTION & REPORT CARDS --- */
+/* Base container for a transaction item inside the list */
+.list-container li {
+    display: block;
+    /* Change from flex to block to contain the new card structure */
+    padding: 1rem 1.25rem;
+    /* Slightly more padding for a cleaner look */
+    border-bottom: 1px solid var(--border-light);
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s, filter 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    /* Remove highlight on tap */
+}
+
+/* This class wraps the entire content of a list item */
+.transaction-card-redesigned {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Left side: Icon and main details */
+.tx-main-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-grow: 1;
+    min-width: 0;
+    /* Allow the content to shrink */
+}
+
+/* Container for description and meta data */
+.tx-details {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+/* Multi-line description for long text */
+.tx-details p {
+    margin: 0 0 0.4rem;
+    font-weight: 600;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    /* Limit the description to 2 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    word-break: break-word;
+}
+
+/* Grid for metadata with explicit labels */
+.tx-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    /* Responsive grid for key-value pairs */
+    gap: 0.5rem 1rem;
+    font-size: 0.85rem;
+    color: var(--subtext-light);
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.meta-item label {
+    font-weight: 500;
+    color: var(--text-light);
+    opacity: 0.9;
+    flex-shrink: 0;
+}
+
+.meta-item span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.meta-item i {
+    opacity: 0.7;
+    width: 1.2em;
+    /* fixed width for icons */
+    text-align: center;
+}
+
+/* Right side: Amount and actions */
+.tx-amount-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.item-amount {
+    font-size: 1.15rem;
+    font-weight: 700;
+    direction: ltr;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.item-actions {
+    display: flex;
+    gap: 0.2rem;
+    margin-left: 0;
+}
+
+/* --- Daily Report Card Redesign --- */
+.daily-report-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    padding: 1rem;
+    /* Increased padding */
+    cursor: pointer;
+    align-items: center;
+    transition: var(--transition-fast);
+}
+
+.daily-report-item.active .daily-report-header {
+    background-color: var(--gray-100);
+}
+
+body.dark-mode .daily-report-item.active .daily-report-header {
+    background-color: var(--gray-900);
+}
+
+/* Container for date and summary in the header */
+.report-date-summary {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-grow: 1;
+    min-width: 0;
+}
+
+/* Date styling */
+.date-info {
+    text-align: center;
+    flex-shrink: 0;
+    min-width: 70px;
+    /* fixed width for date column */
+}
+
+.date-info .day-of-week {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-light);
+    display: block;
+}
+
+.date-info .date-full {
+    font-size: 0.75rem;
+    color: var(--subtext-light);
+    display: block;
+}
+
+/* Grid for the income/expense/net summary */
+.flow-summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.5rem;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.flow-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    gap: 0.1rem;
+}
+
+.flow-item label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--subtext-light);
+    opacity: 0.9;
+    flex-shrink: 0;
+}
+
+.flow-item span {
+    font-weight: 700;
+    direction: ltr;
+}
+
+.expand-arrow {
+    flex-shrink: 0;
+}
+
+/* Remove the previous media query for flow-summary */
+@media (min-width: 641px) {
+    .flow-summary {
+        display: none;
+    }
+    /* Hide old flow summary on larger screens */
+}
+
+.item-icon {
+    font-size: 1rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.item-icon.income {
+    background-color: var(--income-bg-light);
+    color: var(--income);
+}
+
+.item-icon.expense,
+.item-icon.debt,
+.item-icon.issuedCheck {
+    background-color: var(--expense-bg-light);
+    color: var(--expense);
+}
+
+.item-icon.transfer {
+    background-color: rgba(255, 149, 0, 0.15);
+    color: var(--transfer);
+}
+
+.item-icon.cashflow {
+    background-color: rgba(0, 122, 255, 0.15);
+    color: var(--primary);
+}
+
+.item-icon.receivable,
+.item-icon.receivedCheck {
+    background-color: var(--income-bg-light);
+    color: var(--income);
+}
+
+.item-icon.installmentPayment,
+.item-icon.loan {
+    background-color: rgba(175, 82, 222, 0.15);
+    color: var(--loan);
+}
+
+.item-icon.goal {
+    background-color: rgba(50, 173, 234, 0.15);
+    color: var(--goal);
+}
+
+.item-icon.contact {
+    background-color: var(--gray-200);
+    color: var(--gray-700);
+}
+
+body.dark-mode .item-icon.contact {
+    background-color: var(--gray-800);
+    color: var(--gray-300);
+}
+
+.item-info {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.item-info p {
+    margin: 0 0 0.2rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.item-info .meta-data {
+    font-size: 0.8rem;
+    color: var(--subtext-light);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.8rem;
+}
+
+.item-amount {
+    font-weight: 600;
+    font-size: 1.1rem;
+    direction: ltr;
+    margin-left: 0.5rem;
+}
+
+.item-amount.income {
+    color: var(--income);
+}
+
+.item-amount.expense {
+    color: var(--expense);
+}
+
+.item-actions {
+    display: flex;
+    margin-left: auto;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    color: var(--subtext-light);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: var(--transition-fast);
+    padding: 0.5rem;
+}
+
+.action-btn.edit-btn:hover {
+    color: var(--primary);
+}
+
+.action-btn.delete-btn:hover {
+    color: var(--expense);
+}
+
+.due-date-info.overdue {
+    color: var(--expense);
+    font-weight: bold;
+}
+
+.meta-data .meta-status {
+    font-weight: 600;
+}
+
+.meta-data .meta-status.success {
+    color: var(--income);
+}
+
+.meta-data .meta-status.danger {
+    color: var(--expense);
+}
+
+.check-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background-color: var(--primary);
+    color: white;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+.goal-item {
+    background: var(--card-light);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.goal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.goal-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.goal-title h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.goal-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 1.5rem;
+    font-size: 0.9rem;
+}
+
+.goal-details span {
+    color: var(--subtext-light);
+}
+
+.goal-details strong {
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background-color: var(--gray-200);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+body.dark-mode .progress-bar-container {
+    background-color: var(--gray-800);
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease-in-out;
+}
+
+.progress-bar.loan {
+    background-color: var(--loan);
+}
+
+.progress-bar.goal {
+    background-color: var(--goal);
+}
+
+.progress-text {
+    text-align: center;
+    color: var(--subtext-light);
+    font-size: 0.85rem;
+}
+
+.savings-hero-card {
+    background: linear-gradient(135deg, var(--goal), var(--purple-ios));
+    color: white;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 2rem 1.5rem;
+}
+
+.savings-hero-card .hero-icon {
+    font-size: 2rem;
+    width: 4rem;
+    height: 4rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+}
+
+.savings-hero-card h4 {
+    margin: 0;
+    font-weight: 500;
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+.savings-hero-card h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    letter-spacing: -1px;
+}
+
+.savings-hero-card h1 span {
+    font-size: 1.2rem;
+    font-weight: 400;
+    opacity: 0.8;
+    margin-right: 0.25rem;
+}
+
+.savings-hero-card .btn {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    width: 100%;
+    margin-top: 1rem;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+#daily-reports-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.daily-report-item {
+    background: var(--card-light);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border-left: 4px solid;
+    transition: var(--transition-medium);
+}
+
+.daily-report-item[data-net-flow='0'] {
+    border-left-color: var(--subtext-light);
+}
+
+.daily-report-item[data-net-flow^="-"] {
+    border-left-color: var(--expense);
+}
+
+.daily-report-item:not([data-net-flow^="-"]):not([data-net-flow='0']) {
+    border-left-color: var(--income);
+}
+
+.daily-report-item.active .daily-report-header {
+    background-color: var(--gray-200);
+}
+
+.daily-report-item.active .expand-arrow {
+    transform: rotate(180deg);
+}
+
+.daily-report-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out;
+}
+
+.daily-report-item.active .daily-report-body {
+    max-height: 2000px;
+}
+
+.daily-report-body .list-container {
+    margin: 0;
+    background-color: var(--bg-light);
+}
+
+body.dark-mode .daily-report-body .list-container {
+    background-color: var(--bg-dark);
+}
+
+#expense-reports-page .card-section {
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+#expense-reports-page .report-controls {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+#expense-reports-page .control-group {
+    display: flex;
+    gap: 0.5rem;
+    background-color: var(--gray-200);
+    border-radius: 8px;
+    padding: 4px;
+}
+
+body.dark-mode #expense-reports-page .control-group {
+    background-color: var(--gray-800);
+}
+
+#expense-reports-page .header-actions .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+#expense-reports-page .report-controls .header-icon-btn {
+    color: var(--subtext-light);
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+    background-color: transparent;
+    border-radius: 6px;
+}
+
+#expense-reports-page .report-controls .header-icon-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+body.dark-mode #expense-reports-page .report-controls .header-icon-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+#expense-reports-page .category-report-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+#expense-reports-page .category-report-card-new {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 1rem;
+    align-items: center;
+    background-color: var(--card-light);
+    border-radius: var(--radius);
+    padding: 1rem;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+#expense-reports-page .category-report-card-new:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+#expense-reports-page .category-report-card-new .item-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 1.2rem;
+    border-radius: var(--radius);
+    flex-shrink: 0;
+}
+
+#expense-reports-page .category-report-card-new .category-info {
+    min-width: 0;
+}
+
+#expense-reports-page .category-report-card-new .category-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#expense-reports-page .category-report-card-new .category-stats {
+    margin-top: 0.25rem;
+}
+
+#expense-reports-page .category-report-card-new .tx-count {
+    font-size: 0.8rem;
+    color: var(--subtext-light);
+}
+
+#expense-reports-page .category-report-card-new .category-amount-progress {
+    text-align: right;
+}
+
+#expense-reports-page .category-report-card-new .total-amount {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+#expense-reports-page .category-report-card-new .progress-bar-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 100px;
+}
+
+#expense-reports-page .category-report-card-new .percentage-text {
+    font-size: 0.75rem;
+    color: var(--subtext-light);
+    font-weight: 500;
+}
+
+#expense-reports-page .category-report-card-new .progress-bar-container {
+    flex-grow: 1;
+    height: 6px;
+    border-radius: 3px;
+    background-color: var(--gray-200);
+    overflow: hidden;
+}
+
+body.dark-mode #expense-reports-page .category-report-card-new .progress-bar-container {
+    background-color: var(--gray-800);
+}
+
+#expense-reports-page .category-report-card-new .progress-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease-in-out;
+}
+
+#expense-reports-page .category-report-card-new .item-actions {
+    margin-left: -0.5rem;
+}
+
+#expense-reports-page .category-report-card-new .action-btn {
+    font-size: 1rem;
+}
+
+.icon-picker {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+    gap: 0.5rem;
+    margin-top: 1rem;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--border-light);
+    padding: 0.5rem;
+    border-radius: var(--radius);
+}
+
+.icon-picker-item {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    color: var(--subtext-light);
+}
+
+.icon-picker-item:hover {
+    background-color: var(--gray-200);
+}
+
+body.dark-mode .icon-picker-item:hover {
+    background-color: var(--gray-800);
+}
+
+.icon-picker-item.selected {
+    background-color: var(--primary);
+    color: white;
+}
+
+/* --- START: UPDATED CONTACTS PAGE STYLES --- */
+#contacts-page .page-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+#contacts-page .control-group-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    #contacts-page .page-controls {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+
+    #contacts-page .control-group-container {
+        flex-direction: row;
+        flex-grow: 1;
+        justify-content: flex-start;
+        gap: 1.5rem;
+    }
+
+    #contacts-page .page-controls .btn-primary {
+        flex-shrink: 0;
+        min-width: fit-content;
+    }
+}
+
+
+/* Segmented Control Styling */
+.segmented-control {
+    display: flex;
+    background-color: var(--gray-200);
+    border-radius: 8px;
+    padding: 4px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+body.dark-mode .segmented-control {
+    background-color: var(--gray-800);
+}
+
+.segmented-control .control-button {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border: none;
+    background-color: transparent;
+    color: var(--subtext-light);
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    font-family: var(--font-family);
+    -webkit-appearance: none;
+    /* For iOS Safari */
+    -moz-appearance: none;
+    /* For Firefox */
+    appearance: none;
+    /* Standard property */
+}
+
+.segmented-control .control-button.active {
+    background-color: var(--card-light);
+    color: var(--text-light);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    /* Subtle shadow for active segment */
+}
+
+body.dark-mode .segmented-control .control-button.active {
+    background-color: var(--card-dark);
+}
+
+/* Sort Control Group */
+.sort-control-group {
+    display: flex;
+    gap: 0.5rem;
+    background-color: var(--gray-200);
+    border-radius: 8px;
+    padding: 4px;
+    box-sizing: border-box;
+}
+
+body.dark-mode .sort-control-group {
+    background-color: var(--gray-800);
+}
+
+.sort-control-group .form-control {
+    border: none;
+    background-color: transparent;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    height: auto;
+    min-height: 36px;
+    /* Align with button height */
+}
+
+.sort-control-group .header-icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    font-size: 1rem;
+    color: var(--subtext-light);
+    background-color: transparent;
+}
+
+.sort-control-group .header-icon-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+body.dark-mode .sort-control-group .header-icon-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Contact Card Layout */
+.contacts-list-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    /* Reduced gap for slightly more density */
+}
+
+.contact-card-new {
+    background-color: var(--card-light);
+    border-radius: var(--radius);
+    padding: 1rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    transition: var(--transition-fast);
+    cursor: pointer;
+    border-left: 5px solid transparent;
+    /* Added for visual accent on hover/active */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    /* Subtle shadow for depth */
+}
+
+.contact-card-new:active {
+    transform: scale(0.98);
+    /* Slightly less dramatic scale */
+}
+
+.contact-card-new:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+    border-left-color: var(--primary);
+    /* Highlight on hover */
+}
+
+.contact-card-new-icon .item-icon.contact {
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+    border-radius: 12px;
+    /* Square with radius for a modern look */
+    background-color: var(--gray-200);
+    /* Consistent icon background */
+    color: var(--gray-700);
+}
+
+body.dark-mode .contact-card-new-icon .item-icon.contact {
+    background-color: var(--gray-800);
+    color: var(--gray-300);
+}
+
+.contact-card-new-details {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    /* Adjusted gap */
+    min-width: 0;
+    /* Ensures content inside flex items shrinks */
+}
+
+.contact-card-new-row-1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    /* Align name to top if actions are taller */
+    gap: 0.5rem;
+    width: 100%;
+    /* Ensure it takes full width */
+}
+
+.contact-card-new-row-1 .contact-name-tx {
+    min-width: 0;
+    flex-shrink: 1;
+    /* Allow text to shrink */
+}
+
+.contact-card-new-row-1 h4 {
+    margin: 0;
+    font-size: 1.05rem;
+    /* Slightly smaller for balance */
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.contact-card-new-row-1 .contact-tx-count {
+    font-size: 0.75rem;
+    /* Smaller for secondary info */
+    color: var(--subtext-light);
+}
+
+.contact-card-new-row-1 .item-actions {
+    flex-shrink: 0;
+    /* Prevent actions from shrinking */
+    margin-left: -0.5rem;
+    /* Adjust alignment */
+}
+
+.contact-card-new-row-2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    /* Adjusted gap */
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-light);
+    flex-wrap: wrap;
+    /* Allow wrapping on smaller screens */
+    width: 100%;
+}
+
+.contact-card-new-row-2 .balance-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1;
+    /* Distribute space evenly */
+    min-width: 80px;
+    /* Ensure items don't become too small */
+}
+
+.contact-card-new-row-2 .balance-item span {
+    font-size: 0.7rem;
+    /* Smaller label for balance */
+    color: var(--subtext-light);
+    margin-bottom: 0.1rem;
+}
+
+.contact-card-new-row-2 .balance-item strong {
+    font-weight: 600;
+    font-size: 0.95rem;
+    /* Slightly smaller for balance figures */
+}
+
+.contact-card-new-row-2 .balance-item.net strong {
+    font-size: 1.05rem;
+    /* Slightly larger for net balance */
+    letter-spacing: -0.2px;
+}
+
+/* Balance Colors (already defined, just ensure they are applied) */
+.balance-positive {
+    color: var(--income);
+}
+
+.balance-negative {
+    color: var(--expense);
+}
+
+.balance-zero {
+    color: var(--subtext-light);
+}
+
+/* --- END: UPDATED CONTACTS PAGE STYLES --- */
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--nav-height);
+    padding: 5px 0 var(--safe-area-bottom);
+    /* Adjusted padding-bottom for safe area */
+    background-color: rgba(249, 249, 249, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-around;
+    z-index: 100;
+    box-sizing: content-box;
+}
+
+body.dark-mode .bottom-nav {
+    background-color: rgba(28, 28, 30, 0.75);
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    color: var(--subtext-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    font-family: var(--font-family);
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s, filter 0.2s;
+    flex: 1;
+    height: 100%;
+    padding-top: 5px;
+}
+
+.nav-btn i {
+    font-size: 1.3rem;
+}
+
+.nav-btn span {
+    font-size: 0.65rem;
+    font-weight: 500;
+}
+
+.nav-btn.active {
+    color: var(--primary);
+}
+
+.fab {
+    position: fixed;
+    bottom: calc(var(--nav-height) + var(--safe-area-bottom) - 30px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 56px;
+    height: 56px;
+    background-color: var(--primary);
+    color: white;
+    border: 4px solid var(--bg-light);
+    border-radius: 50%;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 25px rgba(0, 122, 255, 0.4);
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s;
+    z-index: 101;
+}
+
+body.dark-mode .fab {
+    border-color: var(--bg-dark);
+}
+
+.fab:active {
+    transform: translateX(-50%) scale(0.95);
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-medium), visibility var(--transition-medium);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: var(--bg-light);
+    width: 100%;
+    max-width: 100%;
+    padding: 1rem 1rem calc(1rem + var(--safe-area-bottom));
+    border-radius: 20px 20px 0 0;
+    transform: translateY(100%);
+    transition: transform var(--transition-medium);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-overlay.active .modal-content {
+    transform: translateY(0);
+}
+
+.modal-content .modal-header {
+    text-align: center;
+    padding: 0.5rem 0 1.5rem;
+    position: relative;
+}
+
+.modal-content .modal-header::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 5px;
+    background-color: var(--gray-300);
+    border-radius: 2.5px;
+}
+
+body.dark-mode .modal-content .modal-header::before {
+    background-color: var(--gray-700);
+}
+
+.modal-content h3 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.form-actions .btn {
+    flex: 1;
+    padding: 1rem;
+}
+
+#toast {
+    position: fixed;
+    top: calc(var(--header-height) + var(--safe-area-top) + 1rem);
+    left: 50%;
+    background-color: var(--gray-800);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -20px);
+    transition: var(--transition-medium);
+}
+
+body.dark-mode #toast {
+    background-color: var(--gray-200);
+    color: var(--gray-900);
+}
+
+#toast.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+}
+
+@media (min-width: 641px) {
+    .modal-overlay {
+        align-items: center;
+    }
+
+    .modal-content {
+        width: 90%;
+        max-width: 480px;
+        border-radius: var(--radius);
+        transform: translateY(20px) scale(0.95);
+        padding-bottom: 1.5rem;
+    }
+
+    .modal-overlay.active .modal-content {
+        transform: translateY(0) scale(1);
+    }
+
+    .modal-content .modal-header::before {
+        display: none;
+    }
+
+    .flow-summary {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .flow-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+}
     </style>
 </head>
 
 <body>
     <div class="app-wrapper">
         <header class="app-header">
-            <h1 id="app-header-title">حسابداری شخصی شمار</h1>
+            <h1 id="app-header-title">مدیریت مالی شخصی شمارا</h1>
             <div class="header-controls">
                 <i class="fas fa-cog" id="settings-btn"></i>
                 <div class="theme-switcher"><i class="fas fa-sun" id="theme-toggle"></i></div>
@@ -1933,7 +2032,7 @@
         </main>
         <button class="fab" data-action="add-transaction"><i class="fas fa-plus"></i></button>
         <nav class="bottom-nav">
-            <button class="nav-btn active" data-page="dashboard-page" data-title="حسابداری شخصی شمار"><i
+            <button class="nav-btn active" data-page="dashboard-page" data-title="مدیریت مالی شخصی شمارا"><i
                     class="fas fa-tachometer-alt"></i><span>داشبورد</span></button>
             <button class="nav-btn" data-page="transactions-page" data-title="تراکنش‌ها"><i
                     class="fas fa-exchange-alt"></i><span>تراکنش‌ها</span></button>
@@ -2146,7 +2245,7 @@
             // --- UI RENDERING ---
             const updateAllUI = () => {
                 const currentPageNavBtn = qs(`.nav-btn[data-page="${currentPageId}"]`) || qs('.nav-btn.active');
-                const currentPageTitle = currentPageNavBtn ? currentPageNavBtn.dataset.title : "حسابداری شخصی شمار";
+                const currentPageTitle = currentPageNavBtn ? currentPageNavBtn.dataset.title : "مدیریت مالی شخصی شمارا";
                 if (currentPageId) {
                     switchPage(currentPageId, currentPageTitle);
                 }
@@ -2160,29 +2259,32 @@
                     return balance;
                 }, 0);
             };
-            const getTransactionListItemHTML = (tx, options = {}) => {
+           const getTransactionListItemHTML = (tx, options = {}) => {
                 const { showAccount = false } = options;
                 let sign = tx.type === 'income' || tx.type.includes('received') || tx.type === 'receivable' ? '+' : '-';
                 const icons = { income: 'fa-arrow-up', expense: 'fa-arrow-down', transfer: 'fa-exchange-alt', cashflow: 'fa-retweet', debt: 'fa-file-invoice-dollar', receivable: 'fa-hand-holding-dollar', issuedCheck: 'fa-money-check-alt', receivedCheck: 'fa-money-check-alt', installmentPayment: 'fa-receipt' };
-                const displayDate = tx.date && moment(tx.date, MOMENT_FORMAT).isValid() ? moment(tx.date, MOMENT_FORMAT).format('jD jMMMM') : '-';
+                const displayDate = tx.date && moment(tx.date, MOMENT_FORMAT).isValid() ? moment(tx.date, MOMENT_FORMAT).format('jD jMMMM YYYY') : '-';
                 const displayDueDate = (tx.dueDate && moment(tx.dueDate, MOMENT_FORMAT).isValid()) ? moment(tx.dueDate, MOMENT_FORMAT).format(JALALI_DISPLAY_FORMAT) : null;
                 const isOverdue = displayDueDate && tx.status === 'pending' && moment(tx.dueDate, MOMENT_FORMAT).isBefore(moment(), 'day');
                 const account = state.accounts.find(a => a.id == tx.accountId);
                 const contact = tx.contactId ? state.contacts.find(c => c.id == tx.contactId) : null;
-                let descriptionHTML = tx.description || TRANSACTION_TYPES[tx.type] || "تراکنش";
+                let descriptionHTML = tx.description || TRANSACTION_TYPES[tx.type] || "توضیحات ثبت نشده";
                 if (tx.type === 'receivedCheck' || tx.type === 'issuedCheck') descriptionHTML += ` <span class="check-badge">چک</span>`;
-                let meta = `<div class="meta-data"><span><i class="fas fa-calendar-day" style="opacity: 0.7;"></i> ${displayDate}</span>`;
-                if (account && showAccount && tx.type !== 'cashflow') meta += `<span> • <i class="fas fa-wallet" style="opacity: 0.7"></i> ${account.name}</span>`;
+                
+                // Build the new meta grid HTML with labels
+                let metaGridHTML = '';
+                metaGridHTML += `<div class="meta-item"><label><i class="fas fa-calendar-day"></i> تاریخ:</label><span>${displayDate}</span></div>`;
+                if (account && showAccount && tx.type !== 'cashflow') metaGridHTML += `<div class="meta-item"><label><i class="fas fa-wallet"></i> حساب:</label><span>${account.name}</span></div>`;
                 if (contact) {
                     const contactIcon = contact.icon || 'fa-user';
-                    meta += `<span> • <i class="fas ${contactIcon}" style="opacity: 0.7"></i> ${contact.name}</span>`;
+                    metaGridHTML += `<div class="meta-item"><label><i class="fas ${contactIcon}"></i> طرف حساب:</label><span>${contact.name}</span></div>`;
                 }
                 if (tx.category) {
                     const categoryObj = (tx.type === 'expense' ? state.expenseCategories : state.incomeSources).find(c => c.name === tx.category);
                     const iconClass = categoryObj ? categoryObj.icon : 'fa-tag';
-                    meta += `<span> • <i class="fas ${iconClass}" style="opacity: 0.8; width: 1.2em;"></i> ${tx.category}</span>`;
+                    metaGridHTML += `<div class="meta-item"><label><i class="fas ${iconClass}"></i> دسته:</label><span>${tx.category}</span></div>`;
                 }
-                if (displayDueDate) meta += `<span class="due-date-info ${isOverdue ? 'overdue' : ''}"><i class="fas fa-hourglass-half" style="opacity: 0.7;"></i> ${displayDueDate}</span>`;
+                if (displayDueDate) metaGridHTML += `<div class="meta-item due-date-info ${isOverdue ? 'overdue' : ''}"><label><i class="fas fa-hourglass-half"></i> سررسید:</label><span>${displayDueDate}</span></div>`;
                 const statusTypes = ['debt', 'receivable', 'issuedCheck', 'receivedCheck'];
                 if (statusTypes.includes(tx.type) && tx.status) {
                     const statuses = STATUS_TYPES[tx.type] || {};
@@ -2190,22 +2292,36 @@
                     let statusClass = '';
                     if (['paid', 'received', 'cleared'].includes(tx.status)) statusClass = 'success';
                     else if (['not_paid', 'not_received', 'bounced'].includes(tx.status)) statusClass = 'danger';
-                    meta += `<span class="meta-status ${statusClass}">${statusText}</span>`;
+                    metaGridHTML += `<div class="meta-item meta-status ${statusClass}"><label><i class="fas fa-info-circle"></i> وضعیت:</label><span>${statusText}</span></div>`;
                 }
-                meta += '</div>';
-                let actions = `<div class="item-actions"><button class="action-btn edit-btn" data-id="${tx.id}" data-type="transaction"><i class="fas fa-pen-to-square"></i></button><button class="action-btn delete-btn" data-id="${tx.id}" data-type="transaction"><i class="fas fa-trash-alt"></i></button></div>`;
-                let amountHTML = `<div class="item-amount ${tx.type === 'income' ? 'income' : 'expense'}">${sign} ${formatCurrency(tx.amount)} تومان</div>`;
-                if (tx.type === 'transfer' || tx.type === 'cashflow') {
-                    sign = '';
-                    amountHTML = `<div class="item-amount">${formatCurrency(tx.amount)} تومان</div>`;
-                }
+
                 let itemIconClass = tx.type;
                 if (tx.transferId) {
                     itemIconClass = tx.type === 'income' ? 'income' : 'expense';
                     sign = tx.type === 'income' ? '+' : '-';
-                    amountHTML = `<div class="item-amount ${itemIconClass}">${sign} ${formatCurrency(tx.amount)} تومان</div>`;
                 }
-                return `<div class="item-icon ${itemIconClass}"><i class="fas ${icons[tx.type] || 'fa-dollar-sign'}"></i></div> <div class="item-info"> <p>${descriptionHTML}</p> ${meta} </div> ${amountHTML} ${actions}`;
+                
+                // --- Use the new HTML structure for a complete and organized card ---
+                return `
+                    <div class="transaction-card-redesigned">
+                        <div class="tx-main-info">
+                            <div class="item-icon ${itemIconClass}">
+                                <i class="fas ${icons[tx.type] || 'fa-dollar-sign'}"></i>
+                            </div>
+                            <div class="tx-details">
+                                <p>${descriptionHTML}</p>
+                                <div class="tx-meta-grid">${metaGridHTML}</div>
+                            </div>
+                        </div>
+                        <div class="tx-amount-actions">
+                            <div class="item-amount ${tx.type === 'income' ? 'income' : 'expense'}">${sign} ${formatCurrency(tx.amount)} تومان</div>
+                            <div class="item-actions">
+                                <button class="action-btn edit-btn" data-id="${tx.id}" data-type="transaction"><i class="fas fa-pen-to-square"></i></button>
+                                <button class="action-btn delete-btn" data-id="${tx.id}" data-type="transaction"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
             };
             const getAccountListItemHTML = (item) => {
                 const balance = calculateBalance(state.transactions.filter(tx => tx.accountId == item.id));
@@ -2658,7 +2774,6 @@
                 statusEl.innerHTML = '';
                 const summaryEl = qs('.filter-summary', page);
                 const hasActiveFilters = isFilterActive(pageKey); // Check if filters are active
-
                 if (filteredTxs.length > 0 && hasActiveFilters) { // Only show summary if there are filtered transactions AND filters are active
                     summaryEl.style.display = 'block';
                     let totalIncome = 0, totalExpense = 0;
@@ -2700,14 +2815,16 @@
                     const m = moment(day, MOMENT_FORMAT);
                     return `<div class="daily-report-item" data-net-flow="${dayNet}">
                                                     <div class="daily-report-header">
-                                                        <div class="date-info">
-                                                            <span class="day-of-week">${m.format('dddd')}</span>
-                                                            <span class="date-full">${m.format(JALALI_DISPLAY_FORMAT)}</span>
-                                                        </div>
-                                                        <div class="flow-summary">
-                                                            <div class="flow-item income"><i class="fas fa-arrow-up"></i><span>${formatCurrency(data.income)}</span></div>
-                                                            <div class="flow-item expense"><i class="fas fa-arrow-down"></i><span>${formatCurrency(data.expense)}</span></div>
-                                                            <div class="flow-item ${netFlowClass}"><i class="fas fa-coins"></i><span>${dayNet >= 0 ? '+' : ''}${formatCurrency(dayNet)}</span></div>
+                                                        <div class="report-date-summary">
+                                                            <div class="date-info">
+                                                                <span class="day-of-week">${m.format('dddd')}</span>
+                                                                <span class="date-full">${m.format(JALALI_DISPLAY_FORMAT)}</span>
+                                                            </div>
+                                                            <div class="flow-summary-grid">
+                                                                <div class="flow-item income"><label>دریافتی</label><span>${formatCurrency(data.income)}</span></div>
+                                                                <div class="flow-item expense"><label>پرداختی</label><span>${formatCurrency(data.expense)}</span></div>
+                                                                <div class="flow-item ${netFlowClass}"><label>برآیند</label><span>${dayNet >= 0 ? '+' : ''}${formatCurrency(dayNet)}</span></div>
+                                                            </div>
                                                         </div>
                                                         <i class="fas fa-chevron-down expand-arrow"></i>
                                                     </div>
@@ -3107,7 +3224,7 @@
                 modal.innerHTML = `
                                             <div class="modal-content">
                                                 <div class="modal-header"><h3>بیشتر</h3></div>
-                                                <ul class="list-container" style="margin:0;">
+                                                <ul class="list-container2" style="margin:0;">
                                                     <li class="more-menu-item" data-page="reports-page" data-title="گزارش‌های جامع"><div class="item-icon" style="background-color:rgba(255,159,10,0.15); color: #ff9f0a;"><i class="fas fa-chart-pie"></i></div><div class="item-info"><p>گزارش‌ جامع روزانه</p></div><i class="fas fa-chevron-left"></i></li>
                                                     <li class="more-menu-item" data-page="expense-reports-page" data-title="گزارش هزینه ها"><div class="item-icon expense"><i class="fas fa-chart-bar"></i></div><div class="item-info"><p>گزارش هزینه ها بر اساس دسته بندی</p></div><i class="fas fa-chevron-left"></i></li>
                                                     <li class="more-menu-item" data-page="debts-page" data-title="بدهی‌ها"><div class="item-icon debt"><i class="fas fa-file-invoice-dollar"></i></div><div class="item-info"><p>بدهی‌ها و چک‌های صادره</p></div><i class="fas fa-chevron-left"></i></li>
@@ -3117,7 +3234,7 @@
                                                     <li class="more-menu-item" data-page="savings-page" data-title="پس‌انداز"><div class="item-icon goal"><i class="fas fa-piggy-bank"></i></div><div class="item-info"><p>اهداف و پس‌انداز</p></div><i class="fas fa-chevron-left"></i></li>
                                                 </ul>
                                                 <div style="text-align: center; padding: 15px 10px 5px; font-size: 0.75rem; color: var(--subtext-light);">
-                                                    وب اپلیکیشن حسابداری شخصی شمار نسخه 1.1 | طراحی و کدنویسی شده توسط پیمان عابدین پور
+                                                    وب اپلیکیشن مدیریت مالی شخصی شمارا نسخه 0.01 | طراحی و کدنویسی شده توسط پیمان عابدین پور
                                                 </div>
                                             </div>`;
                 openModal('#more-menu-modal-overlay');
@@ -3220,11 +3337,11 @@
                                             <div class="modal-content" id="account-details-content">
                                                 <div class="modal-header"><h3>${acc.name}</h3></div>
                                                 <div style="text-align: right; line-height: 2; font-size: 0.9rem; padding: 0 1rem;">
-                                                    <p><strong>شماره کارت:</strong> ${acc.cardNumber || '-'}</p>
+                                                    <p><strong>شماراه کارت:</strong> ${acc.cardNumber || '-'}</p>
                                                     <p><strong>تاریخ انقضا:</strong> ${(acc.expMonth && acc.expYear) ? `${acc.expMonth}/${acc.expYear}` : '-'}</p>
                                                     <p><strong>CVV2:</strong> ${acc.cvv2 || '-'}</p>
-                                                    <p><strong>شماره حساب:</strong> ${acc.accountNumber || '-'}</p>
-                                                    <p><strong>شماره شبا:</strong> ${acc.shabaNumber || '-'}</p>
+                                                    <p><strong>شماراه حساب:</strong> ${acc.accountNumber || '-'}</p>
+                                                    <p><strong>شماراه شبا:</strong> ${acc.shabaNumber || '-'}</p>
                                                     <p><strong>یادداشت:</strong> ${acc.notes || '-'}</p>
                                                 </div>
                                                 <div class="form-actions">
@@ -3295,8 +3412,8 @@
                                                         <input type="hidden" id="selected-contact-icon" value="${currentIcon}">
                                                     </div>
                                                     <div class="form-group"><input type="text" id="contact-phone" class="form-control" value="${contact ? contact.phone || '' : ''}" inputmode="tel" placeholder="تلفن (اختیاری)"></div>
-                                                    <div class="form-group"><input type="text" id="contact-card-number" class="form-control" value="${contact ? contact.cardNumber || '' : ''}" inputmode="numeric" placeholder="شماره کارت (اختیاری)"></div>
-                                                    <div class="form-group"><input type="text" id="contact-account-number" class="form-control" value="${contact ? contact.accountNumber || '' : ''}" inputmode="numeric" placeholder="شماره حساب (اختیاری)"></div>
+                                                    <div class="form-group"><input type="text" id="contact-card-number" class="form-control" value="${contact ? contact.cardNumber || '' : ''}" inputmode="numeric" placeholder="شماراه کارت (اختیاری)"></div>
+                                                    <div class="form-group"><input type="text" id="contact-account-number" class="form-control" value="${contact ? contact.accountNumber || '' : ''}" inputmode="numeric" placeholder="شماراه حساب (اختیاری)"></div>
                                                     <div class="form-group"><textarea id="contact-notes" rows="2" class="form-control" placeholder="یادداشت (اختیاری)">${contact ? contact.notes || '' : ''}</textarea></div>
                                                     <div class="form-actions">
                                                         <button type="button" class="btn btn-secondary" data-action="close-modal">انصراف</button>
@@ -3317,136 +3434,161 @@
             };
 
             // === NEW: Smart SMS Parsing Function ===
-       const parseSmsAndOpenModal = async (text) => {
-                // If no text is passed, try to read from clipboard
-                if (!text || typeof text !== 'string') {
-                    try {
-                        if (navigator.clipboard && typeof navigator.clipboard.readText === 'function') {
-                            text = await navigator.clipboard.readText();
-                        }
-                        if (!text) {
-                            showToast('کلیپ‌بورد خالی است. ابتدا متن پیامک را کپی کنید.');
-                            renderTransactionModal(); // Open an empty modal for manual entry
-                            return;
-                        }
-                    } catch (err) {
-                        console.error('Failed to read clipboard contents: ', err);
-                        showToast('برای الصاق خودکار، دسترسی به کلیپ‌بورد لازم است.');
-                        renderTransactionModal(); // Open an empty modal
-                        return;
-                    }
-                }
+const parseSmsAndOpenModal = async (text) => {
+    if (!text || typeof text !== 'string') {
+        try {
+            if (navigator.clipboard && typeof navigator.clipboard.readText === 'function') {
+                text = await navigator.clipboard.readText();
+            }
+            if (!text) {
+                showToast('کلیپ‌بورد خالی است. ابتدا متن پیامک را کپی کنید.');
+                renderTransactionModal();
+                return;
+            }
+        } catch (err) {
+            console.error('Failed to read clipboard contents: ', err);
+            showToast('برای الصاق خودکار، دسترسی به کلیپ‌بورد لازم است.');
+            renderTransactionModal();
+            return;
+        }
+    }
 
-                const normalizedText = normalizeDigits(text.replace(/\n/g, ' '));
+    // --- Normalization ---
+    const normalizedText = normalizeDigits(text.replace(/\n/g, ' ').replace(/\u00A0/g, ' '));
 
-                // A library of regex patterns for different banks and transaction types.
-                // The order matters: more specific patterns should come before general ones.
-                const patterns = [
-                    // === NEW PATTERNS (from this request) ===
-                    { bank: 'بلو', type: 'income', regex: /بلو.* ([\d,٬]+) ریال به حساب شما نشست/, desc: 'واریز به بلو' },
-                    { bank: 'خاورمیانه', type: 'income', regex: /بانک خاورمیانه.*\+([\d,٬]+)/, desc: 'واریز به خاورمیانه' },
-                    { bank: 'گردشگری', type: 'expense', regex: /بانك گردشگری.*برداشت از:.*مبلغ:\s*([\d,٬]+)\s*ريال/, desc: 'برداشت از گردشگری' },
-                    { bank: 'گردشگری', type: 'income', regex: /بانك گردشگری.*واريز به:.*مبلغ:\s*([\d,٬]+)\s*ريال/, desc: 'واریز به گردشگری' },
-                    { bank: 'ملی', type: 'income', regex: /بانك ملي ايران\s*انتقالي:\s*([\d,٬]+)\+/, desc: 'انتقال به بانک ملی' },
-                    // **FIXED**: The regex for Bank Tejarat now has the correct format without the typo.
-                    { bank: 'تجارت', type: 'expense', regex: /\*بانک تجارت\*.*برداشت:\s*([\d,٬]+)\s*ریال/, desc: 'برداشت از تجارت' },
+    // --- تابع استخراج فقط رقم ---
+    function extractAmount(str) {
+        return str.replace(/[^\d]/g, '');
+    }
 
-                    // === PATTERNS FROM PREVIOUS TURN (re-ordered for specificity) ===
-                    // Specific banks first
-                    { bank: 'بلو', type: 'expense', regex: /بلو.* ([\d,٬]+) ریال از حساب شما پرید/, desc: 'برداشت پول بلو' },
-                    { bank: 'خاورمیانه', type: 'expense', regex: /بانک خاورمیانه.*برداشت وجه از خودپرداز\s*-?([\d,٬]+)/, desc: 'برداشت وجه خاورمیانه' },
-                    { bank: 'سپه', type: 'expense', regex: /بانك سپه.*مبلغ:\s*([\d,٬]+)\s*ريال/, desc: 'تراکنش بانک سپه' },
-                    { bank: 'ملی', type: 'expense', regex: /بانك ملي ايران\s*برداشت:\s*([\d,٬]+)-?/, desc: 'برداشت از بانک ملی' },
-                    { bank: 'ملت', type: 'expense', regex: /خريد Auth.*مبلغ:\s*([\d,٬]+)\s*ريال.*بانك ملت/, desc: 'خرید با کارت ملت' },
-                    { bank: 'ملت', type: 'expense', regex: /برداشت مبلغ ([\d,٬]+)\s*ريال از .*بانك ملت/, desc: 'برداشت از بانک ملت' },
-                    { bank: 'ملت', type: 'income', regex: /واريز مبلغ ([\d,٬]+)\s*ريال به .*بانك ملت/, desc: 'واریز به بانک ملت' },
-                    { bank: 'ملی', type: 'expense', regex: /بانك ملي ايران برداشت مبلغ ([\d,٬]+)\s*ريال/, desc: 'برداشت از بانک ملی' },
-                    { bank: 'ملی', type: 'expense', regex: /خريد مبلغ ([\d,٬]+)\s*ريال از كارت بانك ملي/, desc: 'خرید با کارت ملی' },
-                    { bank: 'ملی', type: 'income', regex: /واريز چك .* به مبلغ ([\d,٬]+)\s*ريال در بانك ملي/, desc: 'واریز چک به بانک ملی' },
-                    { bank: 'ملی', type: 'income', regex: /بانك ملي ايران واريز مبلغ ([\d,٬]+)\s*ريال/, desc: 'واریز به بانک ملی' },
-                    { bank: 'صادرات', type: 'expense', regex: /برداشت مبلغ ([\d,٬]+)\s*ريال .* سپهر بانك صادرات/, desc: 'برداشت از بانک صادرات' },
-                    { bank: 'صادرات', type: 'expense', regex: /خريد با كارت سپهر مبلغ ([\d,٬]+)\s*ريال .* بانك صادرات/, desc: 'خرید با کارت صادرات' },
-                    { bank: 'صادرات', type: 'income', regex: /واريز به سپهر كارت مبلغ ([\d,٬]+)\s*ريال .* بانك صادرات/, desc: 'واریز به بانک صادرات' },
-                    { bank: 'پاسارگاد', type: 'expense', regex: /بانک پاسارگاد برداشت مبلغ ([\d,٬]+)/, desc: 'برداشت از بانک پاسارگاد' },
-                    { bank: 'پاسارگاد', type: 'expense', regex: /بانک پاسارگاد خريد مبلغ ([\d,٬]+)/, desc: 'خرید با کارت پاسارگاد' },
-                    { bank: 'پاسارگاد', type: 'income', regex: /بانک پاسارگاد واريز مبلغ ([\d,٬]+)/, desc: 'واریز به بانک پاسارگاد' },
+    // --- Patterns (بدون حذف قبلی‌ها + الگویی که هم فاصله و هم نبود فاصله را پوشش دهد) ---
+    const patterns = [
+        // برداشت و واریز با یا بدون فاصله (ابتدای آرایه تا همیشه اول بررسی شود)
+        { bank: null, type: 'expense', regex: /برداشت\s*([\d,٬]+)/, desc: 'برداشت وجه' },
+        { bank: null, type: 'income', regex: /واریز\s*([\d,٬]+)/, desc: 'واریز وجه' },
 
-                    // General patterns for when bank name is not available or pattern is unknown
-                    // These should be last
-                    { bank: null, type: 'income', regex: /واریز([\d,٬]+)/, desc: 'واریز وجه' }, // Catches "واریز1,100,000"
-                    { bank: null, type: 'expense', regex: /برداشت\s*([\d,٬]+)/, desc: 'برداشت وجه' }, // Catches "برداشت480,700"
-                    { bank: null, type: 'expense', regex: /(?:برداشت|خريد|خرید|پرداخت|انتقال|ساتنا|پايا|کارت به کارت).*(?:مبلغ|مبلغ:)\s*([\d,٬]+)/, desc: 'تراکنش هزینه' },
-                    { bank: null, type: 'income', regex: /(?:واریز|واريز).*(?:مبلغ|مبلغ:)\s*([\d,٬]+)/, desc: 'تراکنش درآمد' },
-                ];
+        // علامت + یا - در هر جای پیامک
+        { bank: null, type: 'income', regex: /(?:^|\s)\+[\s]*([\d,٬]+)/, desc: 'واریز وجه' },
+        { bank: null, type: 'expense', regex: /(?:^|\s)-[\s]*([\d,٬]+)/, desc: 'برداشت وجه' },
+        { bank: null, type: 'income', regex: /([\d,٬]+)[\s]*\+/, desc: 'واریز وجه' },
+        { bank: null, type: 'expense', regex: /([\d,٬]+)[\s]*-/, desc: 'برداشت وجه' },
 
+        // بانک صادرات
+        { bank: 'صادرات', type: 'expense', regex: /بان[کك] صادرات[\s\S]*?([\d,٬]+)[\s]*-/, desc: 'برداشت از صادرات' },
+        { bank: 'صادرات', type: 'income', regex: /بان[کك] صادرات[\s\S]*?([\d,٬]+)[\s]*\+/, desc: 'واریز به صادرات' },
 
-                let bestMatch = null;
+        // بانک گردشگری
+        { bank: 'گردشگری', type: 'income', regex: /\*?بان[کك] گردشگر[یي][\s\S]*?واریز به:.*?مبلغ:\s*([\d,٬]+)\s*ر[یي]ال/, desc: 'واریز به گردشگری' },
+        { bank: 'گردشگری', type: 'expense', regex: /\*?بان[کك] گردشگر[یي][\s\S]*?برداشت از:.*?مبلغ:\s*([\d,٬]+)\s*ر[یي]ال/, desc: 'برداشت از گردشگری' },
+        { bank: 'گردشگری', type: 'income', regex: /\*?بان[کك] گردشگر[یي][\s\S]*?مبلغ:\s*([\d,٬]+)\s*ر[یي]ال/, desc: 'واریز به گردشگری' },
 
-                for (const pattern of patterns) {
-                    const match = normalizedText.match(pattern.regex);
-                    if (match && match[1]) {
-                        bestMatch = {
-                            amountStr: match[1], // The amount is always the first capturing group
-                            type: pattern.type,
-                            bank: pattern.bank,
-                            description: pattern.desc
-                        };
-                        break; // Stop at the first, most specific match
-                    }
-                }
+        // پیامک خودپرداز بانک ملی با عدد منفی
+        { bank: 'ملی', type: 'expense', regex: /بان[کك] مل[یي] ا[یي]ران[\s\S]*?خودپرداز:\s*([\d,٬]+)-/, desc: 'برداشت خودپرداز ملی' },
 
-                if (bestMatch) {
-                    let amount = parseInt(getUnformattedAmount(bestMatch.amountStr));
-                    // Assume amount is in Rials if not specified, and convert to Toman
-                    if (!/تومان/.test(normalizedText) && (/ريال|ریال/.test(normalizedText) || bestMatch.bank)) {
-                        amount = Math.floor(amount / 10);
-                    }
+        // بانک تجارت - برداشت
+        { bank: 'تجارت', type: 'expense', regex: /\*بان[کك] تجارت\*[\s\S]*?برداشت:\s*([\d,٬]+)\s*ر[یي]ال/, desc: 'برداشت از تجارت' },
 
-                    // --- DATE/TIME PARSING LOGIC (REVISED) ---
-                    let date = moment().format(JALALI_DISPLAY_FORMAT); // Default to today
-                    let time = '';
+        // سایر بانک‌ها
+        { bank: 'بلو', type: 'income', regex: /بلو.* ([\d,٬]+) ر[یي]ال به حساب شما نشست/, desc: 'واریز به بلو' },
+        { bank: 'خاورمیانه', type: 'income', regex: /بان[کك] خاورم[یي]انه.*\+([\d,٬]+)/, desc: 'واریز به خاورمیانه' },
+        { bank: 'گردشگری', type: 'expense', regex: /بان[کك] گردشگر[یي].*برداشت از:.*مبلغ:\s*([\d,٬]+)\s*ر[یي]ال/, desc: 'برداشت از گردشگری' },
+        { bank: 'گردشگری', type: 'income', regex: /بان[کك] گردشگر[یي].*واریز به:.*مبلغ:\s*([\d,٬]+)\s*ر[یي]ال/, desc: 'واریز به گردشگری' },
+        { bank: 'ملی', type: 'income', regex: /بان[کك] مل[یي] ا[یي]ران\s*انتقال[یي]:\s*([\d,٬]+)\+/, desc: 'انتقال به ملی' },
+        { bank: 'بلو', type: 'expense', regex: /بلو.* ([\d,٬]+) ر[یي]ال از حساب شما پرید/, desc: 'برداشت پول بلو' },
+        { bank: 'خاورمیانه', type: 'expense', regex: /بان[کك] خاورم[یي]انه.*برداشت وجه از خودپرداز\s*-?([\d,٬]+)/, desc: 'برداشت وجه خاورمیانه' },
+        { bank: 'سپه', type: 'expense', regex: /بان[کك] سپه.*مبلغ:\s*([\d,٬]+)\s*ر[یي]ال/, desc: 'تراکنش بانک سپه' },
+        { bank: 'ملی', type: 'expense', regex: /بان[کك] مل[یي] ا[یي]ران[\s\S]*?برداشت:\s*([\d,٬]+)-?/, desc: 'برداشت از ملی' },
+        { bank: 'ملت', type: 'expense', regex: /خرید Auth.*مبلغ:\s*([\d,٬]+)\s*ر[یي]ال.*بان[کك] ملت/, desc: 'خرید با کارت ملت' },
+        { bank: 'ملت', type: 'expense', regex: /برداشت مبلغ ([\d,٬]+)\s*ر[یي]ال از .*بان[کك] ملت/, desc: 'برداشت از ملت' },
+        { bank: 'ملت', type: 'income', regex: /واریز مبلغ ([\d,٬]+)\s*ر[یي]ال به .*بان[کك] ملت/, desc: 'واریز به ملت' },
+        { bank: 'ملی', type: 'expense', regex: /بان[کك] مل[یي] ا[یي]ران[\s\S]*?برداشت مبلغ ([\d,٬]+)\s*ر[یي]ال/, desc: 'برداشت از ملی' },
+        { bank: 'ملی', type: 'expense', regex: /خرید مبلغ ([\d,٬]+)\s*ر[یي]ال از [کك]ارت بان[کك] مل[یي]/, desc: 'خرید با کارت ملی' },
+        { bank: 'ملی', type: 'income', regex: /واریز چک .* به مبلغ ([\d,٬]+)\s*ر[یي]ال در بان[کك] مل[یي]/, desc: 'واریز چک به ملی' },
+        { bank: 'ملی', type: 'income', regex: /بان[کك] مل[یي] ا[یي]ران[\s\S]*?واریز مبلغ ([\d,٬]+)\s*ر[یي]ال/, desc: 'واریز به ملی' },
+        { bank: 'صادرات', type: 'expense', regex: /برداشت مبلغ ([\d,٬]+)\s*ر[یي]ال .* سپهر بان[کك] صادرات/, desc: 'برداشت از صادرات' },
+        { bank: 'صادرات', type: 'expense', regex: /خرید با کارت سپهر مبلغ ([\d,٬]+)\s*ر[یي]ال .* بان[کك] صادرات/, desc: 'خرید با کارت صادرات' },
+        { bank: 'صادرات', type: 'income', regex: /واریز به سپهر کارت مبلغ ([\d,٬]+)\s*ر[یي]ال .* بان[کك] صادرات/, desc: 'واریز به صادرات' },
+        { bank: 'پاسارگاد', type: 'expense', regex: /بان[کك] پاسارگاد[\s\S]*?برداشت مبلغ ([\d,٬]+)/, desc: 'برداشت از پاسارگاد' },
+        { bank: 'پاسارگاد', type: 'expense', regex: /بان[کك] پاسارگاد[\s\S]*?خرید مبلغ ([\d,٬]+)/, desc: 'خرید با کارت پاسارگاد' },
+        { bank: 'پاسارگاد', type: 'income', regex: /بان[کك] پاسارگاد[\s\S]*?واریز مبلغ ([\d,٬]+)/, desc: 'واریز به پاسارگاد' },
 
-                    // Regexes for different date formats (order matters)
-                    const dateRegexes = [
-                        { regex: /(\d{4})[\/\.\-_](\d{1,2})[\/\.\-_](\d{1,2})/, y: 1, m: 2, d: 3 }, // Matches: 1404.04.01, 1404/04/01
-                        { regex: /(\d{2})[\/\.\-_](\d{1,2})[\/\.\-_](\d{1,2})/, y: 1, m: 2, d: 3 }, // Matches: 04/04/04, 04/03/22
-                        { regex: /(?:\s|^)(\d{2})(\d{2})-\d{2}:\d{2}/, y: null, m: 1, d: 2 },  // Matches: 0404-11:26
-                        { regex: /(?:\s|^)(\d{1,2})\/(\d{1,2})(?=\s|$)/, y: null, m: 1, d: 2 },  // Matches: 04/06 (no year)
-                    ];
+        // الگوهای عمومی
+        { bank: null, type: 'expense', regex: /(?:برداشت|خرید|پرداخت|انتقال|ساتنا|پایا|کارت به کارت).*(?:مبلغ|مبلغ:)\s*([\d,٬]+)/, desc: 'تراکنش هزینه' },
+        { bank: null, type: 'income', regex: /(?:واریز).*(?:مبلغ|مبلغ:)\s*([\d,٬]+)/, desc: 'تراکنش درآمد' },
+    ];
 
-                    for (const dr of dateRegexes) {
-                        const dateMatch = normalizedText.match(dr.regex);
-                        if (dateMatch) {
-                            let year = dr.y ? dateMatch[dr.y] : moment().format('jYYYY');
-                            if (year.length === 2) { year = '14' + year; }
-                            let month = dateMatch[dr.m].padStart(2, '0');
-                            let day = dateMatch[dr.d].padStart(2, '0');
-                            // **FIXED**: Use template literal backticks `` to correctly build the date string
-                            date = `${year}/${month}/${day}`;
-                            break; // Found a date, stop looking
-                        }
-                    }
+    let bestMatch = null;
 
-                    const timeRegex = /(\d{2}):(\d{2})/;
-                    const timeMatch = normalizedText.match(timeRegex);
-                    if (timeMatch) {
-                        time = ` ${timeMatch[0]}`;
-                    }
-                    // --- END OF REVISED LOGIC ---
-
-                    let prefillData = {
-                        amount: amount,
-                        type: bestMatch.type,
-                        description: bestMatch.description + time,
-                        date: date
-                    };
-                    renderTransactionModal(null, null, prefillData);
-
-                } else {
-                    showToast('قالب پیامک شناسایی نشد. لطفا دستی وارد کنید.');
-                    renderTransactionModal(null, null, { description: text }); // Open modal with pasted text as description
-                }
+    for (const pattern of patterns) {
+        const match = normalizedText.match(pattern.regex);
+        if (match && match[1]) {
+            bestMatch = {
+                amountStr: match[1],
+                type: pattern.type,
+                bank: pattern.bank,
+                description: pattern.desc
             };
+            break;
+        }
+    }
+
+    if (bestMatch) {
+        let amount = parseInt(extractAmount(bestMatch.amountStr));
+        const hasToman = /تومان/.test(normalizedText);
+        const hasRial = /ر[یي]ال/.test(normalizedText);
+        const hasSignOnly = /^[\s\S]*[+\-][\s]*[\d,٬]+[\s\S]*$|^[\s\S]*[\d,٬]+[\s]*[+\-][\s\S]*$/.test(normalizedText);
+
+        if (!hasToman && (hasRial || hasSignOnly || bestMatch.bank)) {
+            amount = Math.floor(amount / 10);
+        }
+
+        // --- تاریخ و زمان ---
+        let date = moment().format('jYYYY/MM/DD');
+        let time = '';
+        const dateRegexes = [
+            { regex: /(\d{4})[\/\.\-_](\d{1,2})[\/\.\-_](\d{1,2})/, y: 1, m: 2, d: 3 },
+            { regex: /(\d{2})[\/\.\-_](\d{1,2})[\/\.\-_](\d{1,2})/, y: 1, m: 2, d: 3 },
+            { regex: /(\d{2})(\d{2})[-_ ](\d{2}):(\d{2})/, y: null, m: 1, d: 2, t: [3,4] },
+            { regex: /(\d{2})\/(\d{2})[-_ ](\d{2}):(\d{2})/, y: null, m: 1, d: 2, t: [3,4] },
+            { regex: /(\d{2})\/(\d{2})(?:\s|$)/, y: null, m: 1, d: 2 },
+            { regex: /(?:^|\s)(\d{2})(\d{2})(?:\s|-|_)/, y: null, m: 1, d: 2 },
+        ];
+        for (const dr of dateRegexes) {
+            const dateMatch = normalizedText.match(dr.regex);
+            if (dateMatch) {
+                let year = dr.y ? dateMatch[dr.y] : moment().format('jYYYY');
+                if (year.length === 2) year = '14' + year;
+                let month = dateMatch[dr.m].padStart(2, '0');
+                let day = dateMatch[dr.d].padStart(2, '0');
+                date = `${year}/${month}/${day}`;
+                if (dr.t && dateMatch[dr.t[0]] && dateMatch[dr.t[1]]) {
+                    time = ` ${dateMatch[dr.t[0]]}:${dateMatch[dr.t[1]]}`;
+                }
+                break;
+            }
+        }
+        if (!time) {
+            const timeRegex = /(\d{2}):(\d{2})/;
+            const timeMatch = normalizedText.match(timeRegex);
+            if (timeMatch) {
+                time = ` ${timeMatch[0]}`;
+            }
+        }
+
+        let prefillData = {
+            amount: amount,
+            type: bestMatch.type,
+            description: bestMatch.description + time,
+            date: date
+        };
+        renderTransactionModal(null, null, prefillData);
+
+    } else {
+        showToast('قالب پیامک شناسایی نشد. لطفا دستی وارد کنید.');
+        renderTransactionModal(null, null, { description: text });
+    }
+};
+
 
             const setupEventListeners = () => {
                 document.body.addEventListener('click', (e) => {
@@ -3893,7 +4035,7 @@
                     const dataStr = JSON.stringify(state);
                     const blob = new Blob([dataStr], { type: 'application/json' });
                     const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a'); a.href = url; a.download = 'shomar_backup.json'; a.click(); URL.revokeObjectURL(url);
+                    const a = document.createElement('a'); a.href = url; a.download = 'Shomara_backup.json'; a.click(); URL.revokeObjectURL(url);
                     showToast('فایل پشتیبان با موفقیت ایجاد شد.');
                     closeModal('#settings-modal-overlay');
                 } catch (e) { showToast('خطا در ایجاد فایل پشتیبان.'); }
@@ -3961,7 +4103,7 @@
                 loadData();
                 setupEventListeners();
                 setTimeout(() => {
-                    const initialTitle = qs('.nav-btn.active')?.dataset?.title || "حسابداری شخصی شمار";
+                    const initialTitle = qs('.nav-btn.active')?.dataset?.title || "مدیریت مالی شخصی شمارا";
                     switchPage('dashboard-page', initialTitle);
                 }, 50);
             };
