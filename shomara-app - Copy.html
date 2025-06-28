@@ -3590,294 +3590,271 @@ const parseSmsAndOpenModal = async (text) => {
 };
 
 
-const setupEventListeners = () => {
-    document.body.addEventListener('click', (e) => {
-        const target = e.target;
-        const closest = (selector) => target.closest(selector);
-        if (closest('.nav-btn, .fab, .action-card, .btn, .more-menu-item, #theme-toggle, #toggle-balance-visibility, .summary-card, .contact-card-new')) {
-            triggerHapticFeedback();
-        }
-        const expenseCategoryCard = closest('#expense-reports-page .category-report-card-new');
-        if (expenseCategoryCard && !closest('.action-btn')) {
-            e.preventDefault();
-            const categoryName = expenseCategoryCard.dataset.categoryName;
-            state.filters.transactions = {
-                ...state.filters.transactions, // keep other filters
-                type: 'expense',
-                category: categoryName
-            };
-            saveData();
-            switchPage('transactions-page', `تراکنش‌ها: ${categoryName}`);
-            return;
-        }
-        if (closest('[data-action="sort-expense-reports"]')) {
-            const currentSort = state.filters.expenseReports.sortBy;
-            const sortOptions = ['total', 'name', 'count'];
-            const nextIndex = (sortOptions.indexOf(currentSort) + 1) % sortOptions.length;
-            state.filters.expenseReports.sortBy = sortOptions[nextIndex];
-            saveData();
-            renderExpenseReportsPage();
-            return;
-        }
-        const navBtn = closest('.nav-btn');
-        if (navBtn && navBtn.dataset.page) { switchPage(navBtn.dataset.page, navBtn.dataset.title); return; }
-        if (closest('[data-action="open-more-menu"]')) { renderMoreMenuModal(); return; }
-        const moreMenuItem = closest('.more-menu-item');
-        if (moreMenuItem) {
-            closeModal('#more-menu-modal-overlay');
-            setTimeout(() => {
-                switchPage(moreMenuItem.dataset.page, moreMenuItem.dataset.title);
-            }, 150);
-            return;
-        }
-        if (target.matches('.modal-overlay') || closest('[data-action="close-modal"]')) { closeModal('#' + closest('.modal-overlay').id); return; }
-        if (closest('.fab')) { renderTransactionModal(); return; }
-        if (closest('[data-action="add-account"]')) { renderAccountModal(); return; }
-        if (closest('[data-action="add-contact"]')) { renderContactModal(); return; }
-        if (closest('#settings-btn')) { renderSettingsModal(); return; }
-        if (closest('[data-action="toggle-filters"]')) {
-            const container = closest('.page').querySelector('.filters-collapsible-container');
-            container?.classList.toggle('visible');
-            return;
-        }
-        const summaryCard = closest('.summary-card[data-page]');
-        if (summaryCard) {
-            const pageId = summaryCard.dataset.page;
-            const title = summaryCard.dataset.title;
-            const filterType = summaryCard.dataset.filterType;
-            if (pageId === 'transactions-page') {
-                state.filters.transactions = { searchTerm: '', from: null, to: null, type: filterType || 'all', accountId: state.activeAccountId, category: 'all', contactId: 'all' };
-            } else {
-                const pageKey = pageId.replace('-page', '');
-                if (state.filters[pageKey]) {
-                    state.filters[pageKey] = { ...state.filters[pageKey], from: null, to: null, accountId: 'all', status: 'all', contactId: 'all' };
-                }
-            }
-            saveData();
-            switchPage(pageId, title);
-            return;
-        }
-        const quickAction = closest('.action-card');
-        if (quickAction) {
-            const action = quickAction.dataset.action;
-            if (action === 'quick-add-income') renderTransactionModal(null, 'income');
-            if (action === 'quick-add-expense') renderTransactionModal(null, 'expense');
-            if (action === 'quick-add-debt') renderTransactionModal(null, 'debt');
-            if (action === 'quick-add-receivable') renderTransactionModal(null, 'receivable');
-            if (action === 'paste-from-sms') parseSmsAndOpenModal(); // New action
-            return;
-        }
-        if (closest('[data-action="add-to-fund"]')) { renderTransactionModal(null, 'transfer'); return; }
-        if (closest('[data-action="add-loan"]')) { renderLoanModal(); return; }
-        if (closest('[data-action="add-goal"]')) { renderGoalModal(); return; }
-        if (closest('[data-action="add-expense-category"]')) { renderExpenseCategoryModal(); return; }
-        if (closest('[data-action="go-to-loans"]')) { e.preventDefault(); closeModal('#transaction-modal-overlay'); switchPage('loans-page', 'تسهیلات'); return; }
-        if (closest('[data-action="edit-account"]')) { closeModal('#account-details-modal-overlay'); renderAccountModal(closest('[data-action="edit-account"]').dataset.id); return; }
-        const contactCard = closest('[data-action="view-contact-txs"]');
-        if (contactCard && !closest('.action-btn')) {
-            const contactId = contactCard.dataset.id;
-            const contactName = contactCard.dataset.name;
-            state.filters.transactions = { searchTerm: '', from: null, to: null, type: 'all', accountId: 'all', category: 'all', contactId: contactId };
-            saveData();
-            switchPage('transactions-page', `تراکنش‌های ${contactName}`);
-            return;
-        }
-        // Updated click listener for segmented control buttons
-        if (closest('#contact-status-filter-segmented') && target.classList.contains('control-button')) {
-            state.filters.contacts.statusFilter = target.dataset.filter;
-            saveData();
-            renderContactsPage(); // Re-render the contacts page to apply the filter
-            return;
-        }
-        if (closest('#contact-sort-direction')) {
-            const currentDirection = state.filters.contacts.sortDirection || 'desc';
-            state.filters.contacts.sortDirection = currentDirection === 'asc' ? 'desc' : 'asc';
-            saveData();
-            renderContactsPage(); // Re-render the contacts page to apply the new sort direction
-            return;
-        }
-        const listItem = closest('.list-container li[data-id]');
-        if (listItem && !closest('.action-btn')) {
-            const id = listItem.dataset.id;
-            const type = listItem.dataset.type;
-            if (type === 'account') renderAccountDetailsModal(id);
-            else if (type === 'loan') renderLoanModal(id);
-            else if (type === 'transaction') renderTransactionModal(id);
-            else if (type === 'contact') renderContactModal(parseInt(id));
-            return;
-        }
-        const actionBtn = closest('.action-btn');
-        if (actionBtn) {
-            e.stopPropagation();
-            e.preventDefault();
-            const id = actionBtn.dataset.id;
-            const type = actionBtn.dataset.type;
-            if (actionBtn.classList.contains('edit-btn')) {
-                if (type === 'goal') renderGoalModal(id);
-                else if (type === 'transaction') renderTransactionModal(id);
-                else if (type === 'loan') renderLoanModal(id);
-                else if (type === 'expense-category') renderExpenseCategoryModal(id);
-                else if (type === 'contact') renderContactModal(parseInt(id));
-            } else if (actionBtn.classList.contains('delete-btn')) {
-                itemToDelete = { id: (type === 'expense-category') ? id : parseInt(id), type: type };
-                let message = 'آیا از حذف این مورد مطمئن هستید؟';
-                if (type === 'expense-category') {
-                    message = `با حذف دسته‌بندی «${id}»، این دسته از تمام تراکنش‌های مرتبط نیز حذف خواهد شد. آیا مطمئن هستید؟`
-                }
-                if (type === 'contact') {
-                    const contactName = state.contacts.find(c => c.id == id)?.name;
-                    message = `با حذف «${contactName}»، این شخص از تمام بدهی‌ها و طلب‌های مرتبط حذف خواهد شد (تراکنش‌ها باقی می‌مانند). آیا مطمئن هستید؟`;
-                }
-                renderConfirmModal(message);
-            }
-            return;
-        }
-        const deleteBtn = closest('[data-action="delete-item"]');
-        if (deleteBtn) {
-            itemToDelete = { id: parseInt(deleteBtn.dataset.id), type: deleteBtn.dataset.type };
-            if (itemToDelete.type === 'account') {
-                renderConfirmModal('هشدار: فقط در صورتی می‌توانید حساب را حذف کنید که هیچ تراکنشی نداشته باشد. آیا ادامه می‌دهید؟');
-                closeModal('#account-modal-overlay');
-            } else {
-                renderConfirmModal('آیا از حذف این مورد مطمئن هستید؟');
-            }
-            return;
-        }
-        if (closest('#confirm-delete-btn')) { handleDelete(); return; }
-        if (closest('#theme-toggle')) { document.body.classList.toggle('dark-mode'); updateThemeIcon(); saveData(); }
-        if (closest('#toggle-balance-visibility')) { state.isBalanceVisible = !state.isBalanceVisible; saveData(); renderDashboardPage(); }
-        if (closest('.daily-report-header')) { closest('.daily-report-item').classList.toggle('active'); }
-        if (closest('#backup-btn')) { handleBackup(); return; }
-        if (closest('#restore-btn')) { qs('#restore-file-input').click(); return; }
-        if (closest('#export-csv-btn')) { exportTransactionsToCSV(); return; }
-        if (closest('#clear-tx-filters-btn')) { state.filters.transactions = { searchTerm: '', from: null, to: null, type: 'all', accountId: 'all', category: 'all', contactId: 'all' }; renderTransactionsPage(); saveData(); return; }
-        if (closest('.clear-generic-filters-btn')) {
-            const pageKey = target.dataset.pagekey;
-            if (pageKey && state.filters[pageKey]) {
-                state.filters[pageKey] = { ...state.filters[pageKey], from: null, to: null, accountId: 'all', status: 'all', contactId: 'all' };
-                saveData();
-                const title = qs('#app-header-title').textContent;
-                switchPage(`${pageKey}-page`, title);
-            }
-            return;
-        }
-        if (closest('#install-pwa-btn')) {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        showToast('برنامه با موفقیت نصب شد.');
-                    } else {
-                        showToast('نصب برنامه لغو شد.');
+            const setupEventListeners = () => {
+                document.body.addEventListener('click', (e) => {
+                    const target = e.target;
+                    const closest = (selector) => target.closest(selector);
+                    if (closest('.nav-btn, .fab, .action-card, .btn, .more-menu-item, #theme-toggle, #toggle-balance-visibility, .summary-card, .contact-card-new')) {
+                        triggerHapticFeedback();
                     }
-                    deferredPrompt = null;
-                    closeModal('#settings-modal-overlay');
+                    const expenseCategoryCard = closest('#expense-reports-page .category-report-card-new');
+                    if (expenseCategoryCard && !closest('.action-btn')) {
+                        e.preventDefault();
+                        const categoryName = expenseCategoryCard.dataset.categoryName;
+                        state.filters.transactions = {
+                            ...state.filters.transactions, // keep other filters
+                            type: 'expense',
+                            category: categoryName
+                        };
+                        saveData();
+                        switchPage('transactions-page', `تراکنش‌ها: ${categoryName}`);
+                        return;
+                    }
+                    if (closest('[data-action="sort-expense-reports"]')) {
+                        const currentSort = state.filters.expenseReports.sortBy;
+                        const sortOptions = ['total', 'name', 'count'];
+                        const nextIndex = (sortOptions.indexOf(currentSort) + 1) % sortOptions.length;
+                        state.filters.expenseReports.sortBy = sortOptions[nextIndex];
+                        saveData();
+                        renderExpenseReportsPage();
+                        return;
+                    }
+                    const navBtn = closest('.nav-btn');
+                    if (navBtn && navBtn.dataset.page) { switchPage(navBtn.dataset.page, navBtn.dataset.title); return; }
+                    if (closest('[data-action="open-more-menu"]')) { renderMoreMenuModal(); return; }
+                    const moreMenuItem = closest('.more-menu-item');
+                    if (moreMenuItem) {
+                        closeModal('#more-menu-modal-overlay');
+                        setTimeout(() => {
+                            switchPage(moreMenuItem.dataset.page, moreMenuItem.dataset.title);
+                        }, 150);
+                        return;
+                    }
+                    if (target.matches('.modal-overlay') || closest('[data-action="close-modal"]')) { closeModal('#' + closest('.modal-overlay').id); return; }
+                    if (closest('.fab')) { renderTransactionModal(); return; }
+                    if (closest('[data-action="add-account"]')) { renderAccountModal(); return; }
+                    if (closest('[data-action="add-contact"]')) { renderContactModal(); return; }
+                    if (closest('#settings-btn')) { renderSettingsModal(); return; }
+                    if (closest('[data-action="toggle-filters"]')) {
+                        const container = closest('.page').querySelector('.filters-collapsible-container');
+                        container?.classList.toggle('visible');
+                        return;
+                    }
+                    const summaryCard = closest('.summary-card[data-page]');
+                    if (summaryCard) {
+                        const pageId = summaryCard.dataset.page;
+                        const title = summaryCard.dataset.title;
+                        const filterType = summaryCard.dataset.filterType;
+                        if (pageId === 'transactions-page') {
+                            state.filters.transactions = { searchTerm: '', from: null, to: null, type: filterType || 'all', accountId: state.activeAccountId, category: 'all', contactId: 'all' };
+                        } else {
+                            const pageKey = pageId.replace('-page', '');
+                            if (state.filters[pageKey]) {
+                                state.filters[pageKey] = { ...state.filters[pageKey], from: null, to: null, accountId: 'all', status: 'all', contactId: 'all' };
+                            }
+                        }
+                        saveData();
+                        switchPage(pageId, title);
+                        return;
+                    }
+                    const quickAction = closest('.action-card');
+                    if (quickAction) {
+                        const action = quickAction.dataset.action;
+                        if (action === 'quick-add-income') renderTransactionModal(null, 'income');
+                        if (action === 'quick-add-expense') renderTransactionModal(null, 'expense');
+                        if (action === 'quick-add-debt') renderTransactionModal(null, 'debt');
+                        if (action === 'quick-add-receivable') renderTransactionModal(null, 'receivable');
+                        if (action === 'paste-from-sms') parseSmsAndOpenModal(); // New action
+                        return;
+                    }
+                    if (closest('[data-action="add-to-fund"]')) { renderTransactionModal(null, 'transfer'); return; }
+                    if (closest('[data-action="add-loan"]')) { renderLoanModal(); return; }
+                    if (closest('[data-action="add-goal"]')) { renderGoalModal(); return; }
+                    if (closest('[data-action="add-expense-category"]')) { renderExpenseCategoryModal(); return; }
+                    if (closest('[data-action="go-to-loans"]')) { e.preventDefault(); closeModal('#transaction-modal-overlay'); switchPage('loans-page', 'تسهیلات'); return; }
+                    if (closest('[data-action="edit-account"]')) { closeModal('#account-details-modal-overlay'); renderAccountModal(closest('[data-action="edit-account"]').dataset.id); return; }
+                    const contactCard = closest('[data-action="view-contact-txs"]');
+                    if (contactCard && !closest('.action-btn')) {
+                        const contactId = contactCard.dataset.id;
+                        const contactName = contactCard.dataset.name;
+                        state.filters.transactions = { searchTerm: '', from: null, to: null, type: 'all', accountId: 'all', category: 'all', contactId: contactId };
+                        saveData();
+                        switchPage('transactions-page', `تراکنش‌های ${contactName}`);
+                        return;
+                    }
+                    // Updated click listener for segmented control buttons
+                    if (closest('#contact-status-filter-segmented') && target.classList.contains('control-button')) {
+                        state.filters.contacts.statusFilter = target.dataset.filter;
+                        saveData();
+                        renderContactsPage(); // Re-render the contacts page to apply the filter
+                        return;
+                    }
+                    if (closest('#contact-sort-direction')) {
+                        const currentDirection = state.filters.contacts.sortDirection || 'desc';
+                        state.filters.contacts.sortDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+                        saveData();
+                        renderContactsPage(); // Re-render the contacts page to apply the new sort direction
+                        return;
+                    }
+                    const listItem = closest('.list-container li[data-id]');
+                    if (listItem && !closest('.action-btn')) {
+                        const id = listItem.dataset.id;
+                        const type = listItem.dataset.type;
+                        if (type === 'account') renderAccountDetailsModal(id);
+                        else if (type === 'loan') renderLoanModal(id);
+                        else if (type === 'transaction') renderTransactionModal(id);
+                        else if (type === 'contact') renderContactModal(parseInt(id));
+                        return;
+                    }
+                    const actionBtn = closest('.action-btn');
+                    if (actionBtn) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        const id = actionBtn.dataset.id;
+                        const type = actionBtn.dataset.type;
+                        if (actionBtn.classList.contains('edit-btn')) {
+                            if (type === 'goal') renderGoalModal(id);
+                            else if (type === 'transaction') renderTransactionModal(id);
+                            else if (type === 'loan') renderLoanModal(id);
+                            else if (type === 'expense-category') renderExpenseCategoryModal(id);
+                            else if (type === 'contact') renderContactModal(parseInt(id));
+                        } else if (actionBtn.classList.contains('delete-btn')) {
+                            itemToDelete = { id: (type === 'expense-category') ? id : parseInt(id), type: type };
+                            let message = 'آیا از حذف این مورد مطمئن هستید؟';
+                            if (type === 'expense-category') {
+                                message = `با حذف دسته‌بندی «${id}»، این دسته از تمام تراکنش‌های مرتبط نیز حذف خواهد شد. آیا مطمئن هستید؟`
+                            }
+                            if (type === 'contact') {
+                                const contactName = state.contacts.find(c => c.id == id)?.name;
+                                message = `با حذف «${contactName}»، این شخص از تمام بدهی‌ها و طلب‌های مرتبط حذف خواهد شد (تراکنش‌ها باقی می‌مانند). آیا مطمئن هستید؟`;
+                            }
+                            renderConfirmModal(message);
+                        }
+                        return;
+                    }
+                    const deleteBtn = closest('[data-action="delete-item"]');
+                    if (deleteBtn) {
+                        itemToDelete = { id: parseInt(deleteBtn.dataset.id), type: deleteBtn.dataset.type };
+                        if (itemToDelete.type === 'account') {
+                            renderConfirmModal('هشدار: فقط در صورتی می‌توانید حساب را حذف کنید که هیچ تراکنشی نداشته باشد. آیا ادامه می‌دهید؟');
+                            closeModal('#account-modal-overlay');
+                        } else {
+                            renderConfirmModal('آیا از حذف این مورد مطمئن هستید؟');
+                        }
+                        return;
+                    }
+                    if (closest('#confirm-delete-btn')) { handleDelete(); return; }
+                    if (closest('#theme-toggle')) { document.body.classList.toggle('dark-mode'); updateThemeIcon(); saveData(); }
+                    if (closest('#toggle-balance-visibility')) { state.isBalanceVisible = !state.isBalanceVisible; saveData(); renderDashboardPage(); }
+                    if (closest('.daily-report-header')) { closest('.daily-report-item').classList.toggle('active'); }
+                    if (closest('#backup-btn')) { handleBackup(); return; }
+                    if (closest('#restore-btn')) { qs('#restore-file-input').click(); return; }
+                    if (closest('#export-csv-btn')) { exportTransactionsToCSV(); return; }
+                    if (closest('#clear-tx-filters-btn')) { state.filters.transactions = { searchTerm: '', from: null, to: null, type: 'all', accountId: 'all', category: 'all', contactId: 'all' }; renderTransactionsPage(); saveData(); return; }
+                    if (closest('.clear-generic-filters-btn')) {
+                        const pageKey = target.dataset.pagekey;
+                        if (pageKey && state.filters[pageKey]) {
+                            state.filters[pageKey] = { ...state.filters[pageKey], from: null, to: null, accountId: 'all', status: 'all', contactId: 'all' };
+                            saveData();
+                            const title = qs('#app-header-title').textContent;
+                            switchPage(`${pageKey}-page`, title);
+                        }
+                        return;
+                    }
+                    if (closest('#install-pwa-btn')) {
+                        if (deferredPrompt) {
+                            deferredPrompt.prompt();
+                            deferredPrompt.userChoice.then((choiceResult) => {
+                                if (choiceResult.outcome === 'accepted') {
+                                    showToast('برنامه با موفقیت نصب شد.');
+                                } else {
+                                    showToast('نصب برنامه لغو شد.');
+                                }
+                                deferredPrompt = null;
+                                closeModal('#settings-modal-overlay');
+                            });
+                        }
+                        return;
+                    }
                 });
-            }
-            return;
-        }
-    });
-    document.body.addEventListener('submit', (e) => {
-        e.preventDefault();
-        triggerHapticFeedback(5);
-        if (e.target.id === 'transaction-form') { handleTransactionSubmit(e.target); }
-        if (e.target.id === 'account-form') { handleAccountSubmit(e.target); }
-        if (e.target.id === 'contact-form') { handleContactSubmit(e.target); }
-        if (e.target.id === 'loan-form') { handleLoanSubmit(e.target); }
-        if (e.target.id === 'goal-form') { handleGoalSubmit(e.target); }
-        if (e.target.id === 'expense-category-form') { handleExpenseCategorySubmit(e.target); }
-    });
+                document.body.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    triggerHapticFeedback(5);
+                    if (e.target.id === 'transaction-form') { handleTransactionSubmit(e.target); }
+                    if (e.target.id === 'account-form') { handleAccountSubmit(e.target); }
+                    if (e.target.id === 'contact-form') { handleContactSubmit(e.target); }
+                    if (e.target.id === 'loan-form') { handleLoanSubmit(e.target); }
+                    if (e.target.id === 'goal-form') { handleGoalSubmit(e.target); }
+                    if (e.target.id === 'expense-category-form') { handleExpenseCategorySubmit(e.target); }
+                });
+                document.body.addEventListener('change', (e) => {
+                    const target = e.target;
+                    if (target.id === 'dashboard-period-filter') { state.dashboardPeriod = target.value; saveData(); renderDashboardPage(); }
+                    if (target.id === 'account-filter-dashboard') { if (target.value !== 'add_new_account') { state.activeAccountId = target.value; saveData(); renderDashboardPage(); } }
 
-    // --- ADDED: Handle dropdown changes to open new modals ---
-    document.body.addEventListener('change', (e) => {
-        const target = e.target;
-        // Check if the change is from the transaction modal's account or contact dropdowns.
-        if (target.closest('#transaction-modal-overlay')) {
-            if (target.matches('#account-select') && target.value === 'add_new_account') {
-                preChangeSelectValue = target.value;
-                // Close the current modal first to prevent UI issues
-                closeModal('#transaction-modal-overlay');
-                // Open the new account modal with a slight delay for a smooth transition
-                setTimeout(() => renderAccountModal(), 300);
-                // Reset the dropdown value to its previous state after the modal opens
-                target.value = preChangeSelectValue;
-                return;
-            }
-            if (target.matches('#contact-select') && target.value === 'add_new_contact') {
-                preChangeSelectValue = target.value;
-                closeModal('#transaction-modal-overlay');
-                setTimeout(() => renderContactModal(), 300);
-                target.value = preChangeSelectValue;
-                return;
-            }
-        }
-        // ... (keep all existing change listeners below) ...
-        if (target.id === 'dashboard-period-filter') { state.dashboardPeriod = target.value; saveData(); renderDashboardPage(); }
-        if (target.id === 'account-filter-dashboard') { if (target.value !== 'add_new_account') { state.activeAccountId = target.value; saveData(); renderDashboardPage(); } }
+                    if (target.id === 'contact-sort-filter') {
+                        state.filters.contacts.sortBy = qs('#contact-sort-filter').value;
+                        saveData();
+                        renderContactsPage();
+                        return;
+                    }
+                    // This block handles filter changes for both 'transactions-page' and other filtered list pages ('reports', 'debts', 'receivables')
+                    const pageEl = target.closest('.page[id$="-page"]'); // Get the closest page element
+                    if (pageEl) {
+                        const pageId = pageEl.id;
+                        const pageKey = pageId.replace('-page', '');
 
-        if (target.id === 'contact-sort-filter') {
-            state.filters.contacts.sortBy = qs('#contact-sort-filter').value;
-            saveData();
-            renderContactsPage();
-            return;
-        }
-        // This block handles filter changes for both 'transactions-page' and other filtered list pages ('reports', 'debts', 'receivables')
-        const pageEl = target.closest('.page[id$="-page"]'); // Get the closest page element
-        if (pageEl) {
-            const pageId = pageEl.id;
-            const pageKey = pageId.replace('-page', '');
-
-            if (pageKey === 'transactions') {
-                if (target.id === 'type-filter') {
-                    state.filters.transactions.category = 'all';
-                    state.filters.transactions.contactId = 'all';
-                    renderCategoryFilter();
-                }
-                state.filters.transactions.accountId = qs('#account-filter', pageEl).value;
-                state.filters.transactions.type = qs('#type-filter', pageEl).value;
-                state.filters.transactions.category = qs('#category-filter', pageEl).value;
-                state.filters.transactions.contactId = qs('#contact-filter', pageEl).value;
-                // Date filters are handled by the pDatepicker's observer, but ensuring they are picked up on other changes:
-                state.filters.transactions.from = qs('#from-date-filter-tx', pageEl).value ? moment(normalizeDigits(qs('#from-date-filter-tx', pageEl).value), JALALI_DISPLAY_FORMAT).format(MOMENT_FORMAT) : null;
-                state.filters.transactions.to = qs('#to-date-filter-tx', pageEl).value ? moment(normalizeDigits(qs('#to-date-filter-tx', pageEl).value), JALALI_DISPLAY_FORMAT).format(MOMENT_FORMAT) : null;
-                renderTransactionList();
-                saveData();
-                return;
-            } else if (state.filters[pageKey] && target.closest('.filters-collapsible-container')) {
-                // This part handles generic filters for reports, debts, receivables
-                state.filters[pageKey] = {
-                    ...state.filters[pageKey],
-                    from: qs('.from-date-filter', pageEl)?.value ? moment(normalizeDigits(qs('.from-date-filter', pageEl).value), JALALI_DISPLAY_FORMAT).format(MOMENT_FORMAT) : null,
-                    to: qs('.to-date-filter', pageEl)?.value ? moment(normalizeDigits(qs('.to-date-filter', pageEl).value), JALALI_DISPLAY_FORMAT).format(MOMENT_FORMAT) : null,
-                    accountId: qs('.account-filter', pageEl) ? qs('.account-filter', pageEl).value : 'all',
-                    contactId: qs('.contact-filter', pageEl) ? qs('.contact-filter', pageEl).value : 'all',
-                    status: qs('.status-filter', pageEl) ? qs('.status-filter', pageEl).value : 'all',
-                };
-                saveData();
-                // Re-render the specific page to apply new filters
-                const pageRenderers = { 'reports': renderReportsPage, 'debts': renderDebtsPage, 'receivables': renderReceivablesPage };
-                pageRenderers[pageKey]?.();
-                return;
-            }
-        }
-        if (target.matches('#transaction-form #type')) { handleTransactionFormChange(); }
-        if (target.matches('#transaction-form #category-select')) { qs('#new-category-group').style.display = target.value === 'add-new' ? 'block' : 'none'; }
-    });
-    document.body.addEventListener('input', (e) => {
-        if (e.target.id === 'search-input' && e.target.closest('#transactions-page')) {
-            state.filters.transactions.searchTerm = e.target.value.toLowerCase();
-            renderTransactionList();
-            saveData();
-        }
-        if (e.target.classList.contains('currency-input')) formatInputAsCurrency(e.target);
-    });
-    document.body.addEventListener('mousedown', e => {
-        if (e.target.tagName === 'SELECT' && (e.target.classList.contains('account-dropdown') || e.target.classList.contains('contact-dropdown'))) {
-            preChangeSelectValue = e.target.value;
-        }
-    });
-    qs('#restore-file-input').addEventListener('change', handleRestore);
-};
+                        if (pageKey === 'transactions') {
+                            if (target.id === 'type-filter') {
+                                state.filters.transactions.category = 'all';
+                                state.filters.transactions.contactId = 'all';
+                                renderCategoryFilter();
+                            }
+                            state.filters.transactions.accountId = qs('#account-filter', pageEl).value;
+                            state.filters.transactions.type = qs('#type-filter', pageEl).value;
+                            state.filters.transactions.category = qs('#category-filter', pageEl).value;
+                            state.filters.transactions.contactId = qs('#contact-filter', pageEl).value;
+                            // Date filters are handled by the pDatepicker's observer, but ensuring they are picked up on other changes:
+                            state.filters.transactions.from = qs('#from-date-filter-tx', pageEl).value ? moment(normalizeDigits(qs('#from-date-filter-tx', pageEl).value), JALALI_DISPLAY_FORMAT).format(MOMENT_FORMAT) : null;
+                            state.filters.transactions.to = qs('#to-date-filter-tx', pageEl).value ? moment(normalizeDigits(qs('#to-date-filter-tx', pageEl).value), JALALI_DISPLAY_FORMAT).format(MOMENT_FORMAT) : null;
+                            renderTransactionList();
+                            saveData();
+                            return;
+                        } else if (state.filters[pageKey] && target.closest('.filters-collapsible-container')) {
+                            // This part handles generic filters for reports, debts, receivables
+                            state.filters[pageKey] = {
+                                ...state.filters[pageKey],
+                                from: qs('.from-date-filter', pageEl)?.value ? moment(normalizeDigits(qs('.from-date-filter', pageEl).value), JALALI_DISPLAY_FORMAT).format(MOMENT_FORMAT) : null,
+                                to: qs('.to-date-filter', pageEl)?.value ? moment(normalizeDigits(qs('.to-date-filter', pageEl).value), JALALI_DISPLAY_FORMAT).format(MOMENT_FORMAT) : null,
+                                accountId: qs('.account-filter', pageEl) ? qs('.account-filter', pageEl).value : 'all',
+                                contactId: qs('.contact-filter', pageEl) ? qs('.contact-filter', pageEl).value : 'all',
+                                status: qs('.status-filter', pageEl) ? qs('.status-filter', pageEl).value : 'all',
+                            };
+                            saveData();
+                            // Re-render the specific page to apply new filters
+                            const pageRenderers = { 'reports': renderReportsPage, 'debts': renderDebtsPage, 'receivables': renderReceivablesPage };
+                            pageRenderers[pageKey]?.();
+                            return;
+                        }
+                    }
+                    if (target.matches('#transaction-form #type')) { handleTransactionFormChange(); }
+                    if (target.matches('#transaction-form #category-select')) { qs('#new-category-group').style.display = target.value === 'add-new' ? 'block' : 'none'; }
+                });
+                document.body.addEventListener('input', (e) => {
+                    if (e.target.id === 'search-input' && e.target.closest('#transactions-page')) {
+                        state.filters.transactions.searchTerm = e.target.value.toLowerCase();
+                        renderTransactionList();
+                        saveData();
+                    }
+                    if (e.target.classList.contains('currency-input')) formatInputAsCurrency(e.target);
+                });
+                document.body.addEventListener('mousedown', e => {
+                    if (e.target.tagName === 'SELECT' && (e.target.classList.contains('account-dropdown') || e.target.classList.contains('contact-dropdown'))) {
+                        preChangeSelectValue = e.target.value;
+                    }
+                });
+                qs('#restore-file-input').addEventListener('change', handleRestore);
+            };
   function handleTransactionSubmit(form) {
                 const id = qs('#transaction-id', form).value;
                 const type = qs('#type', form).value;
