@@ -1,34 +1,23 @@
 
 
+
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
     <title>شمارا</title>
     <meta name="description" content="مدیریت مالی شخصی شمارا">
     <meta name="application-name" content="شمارا">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="شمارا">
+    <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="https://i.postimg.cc/pX061LJC/shomara-app.png">
     <link rel="icon" type="image/png" href="https://i.postimg.cc/pX061LJC/shomara-app.png">
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
-        &quot;name&quot;: &quot;شمارا&quot;,
-        &quot;short_name&quot;: &quot;شمارا&quot;,
-        &quot;description&quot;: &quot;مدیریت مالی شخصی شمارا&quot;,
-        &quot;start_url&quot;: &quot;.&quot;,
-        &quot;display&quot;: &quot;standalone&quot;,
-        &quot;background_color&quot;: &quot;#f2f2f7&quot;,
-        &quot;theme_color&quot;: &quot;#007AFF&quot;,
-        &quot;icons&quot;: [
-            { &quot;src&quot;: &quot;https://i.postimg.cc/pX061LJC/shomara-app.png&quot;, &quot;sizes&quot;: &quot;192x192&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;purpose&quot;: &quot;any&quot; },
-            { &quot;src&quot;: &quot;https://i.postimg.cc/pX061LJC/shomara-app.png&quot;, &quot;sizes&quot;: &quot;512x512&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;purpose&quot;: &quot;any&quot; },
-            { &quot;src&quot;: &quot;https://i.postimg.cc/pX061LJC/shomara-app.png&quot;, &quot;sizes&quot;: &quot;192x192&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;purpose&quot;: &quot;maskable&quot; },
-            { &quot;src&quot;: &quot;https://i.postimg.cc/pX061LJC/shomara-app.png&quot;, &quot;sizes&quot;: &quot;512x512&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;purpose&quot;: &quot;maskable&quot; }
-        ]
-    }">
+
     <link rel="apple-touch-startup-image" href="https://i.postimg.cc/pX061LJC/shomara-app.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet"
@@ -169,6 +158,10 @@ body.modal-open {
     transition: var(--transition-fast);
     box-sizing: content-box;
     /* Explicitly set for clarity */
+        /* ... */
+    padding: var(--safe-area-top) 1rem 0; /* Adjusted padding-top for safe area */
+    /* ... */
+    box-sizing: content-box; /* Explicitly set for clarity */
 }
 
 body.dark-mode .app-header {
@@ -694,9 +687,10 @@ body.dark-mode .filter-summary {
 /* --- REDESIGNED TRANSACTION & REPORT CARDS --- */
 /* Base container for a transaction item inside the list */
 .list-container li {
-    display: block;
+    display: flex;
     /* Change from flex to block to contain the new card structure */
     padding: 1rem 1.25rem;
+    flex-direction: column;
     /* Slightly more padding for a cleaner look */
     border-bottom: 1px solid var(--border-light);
     cursor: pointer;
@@ -974,7 +968,7 @@ body.dark-mode .item-icon.contact {
 .item-amount {
     font-weight: 600;
     font-size: 1.1rem;
-    direction: ltr;
+    direction: rtl;
     margin-left: 0.5rem;
 }
 
@@ -1904,6 +1898,10 @@ body.dark-mode #toast {
         font-size: 0.9rem;
     }
 }
+input, textarea {
+    -webkit-user-select: text !important;
+    user-select: text !important;
+}
     </style>
 </head>
 
@@ -2021,7 +2019,7 @@ body.dark-mode #toast {
         <button class="fab" data-action="add-transaction"><i class="fas fa-plus"></i></button>
         <nav class="bottom-nav">
             <button class="nav-btn active" data-page="dashboard-page" data-title="مدیریت مالی شخصی شمارا"><i
-                    class="fas fa-tachometer-alt"></i><span>داشبورد</span></button>
+                    class="fas fa-home"></i><span>خانه</span></button>
             <button class="nav-btn" data-page="transactions-page" data-title="تراکنش‌ها"><i
                     class="fas fa-exchange-alt"></i><span>تراکنش‌ها</span></button>
             <button class="nav-btn" data-page="accounts-page" data-title="حساب‌ها"><i
@@ -2251,7 +2249,7 @@ body.dark-mode #toast {
                 const { showAccount = false } = options;
                 let sign = tx.type === 'income' || tx.type.includes('received') || tx.type === 'receivable' ? '+' : '-';
                 const icons = { income: 'fa-arrow-up', expense: 'fa-arrow-down', transfer: 'fa-exchange-alt', cashflow: 'fa-retweet', debt: 'fa-file-invoice-dollar', receivable: 'fa-hand-holding-dollar', issuedCheck: 'fa-money-check-alt', receivedCheck: 'fa-money-check-alt', installmentPayment: 'fa-receipt' };
-                const displayDate = tx.date && moment(tx.date, MOMENT_FORMAT).isValid() ? moment(tx.date, MOMENT_FORMAT).format('jD jMMMM YYYY') : '-';
+               const displayDate = tx.date && moment(tx.date, MOMENT_FORMAT).isValid() ? moment(tx.date, MOMENT_FORMAT).format(JALALI_DISPLAY_FORMAT) : '-';
                 const displayDueDate = (tx.dueDate && moment(tx.dueDate, MOMENT_FORMAT).isValid()) ? moment(tx.dueDate, MOMENT_FORMAT).format(JALALI_DISPLAY_FORMAT) : null;
                 const isOverdue = displayDueDate && tx.status === 'pending' && moment(tx.dueDate, MOMENT_FORMAT).isBefore(moment(), 'day');
                 const account = state.accounts.find(a => a.id == tx.accountId);
@@ -2458,7 +2456,7 @@ body.dark-mode #toast {
                                                 <div><span>تعداد</span><strong>${filteredTxs.length.toLocaleString('fa-IR')}</strong></div>
                                                 <div><span>دریافتی</span><strong style="color:var(--income);">${formatCurrency(totalIncome)} تومان</strong></div>
                                                 <div><span>پرداختی</span><strong style="color:var(--expense);">${formatCurrency(totalExpense)} تومان</strong></div>
-                                                <div><span>برآیند</span><strong style="direction: ltr; color:${netFlow >= 0 ? 'var(--income)' : 'var(--expense)'};">${netFlow >= 0 ? '+' : ''}${formatCurrency(netFlow)} تومان</strong></div>
+                                                <div><span>برآیند</span><strong style="direction: rtl; color:${netFlow >= 0 ? 'var(--income)' : 'var(--expense)'};">${netFlow >= 0 ? '+' : ''}${formatCurrency(netFlow)} تومان</strong></div>
                                             </div>`;
                 summaryEl.style.display = 'block';
             }
@@ -2996,7 +2994,7 @@ body.dark-mode #toast {
                                             </div>
                                             <div class="balance-item net">
                                                 <span>برآیند</span>
-                                                <strong class="${balanceClass}" style="direction: ltr;">${contact.netBalance >= 0 ? '+' : ''}${formatCurrency(contact.netBalance)} تومان</strong>
+                                                <strong class="${balanceClass}" style="direction: rtl;">${contact.netBalance >= 0 ? '+' : ''}${formatCurrency(contact.netBalance)} تومان</strong>
                                             </div>
                                         </div>
                                     </div>
@@ -3330,11 +3328,11 @@ body.dark-mode #toast {
                                             <div class="modal-content" id="account-details-content">
                                                 <div class="modal-header"><h3>${acc.name}</h3></div>
                                                 <div style="text-align: right; line-height: 2; font-size: 0.9rem; padding: 0 1rem;">
-                                                    <p><strong>شماراه کارت:</strong> ${acc.cardNumber || '-'}</p>
+                                                    <p><strong>شماره کارت:</strong> ${acc.cardNumber || '-'}</p>
                                                     <p><strong>تاریخ انقضا:</strong> ${(acc.expMonth && acc.expYear) ? `${acc.expMonth}/${acc.expYear}` : '-'}</p>
                                                     <p><strong>CVV2:</strong> ${acc.cvv2 || '-'}</p>
-                                                    <p><strong>شماراه حساب:</strong> ${acc.accountNumber || '-'}</p>
-                                                    <p><strong>شماراه شبا:</strong> ${acc.shabaNumber || '-'}</p>
+                                                    <p><strong>شماره حساب:</strong> ${acc.accountNumber || '-'}</p>
+                                                    <p><strong>شماره شبا:</strong> ${acc.shabaNumber || '-'}</p>
                                                     <p><strong>یادداشت:</strong> ${acc.notes || '-'}</p>
                                                 </div>
                                                 <div class="form-actions">
