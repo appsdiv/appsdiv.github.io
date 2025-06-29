@@ -3767,6 +3767,54 @@ const setupEventListeners = () => {
             }
             return;
         }
+
+    //slide
+let longPressTimer;
+const LONG_PRESS_THRESHOLD = 700; // 700ms, adjust as needed
+  // --- NEW: Touch event listeners for long press on modal overlays ---
+    qsa('.modal-overlay').forEach(modalOverlay => {
+        let touchstartX = 0;
+        let touchstartY = 0;
+
+        modalOverlay.addEventListener('touchstart', (e) => {
+            // Prevent default behavior to avoid scrolling on press
+            e.preventDefault();
+            
+            // Record initial touch position
+            touchstartX = e.touches[0].clientX;
+            touchstartY = e.touches[0].clientY;
+
+            // Start a timer for the long press
+            longPressTimer = setTimeout(() => {
+                // If the timer completes, close the modal
+                closeModal('#' + modalOverlay.id);
+                triggerHapticFeedback(50); // Optional haptic feedback on success
+                longPressTimer = null; // Clear the timer
+            }, LONG_PRESS_THRESHOLD);
+        }, { passive: false }); // Use passive: false to allow preventDefault
+
+        modalOverlay.addEventListener('touchend', (e) => {
+            // If the timer exists, clear it because the user lifted their finger early
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+                // Since the touch was not a long press, let the default click/tap behavior happen
+            }
+        });
+
+        modalOverlay.addEventListener('touchmove', (e) => {
+            // If the user moves their finger significantly, cancel the long press
+            const touchendX = e.touches[0].clientX;
+            const touchendY = e.touches[0].clientY;
+            const distance = Math.sqrt(Math.pow(touchendX - touchstartX, 2) + Math.pow(touchendY - touchstartY, 2));
+
+            if (longPressTimer && distance > 10) { // Check for a movement threshold (e.g., 10 pixels)
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+        });
+    });
+
     });
     document.body.addEventListener('submit', (e) => {
         e.preventDefault();
