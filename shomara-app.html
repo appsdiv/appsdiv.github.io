@@ -1770,11 +1770,21 @@ body.dark-mode .fab {
     backdrop-filter: blur(5px);
     opacity: 0;
     visibility: hidden;
-    transition: opacity var(--transition-medium), visibility var(--transition-medium);
+      transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+
+   /* transition: opacity var(--transition-medium), visibility var(--transition-medium); */
     z-index: 1000;
     display: flex;
     justify-content: center;
     align-items: flex-end;
+}
+/* Apply the animation to the modal content when the overlay is being dismissed */
+.modal-overlay:not(.active) .modal-content {
+  animation: slideDownAndFadeOut 0.3s forwards cubic-bezier(0.3, 0.7, 0.4, 1);
+}
+/* Ensure the modal is hidden immediately after the animation finishes */
+.modal-overlay.hidden {
+  display: none;
 }
 
 .modal-overlay.active {
@@ -1901,6 +1911,17 @@ body.dark-mode #toast {
 input, textarea {
     -webkit-user-select: text !important;
     user-select: text !important;
+}
+/* This keyframe animates the content sliding down and fading out */
+@keyframes slideDownAndFadeOut {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
 }
     </style>
 </head>
@@ -2152,12 +2173,34 @@ input, textarea {
                 qs(modalId)?.classList.add('active');
                 document.body.classList.add('modal-open');
             };
-            const closeModal = (modalId) => {
-                qs(modalId)?.classList.remove('active');
-                if (qsa('.modal-overlay.active').length === 0) {
-                    document.body.classList.remove('modal-open');
-                }
-            };
+        /* --- MODIFIED closeModal function for smooth animation --- */
+const closeModal = (modalId) => {
+  const modal = qs(modalId);
+  if (modal && modal.classList.contains('active')) {
+    // Remove the 'active' class to start the CSS slide-down animation
+    modal.classList.remove('active');
+    
+    // Get the modal content element to listen for the animation end
+    const content = qs('.modal-content', modal);
+
+    // Create a temporary event listener to hide the modal completely after the animation finishes
+    const onAnimationEnd = () => {
+      // Add a 'hidden' class to completely remove it from the display flow
+      modal.classList.add('hidden');
+      
+      // Remove the listener to prevent memory leaks
+      content.removeEventListener('animationend', onAnimationEnd);
+
+      // Check if any other modals are still active before allowing the body to scroll again
+      if (qsa('.modal-overlay.active').length === 0) {
+        document.body.classList.remove('modal-open');
+      }
+    };
+    
+    // Add the listener for the 'animationend' event
+    content.addEventListener('animationend', onAnimationEnd);
+  }
+};
             const isFilterActive = (pageKey) => {
                 const f = state.filters[pageKey];
                 if (!f) return false;
@@ -3770,49 +3813,93 @@ const setupEventListeners = () => {
 
     //slide
 let longPressTimer;
+let isHolding = false; // New flag to confirm a successful long press
 const LONG_PRESS_THRESHOLD = 700; // 700ms, adjust as needed
-  // --- NEW: Touch event listeners for long press on modal overlays ---
-    qsa('.modal-overlay').forEach(modalOverlay => {
-        let touchstartX = 0;
-        let touchstartY = 0;
+const MOVE_THRESHOLD = 15; // 15 pixels, to prevent accidental cancels
 
-        modalOverlay.addEventListener('touchstart', (e) => {
-            // Prevent default behavior to avoid scrolling on press
-            e.preventDefault();
-            
-            // Record initial touch position
+// --- NEW: Touch and mouse event listeners for smooth dismissal ---
+qsa('.modal-overlay').forEach(modalOverlay => {
+    let touchstartX = 0;
+    let touchstartY = 0;
+    let touchMoved = false;
+
+    // Helper function to clear the timer and reset state
+    const clearLongPressTimer = () => {
+        if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+        }
+        isHolding = false;
+        touchMoved = false;
+    };
+
+    modalOverlay.addEventListener('touchstart', (e) => {
+        // Only start the timer if a single finger is used on the overlay.
+        if (e.touches.length === 1) {
             touchstartX = e.touches[0].clientX;
             touchstartY = e.touches[0].clientY;
+            touchMoved = false;
 
-            // Start a timer for the long press
+            // Set a timer for the long press
             longPressTimer = setTimeout(() => {
-                // If the timer completes, close the modal
-                closeModal('#' + modalOverlay.id);
-                triggerHapticFeedback(50); // Optional haptic feedback on success
-                longPressTimer = null; // Clear the timer
-            }, LONG_PRESS_THRESHOLD);
-        }, { passive: false }); // Use passive: false to allow preventDefault
-
-        modalOverlay.addEventListener('touchend', (e) => {
-            // If the timer exists, clear it because the user lifted their finger early
-            if (longPressTimer) {
-                clearTimeout(longPressTimer);
+                // If the timer completes without the finger moving too much, confirm the hold
+                if (!touchMoved) {
+                    isHolding = true;
+                    // You can add a subtle visual cue here if desired, but you said you don't want it.
+                    // For example: modalOverlay.classList.add('holding-state');
+                    triggerHapticFeedback(50); // Provide haptic feedback for a better user experience
+                }
                 longPressTimer = null;
-                // Since the touch was not a long press, let the default click/tap behavior happen
-            }
-        });
+            }, LONG_PRESS_THRESHOLD);
+        }
+    }, { passive: false }); // Use passive: false to allow preventDefault
 
-        modalOverlay.addEventListener('touchmove', (e) => {
-            // If the user moves their finger significantly, cancel the long press
+    modalOverlay.addEventListener('touchend', (e) => {
+        // If the hold was confirmed and the finger is lifted, trigger the close action
+        if (isHolding) {
+            closeModal('#' + modalOverlay.id);
+        }
+        // Always clear the timer and reset state when the touch ends
+        clearLongPressTimer();
+    });
+
+    modalOverlay.addEventListener('touchmove', (e) => {
+        // If the user moves their finger significantly, cancel the long press
+        if (longPressTimer) {
             const touchendX = e.touches[0].clientX;
             const touchendY = e.touches[0].clientY;
             const distance = Math.sqrt(Math.pow(touchendX - touchstartX, 2) + Math.pow(touchendY - touchstartY, 2));
 
-            if (longPressTimer && distance > 10) { // Check for a movement threshold (e.g., 10 pixels)
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
+            if (distance > MOVE_THRESHOLD) {
+                touchMoved = true;
+                clearLongPressTimer(); // Cancel the timer
             }
-        });
+        }
+    });
+
+    // --- Desktop mouse event listeners for a consistent experience ---
+    modalOverlay.addEventListener('mousedown', (e) => {
+        // Only trigger on the overlay itself, not the content inside
+        if (e.target.classList.contains('modal-overlay')) {
+            longPressTimer = setTimeout(() => {
+                isHolding = true;
+                triggerHapticFeedback(50);
+            }, LONG_PRESS_THRESHOLD);
+        }
+    });
+
+    modalOverlay.addEventListener('mouseup', (e) => {
+        if (isHolding && e.target.classList.contains('modal-overlay')) {
+            closeModal('#' + modalOverlay.id);
+        }
+        clearLongPressTimer();
+    });
+
+    modalOverlay.addEventListener('mouseleave', () => {
+        clearLongPressTimer(); // Cancel if the mouse leaves the element
+    });
+
+        //endslide
     });
 
     });
