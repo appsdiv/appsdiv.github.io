@@ -37,18 +37,63 @@
             50% { transform: scale(0.85); background-color: hsla(0, 100%, 80%, 0.5); }
             100% { transform: scale(1); }
         }
+        /* Styles for Stats Modal */
+        .stat-card {
+            @apply bg-white dark:bg-slate-700/50 p-4 rounded-xl text-center shadow-sm transition-all hover:shadow-md hover:scale-105;
+        }
+        .stat-value {
+            @apply text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-1;
+        }
+        .stat-label {
+            @apply text-xs text-slate-500 dark:text-slate-400 font-semibold;
+        }
+        .stats-tab-btn {
+            @apply flex-grow md:flex-grow-0 px-4 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 transition-colors font-semibold flex items-center justify-center gap-2 bg-slate-200/60 dark:bg-slate-700/60 hover:bg-slate-300/70 dark:hover:bg-slate-600/80;
+        }
+        .stats-tab-btn.active {
+            @apply bg-indigo-600 text-white shadow-lg shadow-indigo-500/30;
+        }
         .heatmap-day {
              @apply aspect-square rounded-lg flex items-center justify-center text-sm transition-colors relative;
         }
         .heatmap-count {
             @apply absolute -top-1.5 -right-1.5 bg-sky-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-lg;
         }
-        /* Enhanced Glassmorphism Modal Style for Readability */
+        /* Glassmorphism Modal Style */
         .glass-modal-content {
-            @apply bg-slate-50/90 dark:bg-slate-900/85 backdrop-blur-2xl border border-slate-200/50 dark:border-slate-700/50;
+            @apply bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50;
         }
-        .day-cell-content {
-            @apply flex flex-col items-center justify-center font-bold text-sm;
+        /* Custom style for completed day cells */
+        .day-completed {
+            background-color: #ebfaee !important;
+        }
+        .dark .day-completed {
+            background-color: #e8f1ea8f !important; /* Tailwind green-900 */
+        }
+        /* Settings Menu */
+        #settingsMenu { display: none; }
+        #settingsMenu.visible { display: block; }
+        
+        /* --- Emoji Container Styles --- */
+        /* Base styles for the emoji circle (shape, size, etc.) */
+        .emoji-container {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            /* Optional: adds a smooth transition between colors */
+            transition: background-color 0.2s;
+        }
+        /* Default background for LIGHT mode */
+        .emoji-container {
+            background-color: #f1f5f9; /* A light grey (Tailwind's slate-100) for good contrast */
+        }
+        /* Specific background for DARK mode */
+        .dark .emoji-container {
+            /*background-color: #f6f7f7e8; /* Your desired color for dark theme */
+            background-color: rgb(59 130 246 / 13%);
         }
     </style>
     <script>
@@ -59,14 +104,7 @@
                     colors: {
                         primary: { DEFAULT: 'hsl(250, 85%, 60%)', dark: 'hsl(250, 90%, 70%)' },
                         accent: 'hsl(205, 90%, 55%)',
-                    },
-                    borderRadius: {
-                        '3xl': '1.5rem',
-                    },
-                     boxShadow: {
-                        'ios': '0 4px 15px rgba(0, 0, 0, 0.08)',
-                        'ios-dark': '0 4px 15px rgba(0, 0, 0, 0.2)',
-                     }
+                    }
                 }
             }
         }
@@ -74,22 +112,9 @@
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 antialiased">
     <div class="min-h-screen pt-[env(safe-area-inset-top)]">
-        <header id="navbar" class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700/80">
-            <div class="flex items-center gap-2">
-                 <button id="aboutBtn" aria-label="درباره" class="text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full p-2 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </button>
-                 <button id="backupBtn" aria-label="پشتیبان گیری و بازیابی" class="text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full p-2 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 15l-3-3m0 0l3-3m-3 3h12" />
-                    </svg>
-                </button>
-                 <button id="archiveToggleBtn" aria-label="نمایش آرشیو" class="text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full p-2 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
-                </button>
-            </div>
+        <header id="navbar" class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
+            <div class="flex-1"></div>
+
             <div class="flex items-center gap-2">
                 <button id="nextWeekBtn" aria-label="هفته بعد" class="text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full p-2 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
@@ -99,7 +124,40 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
                 </button>
             </div>
-            <button id="darkModeBtn" aria-label="تغییر تم" class="text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full p-2 transition-colors text-xl">🌙</button>
+
+            <div class="flex-1 flex justify-end">
+                <div class="relative">
+                    <button id="settingsMenuBtn" aria-label="تنظیمات" class="text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full p-2 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </button>
+                    <div id="settingsMenu" class="absolute left-0 mt-2 w-56 origin-top-left bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg shadow-2xl rounded-xl border border-slate-200 dark:border-slate-700 p-2 text-base z-[1001]">
+                        <button id="archiveToggleBtn" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
+                           <span>نمایش آرشیو</span>
+                        </button>
+                         <button id="darkModeBtn" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                           <span class="text-xl w-5 text-center">🌙</span>
+                           <span>تغییر تم</span>
+                        </button>
+                        <div class="my-1 h-px bg-slate-200 dark:bg-slate-700"></div>
+                        <button id="backupBtn" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 15l-3-3m0 0l3-3m-3 3h12" />
+                           </svg>
+                           <span>پشتیبان‌گیری</span>
+                        </button>
+                         <button id="aboutBtn" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                               <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                           </svg>
+                           <span>درباره</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </header>
 
         <main id="mainContent" class="max-w-4xl mx-auto p-4 pb-32">
@@ -115,12 +173,11 @@
 
         <footer id="totalsBar" class="fixed bottom-0 left-0 right-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-t border-slate-200 dark:border-slate-700 flex items-center justify-around pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-3 text-center"></footer>
 
-        <button id="fab" aria-label="افزودن هدف" class="fixed right-6 bottom-[calc(env(safe-area-inset-bottom)+5rem)] z-50 w-16 h-16 bg-indigo-600 text-white rounded-full flex items-center justify-center text-3xl shadow-lg hover:bg-indigo-700 active:scale-90 transition-all">＋</button>
+        <button id="fab" aria-label="افزودن هدف" class="fixed right-6 bottom-[calc(env(safe-area-inset-bottom)+5rem)] z-50 w-16 h-16 bg-indigo-600 text-white rounded-full flex items-center justify-center text-3xl shadow-lg hover:bg-indigo-700 active:scale-90 transition-transform">＋</button>
     </div>
 
     <div id="modalArea"></div>
     <div id="contextMenu" class="fixed z-[1000] min-w-[180px] bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg shadow-2xl rounded-xl border border-slate-200 dark:border-slate-700 p-2 text-base" style="display:none"></div>
-
 <script>
     // --- CONSTANTS & CONFIG ---
     const EMOJIS = ['✅','🎉','🔥','💪','🎯','👍','👎','❌','🤔','😴','🍔','💻','🧘','📖'];
@@ -160,6 +217,7 @@
       let jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
       return [jy, jm, jd];
     }
+
     function toGregorian(jy, jm, jd) {
         let gy = (jy <= 979) ? 621 : 1600;
         jy -= (jy <= 979) ? 0 : 979;
@@ -211,6 +269,7 @@
         const order = goals.map(g => g.id);
         return { goals, order };
     }
+
     function loadStateFromStorage() {
         const data = localStorage.getItem(STORAGE_KEY);
         const order = localStorage.getItem(STORAGE_ORDER);
@@ -249,22 +308,25 @@
         appState.order = orderArr.filter(id => goals.some(g => g.id === id));
         appState.theme = theme;
     }
+
     function persistState() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(appState.goals));
         localStorage.setItem(STORAGE_ORDER, JSON.stringify(appState.order));
     }
+
     function setTheme(theme) {
         appState.theme = theme;
         localStorage.setItem(STORAGE_THEME, theme);
         applyTheme();
     }
+
     function applyTheme() {
         let themeToApply = appState.theme;
         if (themeToApply === 'auto') {
             themeToApply = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
         document.documentElement.classList.toggle('dark', themeToApply === 'dark');
-        document.getElementById('darkModeBtn').innerText = themeToApply === 'dark' ? '🌞' : '🌙';
+        document.querySelector('#darkModeBtn .text-xl').innerText = themeToApply === 'dark' ? '🌞' : '🌙';
     }
 
     // --- RENDER FUNCTIONS ---
@@ -280,6 +342,7 @@
             setTimeout(() => initEditInput(appState.editing), 30);
         }
     }
+
     function renderHeader() {
         document.getElementById('weekTitle').innerText = formatWeekRange(appState.currentWeek);
         const today = new Date();
@@ -296,16 +359,18 @@
             return `<div class="${classes}" data-day="${i}"><span class="text-sm font-semibold">${dayName}</span><span class="text-xs mt-1">${dayNumber}</span></div>`;
         }).join('');
     }
+
     function renderCategoryFilters() {
         const filters = ['all', ...Object.keys(CATEGORIES)];
         let html = filters.map(cat => {
             const isActive = appState.activeCategory === cat;
             const activeClass = 'bg-indigo-600 text-white';
             const inactiveClass = 'bg-white dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600';
-            return `<button data-category="${cat}" class="px-4 py-2 text-sm font-semibold rounded-full shadow-sm transition-all active:scale-95 ${isActive ? activeClass : inactiveClass}">${cat === 'all' ? 'همه' : cat}</button>`;
+            return `<button data-category="${cat}" class="px-4 py-2 text-sm font-semibold rounded-full shadow-sm transition-colors ${isActive ? activeClass : inactiveClass}">${cat === 'all' ? 'همه' : cat}</button>`;
         }).join('');
         document.getElementById('categoryFilters').innerHTML = html;
     }
+
     function renderGoals() {
         const filteredGoals = appState.order
             .map(id => appState.goals.find(g => g.id === id))
@@ -321,13 +386,6 @@
         }
     }
 
-    function getColorForCount(count) {
-        if (count >= 4) return 'bg-green-600 text-white font-bold dark:bg-green-400/80 dark:text-green-900';
-        if (count >= 2) return 'bg-green-500/80 text-green-900 dark:bg-green-500/70 dark:text-white';
-        if (count > 0) return 'bg-green-400/60 text-green-800 dark:bg-green-600/50 dark:text-green-200';
-        return 'bg-slate-200 dark:bg-slate-700/50 hover:bg-slate-300 dark:hover:bg-slate-600';
-    }
-
     function renderSingleGoalCard(goal) {
         const weekDates = getWeekDates(appState.currentWeek);
         const currentWeekId = weekIdForDate(appState.currentWeek);
@@ -337,32 +395,25 @@
         const dayCellsHtml = weekDates.map((date, i) => {
             const isActive = !!goal.days[i];
             const dayData = goal.history?.[currentWeekId]?.[i] || { entries: [], note: '' };
-            const entryCount = dayData.entries.length;
+            const dayCompleted = dayData.entries.length > 0;
 
             const baseClasses = "goal-day group aspect-square rounded-full flex items-center justify-center relative transition-colors cursor-pointer";
-            const colorClasses = isActive ? getColorForCount(entryCount) : '';
+            const activeClasses = "active bg-slate-200 dark:bg-slate-700/50 hover:bg-slate-300 dark:hover:bg-slate-600";
             const disabledClasses = "bg-slate-100 dark:bg-slate-800/50 opacity-60 !cursor-not-allowed";
-            const todayClasses = "ring-2 ring-sky-500 shadow-md shadow-sky-500/30";
-            
-            let classes = `${baseClasses} ${isActive ? colorClasses : disabledClasses}`;
+            const todayClasses = "border-2 border-sky-500 shadow-md shadow-sky-500/30";
+
+            let classes = `${baseClasses} ${isActive ? activeClasses : disabledClasses}`;
+            if(dayCompleted) classes += ' day-completed';
             if (isActive && isToday(date)) classes += ` ${todayClasses}`;
 
-            let cellContent = '';
-            if (isActive && entryCount > 0) {
-                 if (entryCount === 1) {
-                    cellContent = `<div class="day-cell-content text-lg">${escapeHtml(dayData.entries[0])}</div>`;
-                } else {
-                    cellContent = `<div class="day-cell-content"><span class="text-base">🎯</span><span class="text-xs">${toFa(entryCount)}</span></div>`;
-                }
-            }
-
+            let cellContent = `<div class="flex flex-wrap items-center justify-center gap-px leading-none p-1">${dayData.entries.map(em => em ? `<span class="text-sm md:text-base">${escapeHtml(em)}</span>` : '').join('')}</div>`;
             return `<div class="${classes}" data-goal-id="${goal.id}" data-day-index="${i}" tabindex="0">${cellContent}${dayData.note ? `<div class="absolute top-0 right-0 w-2 h-2 bg-amber-400 rounded-full" title="${escapeHtml(dayData.note)}"></div>` : ''}</div>`;
         }).join('');
 
         return `
-        <div class="goal-card bg-white dark:bg-slate-800 shadow-ios dark:shadow-ios-dark rounded-3xl p-4 border border-slate-200/50 dark:border-slate-700/50 goal-anim-in ${goal.archived ? 'opacity-60' : ''}" data-id="${goal.id}">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="text-3xl">${goal.emoji || '🎯'}</div>
+        <div class="goal-card bg-white dark:bg-slate-800 shadow-md rounded-2xl p-4 goal-anim-in ${goal.archived ? 'opacity-60' : ''}" data-id="${goal.id}">
+            <div class="flex items-center gap-2 mb-4">
+                <div class="emoji-container text-3xl">${goal.emoji || '🎯'}</div>
                 <div class="flex-grow min-w-0">
                     <div class="flex items-center gap-2">
                         ${appState.editing === goal.id
@@ -399,6 +450,14 @@
     }
 
     // --- CALCULATIONS ---
+    function isGoalAchievedOnDate(goal, date) {
+        if (!date || !goal) return false;
+        const localDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const dayOfWeek = (localDate.getDay() + 1) % 7;
+        const weekId = weekIdForDate(localDate);
+        const dayData = goal.history?.[weekId]?.[dayOfWeek];
+        return !!(dayData?.entries?.length > 0);
+    }
     function getEntryCountOnDate(goal, date) {
         if (!date || !goal) return 0;
         const localDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -407,6 +466,7 @@
         const dayData = goal.history?.[weekId]?.[dayOfWeek];
         return dayData?.entries?.length || 0;
     }
+
     function calculateScores(goal) {
         let weekly = 0, allTime = 0;
         const currentWeekId = weekIdForDate(appState.currentWeek);
@@ -415,6 +475,7 @@
                 const weekData = goal.history[weekId];
                 if (!weekData) continue;
                 let scoreForWeek = 0;
+                const weekStartDate = new Date(weekId.replace(/-/g, '/'));
                 weekData.forEach((dayData, dayIndex) => {
                     if (!dayData) return;
                     if (goal.days[dayIndex]) {
@@ -435,50 +496,93 @@
              modalArea.innerHTML = '';
         }
     }
+
     function closeContextMenu() {
         const menu = document.getElementById('contextMenu');
         menu.style.display = 'none';
         appState.contextMenuGoalId = null;
     }
+
+    function toggleSettingsMenu(visible) {
+        const menu = document.getElementById('settingsMenu');
+        menu.classList.toggle('visible', visible);
+        if (visible) {
+            setTimeout(() => document.addEventListener('click', closeSettingsMenuOnClickOutside, { once: true }), 10);
+        }
+    }
+
+    function closeSettingsMenuOnClickOutside(e) {
+        if (!e.target.closest('#settingsMenu') && !e.target.closest('#settingsMenuBtn')) {
+            toggleSettingsMenu(false);
+        } else {
+            // Re-add listener if click was inside menu
+            document.addEventListener('click', closeSettingsMenuOnClickOutside, { once: true });
+        }
+    }
+
     function showAboutModal() {
         const modal = document.createElement('div');
-        modal.className = 'fixed inset-0 bg-black/30 z-[100] flex items-center justify-center p-4';
+        modal.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4';
         modal.innerHTML = `
-            <div class="modal-content glass-modal-content rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl">
-                <div class="flex justify-center mb-4">
-                    <div class="w-20 h-20 bg-indigo-500 rounded-2xl flex items-center justify-center text-white text-4xl font-bold">
-                        <span>🎯</span>
+            <div class="modal-content glass-modal-content rounded-2xl p-6 w-full max-w-md shadow-2xl">
+                <div class="flex flex-col items-center text-center">
+                     <div class="w-24 h-24 bg-indigo-100 dark:bg-indigo-900/50 rounded-3xl flex items-center justify-center mb-5 border border-indigo-200 dark:border-indigo-800">
+                         <span class="text-5xl">🎯</span>
                     </div>
+                    <h2 class="text-2xl font-bold mb-2 text-slate-900 dark:text-white">مدیریت عادت</h2>
+                    <p class="text-base text-slate-600 dark:text-slate-300 mb-6">نسخه ۱.۰.۰</p>
+                    <div class="text-sm text-slate-500 dark:text-slate-400 space-y-2">
+                        <p>ساخته شده با ❤️ برای کمک به شما در ساختن عادات بهتر.</p>
+                        <p>کپی رایت © ${new Date().getFullYear()} - تمامی حقوق محفوظ است.</p>
+                    </div>
+                    <button class="close-modal-btn w-full mt-8 p-3 rounded-lg font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">بستن</button>
                 </div>
-                <h2 class="text-xl font-bold mb-2">مدیریت عادت</h2>
-                <p class="text-sm text-slate-600 dark:text-slate-300 mb-4">نسخه ۱.۱.۰</p>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">ساخته شده توسط: [نام شما یا شرکت]</p>
-                <p class="text-xs text-slate-400 dark:text-slate-500 mb-6">کپی رایت © ${new Date().getFullYear()} - تمامی حقوق محفوظ است.</p>
-                <button class="close-modal-btn w-full p-3 rounded-lg font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition">بستن</button>
             </div>
         `;
         document.getElementById('modalArea').appendChild(modal);
         modal.onclick = e => { if (e.target === modal || e.target.closest('.close-modal-btn')) closeModal(); };
     }
+
     function showBackupModal() {
         const modal = document.createElement('div');
-        modal.className = 'fixed inset-0 bg-black/30 z-[100] flex items-center justify-center p-4';
+        modal.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4';
         modal.innerHTML = `
-            <div class="modal-content glass-modal-content rounded-3xl p-6 w-full max-w-sm shadow-2xl">
-                <h2 class="text-xl font-bold mb-5 text-center">پشتیبان‌گیری و بازیابی</h2>
-                <p class="text-center text-sm text-slate-600 dark:text-slate-300 mb-6">می‌توانید از اطلاعات خود خروجی گرفته و یا اطلاعات قبلی خود را وارد برنامه کنید.</p>
-                <div class="space-y-4">
-                    <button id="exportBtn" class="w-full p-4 rounded-lg font-bold bg-green-600 text-white hover:bg-green-700 transition flex items-center justify-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                        <span>خروجی گرفتن (JSON)</span>
-                    </button>
-                    <button id="importBtn" class="w-full p-4 rounded-lg font-bold bg-sky-600 text-white hover:bg-sky-700 transition flex items-center justify-center gap-2">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                        <span>ورودی گرفتن (JSON)</span>
-                    </button>
+            <div class="modal-content glass-modal-content rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar">
+                <div class="flex justify-between items-center mb-5">
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white">پشتیبان‌گیری و بازیابی</h2>
+                    <button class="close-modal-btn text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full p-2 transition-colors">&times;</button>
+                </div>
+                <div class="space-y-6">
+                    <div class="bg-white/50 dark:bg-slate-800/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100">خروجی گرفتن اطلاعات</h3>
+                                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1 mb-4">یک فایل JSON از تمام اهداف و تاریخچه خود دانلود کنید. این فایل را در مکانی امن برای بازیابی در آینده نگهداری کنید.</p>
+                                <button id="exportBtn" class="w-full sm:w-auto px-5 py-2.5 rounded-lg font-bold bg-green-600 text-white hover:bg-green-700 transition-colors">دانلود فایل پشتیبان</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/50 dark:bg-slate-800/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-sky-100 dark:bg-sky-900/50 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-600 dark:text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100">ورودی گرفتن اطلاعات</h3>
+                                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1 mb-4">یک فایل پشتیبان JSON را برای بازیابی اطلاعات خود انتخاب کنید. لطفاً توجه داشته باشید:</p>
+                                <div class="p-3 mb-4 rounded-lg bg-amber-100/50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-sm">
+                                    <strong>هشدار:</strong> این عمل تمام اطلاعات فعلی شما را بازنویسی خواهد کرد و غیرقابل بازگشت است.
+                                </div>
+                                <button id="importBtn" class="w-full sm:w-auto px-5 py-2.5 rounded-lg font-bold bg-sky-600 text-white hover:bg-sky-700 transition-colors">انتخاب فایل و بازیابی</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                  <input type="file" id="importFile" class="hidden" accept=".json">
-                 <button class="close-modal-btn w-full mt-8 p-3 rounded-lg font-semibold bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition">لغو</button>
             </div>
         `;
         document.getElementById('modalArea').appendChild(modal);
@@ -487,9 +591,13 @@
         modal.querySelector('#importBtn').onclick = () => document.getElementById('importFile').click();
         modal.querySelector('#importFile').onchange = importData;
     }
+
     function exportData() {
         try {
-            const dataToExport = { goals: appState.goals, order: appState.order };
+            const dataToExport = {
+                goals: appState.goals,
+                order: appState.order
+            };
             const dataStr = JSON.stringify(dataToExport, null, 2);
             const dataBlob = new Blob([dataStr], {type: "application/json"});
             const url = URL.createObjectURL(dataBlob);
@@ -505,11 +613,15 @@
             alert("خطا در خروجی گرفتن اطلاعات.");
         }
     }
+
     function importData(event) {
         const file = event.target.files[0];
         if (!file) return;
-        if (!confirm("آیا مطمئن هستید؟ با وارد کردن اطلاعات جدید، تمام اطلاعات فعلی شما بازنویسی خواهد شد. این عمل غیرقابل بازگشت است.")) return;
-        
+
+        if (!confirm("آیا مطمئن هستید؟ با وارد کردن اطلاعات جدید، تمام اطلاعات فعلی شما بازنویسی خواهد شد. این عمل غیرقابل بازگشت است.")) {
+            return;
+        }
+
         const reader = new FileReader();
         reader.onload = (e) => {
             try {
@@ -522,7 +634,9 @@
                     fullRender();
                     closeModal();
                     alert("اطلاعات با موفقیت وارد شد.");
-                } else { throw new Error("Invalid file format."); }
+                } else {
+                    throw new Error("Invalid file format.");
+                }
             } catch (error) {
                 console.error("Error importing data:", error);
                 alert("خطا در وارد کردن اطلاعات. فایل انتخاب شده معتبر نیست.");
@@ -530,6 +644,7 @@
         };
         reader.readAsText(file);
     }
+
     function renderMonthlyHeatmap(container, goal, jYear, jMonth) {
         const monthLength = jalaliMonthLength(jYear, jMonth);
         const firstGregorianDate = toGregorian(jYear, jMonth, 1);
@@ -538,21 +653,30 @@
 
         let html = `
             <div class="flex items-center justify-between mb-3 px-1">
-                <button data-action="prev" class="heatmap-nav-btn p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+                <button data-action="prev" class="heatmap-nav-btn p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
                 <span class="font-bold text-sm">${displayDate.toLocaleDateString('fa-IR', { month: 'long', year: 'numeric'})}</span>
-                <button data-action="next" class="heatmap-nav-btn p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+                <button data-action="next" class="heatmap-nav-btn p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
             </div>
-            <div class="grid grid-cols-7 gap-1 text-center text-xs text-slate-400 mb-2">${WEEKDAY_NAMES_SHORT.map(d => `<div>${d}</div>`).join('')}</div>
+            <div class="grid grid-cols-7 gap-1 text-center text-xs text-slate-400 mb-2">
+                ${WEEKDAY_NAMES_SHORT.map(d => `<div>${d}</div>`).join('')}
+            </div>
             <div class="grid grid-cols-7 gap-1.5">`;
 
-        for (let i = 0; i < startOffset; i++) { html += '<div></div>'; }
+        for (let i = 0; i < startOffset; i++) {
+            html += '<div></div>';
+        }
 
         for (let jd = 1; jd <= monthLength; jd++) {
             const gDate = toGregorian(jYear, jMonth, jd);
-            const entryCount = getEntryCountOnDate(goal, gDate);
             let colorClass = 'bg-slate-200/80 dark:bg-slate-700/80';
+            const entryCount = getEntryCountOnDate(goal, gDate);
+
             if (entryCount > 0) {
-                colorClass = getColorForCount(entryCount);
+                colorClass = 'bg-green-500 text-white font-bold';
             } else if (!goal.days[(gDate.getDay() + 1) % 7]) {
                 colorClass = 'bg-slate-100 dark:bg-slate-800/60 opacity-70';
             }
@@ -560,8 +684,8 @@
 
             html += `<div class="heatmap-day ${colorClass}" title="${gDate.toLocaleDateString('fa-IR')}">
                          <span class="text-xl font-semibold">${toFa(jd)}</span>
-                         ${entryCount > 1 ? `<span class="heatmap-count">${toFa(entryCount)}</span>` : ''}
-                       </div>`;
+                         ${entryCount > 0 ? `<span class="heatmap-count">${toFa(entryCount)}</span>` : ''}
+                        </div>`;
         }
 
         html += `</div>`;
@@ -569,16 +693,20 @@
 
         container.querySelectorAll('.heatmap-nav-btn').forEach(btn => {
             btn.onclick = () => {
-                let newMonth = jMonth, newYear = jYear;
+                let newMonth = jMonth;
+                let newYear = jYear;
                 if (btn.dataset.action === 'next') {
-                    newMonth++; if (newMonth > 12) { newMonth = 1; newYear++; }
+                    newMonth++;
+                    if (newMonth > 12) { newMonth = 1; newYear++; }
                 } else {
-                    newMonth--; if (newMonth < 1) { newMonth = 12; newYear--; }
+                    newMonth--;
+                    if (newMonth < 1) { newMonth = 12; newYear--; }
                 }
                 renderMonthlyHeatmap(container, goal, newYear, newMonth);
             }
         });
     }
+
     function showStatsModal(goalId) {
         const goal = appState.goals.find(g => g.id === goalId);
         if (!goal) return;
@@ -586,7 +714,7 @@
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4';
         modal.innerHTML = `
-            <div class="modal-content bg-slate-100 dark:bg-slate-800 rounded-3xl p-4 md:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl no-scrollbar">
+            <div class="modal-content bg-slate-100 dark:bg-slate-800 rounded-2xl p-4 md:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl no-scrollbar">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl md:text-2xl font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-3">
                         <span class="text-2xl">${goal.emoji}</span>
@@ -611,23 +739,48 @@
     // --- ACTIONS & LISTENERS ---
     window.editGoal = (goalId) => { const goal = appState.goals.find(g => g.id === goalId); if(goal) showGoalModal(goal); };
     window.startEdit = (goalId) => { appState.editing = goalId; fullRender(); };
+
     document.getElementById('navbar').onclick = e => {
+        if (e.target.closest('#prevWeekBtn')) {
+            appState.currentWeek.setDate(appState.currentWeek.getDate() - 7); fullRender();
+        } else if (e.target.closest('#nextWeekBtn')) {
+            appState.currentWeek.setDate(appState.currentWeek.getDate() + 7); fullRender();
+        } else if (e.target.closest('#settingsMenuBtn')) {
+             toggleSettingsMenu(!document.getElementById('settingsMenu').classList.contains('visible'));
+        }
+    };
+    
+    document.getElementById('settingsMenu').addEventListener('click', e => {
         if (e.target.closest('#archiveToggleBtn')) {
             appState.showArchived = !appState.showArchived;
             document.getElementById('archiveToggleBtn').classList.toggle('text-indigo-500', appState.showArchived);
             fullRender();
-        } else if (e.target.closest('#prevWeekBtn')) {
-            appState.currentWeek.setDate(appState.currentWeek.getDate() - 7); fullRender();
-        } else if (e.target.closest('#nextWeekBtn')) {
-            appState.currentWeek.setDate(appState.currentWeek.getDate() + 7); fullRender();
         } else if (e.target.closest('#darkModeBtn')) {
-            setTheme({ 'dark': 'light', 'light': 'auto', 'auto': 'dark' }[appState.theme]);
+            const transition = {
+                'dark': 'light',
+                'light': 'auto',
+                'auto': 'dark'
+            };
+            let newTheme = transition[appState.theme];
+
+            // FIX: If transitioning from 'auto' results in the same visual theme,
+            // skip to the next state in the cycle to ensure a visible change.
+            if (appState.theme === 'auto') {
+                const systemIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                // If system is dark and the next theme is also 'dark', skip to 'light'
+                if (systemIsDark && newTheme === 'dark') {
+                    newTheme = transition[newTheme]; // This will be 'light'
+                }
+            }
+            setTheme(newTheme);
         } else if (e.target.closest('#aboutBtn')) {
             showAboutModal();
         } else if (e.target.closest('#backupBtn')) {
             showBackupModal();
         }
-    };
+        toggleSettingsMenu(false); // Close menu after action
+    });
+
     document.getElementById('fab').onclick = () => showGoalModal(null);
     document.getElementById('categoryFilters').onclick = (e) => {
         if(e.target.closest('button')) {
@@ -658,6 +811,7 @@
         el.onblur = saveAndExit;
         el.onkeydown = (e) => { if (e.key === "Enter") el.blur(); if (e.key === "Escape") { appState.editing = null; fullRender(); } };
     }
+
     window.duplicateGoal = (goalId) => {
         const originalGoal = appState.goals.find(g => g.id === goalId);
         if (originalGoal) {
@@ -673,15 +827,17 @@
             fullRender();
         }
     };
+
     window.toggleArchiveGoal = (goalId) => {
         const goal = appState.goals.find(g => g.id === goalId);
         if (goal) { goal.archived = !goal.archived; persistState(); fullRender(); }
     };
+
     window.deleteGoal = (goalId) => {
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4';
         modal.innerHTML = `
-            <div class="modal-content bg-slate-50 dark:bg-slate-800 rounded-3xl p-5 w-full max-w-sm shadow-2xl text-center">
+            <div class="modal-content bg-slate-50 dark:bg-slate-800 rounded-2xl p-5 w-full max-w-sm shadow-2xl text-center">
                 <h3 class="font-bold text-lg mb-2">تایید حذف</h3>
                 <p class="text-sm text-slate-600 dark:text-slate-300 mb-6">آیا از حذف این هدف مطمئن هستید؟ این عمل غیرقابل بازگشت است.</p>
                 <div class="grid grid-cols-2 gap-4">
@@ -710,6 +866,7 @@
             }
         };
     };
+
     function addCheckmark(goalId, dayIndex, cellElement) {
         const goal = appState.goals.find(g => g.id === goalId);
         if (!goal || !goal.days[dayIndex]) return;
@@ -719,10 +876,22 @@
         if (!goal.history[weekId][dayIndex]) goal.history[weekId][dayIndex] = { entries: [], note: '' };
         goal.history[weekId][dayIndex].entries.push('✅');
         persistState();
+        cellElement.classList.add('day-completed');
         cellElement.classList.add('cell-swipe-up');
         cellElement.addEventListener('animationend', () => cellElement.classList.remove('cell-swipe-up'), { once: true });
-        fullRender(); // Full render to update colors and counts
+        const dayData = goal.history[weekId][dayIndex];
+        cellElement.querySelector('div').innerHTML = dayData.entries.map(em => em ? `<span class="text-sm md:text-base">${escapeHtml(em)}</span>` : '').join('');
+        const card = cellElement.closest('.goal-card');
+        if (card) {
+            const weeklyScoreElement = card.querySelector('.weekly-score');
+            if (weeklyScoreElement) {
+                const newScores = calculateScores(goal);
+                weeklyScoreElement.innerText = `هفته: ${toFa(newScores.weekly)}`;
+            }
+        }
+        renderTotals();
     }
+
     function removeLastEmoji(goalId, dayIndex, cellElement) {
         const goal = appState.goals.find(g => g.id === goalId);
         if (!goal || !goal.days[dayIndex]) return;
@@ -730,51 +899,86 @@
         if (!goal.history?.[weekId]?.[dayIndex]?.entries.length > 0) return;
         goal.history[weekId][dayIndex].entries.pop();
         persistState();
+        if (goal.history[weekId][dayIndex].entries.length === 0) {
+            cellElement.classList.remove('day-completed');
+        }
         cellElement.classList.add('cell-swipe-down');
         cellElement.addEventListener('animationend', () => cellElement.classList.remove('cell-swipe-down'), { once: true });
-        fullRender(); // Full render to update colors and counts
+        const dayData = goal.history[weekId][dayIndex];
+        cellElement.querySelector('div').innerHTML = dayData.entries.map(em => em ? `<span class="text-sm md:text-base">${escapeHtml(em)}</span>` : '').join('');
+        const card = cellElement.closest('.goal-card');
+        if (card) {
+            const weeklyScoreElement = card.querySelector('.weekly-score');
+            if (weeklyScoreElement) {
+                const newScores = calculateScores(goal);
+                weeklyScoreElement.innerText = `هفته: ${toFa(newScores.weekly)}`;
+            }
+        }
+        renderTotals();
     }
+
     function setupCellListeners() {
         document.querySelectorAll('.goal-day').forEach(cell => {
-            let pressTimer = null; let longPressTriggered = false; let startY = 0, startX = 0;
-            let isDragging = false; let swipeTriggered = false; let hasMoved = false;
+            let pressTimer = null;
+            let longPressTriggered = false;
+            let startY = 0, startX = 0;
+            let isDragging = false;
+            let swipeTriggered = false;
+            let hasMoved = false;
 
             const handlePressStart = (e) => {
                 if (cell.classList.contains('!cursor-not-allowed')) return;
+
                 startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
                 startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-                isDragging = true; swipeTriggered = false; longPressTriggered = false; hasMoved = false;
+                isDragging = true;
+                swipeTriggered = false;
+                longPressTriggered = false;
+                hasMoved = false;
 
                 pressTimer = setTimeout(() => {
-                    longPressTriggered = true; isDragging = false;
+                    longPressTriggered = true;
+                    isDragging = false;
                     const { goalId, dayIndex } = cell.dataset;
                     showDayDetailModal(goalId, parseInt(dayIndex));
                     cleanupListeners();
                 }, 500);
 
                 document.addEventListener('mousemove', handlePressMove);
-                document.addEventListener('touchmove', handlePressMove, { passive: false });
+                document.addEventListener('touchmove', handlePressMove, { passive: false }); // Explicitly not passive
                 document.addEventListener('mouseup', handlePressEnd, { once: true });
                 document.addEventListener('touchend', handlePressEnd, { once: true });
             };
+
             const handlePressMove = (e) => {
                 if (!isDragging || longPressTriggered || swipeTriggered) return;
+
                 const currentY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
                 const currentX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-                const deltaY = currentY - startY; const deltaX = currentX - startX;
+                const deltaY = currentY - startY;
+                const deltaX = currentX - startX;
                 const SWIPE_THRESHOLD = 30;
                 if (Math.abs(deltaY) > 10 || Math.abs(deltaX) > 10) {
-                    hasMoved = true; clearTimeout(pressTimer);
-                    if (Math.abs(deltaY) > Math.abs(deltaX)) { e.preventDefault(); }
+                    hasMoved = true;
+                    clearTimeout(pressTimer);
+                    // Only prevent default if vertical scroll is likely, to allow horizontal scroll
+                    if (Math.abs(deltaY) > Math.abs(deltaX)) {
+                         e.preventDefault();
+                    }
                 }
+
                 if (Math.abs(deltaY) > SWIPE_THRESHOLD && Math.abs(deltaY) > Math.abs(deltaX)) {
                     swipeTriggered = true;
                     const { goalId, dayIndex } = cell.dataset;
-                    if (deltaY < 0) { addCheckmark(goalId, parseInt(dayIndex), cell); } 
-                    else { removeLastEmoji(goalId, parseInt(dayIndex), cell); }
+                    if (deltaY < 0) { // Swipe Up
+                        addCheckmark(goalId, parseInt(dayIndex), cell);
+                    } else { // Swipe Down
+                        removeLastEmoji(goalId, parseInt(dayIndex), cell);
+                    }
                     cleanupListeners();
                 }
             };
+
             const handlePressEnd = () => {
                 clearTimeout(pressTimer);
                 if (isDragging && !longPressTriggered && !swipeTriggered && !hasMoved) {
@@ -783,39 +987,49 @@
                 }
                 cleanupListeners();
             };
+
             const cleanupListeners = () => {
-                isDragging = false; clearTimeout(pressTimer);
+                isDragging = false;
+                clearTimeout(pressTimer);
                 document.removeEventListener('mousemove', handlePressMove);
                 document.removeEventListener('touchmove', handlePressMove);
                 document.removeEventListener('mouseup', handlePressEnd);
                 document.removeEventListener('touchend', handlePressEnd);
             }
+            // Clean up old listeners before adding new ones to prevent duplicates
             cell.removeEventListener('mousedown', handlePressStart);
             cell.removeEventListener('touchstart', handlePressStart);
+
+            // Add new listeners
             cell.addEventListener('mousedown', handlePressStart);
-            cell.addEventListener('touchstart', handlePressStart, { passive: false });
+            cell.addEventListener('touchstart', handlePressStart, { passive: false }); // Crucial for calling preventDefault
         });
     }
+
     function initSortable() {
         if (sortable) sortable.destroy();
         const list = document.getElementById('goalList');
         if(!list) return;
         sortable = Sortable.create(list, {
-            handle: '.goal-handle', animation: 200, ghostClass: 'sortable-ghost',
+            handle: '.goal-handle',
+            animation: 200,
+            ghostClass: 'sortable-ghost',
             onEnd: (evt) => {
                 appState.order = Array.from(evt.to.children).map(card => card.dataset.id);
                 persistState();
+                // Re-attach all event listeners after sorting to fix interaction issues.
                 setupCellListeners();
             }
         });
     }
+
     showGoalModal = (goal) => {
         const isEdit = !!goal;
         const draft = isEdit ? JSON.parse(JSON.stringify(goal)) : { id: '' + Date.now(), name: '', emoji: '🎯', days: Array(7).fill(true), history: {}, type: 'binary', archived: false, category: 'شخصی', creationDate: new Date().toISOString() };
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black/30 backdrop-blur-sm z-[100] flex items-end justify-center';
         modal.innerHTML = `
-            <div class="modal-content bg-slate-50 dark:bg-slate-900 rounded-t-3xl p-4 w-full max-w-lg pb-[calc(env(safe-area-inset-bottom)+1rem)] shadow-2xl">
+            <div class="modal-content bg-slate-50 dark:bg-slate-900 rounded-t-2xl p-4 w-full max-w-lg pb-[calc(env(safe-area-inset-bottom)+1rem)] shadow-2xl">
                 <h2 class="text-xl font-bold text-center mb-6 text-indigo-600 dark:text-indigo-400">${isEdit ? 'ویرایش هدف' : 'هدف جدید'}</h2>
                 <div class="space-y-4">
                     <div class="flex gap-4">
@@ -838,13 +1052,15 @@
             toggle.onclick = () => { const day = parseInt(toggle.dataset.day); draft.days[day] = !draft.days[day]; toggle.classList.toggle('bg-indigo-500'); toggle.classList.toggle('text-white'); };
         });
         modal.querySelector('#saveGoalBtn').onclick = () => {
-            draft.name = modal.querySelector('#goalName').value.trim(); draft.emoji = modal.querySelector('#goalEmoji').value;
-            draft.category = modal.querySelector('#goalCategory').value; draft.type = 'binary';
-            if (isEdit) { const index = appState.goals.findIndex(g => g.id === goal.id); if (index > -1) appState.goals[index] = draft; } 
-            else { appState.goals.push(draft); appState.order.push(draft.id); }
+            draft.name = modal.querySelector('#goalName').value.trim();
+            draft.emoji = modal.querySelector('#goalEmoji').value;
+            draft.category = modal.querySelector('#goalCategory').value;
+            draft.type = 'binary';
+            if (isEdit) { const index = appState.goals.findIndex(g => g.id === goal.id); if (index > -1) appState.goals[index] = draft; } else { appState.goals.push(draft); appState.order.push(draft.id); }
             persistState(); closeModal(); fullRender();
         };
     };
+
     showLogModal = (goalId, dayIndex) => {
         const goal = appState.goals.find(g => g.id === goalId);
         if (!goal || !goal.days[dayIndex]) return;
@@ -852,7 +1068,7 @@
         if (!goal.history) goal.history = {};
         if (!goal.history[weekId]) goal.history[weekId] = Array(7).fill(null).map(() => ({ entries: [], note: '' }));
         if (!goal.history[weekId][dayIndex]) goal.history[weekId][dayIndex] = { entries: [], note: '' };
-        
+
         const dayData = goal.history[weekId][dayIndex];
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black/30 backdrop-blur-sm z-[100] flex items-end justify-center';
@@ -863,7 +1079,7 @@
         };
 
         modal.innerHTML = `
-            <div class="modal-content bg-slate-50 dark:bg-slate-900 rounded-t-3xl p-4 w-full max-w-lg pb-[calc(env(safe-area-inset-bottom)+1rem)] shadow-2xl">
+            <div class="modal-content bg-slate-50 dark:bg-slate-900 rounded-t-2xl p-4 w-full max-w-lg pb-[calc(env(safe-area-inset-bottom)+1rem)] shadow-2xl">
                 <h2 class="text-xl font-bold text-center mb-4 truncate">${goal.name}</h2>
                 <div class="space-y-4">
                     <div><label class="font-semibold mb-2 block text-sm">موارد ثبت شده امروز</label><div id="entries-list" class="flex flex-wrap gap-2 min-h-[40px] bg-white dark:bg-slate-800 p-2 rounded-lg"></div></div>
@@ -876,60 +1092,95 @@
 
         const entriesList = modal.querySelector('#entries-list');
         renderEntries(entriesList);
-        const saveAll = () => {
+
+        const saveNote = () => {
              goal.history[weekId][dayIndex].note = modal.querySelector('#note-input').value;
              persistState();
              fullRender();
-             closeModal();
         };
-        modal.onclick = e => { if (e.target === modal) saveAll(); };
-        modal.querySelector('.action-btn-done').onclick = saveAll;
+
+        modal.onclick = e => { if (e.target === modal) { saveNote(); closeModal(); } };
+        modal.querySelector('.action-btn-done').onclick = () => { saveNote(); closeModal(); };
         entriesList.addEventListener('click', e => {
             if (e.target.classList.contains('delete-entry-btn')) {
                  const index = parseInt(e.target.dataset.index);
                  dayData.entries.splice(index, 1);
+                persistState();
                 renderEntries(entriesList);
             }
         });
+
         modal.querySelectorAll('.emoji-btn').forEach(btn => {
-            btn.onclick = () => { dayData.entries.push(btn.innerText); renderEntries(entriesList); };
+            btn.onclick = () => {
+                dayData.entries.push(btn.innerText);
+                persistState();
+                renderEntries(entriesList);
+            };
         });
     }
+
     function showDayDetailModal(goalId, dayIndex) {
-        const goal = appState.goals.find(g => g.id === goalId); if (!goal) return;
-        const date = getWeekDates(appState.currentWeek)[dayIndex];
+        const goal = appState.goals.find(g => g.id === goalId);
+        if (!goal) return;
+
+        const weekDates = getWeekDates(appState.currentWeek);
+        const date = weekDates[dayIndex];
         const weekId = weekIdForDate(appState.currentWeek);
         const dayData = goal.history?.[weekId]?.[dayIndex] || { entries: [], note: '' };
+
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4';
+
         const formattedDate = date.toLocaleDateString('fa-IR', { weekday: 'long', month: 'long', day: 'numeric' });
-        const entriesHtml = dayData.entries.length > 0 ? dayData.entries.map(entry => `<span class="text-2xl">${escapeHtml(entry)}</span>`).join('') : '<span class="text-sm text-slate-400">موردی ثبت نشده</span>';
-        const noteHtml = dayData.note ? `<p class="text-sm bg-amber-100 dark:bg-amber-900/50 p-3 rounded-lg">${escapeHtml(dayData.note)}</p>` : '<span class="text-sm text-slate-400">یادداشتی وجود ندارد</span>';
+        const entriesHtml = dayData.entries.length > 0
+            ? dayData.entries.map(entry => `<span class="text-2xl">${escapeHtml(entry)}</span>`).join('')
+            : '<span class="text-sm text-slate-400">موردی ثبت نشده</span>';
+        const noteHtml = dayData.note
+            ? `<p class="text-sm bg-amber-100 dark:bg-amber-900/50 p-3 rounded-lg">${escapeHtml(dayData.note)}</p>`
+            : '<span class="text-sm text-slate-400">یادداشتی وجود ندارد</span>';
+
         modal.innerHTML = `
-            <div class="modal-content bg-slate-50 dark:bg-slate-800 rounded-3xl p-5 w-full max-w-sm shadow-2xl">
+            <div class="modal-content bg-slate-50 dark:bg-slate-800 rounded-2xl p-5 w-full max-w-sm shadow-2xl">
                 <h3 class="font-bold text-lg text-indigo-600 dark:text-indigo-400 mb-2">${escapeHtml(goal.name)}</h3>
                 <p class="text-sm text-slate-500 dark:text-slate-400 font-semibold mb-4">${formattedDate}</p>
                 <div class="space-y-4">
-                    <div><h4 class="font-semibold text-sm mb-2">موارد ثبت شده</h4><div class="flex flex-wrap gap-3 items-center min-h-[40px] bg-white dark:bg-slate-700/50 p-3 rounded-lg">${entriesHtml}</div></div>
-                    <div><h4 class="font-semibold text-sm mb-2">یادداشت</h4><div class="min-h-[40px]">${noteHtml}</div></div>
+                    <div>
+                        <h4 class="font-semibold text-sm mb-2">موارد ثبت شده</h4>
+                        <div class="flex flex-wrap gap-3 items-center min-h-[40px] bg-white dark:bg-slate-700/50 p-3 rounded-lg">${entriesHtml}</div>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-sm mb-2">یادداشت</h4>
+                        <div class="min-h-[40px]">${noteHtml}</div>
+                    </div>
                 </div>
                  <button class="close-modal-btn w-full mt-6 p-3 rounded-lg font-bold bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition">بستن</button>
             </div>`;
         document.getElementById('modalArea').appendChild(modal);
         modal.onclick = e => { if (e.target === modal || e.target.classList.contains('close-modal-btn')) closeModal(); };
     }
+
     showContextMenu = (e, goalId) => {
         e.preventDefault(); e.stopPropagation();
-        if (appState.contextMenuGoalId === goalId) { closeContextMenu(); return; }
+
+        if (appState.contextMenuGoalId === goalId) {
+            closeContextMenu();
+            return;
+        }
+
         closeContextMenu();
         const goal = appState.goals.find(g => g.id === goalId); if (!goal) return;
         const menu = document.getElementById('contextMenu');
         menu.innerHTML = `<button onclick="editGoal('${goalId}')" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg">✏️ <span>ویرایش</span></button><button onclick="duplicateGoal('${goalId}')" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg">🗂️ <span>کپی</span></button><button onclick="toggleArchiveGoal('${goalId}')" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg">${goal.archived ? '📂 <span>لغو آرشیو</span>' : '🗄️ <span>آرشیو</span>'}</button><div class="my-1 h-px bg-slate-200 dark:bg-slate-700"></div><button onclick="deleteGoal('${goalId}')" class="w-full text-right flex items-center gap-3 p-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg">🗑️ <span>حذف</span></button>`;
         menu.style.display = 'block';
-        const rect = menu.getBoundingClientRect(); let left = e.clientX; let top = e.clientY;
+        const rect = menu.getBoundingClientRect();
+        let left = e.clientX;
+        let top = e.clientY;
+
         if (left + rect.width > window.innerWidth - 10) { left = window.innerWidth - rect.width - 10; }
         if (top + rect.height > window.innerHeight - 10) { top = window.innerHeight - rect.height - 10; }
-        menu.style.left = `${left}px`; menu.style.top = `${top}px`;
+
+        menu.style.left = `${left}px`;
+        menu.style.top = `${top}px`;
         appState.contextMenuGoalId = goalId;
         setTimeout(() => document.addEventListener('click', closeContextMenu, { once: true }), 10);
     };
