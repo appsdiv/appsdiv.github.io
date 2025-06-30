@@ -5,20 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>روزا | اپلیکیشن مدیریت عادت</title>
     <meta name="description" content="اپلیکیشن مدیریت عادت و هدف شخصی روزا (Rooza)">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
     <meta name="apple-mobile-web-app-title" content="روزا">
     <meta name="application-name" content="روزا">
-    
     <link rel="icon" type="image/png" href="https://i.ibb.co/kV0P6jz5/rooza-app.png">
-    
-    <link rel="apple-touch-icon" href="https://i.ibb.co/kV0P6jz5/rooza-app.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="https://i.ibb.co/kV0P6jz5/rooza-app.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="https://i.ibb.co/kV0P6jz5/rooza-app.png">
-    <link rel="apple-touch-icon" sizes="167x167" href="https://i.ibb.co/kV0P6jz5/rooza-app.png">
-
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -28,7 +17,13 @@
         .sortable-ghost { opacity: 0.4; background-color: #cce7ff; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        /* Animations for Goal Cards */
+
+        /* --- NEW: Core Transitions --- */
+        button, .goal-card, .goal-day, .weekday-toggle, .report-tab-btn, .stat-card {
+            transition: all 0.25s ease-in-out;
+        }
+
+        /* --- Animations for Goal Cards --- */
         .goal-anim-in { animation: goal-fade-in 0.4s ease-out forwards; }
         .goal-anim-out { animation: goal-fade-out 0.3s ease-in forwards; }
         @keyframes goal-fade-in {
@@ -39,75 +34,92 @@
             from { opacity: 1; transform: scale(1); }
             to { opacity: 0; transform: scale(0.95); }
         }
-        /* Animations for Swipe Gestures */
+        .goal-card:hover {
+             transform: translateY(-4px);
+             box-shadow: 0 10px 20px -5px rgba(0,0,0,0.1);
+        }
+        .dark .goal-card:hover {
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.25);
+        }
+
+        /* --- Animations for Swipe Gestures --- */
         .cell-swipe-up { animation: cell-pop 0.2s ease-out forwards; }
         .cell-swipe-down { animation: cell-shrink 0.2s ease-out forwards; }
         @keyframes cell-pop {
             0% { transform: scale(1); }
-            50% { transform: scale(1.15); background-color: hsla(120, 73%, 75%, 0.5); }
-            100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1.08); }
         }
         @keyframes cell-shrink {
             0% { transform: scale(1); }
             50% { transform: scale(0.85); background-color: hsla(0, 100%, 80%, 0.5); }
             100% { transform: scale(1); }
         }
-        /* Styles for Stats Modal */
-        .stat-card {
-            @apply bg-white dark:bg-slate-700/50 p-4 rounded-xl text-center shadow-sm transition-all hover:shadow-md hover:scale-105;
+
+        /* --- NEW: Glassmorphism UI Style --- */
+        .glass-ui {
+            @apply bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-2xl;
         }
-        .stat-value {
-            @apply text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-1;
+
+        /* --- NEW: Pill/Glass Input Field Style --- */
+        .glass-input {
+             @apply w-full p-3 bg-slate-200/50 dark:bg-slate-800/50 border border-slate-300/70 dark:border-slate-700/70 placeholder-slate-400 dark:placeholder-slate-500;
+             @apply focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500/0 outline-none transition-all duration-300;
         }
-        .stat-label {
-            @apply text-xs text-slate-500 dark:text-slate-400 font-semibold;
+        .pill-input { @apply rounded-full; }
+        .squircle-input { @apply rounded-2xl; }
+
+
+        /* --- NEW: Bolder Style for Completed Days --- */
+        .day-completed {
+            background-color: #c6f6d5 !important;
+            border: 2px solid #68d391 !important;
+            transform: scale(1.08);
+            box-shadow: 0 0 10px rgba(72, 187, 120, 0.5);
+            color: #2f855a !important;
+            font-weight: bold;
         }
-        /* NEW Pill Buttons Style for Report Selector */
-        .report-tab-btn {
-            @apply px-4 py-2 text-sm font-semibold rounded-full shadow-sm transition-colors duration-300 ease-in-out bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600;
+        .dark .day-completed {
+            background-color: #2f855a !important;
+            border: 2px solid #9ae6b4 !important;
+            box-shadow: 0 0 12px rgba(154, 230, 180, 0.5);
+            color: #f0fff4 !important;
+        }
+
+        /* --- Bolder Style for Active Filters --- */
+        .category-filter-btn.active {
+            @apply bg-indigo-600 text-white shadow-lg shadow-indigo-500/50 ring-2 ring-offset-2 ring-indigo-500 ring-offset-slate-100 dark:ring-offset-slate-900 scale-105;
         }
         .report-tab-btn.active {
             @apply bg-indigo-600 text-white shadow-lg shadow-indigo-500/30;
         }
+        .report-tab-btn {
+             @apply px-4 py-2 text-sm font-semibold rounded-full shadow-sm transition-colors duration-300 ease-in-out bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600;
+        }
 
+        /* --- Misc Styles --- */
+        .stat-card {
+             @apply bg-white dark:bg-slate-700/50 p-4 rounded-xl text-center shadow-sm transition-all hover:shadow-md hover:scale-105;
+        }
+        .stat-value {
+             @apply text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-1;
+        }
+        .stat-label {
+             @apply text-xs text-slate-500 dark:text-slate-400 font-semibold;
+        }
         .heatmap-day {
-             @apply aspect-square rounded-lg flex items-center justify-center text-xs transition-colors relative cursor-pointer;
+              @apply aspect-square rounded-lg flex items-center justify-center text-xs transition-colors relative cursor-pointer;
         }
         .heatmap-count {
-            @apply absolute -top-1.5 -right-1.5 bg-sky-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-lg;
+             @apply absolute -top-1.5 -right-1.5 bg-sky-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-lg;
         }
-        /* Glassmorphism Modal Style */
-        .glass-modal-content {
-            @apply bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50;
-            background-color: #fbfbfbf2;
+        .emoji-container {
+             width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+             border-radius: 9999px; transition: background-color 0.2s; background-color: #f1f5f9;
         }
-        .dark .glass-modal-content {
-            background-color: #0e0e0ef2;
-        }
-        /* Custom style for completed day cells */
-        .day-completed {
-            background-color: #ebfaee !important;
-        }
-        .dark .day-completed {
-            background-color: #e8f1ea8f !important;
-        }
-        /* Settings Menu */
+        .dark .emoji-container { background-color: rgb(59 130 246 / 13%); }
         #settingsMenu { display: none; }
         #settingsMenu.visible { display: block; }
-        /* Emoji Container Styles */
-        .emoji-container {
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 9999px;
-            transition: background-color 0.2s;
-            background-color: #f1f5f9;
-        }
-        .dark .emoji-container {
-            background-color: rgb(59 130 246 / 13%);
-        }
     </style>
     <script>
         tailwind.config = {
@@ -125,46 +137,46 @@
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 antialiased">
     <div class="min-h-screen pt-[env(safe-area-inset-top)]">
-        <header id="navbar" class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
+        <header id="navbar" class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700/50">
             <div class="flex-1"></div>
             <div class="flex items-center gap-2">
-                <button id="nextWeekBtn" aria-label="هفته بعد" class="text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full p-2 transition-colors">
+                <button id="nextWeekBtn" aria-label="هفته بعد" class="text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full p-2 transition-all hover:scale-110">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                 </button>
                 <div id="weekTitle" class="text-base md:text-lg font-bold text-indigo-600 dark:text-indigo-400 w-40 text-center">هفته</div>
-                <button id="prevWeekBtn" aria-label="هفته قبل" class="text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full p-2 transition-colors">
+                <button id="prevWeekBtn" aria-label="هفته قبل" class="text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full p-2 transition-all hover:scale-110">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
                 </button>
             </div>
             <div class="flex-1 flex justify-end">
                 <div class="relative">
-                    <button id="settingsMenuBtn" aria-label="تنظیمات" class="text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full p-2 transition-colors">
+                    <button id="settingsMenuBtn" aria-label="تنظیمات" class="text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full p-2 transition-all hover:scale-110">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                           <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                     </button>
-                    <div id="settingsMenu" class="absolute left-0 mt-2 w-56 origin-top-left bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg shadow-2xl rounded-xl border border-slate-200 dark:border-slate-700 p-2 text-base z-[1001]">
-                        <button id="reportBtn" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                    <div id="settingsMenu" class="glass-ui absolute left-0 mt-2 w-56 origin-top-left rounded-2xl p-2 text-base z-[1001]">
+                        <button id="reportBtn" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 rounded-lg transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                             <span>گزارش‌ها</span>
                         </button>
-                        <button id="archiveToggleBtn" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                        <button id="archiveToggleBtn" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 rounded-lg transition-colors">
                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
                             <span>نمایش آرشیو</span>
                         </button>
-                         <button id="darkModeBtn" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                         <button id="darkModeBtn" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 rounded-lg transition-colors">
                             <span class="text-xl w-5 text-center">🌙</span>
                             <span>تغییر تم</span>
                         </button>
                         <div class="my-1 h-px bg-slate-200 dark:bg-slate-700"></div>
-                        <button id="backupBtn" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                        <button id="backupBtn" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 rounded-lg transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 15l-3-3m0 0l3-3m-3 3h12" />
                             </svg>
                             <span>پشتیبان‌گیری</span>
                         </button>
-                         <button id="aboutBtn" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                         <button id="aboutBtn" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 rounded-lg transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                  <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
@@ -184,14 +196,18 @@
                 <h3 class="text-lg font-bold text-slate-500 dark:text-slate-400 my-4 p-2 border-b-2 border-slate-200 dark:border-slate-700">آرشیو شده‌ها</h3>
                 <div class="flex flex-col gap-4"></div>
             </div>
+            <footer class="text-center pt-12 pb-4 text-sm text-slate-500 dark:text-slate-400">
+                <p class="font-semibold">Visually refreshed by Gemini</p>
+                <p>&copy; 2025 Rooza App</p>
+            </footer>
         </main>
 
-        <footer id="totalsBar" class="fixed bottom-0 left-0 right-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-t border-slate-200 dark:border-slate-700 flex items-center justify-around pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-3 text-center"></footer>
+        <footer id="totalsBar" class="fixed bottom-0 left-0 right-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-t border-slate-200 dark:border-slate-700/50 flex items-center justify-around pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-3 text-center"></footer>
         <button id="fab" aria-label="افزودن هدف" class="fixed right-6 bottom-[calc(env(safe-area-inset-bottom)+5rem)] z-50 w-16 h-16 bg-indigo-600 text-white rounded-full flex items-center justify-center text-3xl shadow-lg hover:bg-indigo-700 active:scale-90 transition-transform">＋</button>
     </div>
 
     <div id="modalArea"></div>
-    <div id="contextMenu" class="fixed z-[1000] min-w-[180px] bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg shadow-2xl rounded-xl border border-slate-200 dark:border-slate-700 p-2 text-base" style="display:none"></div>
+    <div id="contextMenu" class="glass-ui fixed z-[1000] min-w-[180px] rounded-xl p-2 text-base" style="display:none"></div>
 
 <script>
     // --- CONSTANTS & CONFIG ---
@@ -378,9 +394,9 @@
         const filters = ['all', ...Object.keys(CATEGORIES)];
         let html = filters.map(cat => {
             const isActive = appState.activeCategory === cat;
-            const activeClass = 'bg-indigo-600 text-white';
-            const inactiveClass = 'bg-white dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600';
-            return `<button data-category="${cat}" class="px-4 py-2 text-sm font-semibold rounded-full shadow-sm transition-colors ${isActive ? activeClass : inactiveClass}">${cat === 'all' ? 'همه' : cat}</button>`;
+            const activeClass = 'category-filter-btn active bg-indigo-600 text-white shadow-lg shadow-indigo-500/50 ring-2 ring-offset-2 ring-indigo-500 ring-offset-slate-100 dark:ring-offset-slate-900 scale-105';
+            const inactiveClass = 'category-filter-btn bg-white dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600';
+            return `<button data-category="${cat}" class="px-4 py-2 text-sm font-semibold rounded-full shadow-sm transition-all ${isActive ? activeClass : inactiveClass}">${cat === 'all' ? 'همه' : cat}</button>`;
         }).join('');
         document.getElementById('categoryFilters').innerHTML = html;
     }
@@ -410,7 +426,7 @@
             const isActive = !!goal.days[i];
             const dayData = goal.history?.[currentWeekId]?.[i] || { entries: [], note: '' };
             const dayCompleted = dayData.entries.length > 0;
-            const baseClasses = "goal-day group aspect-square rounded-full flex items-center justify-center relative transition-colors cursor-pointer";
+            const baseClasses = "goal-day group aspect-square rounded-full flex items-center justify-center relative transition-all duration-200 cursor-pointer";
             const activeClasses = "active bg-slate-200 dark:bg-slate-700/50 hover:bg-slate-300 dark:hover:bg-slate-600";
             const disabledClasses = "bg-slate-100 dark:bg-slate-800/50 opacity-60 !cursor-not-allowed";
             const todayClasses = "border-2 border-sky-500 shadow-md shadow-sky-500/30";
@@ -437,13 +453,13 @@
                 <div class="flex-grow min-w-0">
                     <div class="flex items-center gap-2">
                         ${appState.editing === goal.id
-                            ? `<input class="w-full bg-slate-100 dark:bg-slate-700 text-lg font-bold p-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" id="edit-${goal.id}" value="${escapeHtml(goal.name)}" />`
-                            : `<h3 class="text-lg font-bold truncate cursor-pointer hover:text-indigo-600" onclick="showStatsModal('${goal.id}')">${escapeHtml(goal.name || 'بی‌نام')}</h3>`
+                            ? `<input class="w-full bg-slate-200/70 dark:bg-slate-700/70 text-lg font-bold p-2 rounded-full border border-slate-400/50 focus:ring-2 focus:ring-indigo-500 outline-none transition-all duration-300" id="edit-${goal.id}" value="${escapeHtml(goal.name)}" />`
+                            : `<h3 class="text-lg font-bold truncate cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400" onclick="showStatsModal('${goal.id}')">${escapeHtml(goal.name || 'بی‌نام')}</h3>`
                         }
                     </div>
                     ${statsHtml}
                 </div>
-                <button onclick="showContextMenu(event, '${goal.id}')" class="text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full p-2 transition-colors">
+                <button onclick="showContextMenu(event, '${goal.id}')" class="text-slate-400 dark:text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full p-2 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" /></svg>
                 </button>
                 ${!goal.archived ? `<div class="goal-handle text-slate-400 dark:text-slate-500 cursor-grab p-2 text-xl">&#x2630;</div>`: ''}
@@ -494,11 +510,7 @@
         }
         return { weekly, allTime };
     }
-    //streak
 
-
-
-    //streak end
     // --- MODALS & MENUS ---
     function closeModal() {
         const modalArea = document.getElementById('modalArea');
@@ -529,19 +541,19 @@
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4';
         modal.innerHTML = `
-            <div class="modal-content glass-modal-content rounded-2xl p-6 w-full max-w-md shadow-2xl">
+            <div class="modal-content glass-ui rounded-2xl p-6 w-full max-w-md shadow-2xl">
                 <div class="flex flex-col items-center text-center">
-                     <div class="w-24 h-24 bg-white dark:bg-slate-800 rounded-3xl flex items-center justify-center mb-5 border border-slate-200 dark:border-slate-700 shadow-md">
+                     <div class="w-24 h-24 bg-white/80 dark:bg-slate-800/80 rounded-3xl flex items-center justify-center mb-5 border border-slate-200/50 dark:border-slate-700/50 shadow-md">
                          <img src="https://i.ibb.co/kV0P6jz5/rooza-app.png" alt="Rooza Logo" class="w-16 h-16"/>
                     </div>
                     <h2 class="text-2xl font-bold mb-2 text-slate-900 dark:text-white">روزا (Rooza)</h2>
                     <p class="text-base text-slate-600 dark:text-slate-300 mb-6">اپلیکیشن مدیریت عادت و هدف شخصی</p>
                     <div class="text-sm text-slate-500 dark:text-slate-400 space-y-2">
-                        <p>نسخه ۱.۶.۰</p>
+                        <p>نسخه ۱.۷.۰ (UI Revamp by Gemini)</p>
                         <p>ساخته شده برای کمک به شما در ساختن عادات بهتر.</p>
                         <p>کپی رایت © ${new Date().getFullYear()} - Rooza</p>
                     </div>
-                    <button class="close-modal-btn w-full mt-8 p-3 rounded-lg font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">بستن</button>
+                    <button class="close-modal-btn w-full mt-8 p-3 rounded-full font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">بستن</button>
                 </div>
             </div>
         `;
@@ -552,7 +564,7 @@
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4';
         modal.innerHTML = `
-            <div class="modal-content glass-modal-content rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar">
+            <div class="modal-content glass-ui rounded-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto no-scrollbar">
                 <div class="flex justify-between items-center mb-5">
                     <h2 class="text-2xl font-bold text-slate-900 dark:text-white">پشتیبان‌گیری و بازیابی</h2>
                     <button class="close-modal-btn text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full p-2 transition-colors">&times;</button>
@@ -565,8 +577,8 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100">خروجی گرفتن اطلاعات</h3>
-                                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1 mb-4">یک فایل JSON از تمام اهداف و تاریخچه خود دانلود کنید. این فایل را در مکانی امن برای بازیابی در آینده نگهداری کنید.</p>
-                                <button id="exportBtn" class="w-full sm:w-auto px-5 py-2.5 rounded-lg font-bold bg-green-600 text-white hover:bg-green-700 transition-colors">دانلود فایل پشتیبان</button>
+                                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1 mb-4">یک فایل JSON از تمام اهداف و تاریخچه خود دانلود کنید.</p>
+                                <button id="exportBtn" class="px-5 py-2.5 rounded-full font-bold bg-green-600 text-white hover:bg-green-700 transition-colors">دانلود فایل پشتیبان</button>
                             </div>
                         </div>
                     </div>
@@ -577,11 +589,11 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100">ورودی گرفتن اطلاعات</h3>
-                                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1 mb-4">یک فایل پشتیبان JSON را برای بازیابی اطلاعات خود انتخاب کنید. لطفاً توجه داشته باشید:</p>
+                                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1 mb-4">یک فایل پشتیبان JSON را برای بازیابی انتخاب کنید.</p>
                                 <div class="p-3 mb-4 rounded-lg bg-amber-100/50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-sm">
-                                    <strong>هشدار:</strong> این عمل تمام اطلاعات فعلی شما را بازنویسی خواهد کرد و غیرقابل بازگشت است.
+                                    <strong>هشدار:</strong> این عمل تمام اطلاعات فعلی شما را بازنویسی خواهد کرد.
                                 </div>
-                                <button id="importBtn" class="w-full sm:w-auto px-5 py-2.5 rounded-lg font-bold bg-sky-600 text-white hover:bg-sky-700 transition-colors">انتخاب فایل و بازیابی</button>
+                                <button id="importBtn" class="px-5 py-2.5 rounded-full font-bold bg-sky-600 text-white hover:bg-sky-700 transition-colors">انتخاب فایل و بازیابی</button>
                             </div>
                         </div>
                     </div>
@@ -679,7 +691,7 @@
             html += `<div class="heatmap-day ${colorClass}" title="${gDate.toLocaleDateString('fa-IR')}">
                          <span class="text-sm font-semibold">${toFa(jd)}</span>
                          ${entryCount > 0 ? `<span class="heatmap-count">${toFa(entryCount)}</span>` : ''}
-                        </div>`;
+                       </div>`;
         }
         html += `</div>`;
         container.innerHTML = html;
@@ -704,7 +716,7 @@
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4';
         modal.innerHTML = `
-            <div class="modal-content bg-slate-100 dark:bg-slate-800 rounded-2xl p-4 md:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl no-scrollbar">
+            <div class="modal-content glass-ui rounded-2xl p-4 md:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto no-scrollbar">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl md:text-2xl font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-3">
                         <span class="text-2xl">${goal.emoji}</span>
@@ -714,7 +726,7 @@
                 </div>
                 <div>
                     <h3 class="font-bold mb-3 text-slate-700 dark:text-slate-300 text-center">تقویم فعالیت</h3>
-                    <div id="heatmap-container" class="p-3 bg-white dark:bg-slate-700/50 rounded-xl shadow-inner"></div>
+                    <div id="heatmap-container" class="p-3 bg-white/50 dark:bg-slate-700/50 rounded-xl shadow-inner"></div>
                 </div>
             </div>`;
         document.getElementById('modalArea').appendChild(modal);
@@ -732,7 +744,7 @@
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4';
         modal.innerHTML = `
-            <div class="modal-content glass-modal-content rounded-2xl p-4 sm:p-6 w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl">
+            <div class="modal-content glass-ui rounded-2xl p-4 sm:p-6 w-full max-w-4xl max-h-[90vh] flex flex-col">
                 <div class="flex-shrink-0 flex justify-between items-center mb-4">
                     <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">گزارش پیشرفت</h2>
                     <button class="close-modal-btn text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full p-2 transition-colors">&times;</button>
@@ -745,11 +757,11 @@
                          <button data-view="overall" class="report-tab-btn">سالانه</button>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button id="report-next-btn" aria-label="بعدی" class="p-2 rounded-full hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
+                        <button id="report-next-btn" aria-label="بعدی" class="p-2 rounded-full hover:bg-slate-300/50 dark:hover:bg-slate-600/50 transition-colors">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                         </button>
                         <div id="report-date-display" class="w-36 text-center font-bold text-indigo-600 dark:text-indigo-400"></div>
-                        <button id="report-prev-btn" aria-label="قبلی" class="p-2 rounded-full hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
+                        <button id="report-prev-btn" aria-label="قبلی" class="p-2 rounded-full hover:bg-slate-300/50 dark:hover:bg-slate-600/50 transition-colors">
                              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                         </button>
                     </div>
@@ -845,7 +857,7 @@
             const percentage = totalTarget > 0 ? Math.round((totalCompletions / totalTarget) * 100) : 0;
 
             reportHtml += `
-                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm">
+                <div class="bg-white/80 dark:bg-slate-800/80 p-4 rounded-xl shadow-sm">
                     <div class="flex items-start justify-between mb-3">
                         <div class="flex items-center gap-3">
                             <span class="text-2xl">${goal.emoji}</span>
@@ -881,7 +893,7 @@
             </div>`;
 
         const heatmapContainerId = `yearly-heatmap-${jYear}`;
-        container.innerHTML = statsHtml + `<div id="${heatmapContainerId}" class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm"></div>`;
+        container.innerHTML = statsHtml + `<div id="${heatmapContainerId}" class="bg-white/80 dark:bg-slate-800/80 p-4 rounded-xl shadow-sm"></div>`;
         renderYearlyHeatmap(document.getElementById(heatmapContainerId), jYear);
     }
 
@@ -893,14 +905,14 @@
         goals.forEach(goal => {
             if (goal.history) {
                  Object.values(goal.history).forEach(weekData => {
-                     if (weekData) {
-                         weekData.forEach((dayData, dayIndex) => {
-                            if (dayData && dayData.entries.length > 0) {
-                                 totalCompletions += dayData.entries.length;
-                                 dayCounts[dayIndex] += dayData.entries.length;
-                            }
-                         });
-                     }
+                      if (weekData) {
+                           weekData.forEach((dayData, dayIndex) => {
+                               if (dayData && dayData.entries.length > 0) {
+                                    totalCompletions += dayData.entries.length;
+                                    dayCounts[dayIndex] += dayData.entries.length;
+                               }
+                           });
+                      }
                  });
             }
         });
@@ -952,7 +964,7 @@
             const firstGregorianDate = toGregorian(jYear, jm, 1);
             const startOffset = (firstGregorianDate.getDay() + 1) % 7;
 
-            let monthHtml = `<div class="p-3 bg-slate-100 dark:bg-slate-900/50 rounded-lg">
+            let monthHtml = `<div class="p-3 bg-slate-100/80 dark:bg-slate-900/50 rounded-lg">
                 <h4 class="font-semibold text-center text-sm mb-2">${JALALI_MONTH_NAMES[jm-1]}</h4>
                 <div class="grid grid-cols-7 gap-1 text-center text-[10px] text-slate-400 mb-1.5">
                    ${WEEKDAY_NAMES_SHORT.map(d => `<div>${d}</div>`).join('')}
@@ -968,7 +980,7 @@
                 const colorClass = getColor(count);
                 const todayClass = isToday(gDate) ? 'ring-2 ring-sky-500' : '';
                 const title = `${toFa(jd)} ${JALALI_MONTH_NAMES[jm-1]} ${toFa(jYear)}: ${toFa(count)} مورد`;
-                monthHtml += `<div onclick="showDailySummaryModal(${jYear}, ${jm}, ${jd})" class="${colorClass} ${todayClass} heatmap-day text-slate-800 dark:text-slate-200 font-bold" title="${title}">${toFa(jd)}</div>`;
+                monthHtml += `<div onclick="showDailySummaryModal(${jYear}, ${jm}, ${jd})" class="${colorClass} ${todayClass} heatmap-day text-slate-800 dark:text-slate-200 text-xs" title="${title}">${toFa(jd)}</div>`;
             }
             monthHtml += `</div></div>`;
             html += monthHtml;
@@ -997,7 +1009,7 @@
                 if (entryCount > 0) {
                     totalCompletedCount++;
                     completedGoalsHtml += `
-                        <div class="flex items-center justify-between p-3 bg-white dark:bg-slate-700/50 rounded-lg">
+                        <div class="flex items-center justify-between p-3 bg-white/50 dark:bg-slate-700/50 rounded-lg">
                             <div class="flex items-center gap-3">
                                 <span class="text-2xl">${goal.emoji}</span>
                                 <span class="font-semibold">${escapeHtml(goal.name)}</span>
@@ -1013,15 +1025,15 @@
             <div class="mb-4">
                 <h4 class="font-semibold text-sm mb-2 text-slate-600 dark:text-slate-300">آمار روز</h4>
                 <div class="grid grid-cols-3 gap-2 text-center">
-                    <div class="bg-slate-200 dark:bg-slate-700 p-2 rounded-lg">
+                    <div class="bg-slate-200/50 dark:bg-slate-700/50 p-2 rounded-lg">
                         <div class="text-xl font-bold text-green-600 dark:text-green-400">${toFa(totalCompletedCount)}</div>
                         <div class="text-xs text-slate-500 dark:text-slate-400">انجام‌شده</div>
                     </div>
-                    <div class="bg-slate-200 dark:bg-slate-700 p-2 rounded-lg">
+                    <div class="bg-slate-200/50 dark:bg-slate-700/50 p-2 rounded-lg">
                         <div class="text-xl font-bold text-slate-700 dark:text-slate-200">${toFa(totalPlanned)}</div>
                         <div class="text-xs text-slate-500 dark:text-slate-400">برنامه‌ریزی</div>
                     </div>
-                    <div class="bg-slate-200 dark:bg-slate-700 p-2 rounded-lg">
+                    <div class="bg-slate-200/50 dark:bg-slate-700/50 p-2 rounded-lg">
                         <div class="text-xl font-bold text-indigo-600 dark:text-indigo-400">${toFa(successRate)}٪</div>
                         <div class="text-xs text-slate-500 dark:text-slate-400">موفقیت</div>
                     </div>
@@ -1033,13 +1045,13 @@
         }
 
         modal.innerHTML = `
-            <div class="modal-content glass-modal-content rounded-2xl p-5 w-full max-w-md shadow-2xl">
+            <div class="modal-content glass-ui rounded-2xl p-5 w-full max-w-md">
                 <h3 class="font-bold text-lg text-indigo-600 dark:text-indigo-400 mb-1">خلاصه روز</h3>
                 <p class="text-sm text-slate-500 dark:text-slate-400 font-semibold mb-4">${formattedDate}</p>
                 ${statsHtml}
                 <h4 class="font-semibold text-sm mb-2 mt-4 text-slate-600 dark:text-slate-300">عادت‌های انجام‌شده</h4>
                 <div class="space-y-2 max-h-52 overflow-y-auto no-scrollbar">${completedGoalsHtml}</div>
-                <button class="close-modal-btn w-full mt-6 p-3 rounded-lg font-bold bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition">بستن</button>
+                <button class="close-modal-btn w-full mt-6 p-3 rounded-full font-bold bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition">بستن</button>
             </div>`;
 
         document.getElementById('modalArea').appendChild(modal);
@@ -1102,15 +1114,14 @@
     });
     document.getElementById('fab').onclick = () => showGoalModal(null);
 
-    // FIXED: Added listeners re-initialization after filtering.
     document.getElementById('categoryFilters').onclick = (e) => {
         const button = e.target.closest('button');
         if(button) {
             appState.activeCategory = button.dataset.category;
-            renderCategoryFilters(); // Redraw filters to show active state
-            renderGoals(); // Redraw goal list based on filter
-            initSortable(); // Re-enable drag-drop on new elements
-            setupCellListeners(); // Re-attach click listeners to new elements
+            renderCategoryFilters();
+            renderGoals();
+            initSortable();
+            setupCellListeners();
         }
     };
 
@@ -1159,12 +1170,12 @@
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4';
         modal.innerHTML = `
-            <div class="modal-content bg-slate-50 dark:bg-slate-800 rounded-2xl p-5 w-full max-w-sm shadow-2xl text-center">
+            <div class="modal-content glass-ui rounded-2xl p-5 w-full max-w-sm text-center">
                 <h3 class="font-bold text-lg mb-2">تایید حذف</h3>
                 <p class="text-sm text-slate-600 dark:text-slate-300 mb-6">آیا از حذف این هدف مطمئن هستید؟ این عمل غیرقابل بازگشت است.</p>
                 <div class="grid grid-cols-2 gap-4">
-                    <button id="cancel-delete" class="p-3 rounded-lg font-bold bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition">لغو</button>
-                    <button id="confirm-delete" class="p-3 rounded-lg font-bold bg-red-500 text-white hover:bg-red-600 transition">حذف</button>
+                    <button id="cancel-delete" class="p-3 rounded-full font-bold bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 dark:hover:bg-slate-500 transition">لغو</button>
+                    <button id="confirm-delete" class="p-3 rounded-full font-bold bg-red-500 text-white hover:bg-red-600 transition">حذف</button>
                 </div>
             </div>`;
         document.getElementById('modalArea').appendChild(modal);
@@ -1324,19 +1335,20 @@
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black/30 backdrop-blur-sm z-[100] flex items-end justify-center';
         modal.innerHTML = `
-            <div class="modal-content bg-slate-50 dark:bg-slate-900 rounded-t-2xl p-4 w-full max-w-lg pb-[calc(env(safe-area-inset-bottom)+1rem)] shadow-2xl">
+            <div class="modal-content glass-ui rounded-t-3xl p-4 w-full max-w-lg pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+                <div class="w-12 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full mx-auto mb-4"></div>
                 <h2 class="text-xl font-bold text-center mb-6 text-indigo-600 dark:text-indigo-400">${isEdit ? 'ویرایش هدف' : 'هدف جدید'}</h2>
-                <div class="space-y-4">
-                    <div class="flex gap-4">
-                        <div class="flex-grow"><label for="goalName" class="font-semibold mb-2 block text-sm">نام هدف</label><input type="text" id="goalName" value="${escapeHtml(draft.name)}" placeholder="مثلا: ورزش روزانه" class="w-full p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none transition"></div>
-                        <div><label for="goalEmoji" class="font-semibold mb-2 block text-sm">ایموجی</label><input type="text" id="goalEmoji" value="${draft.emoji}" maxlength="2" class="w-20 text-center p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none transition"></div>
+                <div class="space-y-4 px-2">
+                    <div class="flex gap-4 items-end">
+                        <div class="flex-grow"><label for="goalName" class="font-semibold mb-2 block text-sm">نام هدف</label><input type="text" id="goalName" value="${escapeHtml(draft.name)}" placeholder="مثلا: ورزش روزانه" class="glass-input pill-input"></div>
+                        <div><label for="goalEmoji" class="font-semibold mb-2 block text-sm">ایموجی</label><input type="text" id="goalEmoji" value="${draft.emoji}" maxlength="2" class="glass-input squircle-input w-20 text-center text-xl"></div>
                     </div>
-                    <div><label class="font-semibold mb-2 block text-sm">دسته‌بندی</label><select id="goalCategory" class="w-full p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none transition">${Object.keys(CATEGORIES).map(cat => `<option value="${cat}" ${draft.category === cat ? 'selected' : ''}>${cat}</option>`).join('')}</select></div>
-                    <div><label class="font-semibold mb-2 block text-sm">روزهای فعال</label><div class="grid grid-cols-7 gap-2 rounded-lg bg-slate-200 dark:bg-slate-800 p-1 weekday-toggle-row">${WEEKDAY_NAMES_SHORT.map((d, i) => `<div class="weekday-toggle text-center font-bold p-2 rounded-md cursor-pointer transition-colors ${draft.days[i] ? 'bg-indigo-500 text-white' : 'hover:bg-slate-300'}" data-day="${i}">${d}</div>`).join('')}</div></div>
+                    <div><label class="font-semibold mb-2 block text-sm">دسته‌بندی</label><select id="goalCategory" class="glass-input pill-input appearance-none">${Object.keys(CATEGORIES).map(cat => `<option value="${cat}" ${draft.category === cat ? 'selected' : ''}>${cat}</option>`).join('')}</select></div>
+                    <div><label class="font-semibold mb-2 block text-sm">روزهای فعال</label><div class="grid grid-cols-7 gap-2 rounded-lg bg-slate-200/50 dark:bg-slate-800/50 p-1 weekday-toggle-row">${WEEKDAY_NAMES_SHORT.map((d, i) => `<div class="weekday-toggle text-center font-bold p-2 rounded-md cursor-pointer ${draft.days[i] ? 'bg-indigo-500 text-white' : 'hover:bg-slate-300/70 dark:hover:bg-slate-700/70'}" data-day="${i}">${d}</div>`).join('')}</div></div>
                 </div>
-                <div class="grid grid-cols-2 gap-4 mt-8">
-                    <button class="action-btn-cancel w-full p-4 rounded-lg font-bold bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition">لغو</button>
-                    <button id="saveGoalBtn" class="w-full p-4 rounded-lg font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition">${isEdit ? 'ذخیره' : 'افزودن'}</button>
+                <div class="grid grid-cols-2 gap-4 mt-8 px-2">
+                    <button class="action-btn-cancel w-full p-4 rounded-full font-bold bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition">لغو</button>
+                    <button id="saveGoalBtn" class="w-full p-4 rounded-full font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition">${isEdit ? 'ذخیره' : 'افزودن'}</button>
                 </div>
             </div>`;
         document.getElementById('modalArea').appendChild(modal);
@@ -1366,18 +1378,19 @@
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black/30 backdrop-blur-sm z-[100] flex items-end justify-center';
         const renderEntries = (container) => {
-            const listHtml = dayData.entries.map((entry, i) => `<div class="flex items-center gap-1 bg-slate-200 dark:bg-slate-700 rounded-full px-3 py-1 text-sm"><span>${entry}</span><button data-index="${i}" class="delete-entry-btn text-red-500 hover:text-red-700">&times;</button></div>`).join('');
-            container.innerHTML = listHtml || '<span class="text-slate-400">موردی ثبت نشده</span>';
+            const listHtml = dayData.entries.map((entry, i) => `<div class="flex items-center gap-1 bg-slate-200 dark:bg-slate-700 rounded-full px-3 py-1 text-sm"><span>${entry}</span><button data-index="${i}" class="delete-entry-btn text-red-500 hover:text-red-700 font-bold">&times;</button></div>`).join('');
+            container.innerHTML = listHtml || '<span class="text-slate-400 p-2">موردی ثبت نشده</span>';
         };
         modal.innerHTML = `
-            <div class="modal-content bg-slate-50 dark:bg-slate-900 rounded-t-2xl p-4 w-full max-w-lg pb-[calc(env(safe-area-inset-bottom)+1rem)] shadow-2xl">
+            <div class="modal-content glass-ui rounded-t-3xl p-4 w-full max-w-lg pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+                <div class="w-12 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full mx-auto mb-4"></div>
                 <h2 class="text-xl font-bold text-center mb-4 truncate">${goal.name}</h2>
-                <div class="space-y-4">
-                    <div><label class="font-semibold mb-2 block text-sm">موارد ثبت شده امروز</label><div id="entries-list" class="flex flex-wrap gap-2 min-h-[40px] bg-white dark:bg-slate-800 p-2 rounded-lg"></div></div>
-                    <div><label class="font-semibold mb-2 block text-sm">ثبت ایموجی</label><div class="emoji-grid grid grid-cols-7 gap-2 text-3xl">${EMOJIS.map(em => `<button class="emoji-btn text-center rounded-lg p-2 hover:bg-slate-200 dark:hover:bg-slate-700 transition-transform hover:scale-125">${em}</button>`).join('')}</div></div>
-                    <div><label for="note-input" class="font-semibold mb-2 block text-sm">یادداشت</label><textarea id="note-input" class="w-full p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none transition" rows="2" placeholder="یادداشت امروز...">${escapeHtml(dayData.note)}</textarea></div>
+                <div class="space-y-4 px-2">
+                    <div><label class="font-semibold mb-2 block text-sm">موارد ثبت شده امروز</label><div id="entries-list" class="flex flex-wrap gap-2 min-h-[48px] bg-white/50 dark:bg-slate-800/50 p-2 rounded-2xl"></div></div>
+                    <div><label class="font-semibold mb-2 block text-sm">ثبت ایموجی</label><div class="emoji-grid grid grid-cols-7 gap-2 text-3xl">${EMOJIS.map(em => `<button class="emoji-btn text-center rounded-lg p-2 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition-transform hover:scale-125">${em}</button>`).join('')}</div></div>
+                    <div><label for="note-input" class="font-semibold mb-2 block text-sm">یادداشت</label><textarea id="note-input" class="glass-input squircle-input" rows="2" placeholder="یادداشت امروز...">${escapeHtml(dayData.note)}</textarea></div>
                 </div>
-                <div class="mt-8"><button class="action-btn-done w-full p-4 rounded-lg font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition">انجام شد</button></div>
+                <div class="mt-8 px-2"><button class="action-btn-done w-full p-4 rounded-full font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition">انجام شد</button></div>
             </div>`;
         document.getElementById('modalArea').appendChild(modal);
         const entriesList = modal.querySelector('#entries-list');
@@ -1426,23 +1439,23 @@
             ? dayData.entries.map(entry => `<span class="text-2xl">${escapeHtml(entry)}</span>`).join('')
             : '<span class="text-sm text-slate-400">موردی ثبت نشده</span>';
         const noteHtml = dayData.note
-            ? `<p class="text-sm bg-amber-100 dark:bg-amber-900/50 p-3 rounded-lg">${escapeHtml(dayData.note)}</p>`
+            ? `<p class="text-sm bg-amber-100/50 dark:bg-amber-900/50 p-3 rounded-lg">${escapeHtml(dayData.note)}</p>`
             : '<span class="text-sm text-slate-400">یادداشتی وجود ندارد</span>';
         modal.innerHTML = `
-            <div class="modal-content bg-slate-50 dark:bg-slate-800 rounded-2xl p-5 w-full max-w-sm shadow-2xl">
+            <div class="modal-content glass-ui rounded-2xl p-5 w-full max-w-sm">
                 <h3 class="font-bold text-lg text-indigo-600 dark:text-indigo-400 mb-2">${escapeHtml(goal.name)}</h3>
                 <p class="text-sm text-slate-500 dark:text-slate-400 font-semibold mb-4">${formattedDate}</p>
                 <div class="space-y-4">
                     <div>
                         <h4 class="font-semibold text-sm mb-2">موارد ثبت شده</h4>
-                        <div class="flex flex-wrap gap-3 items-center min-h-[40px] bg-white dark:bg-slate-700/50 p-3 rounded-lg">${entriesHtml}</div>
+                        <div class="flex flex-wrap gap-3 items-center min-h-[48px] bg-white/50 dark:bg-slate-700/50 p-3 rounded-lg">${entriesHtml}</div>
                     </div>
                     <div>
                         <h4 class="font-semibold text-sm mb-2">یادداشت</h4>
                         <div class="min-h-[40px]">${noteHtml}</div>
                     </div>
                 </div>
-                 <button class="close-modal-btn w-full mt-6 p-3 rounded-lg font-bold bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition">بستن</button>
+                 <button class="close-modal-btn w-full mt-6 p-3 rounded-full font-bold bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition">بستن</button>
             </div>`;
         document.getElementById('modalArea').appendChild(modal);
         modal.onclick = e => { if (e.target === modal || e.target.classList.contains('close-modal-btn')) closeModal(); };
@@ -1456,15 +1469,29 @@
         closeContextMenu();
         const goal = appState.goals.find(g => g.id === goalId); if (!goal) return;
         const menu = document.getElementById('contextMenu');
-        menu.innerHTML = `<button onclick="editGoal('${goalId}')" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg">✏️ <span>ویرایش</span></button><button onclick="duplicateGoal('${goalId}')" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg">🗂️ <span>کپی</span></button><button onclick="toggleArchiveGoal('${goalId}')" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg">${goal.archived ? '📂 <span>لغو آرشیو</span>' : '🗄️ <span>آرشیو</span>'}</button><div class="my-1 h-px bg-slate-200 dark:bg-slate-700"></div><button onclick="deleteGoal('${goalId}')" class="w-full text-right flex items-center gap-3 p-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg">🗑️ <span>حذف</span></button>`;
+        menu.innerHTML = `<button onclick="editGoal('${goalId}')" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 rounded-lg">✏️ <span>ویرایش</span></button><button onclick="duplicateGoal('${goalId}')" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 rounded-lg">🗂️ <span>کپی</span></button><button onclick="toggleArchiveGoal('${goalId}')" class="w-full text-right flex items-center gap-3 p-3 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 rounded-lg">${goal.archived ? '📂 <span>لغو آرشیو</span>' : '🗄️ <span>آرشیو</span>'}</button><div class="my-1 h-px bg-slate-200 dark:bg-slate-700"></div><button onclick="deleteGoal('${goalId}')" class="w-full text-right flex items-center gap-3 p-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg">🗑️ <span>حذف</span></button>`;
+        
+        const isTouchEvent = e.touches && e.touches.length > 0;
+        const clientX = isTouchEvent ? e.touches[0].clientX : e.clientX;
+        const clientY = isTouchEvent ? e.touches[0].clientY : e.clientY;
         menu.style.display = 'block';
         const rect = menu.getBoundingClientRect();
-        let left = e.clientX;
-        let top = e.clientY;
+        
+        let left = clientX;
+        let top = clientY;
+
+        if (isTouchEvent) {
+            top -= (rect.height + 15); // Position above finger
+        }
+
         if (left + rect.width > window.innerWidth - 10) { left = window.innerWidth - rect.width - 10; }
+        if (left < 10) { left = 10; }
+        if (top < 10) { top = 10; }
         if (top + rect.height > window.innerHeight - 10) { top = window.innerHeight - rect.height - 10; }
+        
         menu.style.left = `${left}px`;
         menu.style.top = `${top}px`;
+        
         appState.contextMenuGoalId = goalId;
         setTimeout(() => document.addEventListener('click', closeContextMenu, { once: true }), 10);
     };
