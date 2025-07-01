@@ -2,7 +2,7 @@ const CACHE_NAME = 'luna-v1';
 // لیست فایل‌هایی که برای عملکرد آفلاین باید ذخیره شوند
 const urlsToCache = [
   '/', // این خط فایل اصلی html شما را ذخیره می‌کند
-  'index.html',
+  'luna-app.html',
   'manifest.json',
   'https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.min.css',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css',

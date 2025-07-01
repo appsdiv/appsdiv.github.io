@@ -1,7 +1,7 @@
 {
   "name": "لونا | Luna",
   "short_name": "لونا",
-  "start_url": "./luna-app.html",
+  "start_url": "luna-app.html",
   "display": "standalone",
   "background_color": "#FEFBFB",
   "theme_color": "#D98BAA",
