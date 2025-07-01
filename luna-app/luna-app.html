@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -19,72 +20,6 @@
     <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
-        /* CSS for Modern PWA Launch Screen */
-   /* CSS for Modern PWA Launch Screen */
-#launch-screen {
-    position: fixed;
-    inset: 0;
-    z-index: 10000;
-    background-color: #FEFBFB;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.5s ease-out, visibility 0.5s;
-    visibility: visible;
-    opacity: 1;
-}
-#launch-screen.hidden {
-    opacity: 0;
-    visibility: hidden;
-}
-.launch-content {
-    text-align: center;
-}
-.launch-logo {
-    width: 100px;
-    height: 100px;
-    border-radius: 22px;
-}
-.launch-title {
-    color: #B4A0C2; /* Muted Purple */
-    font-weight: 500;
-    font-size: 1rem;
-    margin-top: 15px;
-}
-.loader {
-    position: absolute;
-    bottom: 50px;
-    left: 50%;
-    /* The transform property is removed from here */
-    width: 40px;
-    height: 40px;
-    border: 3px solid #F3EAEB;
-    border-bottom-color: #D98BAA;
-    border-radius: 50%;
-    box-sizing: border-box;
-    animation: rotation 1s linear infinite;
-}
-@keyframes rotation {
-    0% {
-        transform: translateX(-50%) rotate(0deg);
-    }
-    100% {
-        transform: translateX(-50%) rotate(360deg);
-    }
-}
-html.dark-mode #launch-screen {
-    background-color: #2A2428;
-}
-html.dark-mode .launch-title {
-    color: #A8A1A4;
-}
-html.dark-mode .loader {
-    border: 3px solid #524A4E;
-    border-bottom-color: #D98BAA;
-}
-
-
-        /* Main App Styles */
         :root {
             --font-family: 'Vazirmatn', sans-serif;
             --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
@@ -207,14 +142,6 @@ html.dark-mode .loader {
     </style>
 </head>
 <body>
-    
-<div id="launch-screen">
-    <div class="launch-content">
-        <img src="https://i.postimg.cc/WbCF8vNk/luna-app.png" alt="لوگوی لونا" class="launch-logo">
-        <p class="launch-title">مدیریت سلامت زنان لونا</p>
-    </div>
-    <span class="loader"></span>
-</div>
 
     <div class="app-container">
         <header class="app-header">
@@ -229,7 +156,7 @@ html.dark-mode .loader {
         <main id="setupView">
             <div class="setup-view card-base">
                 <img src="https://i.postimg.cc/WbCF8vNk/luna-app.png" alt="لوگوی لونا" class="about-logo">
-                <h1>به لونا خوش آمدید</h1><p>برای شروع، تاریخ آخرین پریود و طول معمول دوره خود را وارد کنید.</p>
+                <h1>به لونا خوش آمدید!</h1><p>برای شروع، تاریخ آخرین پریود و طول معمول دوره خود را وارد کنید.</p>
                 <div class="input-group"><label for="lastPeriodDate"><i class="fa-solid fa-calendar-day"></i> تاریخ شروع آخرین پریود</label><input type="text" id="lastPeriodDate" class="input-field" placeholder="انتخاب تاریخ" readonly/></div>
                 <div class="input-group"><label for="cycleLength"><i class="fa-solid fa-arrows-rotate"></i> طول معمول چرخه</label><input type="number" id="cycleLength" class="input-field" value="28" min="15" max="45" /></div>
                 <button id="startTrackingBtn" class="main-btn">شروع ردیابی</button>
@@ -274,16 +201,15 @@ html.dark-mode .loader {
         <img src="https://i.postimg.cc/WbCF8vNk/luna-app.png" alt="لوگوی لونا" class="about-logo">
         <h2>درباره لونا (Luna)</h2>
         <div style="text-align: right; line-height: 1.8; padding: 0 15px; color: var(--text-subtle);">
-            <p>اپلیکیشن سلامت زنان لونا، یک اپلیکیشن هوشمند برای درک و پیگیری چرخه قاعدگی شماست. با لونا می‌توانید در هر روز از دوره، وضعیت بدن، سطح انرژی و تغییرات هورمونی خود را بهتر بشناسید.</p>
+            <p>اپلیکیشن سلامت زنان **لونا**، یک همراه هوشمند برای درک و پیگیری چرخه قاعدگی شماست. با لونا می‌توانید در هر روز از دوره، وضعیت بدن، سطح انرژی و تغییرات هورمونی خود را بهتر بشناسید.</p>
             <p style="color: var(--text-main);"><strong>ویژگی‌ها:</strong></p>
             <ul style="padding-right: 35px; margin-top: -10px;">
                 <li>نمایش روز و فاز فعلی چرخه با طراحی زیبا</li>
                 <li>توضیحات روزانه درباره وضعیت جسمی و روحی</li>
                 <li>نمودارهای انرژی، میل جنسی و احتمال باروری</li>
+                <li>تم رنگی پویا و هماهنگ با هر فاز</li>
                 <li>پشتیبانی از حالت تاریک و روشن</li>
-             
             </ul>
-            <p style="color: var(--text-main);"><strong>برنامه نویسی و توسعه : پیمان عابدین پور © سال 1404</strong></p>
         </div>
         <div class="settings-buttons" style="grid-template-columns: 1fr;">
             <button id="closeAboutBtn" class="main-btn">بستن</button>
@@ -291,202 +217,645 @@ html.dark-mode .loader {
     </div>
     
     <script>
-        const launchScreen = document.getElementById('launch-screen');
-        // Hide launch screen after all content (images, fonts, etc.) is fully loaded
-        window.onload = () => {
-            launchScreen.classList.add('hidden');
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Data & Helpers ---
+
+const cycleData = [
+  {},
+  {
+    day: 1,
+    phase: "قاعدگی",
+    icon: "fa-droplet",
+    color: "var(--c-menstrual)",
+    description: "سلام به روز اول و شروع یک چرخه جدید! امروز بدن با ریزش دیواره رحم، خانه‌تکانی می‌کند و خودش را برای یک ماه جدید و سالم پاکسازی می‌کند. به این تولد دوباره خوشامد بگو.",
+    bleeding: 10,
+    hormones: "استروژن (هورمون انرژی و شادی) و پروژسترون (هورمون آرامش و مادرانگی) هر دو در پایین‌ترین سطح خود هستند. انگار به یک تعطیلات حسابی رفته‌اند!",
+    mood: "ممکن است حس کنی دلت می‌خواهد در غار تنهایی خودت باشی و حوصله کمتری داشته باشی. این فرصتی برای بازنگری و استراحت است، به این حس احترام بگذار.",
+    energy: 2,
+    libido: 2,
+    partner: "حمایت، صبوری و درک متقابل در این روز کلیدی است. یک کیسه آب گرم، یک فنجان چای، و یک آغوش آرام بهترین هدیه است. از او بپرس چه چیزی آرامش می‌کند.",
+    pregnancy: 0,
+  },
+  {
+    day: 2,
+    phase: "قاعدگی",
+    icon: "fa-droplet",
+    color: "var(--c-menstrual)",
+    description: "خونریزی ادامه دارد و بدن همچنان در فاز استراحت و بازیابی است. اگر احساس خستگی می‌کنی طبیعی است، پس به خودت سخت نگیر و به بدنت گوش کن.",
+    bleeding: 8,
+    hormones: "هورمون‌ها همچنان در سطح پایینی قرار دارند و بدن در حال بازیابی انرژی برای روزهای پربار آینده است. صبور باش.",
+    mood: "خلق پایین و تحریک‌پذیری ممکن است ادامه داشته باشد. اگر حساسی و زود از کوره در می‌روی، این بخشی از روند طبیعی بدنت است و تقصیر تو نیست.",
+    energy: 3,
+    libido: 2,
+    partner: "همچنان حمایت و صبوری بهترین کاری است که می‌توانی انجام دهی. حضور آرام تو و کمک در کارهای روزمره، بزرگترین محبت است.",
+    pregnancy: 0,
+  },
+  {
+    day: 3,
+    phase: "قاعدگی",
+    icon: "fa-droplet",
+    color: "var(--c-menstrual)",
+    description: "خبر خوب! خونریزی در حال سبک شدن است و انرژی‌ات کم‌کم رو به افزایش می‌رود. این آخرین روزهای فصل زمستان بدن توست و بهار در راه است.",
+    bleeding: 5,
+    hormones: "استروژن (هورمون انرژی) موتورش را روشن کرده و آماده بازگشت است، هرچند هنوز سطحش پایین است، اما نویدبخش روزهای بهتر است.",
+    mood: "احتمالاً خلق و خویت بهبود پیدا می‌کند، اما ممکن است همچنان کمی حساس باشی. کم‌کم داری از پیله خود بیرون می‌آیی و دنیا رنگی‌تر می‌شود.",
+    energy: 4,
+    libido: 3,
+    partner: "حمایت و درک تو همچنان مؤثر است. یک تعریف کوچک یا یک «دوستت دارم» ساده می‌تواند روز او را بسازد و به او انرژی بدهد.",
+    pregnancy: 0,
+  },
+  {
+    day: 4,
+    phase: "قاعدگی",
+    icon: "fa-droplet",
+    color: "var(--c-menstrual)",
+    description: "خونریزی تقریباً تمام شده و به صورت لکه‌بینی خیلی کم درآمده. فصل بهار بدن کم‌کم در حال آغاز شدن است و تو احساس سبکی و تازگی می‌کنی.",
+    bleeding: 2,
+    hormones: "افزایش تدریجی استروژن حال تو را بهتر می‌کند و به آرامی به تو انرژی می‌دهد. مثل طلوع خورشید بعد از یک شب طولانی است.",
+    mood: "خلق و انگیزه‌ات بهتر می‌شود. احساس می‌کنی دنیا دوباره رنگی شده و آماده‌ای تا از خانه بیرون بزنی و با دیگران ارتباط برقرار کنی.",
+    energy: 5,
+    libido: 4,
+    partner: "او را به یک فعالیت سبک و تجربه مشترک، مثل قدم زدن در پارک یا دیدن یک فیلم کمدی، تشویق کن.",
+    pregnancy: 1,
+  },
+  {
+    day: 5,
+    phase: "فولیکولی",
+    icon: "fa-leaf",
+    color: "var(--c-follicular)",
+    description: "بهار رسماً شروع شد! خونریزی تمام شده و بدنت با جدیت در حال پرورش فولیکول‌ها (کیسه‌های کوچکی که تخمک در آنها رشد می‌کند) در تخمدان است.",
+    bleeding: 0,
+    hormones: "افزایش تدریجی استروژن (هورمون خوش‌بینی و انرژی) به تو حس خوبی می‌دهد و تو را برای روزهای آینده آماده می‌کند. این هورمون مثل یک مربی مشوق عمل می‌کند.",
+    mood: "خلق و انگیزه بهتر می‌شود. احساس سبکی و طراوت می‌کنی و برای شروع هفته‌ای نو، برنامه‌ریزی و هدف‌گذاری آماده‌ای.",
+    energy: 6,
+    libido: 5,
+    partner: "بهترین زمان برای برنامه‌ریزی‌های مشترک و صحبت در مورد اهداف آینده است. از انرژی مثبت او برای پیشبرد کارهای دونفره استفاده کن.",
+    pregnancy: 1,
+  },
+  {
+    day: 6,
+    phase: "فولیکولی",
+    icon: "fa-leaf",
+    color: "var(--c-follicular)",
+    description: "امروز افزایش انرژی و میل جنسی را به شکل محسوس‌تری حس می‌کنی. دنیا جای زیباتری به نظر می‌رسد و تو آماده‌ای تا از این زیبایی لذت ببری.",
+    bleeding: 0,
+    hormones: "مهمانی استروژن در بدن تو هر روز شلوغ‌تر می‌شود و سطح انرژی‌ات را بالاتر می‌برد! این هورمون به تو احساس قدرت و جذابیت می‌دهد.",
+    mood: "روحیه مثبت‌تر و انگیزه بالاتر. آماده‌ای تا کارهای جدید را امتحان کنی و از چالش‌ها نترسی. خوش‌بینی در تو موج می‌زند.",
+    energy: 6,
+    libido: 6,
+    partner: "او را به تجربه‌های مشترک و فعالیت‌های دونفره تشویق کن. انرژی او برای این کارها زیاد است، پس با هم خاطره بسازید.",
+    pregnancy: 2,
+  },
+  {
+    day: 7,
+    phase: "فولیکولی",
+    icon: "fa-leaf",
+    color: "var(--c-follicular)",
+    description: "سطح انرژی و میل جنسی‌ات بیشتر شده و احساس سرزندگی می‌کنی. این روند صعودی ادامه خواهد داشت! از این حس خوب نهایت استفاده را ببر.",
+    bleeding: 0,
+    hormones: "استروژن رو به افزایش است و تو را هر روز اجتماعی‌تر و پرانرژی‌تر می‌کند. این هورمون مسئول درخشش پوست و موی تو نیز هست.",
+    mood: "خلق خوب و انگیزه بیشتر. تمایل بیشتری به معاشرت با دوستان و عزیزان داری و از ارتباطات اجتماعی لذت می‌بری.",
+    energy: 7,
+    libido: 6,
+    partner: "از انرژی خوب او برای ساختن خاطرات شاد و مشترک استفاده کن. یک پیک‌نیک یا یک شام دوستانه ایده خوبی است.",
+    pregnancy: 2,
+  },
+  {
+    day: 8,
+    phase: "فولیکولی",
+    icon: "fa-leaf",
+    color: "var(--c-follicular)",
+    description: "انرژی بالا، روحیه مثبت و میل جنسی رو به رشد! روز خوبی برای انجام کارهای خلاقانه یا ارائه ایده‌های جدید در محل کار است.",
+    bleeding: 0,
+    hormones: "استروژن بالا می‌رود و مغز تو را برای یادگیری، حل مسئله و تفکر خلاق تیزتر و آماده‌تر می‌کند.",
+    mood: "خلق عالی و انگیزه زیاد. احساس می‌کنی هیچ کاری نیست که از پس آن برنیایی و اعتماد به نفست بالاست.",
+    energy: 7,
+    libido: 7,
+    partner: "او را در اهداف و پروژه‌هایش تشویق کن. حمایت تو به او انگیزه مضاعف می‌دهد و باعث می‌شود بیشتر بدرخشد.",
+    pregnancy: 3,
+  },
+  {
+    day: 9,
+    phase: "فولیکولی",
+    icon: "fa-leaf",
+    color: "var(--c-follicular)",
+    description: "به روزهای اوج انرژی نزدیک می‌شویم و بدن در حال آماده شدن برای تخمک‌گذاری است. احساس جذابیت و اعتماد به نفس بیشتری می‌کنی.",
+    bleeding: 0,
+    hormones: "استروژن به سطح بالایی می‌رسد و تو را برای فاز بعدی و اوج باروری آماده می‌کند. بدنت به طور غریزی در حال آماده شدن است.",
+    mood: "روحیه بسیار خوب و میل جنسی بیشتر. امروز روز درخشیدن توست! از این حس قدرت و جذابیت لذت ببر.",
+    energy: 8,
+    libido: 8,
+    partner: "یک قرار شام دونفره یا رفتن به یک مهمانی می‌تواند بسیار لذت‌بخش باشد. او در این روزها از همیشه اجتماعی‌تر است.",
+    pregnancy: 4,
+  },
+  {
+    day: 10,
+    phase: "فولیکولی",
+    icon: "fa-leaf",
+    color: "var(--c-follicular)",
+    description: "انرژی و میل جنسی بالا باقی می‌ماند. امروز احساس شکست‌ناپذیری می‌کنی و آماده‌ای تا هر چالشی را قبول کنی. از این قدرت استفاده کن.",
+    bleeding: 0,
+    hormones: "استروژن زیاد است و تو را سرشار از حس خوب و انرژی نگه می‌دارد. این دوره، زمان طلایی خلاقیت و بهره‌وری توست.",
+    mood: "روحیه عالی و انگیزه بالا. از بودن در جمع و ارتباط با دیگران لذت می‌بری و به راحتی می‌توانی دیگران را متقاعد کنی.",
+    energy: 8,
+    libido: 8,
+    partner: "با هم یک فعالیت ورزشی یا سرگرمی جدید را امتحان کنید. هیجان مشترک رابطه را تقویت می‌کند.",
+    pregnancy: 5,
+  },
+  {
+    day: 11,
+    phase: "فولیکولی",
+    icon: "fa-leaf",
+    color: "var(--c-follicular)",
+    description: "شمارش معکوس برای تخمک‌گذاری شروع شده! انرژی و میل جنسی به شکل قابل توجهی زیاد است و بدنت در حال رسیدن به اوج آمادگی است.",
+    bleeding: 0,
+    hormones: "استروژن در سطح بالا قرار دارد و بدن در حال ارسال سیگنال‌های آمادگی برای باروری است. این آمادگی در تمام وجودت حس می‌شود.",
+    mood: "انگیزه و میل جنسی قابل توجه. احساس می‌کنی بسیار جذاب و خواستنی هستی و اعتماد به نفست به اوج می‌رسد.",
+    energy: 9,
+    libido: 9,
+    partner: "به او بگو که چقدر زیبا و جذاب است. تعریف و تمجید تو در این روزها معجزه می‌کند و حس فوق‌العاده‌ای به او می‌دهد.",
+    pregnancy: 6,
+  },
+  {
+    day: 12,
+    phase: "فولیکولی",
+    icon: "fa-leaf",
+    color: "var(--c-follicular)",
+    description: "انرژی همچنان بالاست و میل جنسی به اوج خود نزدیک می‌شود. تو در بهترین حالت اجتماعی و ارتباطی خود هستی.",
+    bleeding: 0,
+    hormones: "استروژن (هورمون ستاره درونت!) به بیشینه خود نزدیک می‌شود و تو را برای روز بزرگ آماده می‌کند.",
+    mood: "خلق عالی و انرژی زیاد. آماده‌ای تا مرکز توجه باشی و بدرخشی. از این حس قدرت لذت ببر.",
+    energy: 9,
+    libido: 9,
+    partner: "با دوستان مشترکتان یک برنامه تفریحی ترتیب دهید. او از بودن در جمع لذت خواهد برد و بسیار خوش‌صحبت خواهد بود.",
+    pregnancy: 7,
+  },
+  {
+    day: 13,
+    phase: "فولیکولی",
+    icon: "fa-leaf",
+    color: "var(--c-follicular)",
+    description: "بدن شما مانند یک کمان کشیده شده آماده برای رها کردن تخمک است. امروز احساس جذابیت و قدرت فوق‌العاده‌ای داری.",
+    bleeding: 0,
+    hormones: "استروژن در بیشترین مقدار خود قرار دارد و بدن برای رویداد اصلی یعنی تخمک‌گذاری، آماده می‌شود.",
+    mood: "انگیزه و میل جنسی بالا. اعتماد به نفست در اوج است و آماده‌ای تا دنیا را فتح کنی. این حس را جشن بگیر.",
+    energy: 9,
+    libido: 10,
+    partner: "یک هدیه کوچک و بی‌مقدمه یا یک شاخه گل می‌تواند او را بسیار خوشحال کند و نشان‌دهنده توجه تو باشد.",
+    pregnancy: 8,
+  },
+  {
+    day: 14,
+    phase: "فولیکولی",
+    icon: "fa-leaf",
+    color: "var(--c-follicular)",
+    description: "بالاترین سطح انرژی و میل جنسی! استروژن در قله‌ی خود قرار دارد و تو را به یک آهنربای جذابیت تبدیل کرده است.",
+    bleeding: 0,
+    hormones: "استروژن در پیک (اوج) خود است و تو را تبدیل به یک ستاره درخشان کرده! این اوج قدرت زنانه توست.",
+    mood: "روحیه عالی و انرژی زیاد. بهترین زمان برای درخشیدن و ارائه توانایی‌هایت در کار و زندگی شخصی است.",
+    energy: 10,
+    libido: 10,
+    partner: "به او بگو که چقدر به وجودش و موفقیت‌هایش افتخار می‌کنی. از این فرصت برای تحسین او و ابراز عشق و میک لاو استفاده کن.",
+    pregnancy: 9,
+  },
+  {
+    day: 15,
+    phase: "فولیکولی",
+    icon: "fa-leaf",
+    color: "var(--c-follicular)",
+    description: "انرژی و میل جنسی در اوج مطلق قرار دارند. این آخرین روزهای فاز بهاری بدن توست. از این حس قدرت و سرزندگی نهایت استفاده را ببر.",
+    bleeding: 0,
+    hormones: "استروژن بسیار بالاست و همه چیز برای رویداد بزرگ فردا (تخمک‌گذاری) مهیاست. بدنت کاملاً آماده است.",
+    mood: "انگیزه و میل جنسی بالا. احساس قدرت و سرزندگی فوق‌العاده‌ای داری و آماده‌ای تا بدرخشی.",
+    energy: 10,
+    libido: 10,
+    partner: "از این انرژی فوق‌العاده برای یک شب رمانتیک و فراموش‌نشدنی استفاده کنید. بهترین زمان برای یک معاشقه و سکس  است.",
+    pregnancy: 9,
+  },
+  {
+    day: 16,
+    phase: "فولیکولی",
+    icon: "fa-leaf",
+    color: "var(--c-follicular)",
+    description: "بدن در حال انتقال به فاز تخمک‌گذاری است. انرژی همچنان در اوج است و همه چیز برای رویداد اصلی مهیاست.",
+    bleeding: 0,
+    hormones: "استروژن بالا و بدن کاملاً برای تخمک‌گذاری آماده است. شمارش معکوس برای لحظه بزرگ شروع شده!",
+    mood: "خلق و انرژی زیاد. احساس می‌کنی روی ابرها راه می‌روی و هیچ چیز نمی‌تواند جلوی تو را بگیرد.",
+    energy: 10,
+    libido: 10,
+    partner: "امروز بهترین روز برای گرفتن تصمیم‌های مهم دونفره یا برنامه‌ریزی برای آینده است. از این شفافیت ذهنی استفاده کنید.",
+    pregnancy: 10,
+  },
+  {
+    day: 17,
+    phase: "تخمک‌گذاری",
+    special: "ovulation",
+    icon: "fa-star",
+    color: "var(--c-ovulation)",
+    description: "روز تخمک‌گذاری! امروز تخمک بالغ و زیبا از تخمدان آزاد می‌شود. تو در اوج باروری، قدرت زنانگی و جذابیت خودت هستی.",
+    bleeding: 0,
+    hormones: "اوج استروژن باعث یک جهش در هورمون LH (هورمون لوتئینه‌کننده که مثل یک جرقه برای آزادسازی تخمک است) شده.",
+    mood: "اعتماد به نفس بالا، اجتماعی، خوش‌صحبت و فوق‌العاده جذاب! حس می‌کنی ملکه جهان هستی و واقعاً هم هستی!",
+    energy: 10,
+    libido: 10,
+    partner: "امروز بهترین روز برای ابراز عشق و برنامه‌ریزی یک قرار عاشقانه و خاص است. از این انرژی و جذابیت فوق‌العاده لذت ببرید.",
+    pregnancy: 10,
+  },
+  {
+    day: 18,
+    phase: "لوتئال",
+    icon: "fa-moon",
+    color: "var(--c-luteal)",
+    description: "به فصل پاییز خوش آمدی. بعد از هیجان تابستان، حالا بدن با افزایش پروژسترون وارد فاز آرامش می‌شود تا رحم را برای بارداری احتمالی آماده کند.",
+    bleeding: 0,
+    hormones: "پروژسترون (هورمون آرامش و حامی بارداری) در حال افزایش و استروژن در حال کاهش است. این تغییر، شیفت از انرژی بیرونی به درونی است.",
+    mood: "ممکن است کمی آرام‌تر و درون‌گراتر شوی. احتمال تحریک‌پذیری و تغییرات خلقی اولیه وجود دارد. حس «لانه‌سازی» سراغت می‌آید.",
+    energy: 9,
+    libido: 9,
+    partner: "حمایت و صبوری در این فاز جدید اهمیت زیادی دارد. از این آرامش نسبی لذت ببرید و یک شب آرام را با هم بگذرانید.",
+    pregnancy: 8,
+  },
+  {
+    day: 19,
+    phase: "لوتئال",
+    icon: "fa-moon",
+    color: "var(--c-luteal)",
+    description: "انرژی کمی کمتر شده و ممکن است نشانه‌های اولیه پیش از قاعدگی یا PMS (مجموعه‌ای از علائم جسمی و روحی قبل از پریود) مثل نفخ یا حساسیت سینه ظاهر شوند.",
+    bleeding: 0,
+    hormones: "پروژسترون بالا است و بدن را در حالت آماده‌باش و کمی تنش نگه می‌دارد. این هورمون دمای بدن را نیز کمی بالا می‌برد.",
+    mood: "امکان اضطراب یا تغییرات خلقی بیشتر است. شاید کمی بی‌قرار باشی و ندانی دلیلش چیست. این به خاطر نوسان هورمون‌هاست.",
+    energy: 8,
+    libido: 8,
+    partner: "صبور باش و اگر دیدی کمی مضطرب است، به او اطمینان و آرامش بده. یک آغوش گرم می‌تواند بسیار کمک‌کننده باشد.",
+    pregnancy: 7,
+  },
+  {
+    day: 20,
+    phase: "لوتئال",
+    icon: "fa-moon",
+    color: "var(--c-luteal)",
+    description: "انرژی و میل جنسی به کاهش تدریجی خود ادامه می‌دهند. تمایل به آرامش، کارهای خانگی و مرتب‌سازی بیشتر می‌شود.",
+    bleeding: 0,
+    hormones: "پروژسترون همچنان بالاست و این حالت آرام و کمی سنگین را حفظ می‌کند. بدن هنوز منتظر سیگنال بارداری است.",
+    mood: "احتمال تحریک‌پذیری و تغییرات خلقی وجود دارد. آستانه تحملت ممکن است کمی پایین آمده باشد و به سکوت بیشتری نیاز داشته باشی.",
+    energy: 8,
+    libido: 7,
+    partner: "به نیاز او برای آرامش احترام بگذار و او را برای بیرون رفتن یا مهمانی رفتن تحت فشار قرار نده.",
+    pregnancy: 6,
+  },
+  {
+    day: 21,
+    phase: "لوتئال",
+    icon: "fa-moon",
+    color: "var(--c-luteal)",
+    description: "سطح انرژی متوسط است و علائم PMS (سندروم پیش از قاعدگی) ممکن است خود را بیشتر نشان دهند.",
+    bleeding: 0,
+    hormones: "پروژسترون هنوز بالاست اما بدن کم‌کم آماده کاهش سطح آن می‌شود، چون سیگنال بارداری را دریافت نکرده است.",
+    mood: "احتمال تغییرات خلقی و حساسیت احساسی. ممکن است دلت بخواهد به خاطرات گذشته فکر کنی یا کمی بغض کنی.",
+    energy: 7,
+    libido: 6,
+    partner: "یک شنونده خوب باش. گاهی او فقط نیاز دارد حرف بزند بدون اینکه راه‌حلی از تو بخواهد. فقط گوش کن و همدلی نشان بده.",
+    pregnancy: 5,
+  },
+  {
+    day: 22,
+    phase: "لوتئال",
+    icon: "fa-moon",
+    color: "var(--c-luteal)",
+    description: "انرژی و میل جنسی در سراشیبی قرار گرفته‌اند. بدن کم‌کم متوجه می‌شود که بارداری رخ نداده و آماده افت هورمونی می‌شود.",
+    bleeding: 0,
+    hormones: "پروژسترون رو به کاهش است و این سرآغاز علائم شدیدتر PMS است. این افت هورمونی دلیل اصلی تغییرات خلقی است.",
+    mood: "احتمال تحریک‌پذیری بیشتر است. صبر و حوصله‌ات کمتر از همیشه است و ممکن است به سادگی از کوره در بروی.",
+    energy: 6,
+    libido: 5,
+    partner: "آرامش خودت را حفظ کن و مسائل را شخصی نکن. این حالت گذراست و به زودی تمام می‌شود.",
+    pregnancy: 4,
+  },
+  {
+    day: 23,
+    phase: "لوتئال",
+    icon: "fa-moon",
+    color: "var(--c-luteal)",
+    description: "کاهش انرژی ادامه دارد. علائم جسمی PMS مانند نفخ، سردرد یا جوش صورت ممکن است شدیدتر شوند.",
+    bleeding: 0,
+    hormones: "پروژسترون به سرعت در حال کاهش است و بدن را تحت تاثیر قرار می‌دهد. این افت، سیگنال شروع چرخه جدید است.",
+    mood: "امکان اضطراب یا حساسیت احساسی بیشتر است. ممکن است احساس کنی کسی تو را درک نمی‌کند و بسیار تنها هستی.",
+    energy: 6,
+    libido: 4,
+    partner: "در کارهای خانه به او کمک کن. همین کارهای کوچک، حمایت بزرگی محسوب می‌شود و به او نشان می‌دهد که تنها نیست.",
+    pregnancy: 3,
+  },
+  {
+    day: 24,
+    phase: "لوتئال",
+    special: "pms",
+    icon: "fa-moon",
+    color: "var(--c-luteal)",
+    description: "شروع رسمی PMS (سندروم پیش از قاعدگی)! سطح انرژی و میل جنسی کاهش می‌یابد. رسماً وارد هفته پیش از قاعدگی شده‌ای. با خودت مهربان باش.",
+    bleeding: 0,
+    hormones: "پروژسترون پایین می‌آید و این باعث تشدید علائم روحی و جسمی می‌شود. تعادل هورمونی به هم می‌ریزد.",
+    mood: "احتمال بروز علائم پیش از قاعدگی بیشتر است. ممکن است احساس کلافگی، بی‌قراری و غمگینی کنی.",
+    energy: 5,
+    libido: 4,
+    partner: "از بحث و جدل‌های بی‌مورد پرهیز کن. الان زمان مناسبی برای حل مسائل پیچیده نیست. فقط آرامش را حفظ کن.",
+    pregnancy: 2,
+  },
+  {
+    day: 25,
+    phase: "لوتئال",
+    special: "pms",
+    icon: "fa-moon",
+    color: "var(--c-luteal)",
+    description: "انرژی متوسط است و بدن در حال آماده شدن برای چرخه بعدی است. وقتش است سرعت را کم کنی و به خودت و نیازهایت توجه کنی.",
+    bleeding: 0,
+    hormones: "پروژسترون کاهش یافته است و هورمون آرامش‌بخش در حال ترک بدن است. این باعث می‌شود احساس آسیب‌پذیری کنی.",
+    mood: "احتمال تغییرات خلقی و حساسیت احساسی وجود دارد. ممکن است از یک تبلیغ تلویزیونی هم اشکت دربیاید و این کاملاً اوکی است!",
+    energy: 5,
+    libido: 3,
+    partner: "از او بپرس: «شکلات می‌خوای یا پیتزا؟» گاهی بهترین راه حمایت، برآورده کردن هوس‌های کوچک و نشان دادن توجه است!",
+    pregnancy: 1,
+  },
+  {
+    day: 26,
+    phase: "لوتئال",
+    special: "pms",
+    icon: "fa-moon",
+    color: "var(--c-luteal)",
+    description: "انرژی کم است و بدن برای شروع سیکل جدید آماده می‌شود. با خودت مهربان باش و برنامه سنگین نچین. نه گفتن را تمرین کن.",
+    bleeding: 0,
+    hormones: "پروژسترون پایین‌تر شده و بدن خودش را برای شروع مجدد و ریزش دیواره رحم آماده می‌کند.",
+    mood: "خلق ممکن است بسیار متغیر باشد. در یک لحظه شاد و در لحظه بعد غمگین هستی. این نوسان طبیعی است.",
+    energy: 4,
+    libido: 3,
+    partner: "صبور باش و به یاد داشته باش که این حالت موقتی است و به زودی تمام می‌شود. او به درک تو نیاز دارد.",
+    pregnancy: 1,
+  },
+  {
+    day: 27,
+    phase: "لوتئال",
+    special: "pms",
+    icon: "fa-moon",
+    color: "var(--c-luteal)",
+    description: "به قاعدگی خیلی نزدیک شده‌ای. علائم PMS (سندروم پیش از قاعدگی) می‌تواند به اوج خود برسد. نفس عمیق بکش.",
+    bleeding: 0,
+    hormones: "پروژسترون نزدیک به پایین‌ترین مقدار است و این افت شدید باعث این همه حساسیت روحی و جسمی می‌شود.",
+    mood: "پوست دلت نازک شده! ممکن است با کوچکترین حرفی ناراحت شوی یا بغض کنی. خودت را سرزنش نکن و به خودت عشق بورز.",
+    energy: 3,
+    libido: 2,
+    partner: "اینجا مرحله «فقط سکوت کن و بغلش کن» است! حرف‌هایش را به دل نگیر و فقط حضور داشته باش. این بزرگترین کمک است.",
+    pregnancy: 0,
+  },
+  {
+    day: 28,
+    phase: "لوتئال",
+    special: "pms",
+    icon: "fa-moon",
+    color: "var(--c-luteal)",
+    description: "آمادگی نهایی برای قاعدگی. حساسیت و تحریک‌پذیری در بالاترین حد خود قرار دارد. فقط سعی کن این روز را به سلامت بگذرانی.",
+    bleeding: 0,
+    hormones: "پروژسترون بسیار پایین است و بدن در آستانه شروع چرخه جدید قرار دارد. بدن در حال آماده‌باش کامل است.",
+    mood: "حساسیت و تحریک‌پذیری ممکن است زیاد باشد. احساس می‌کنی در یک دیگ زودپز در حال جوشیدنی. از موقعیت‌های استرس‌زا دوری کن.",
+    energy: 3,
+    libido: 2,
+    partner: "فضایی آرام و بدون تنش برایش فراهم کن و از او توقع زیادی نداشته باش. بگذار در آرامش باشد.",
+    pregnancy: 0,
+  },
+  {
+    day: 29,
+    phase: "لوتئال",
+    special: "pms",
+    icon: "fa-moon",
+    color: "var(--c-luteal)",
+    description: "آمادگی کامل برای شروع قاعدگی. بدن در حال آماده شدن برای رهاسازی است. به خودت استراحت مطلق بده.",
+    bleeding: 0,
+    hormones: "پروژسترون پایین است و بدن منتظر سیگنال شروع پریود است. این سکوت قبل از طوفان (قاعدگی) است.",
+    mood: "علائم جسمی و خلقی می‌تواند اوج بگیرد. ممکن است از همه چیز و همه کس خسته باشی و فقط سکوت بخواهی.",
+    energy: 2,
+    libido: 1,
+    partner: "قهرمان باش! تمام مسئولیت‌های خانه را به عهده بگیر و بگذار استراحت کند. این بهترین نوع عشق ورزیدن است.",
+    pregnancy: 0,
+  },
+  {
+    day: 30,
+    phase: "لوتئال",
+    special: "pms",
+    icon: "fa-moon",
+    color: "var(--c-luteal)",
+    description: "پایان فاز پاییزی. بدن در سکوت کامل، منتظر شروع دوباره است. انرژی در پایین‌ترین سطح خود قرار دارد.",
+    bleeding: 0,
+    hormones: "پروژسترون به حداقل رسیده است و بدن در حالت انتظار برای شروع مجدد قرار دارد. این پایان یک سفر و آغاز سفری دیگر است.",
+    mood: "حساسیت و تحریک‌پذیری زیاد است. احساس می‌کنی روی لبه‌ی تیغ راه می‌روی و بسیار آسیب‌پذیری.",
+    energy: 2,
+    libido: 1,
+    partner: "فقط کنارش باش. حضور آرام تو بهترین حمایت است و نشان می‌دهد که در هر حالی، چه در اوج انرژی و چه در خستگی، دوستش داری.",
+    pregnancy: 0,
+  },
+  {
+    day: 31,
+    phase: "لوتئال",
+    special: "pms",
+    icon: "fa-moon",
+    color: "var(--c-luteal)",
+    description: "آخرین روز این سفر! بدن آماده می‌شود تا با شروع خونریزی فردا، دکمه ری‌استارت را بزند و از نو شروع کند.",
+    bleeding: 0,
+    hormones: "پروژسترون و استروژن هر دو در کف مطلق قرار دارند و منتظرند تا با شروع پریود، همه‌چیز از نو شروع شود.",
+    mood: "حساسیت و نوسانات خلقی زیاد است. خسته از خستگی هستی! این نیز بگذرد و فردا روز جدیدی است.",
+    energy: 1,
+    libido: 1,
+    partner: "صبر تو امروز، سرمایه‌گذاری برای روزهای خوب و پر انرژی آینده است. امشب شام مورد علاقه‌اش را درست کن!",
+    pregnancy: 0,
+  },
+]; 
+        
+        
+        ; function getDayData(d,t){const a=4,e=Math.max(10,t-14);let o;if(d<=a)o={...cycleData[d]};else if(d<e){const t=Math.round(5+(d-5)/(e-5-1)*11);o={...cycleData[Math.min(16,t)]}}else if(d===e)o={...cycleData[17]};else{const a=Math.round(18+(d-e-1)/(t-e-1)*13);o={...cycleData[Math.min(31,a)]}}return t-d<=7&&d>e&&(o.special="pms"),o} function toJalali(a,e,t){const n=[0,31,59,90,120,151,181,212,243,273,304,334],o=e>2?a+1:a;let r=355666+365*a+Math.floor((o+3)/4)-Math.floor((o+99)/100)+Math.floor((o+399)/400)+t+n[e-1];let i=-1595+33*Math.floor(r/12053);r%=12053,i+=4*Math.floor(r/1461),r%=1461,r>365&&(i+=Math.floor((r-1)/365),r=(r-1)%365);const l=r<186?1+Math.floor(r/31):7+Math.floor((r-186)/30),s=1+(r<186?r%31:(r-186)%30);return{jy:i,jm:l,jd:s}}function getJalaliMonthLength(a,e){return e<=6?31:e<=11?30:((a-474)%2820+512)*682%2816<682?30:29}function createDatePickerModal(){const a=`<div id="datePickerModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><button id="closeModal" class="btn btn-close">انصراف</button><button id="confirmDate" class="btn btn-confirm">تایید</button></div><div class="selectors-container"><div id="pdp-year" class="selector-column"></div><div id="pdp-month" class="selector-column"></div><div id="pdp-day" class="selector-column"></div></div></div></div>`;document.body.insertAdjacentHTML("beforeend",a)}function initializePersianDatePicker(a){createDatePickerModal();const e=toJalali(new Date().getFullYear(),new Date().getMonth()+1,new Date().getDate()),t=document.getElementById("datePickerModal"),n=()=>t.classList.add("visible"),o=()=>t.classList.remove("visible");function r(){const e=a=>{document.getElementById(a).addEventListener("click",n)};e("lastPeriodDate"),e("settingsPeriodDate"),document.getElementById("closeModal").addEventListener("click",o),t.addEventListener("click",a=>{a.target===t&&o()}),document.getElementById("confirmDate").addEventListener("click",()=>{const t=parseInt(i.getValue()),n=parseInt(l.getValue()),r=parseInt(s.getValue()),d=a=>(a<10?"0":"")+a,c=document.getElementById(a),g=document.getElementById("settingsPeriodDate");c&&(c.value=`${t}/${d(n)}/${d(r)}`,c.dataset.jalaliDate=`${t}-${n}-${r}`),g&&(g.value=`${t}/${d(n)}/${d(r)}`,g.dataset.jalaliDate=`${t}-${n}-${r}`),o()})}class d{constructor(a){this.el=document.querySelector(a.el),this.source=a.source,this.itemHeight=44,this.middleIndex=2,this.onChange=a.onChange||function(){},this._init(a.selectedIndex||0)}_init(a){this.el.innerHTML=`<ul class="selector-list">${this.source.map(a=>`<li class="selector-item">${a.text}</li>`).join("")}</ul><div class="selector-highlight"></div>`,this.list=this.el.querySelector("ul"),this.items=this.el.querySelectorAll("li"),this.select(a,!1),this._attachEvents()}_attachEvents(){let a=0,e=0,t=!1;const n=(n=>{n.stopPropagation(),a=n.touches?n.touches[0].clientY:n.clientY,e=parseFloat(this.list.style.transform.replace("translateY(",""))||0,this.list.style.transition="none",t=!0}),o=(n=>{if(!t)return;n.preventDefault();let o=(n.touches?n.touches[0].clientY:n.clientY)-a;this.list.style.transform=`translateY(${e+o}px)`}),r=(()=>{t&&(t=!1,this._snap())});this.el.addEventListener("mousedown",n),document.addEventListener("mousemove",o),document.addEventListener("mouseup",r),this.el.addEventListener("touchstart",n,{passive:!1}),this.el.addEventListener("touchmove",o,{passive:!1}),this.el.addEventListener("touchend",r)}_snap(){let a=parseFloat(this.list.style.transform.replace("translateY(",""))||0,e=Math.round((a-this.middleIndex*this.itemHeight)/-this.itemHeight);this.select(e)}select(a,e=!0){a=Math.max(0,Math.min(a,this.source.length-1));const t=this.selectedIndex!==a;this.selectedIndex=a,this.list.style.transition="transform 0.2s ease-out",this.list.style.transform=`translateY(${(this.middleIndex-this.selectedIndex)*this.itemHeight}px)`,this.items.forEach((e,t)=>{e.classList.toggle("selected",t===a)}),t&&e&&this.onChange()}updateSource(a){this.source=a,this.list.innerHTML=this.source.map(a=>`<li class="selector-item">${a.text}</li>`).join(""),this.items=this.el.querySelectorAll("li");const e=Math.min(this.selectedIndex,this.source.length-1);this.select(e,!1)}getValue(){return this.source[this.selectedIndex].value}}const c=(a,e)=>Array.from({length:e-a+1},(_,t)=>({value:a+t,text:a+t})),g=(a,e)=>c(1,getJalaliMonthLength(a,e)),p=()=>[{value:1,text:"فروردین"},{value:2,text:"اردیبهشت"},{value:3,text:"خرداد"},{value:4,text:"تیر"},{value:5,text:"مرداد"},{value:6,text:"شهریور"},{value:7,text:"مهر"},{value:8,text:"آبان"},{value:9,text:"آذر"},{value:10,text:"دی"},{value:11,text:"بهمن"},{value:12,text:"اسفند"}],u=()=>{const a=parseInt(i.getValue()),e=parseInt(l.getValue());s.updateSource(g(a,e))};let i=new d({el:"#pdp-year",source:c(1390,e.jy+1),selectedIndex:e.jy-1390,onChange:u}),l=new d({el:"#pdp-month",source:p(),selectedIndex:e.jm-1,onChange:u}),s=new d({el:"#pdp-day",source:g(e.jy,e.jm),selectedIndex:e.jd-1});r()}
+        initializePersianDatePicker("lastPeriodDate");
+        
+        const dom = {
+            html: document.documentElement, setupView: document.getElementById('setupView'), trackerView: document.getElementById('trackerView'),
+            startTrackingBtn: document.getElementById('startTrackingBtn'), openSettingsBtn: document.getElementById('openSettingsBtn'),
+            settingsOverlay: document.getElementById('settingsOverlay'), settingsPanel: document.getElementById('settingsPanel'),
+            saveSettingsBtn: document.getElementById('saveSettingsBtn'), cancelSettingsBtn: document.getElementById('cancelSettingsBtn'),
+            themeToggle: document.getElementById('themeToggle'), lastPeriodDateInput: document.getElementById('lastPeriodDate'),
+            cycleLengthInput: document.getElementById('cycleLength'), settingsPeriodDateInput: document.getElementById('settingsPeriodDate'),
+            settingsCycleLengthInput: document.getElementById('settingsCycleLength'), progressCircleFg: document.getElementById('progress-circle-fg'),
+            progressDayNumber: document.getElementById('progressDayNumber'), phaseIcon: document.getElementById('phaseIcon'),
+            cyclePhaseTitle: document.getElementById('cyclePhaseTitle'), detailsGrid: document.getElementById('detailsGrid'),
+            prevDayBtn: document.getElementById('prevDayBtn'), nextDayBtn: document.getElementById('nextDayBtn'), todayBtn: document.getElementById('todayBtn'),
+            specialDayBanner: document.getElementById('specialDayBanner'), displayedJalaliDate: document.getElementById('displayedJalaliDate'),
+            periodAlertCard: document.getElementById('periodAlertCard'),
+            aboutBtn: document.getElementById('aboutBtn'), aboutOverlay: document.getElementById('aboutOverlay'),
+            aboutPanel: document.getElementById('aboutPanel'), closeAboutBtn: document.getElementById('closeAboutBtn'),
         };
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- Data & Helpers ---
-            const cycleData=[{},{day:1,phase:"قاعدگی",icon:"fa-droplet",color:"var(--c-menstrual)",description:"ریزش پوشش داخلی رحم و آغاز خونریزی.",bleeding:10,hormones:"استروژن و پروژسترون در پایین‌ترین حد خود قرار دارند.",mood:"ممکن است خلق پایین و تحریک‌پذیری وجود داشته باشد.",energy:2,libido:2,partner:"حمایت، صبوری و درک متقابل اهمیت ویژه‌ای دارد.",pregnancy:0},{day:2,phase:"قاعدگی",icon:"fa-droplet",color:"var(--c-menstrual)",description:"ادامه خونریزی؛ سطح انرژی کمی افزایش می‌یابد.",bleeding:8,hormones:"استروژن و پروژسترون همچنان پایین هستند.",mood:"خلق پایین و تحریک‌پذیری ممکن است ادامه داشته باشد.",energy:3,libido:2,partner:"همچنان حمایت و صبوری توصیه می‌شود.",pregnancy:0},{day:3,phase:"قاعدگی",icon:"fa-droplet",color:"var(--c-menstrual)",description:"پایان تدریجی خونریزی؛ انرژی رو به افزایش است.",bleeding:5,hormones:"استروژن و پروژسترون پایین اما رو به افزایش‌اند.",mood:"احتمالاً خلق بهبود می‌یابد اما همچنان حساسیت وجود دارد.",energy:4,libido:3,partner:"حمایت و درک شریک همچنان مؤثر است.",pregnancy:0},{day:4,phase:"قاعدگی",icon:"fa-droplet",color:"var(--c-menstrual)",description:"خونریزی بسیار کم یا لکه‌بینی.",bleeding:2,hormones:"افزایش تدریجی استروژن.",mood:"خلق و انگیزه بهتر می‌شود.",energy:5,libido:4,partner:"تشویق به فعالیت و تجربه‌های مشترک.",pregnancy:1},{day:5,phase:"فولیکولی",icon:"fa-leaf",color:"var(--c-follicular)",description:"پایان خونریزی. فولیکول‌ها در تخمدان شروع به رشد می‌کنند.",bleeding:0,hormones:"افزایش تدریجی استروژن.",mood:"خلق و انگیزه بهتر می‌شود.",energy:6,libido:5,partner:"تشویق به فعالیت و تجربه‌های مشترک.",pregnancy:1},{day:6,phase:"فولیکولی",icon:"fa-leaf",color:"var(--c-follicular)",description:"افزایش محسوس انرژی و میل جنسی.",bleeding:0,hormones:"استروژن همچنان افزایش می‌یابد.",mood:"روحیه مثبت‌تر و انگیزه بالاتر.",energy:6,libido:6,partner:"تشویق به فعالیت و تجربه‌های مشترک.",pregnancy:2},{day:7,phase:"فولیکولی",icon:"fa-leaf",color:"var(--c-follicular)",description:"سطح انرژی و میل جنسی بیشتر شده است.",bleeding:0,hormones:"استروژن رو به افزایش است.",mood:"خلق خوب و انگیزه بیشتر.",energy:7,libido:6,partner:"تشویق به فعالیت و تجربه‌های مشترک.",pregnancy:2},{day:8,phase:"فولیکولی",icon:"fa-leaf",color:"var(--c-follicular)",description:"انرژی بالا؛ میل جنسی و روحیه مثبت.",bleeding:0,hormones:"استروژن بالا می‌رود.",mood:"خلق عالی و انگیزه زیاد.",energy:7,libido:7,partner:"تشویق به فعالیت و تجربه‌های مشترک.",pregnancy:3},{day:9,phase:"فولیکولی",icon:"fa-leaf",color:"var(--c-follicular)",description:"روزهای اوج انرژی؛ نزدیک شدن به تخمک‌گذاری.",bleeding:0,hormones:"استروژن به سطح بالایی می‌رسد.",mood:"روحیه بسیار خوب و میل جنسی بیشتر.",energy:8,libido:8,partner:"تشویق به فعالیت و تجربه‌های مشترک.",pregnancy:4},{day:10,phase:"فولیکولی",icon:"fa-leaf",color:"var(--c-follicular)",description:"انرژی و میل جنسی بالا باقی می‌ماند.",bleeding:0,hormones:"استروژن زیاد است.",mood:"روحیه عالی و انگیزه بالا.",energy:8,libido:8,partner:"تشویق به فعالیت و تجربه‌های مشترک.",pregnancy:5},{day:11,phase:"فولیکولی",icon:"fa-leaf",color:"var(--c-follicular)",description:"نزدیک به تخمک‌گذاری؛ انرژی و میل جنسی زیاد.",bleeding:0,hormones:"استروژن در سطح بالا.",mood:"انگیزه و میل جنسی قابل توجه.",energy:9,libido:9,partner:"تشویق به فعالیت و تجربه‌های مشترک.",pregnancy:6},{day:12,phase:"فولیکولی",icon:"fa-leaf",color:"var(--c-follicular)",description:"همچنان انرژی بالا؛ اوج میل جنسی.",bleeding:0,hormones:"استروژن به بیشینه نزدیک می‌شود.",mood:"خلق عالی و انرژی زیاد.",energy:9,libido:9,partner:"تشویق به فعالیت و تجربه‌های مشترک.",pregnancy:7},{day:13,phase:"فولیکولی",icon:"fa-leaf",color:"var(--c-follicular)",description:"آماده شدن برای تخمک‌گذاری؛ انرژی و میل جنسی بالا.",bleeding:0,hormones:"استروژن در بیشترین مقدار.",mood:"انگیزه و میل جنسی بالا.",energy:9,libido:10,partner:"تشویق به فعالیت و تجربه‌های مشترک.",pregnancy:8},{day:14,phase:"فولیکولی",icon:"fa-leaf",color:"var(--c-follicular)",description:"بالاترین سطح انرژی و میل جنسی.",bleeding:0,hormones:"استروژن در پیک خود است.",mood:"روحیه عالی و انرژی زیاد.",energy:10,libido:10,partner:"تشویق به فعالیت و تجربه‌های مشترک.",pregnancy:9},{day:15,phase:"فولیکولی",icon:"fa-leaf",color:"var(--c-follicular)",description:"پایان فاز فولیکولی؛ انرژی و میل جنسی در اوج.",bleeding:0,hormones:"استروژن بسیار بالاست.",mood:"انگیزه و میل جنسی بالا.",energy:10,libido:10,partner:"تشویق به فعالیت و تجربه‌های مشترک.",pregnancy:9},{day:16,phase:"فولیکولی",icon:"fa-leaf",color:"var(--c-follicular)",description:"انتقال به فاز تخمک‌گذاری؛ انرژی بالا.",bleeding:0,hormones:"استروژن بالا؛ آماده تخمک‌گذاری.",mood:"خلق و انرژی زیاد.",energy:10,libido:10,partner:"تشویق به فعالیت و تجربه‌های مشترک.",pregnancy:10},{day:17,phase:"تخمک‌گذاری",special:"ovulation",icon:"fa-star",color:"var(--c-ovulation)",description:"اوج باروری؛ تخمک از تخمدان آزاد می‌شود.",bleeding:0,hormones:"اوج استروژن و افزایش ناگهانی LH.",mood:"اعتماد به نفس و تمایل به تعامل اجتماعی بالا.",energy:10,libido:10,partner:"ابراز محبت و برنامه‌ریزی فعالیت‌های عاشقانه.",pregnancy:10},{day:18,phase:"لوتئال",icon:"fa-moon",color:"var(--c-luteal)",description:"آغاز فاز لوتئال؛ پروژسترون شروع به افزایش می‌کند.",bleeding:0,hormones:"افزایش پروژسترون، سپس کاهش استروژن.",mood:"احتمال تحریک‌پذیری و تغییرات خلقی.",energy:9,libido:9,partner:"حمایت و صبوری در این فاز اهمیت دارد.",pregnancy:8},{day:19,phase:"لوتئال",icon:"fa-moon",color:"var(--c-luteal)",description:"انرژی کمی کمتر و نشانه‌های PMS ممکن است ظاهر شوند.",bleeding:0,hormones:"پروژسترون بالا.",mood:"امکان اضطراب یا تغییرات خلقی بیشتر است.",energy:8,libido:8,partner:"حمایت و صبوری توصیه می‌شود.",pregnancy:7},{day:20,phase:"لوتئال",icon:"fa-moon",color:"var(--c-luteal)",description:"انرژی و میل جنسی کاهش یافته است.",bleeding:0,hormones:"پروژسترون همچنان بالا.",mood:"احتمال تحریک‌پذیری و تغییرات خلقی.",energy:8,libido:7,partner:"حمایت و صبوری توصیه می‌شود.",pregnancy:6},{day:21,phase:"لوتئال",icon:"fa-moon",color:"var(--c-luteal)",description:"سطح انرژی متوسط؛ شروع علائم پیش از قاعدگی.",bleeding:0,hormones:"پروژسترون بالا.",mood:"احتمال تغییرات خلقی و حساسیت احساسی.",energy:7,libido:6,partner:"حمایت و صبوری توصیه می‌شود.",pregnancy:5},{day:22,phase:"لوتئال",icon:"fa-moon",color:"var(--c-luteal)",description:"انرژی و میل جنسی روند نزولی دارد.",bleeding:0,hormones:"پروژسترون رو به کاهش است.",mood:"احتمال تحریک‌پذیری بیشتر است.",energy:6,libido:5,partner:"حمایت و صبوری توصیه می‌شود.",pregnancy:4},{day:23,phase:"لوتئال",icon:"fa-moon",color:"var(--c-luteal)",description:"ادامه کاهش انرژی و احتمال بروز علائم جسمی (نفخ).",bleeding:0,hormones:"پروژسترون در حال کاهش است.",mood:"امکان اضطراب یا حساسیت احساسی بیشتر است.",energy:6,libido:4,partner:"حمایت و صبوری توصیه می‌شود.",pregnancy:3},{day:24,phase:"لوتئال",icon:"fa-moon",color:"var(--c-luteal)",special:"pms",description:"سطح انرژی و میل جنسی کاهش می‌یابد.",bleeding:0,hormones:"پروژسترون پایین می‌آید.",mood:"احتمال بروز علائم پیش از قاعدگی بیشتر است.",energy:5,libido:4,partner:"حمایت و صبوری توصیه می‌شود.",pregnancy:2},{day:25,phase:"لوتئال",icon:"fa-moon",color:"var(--c-luteal)",special:"pms",description:"انرژی متوسط؛ شروع آمادگی بدن برای قاعدگی جدید.",bleeding:0,hormones:"پروژسترون کاهش یافته است.",mood:"احتمال تغییرات خلقی و حساسیت احساسی وجود دارد.",energy:5,libido:3,partner:"حمایت و صبوری توصیه می‌شود.",pregnancy:1},{day:26,phase:"لوتئال",icon:"fa-moon",color:"var(--c-luteal)",special:"pms",description:"انرژی کم و آماده شدن برای شروع سیکل جدید.",bleeding:0,hormones:"پروژسترون پایین‌تر شده است.",mood:"خلق ممکن است متغیر باشد.",energy:4,libido:3,partner:"حمایت و صبوری توصیه می‌شود.",pregnancy:1},{day:27,phase:"لوتئال",icon:"fa-moon",color:"var(--c-luteal)",special:"pms",description:"نزدیک به قاعدگی؛ انرژی و میل جنسی کم است.",bleeding:0,hormones:"پروژسترون نزدیک به پایین‌ترین مقدار است.",mood:"علائم پیش از قاعدگی می‌تواند شدیدتر شود.",energy:3,libido:2,partner:"حمایت و صبوری توصیه می‌شود.",pregnancy:0},{day:28,phase:"لوتئال",icon:"fa-moon",color:"var(--c-luteal)",special:"pms",description:"آمادگی نهایی برای قاعدگی؛ انرژی پایین است.",bleeding:0,hormones:"پروژسترون بسیار پایین است.",mood:"حساسیت و تحریک‌پذیری ممکن است زیاد باشد.",energy:3,libido:2,partner:"حمایت و صبوری توصیه می‌شود.",pregnancy:0},{day:29,phase:"لوتئال",icon:"fa-moon",color:"var(--c-luteal)",special:"pms",description:"انرژی پایین و آمادگی کامل برای شروع قاعدگی.",bleeding:0,hormones:"پروژسترون پایین.",mood:"علائم جسمی و خلقی می‌تواند اوج بگیرد.",energy:2,libido:1,partner:"حمایت و صبوری توصیه می‌شود.",pregnancy:0},{day:30,phase:"لوتئال",icon:"fa-moon",color:"var(--c-luteal)",special:"pms",description:"پایان فاز لوتئال؛ انرژی و میل جنسی پایین‌ترین مقدار.",bleeding:0,hormones:"پروژسترون به حداقل رسیده است.",mood:"حساسیت و تحریک‌پذیری زیاد است.",energy:2,libido:1,partner:"حمایت و صبوری توصیه می‌شود.",pregnancy:0},{day:31,phase:"لوتئال",icon:"fa-moon",color:"var(--c-luteal)",special:"pms",description:"روز پایانی؛ بدن آماده شروع دوباره قاعدگی می‌شود.",bleeding:0,hormones:"پروژسترون و استروژن هر دو پایین هستند.",mood:"حساسیت و نوسانات خلقی زیاد است.",energy:1,libido:1,partner:"حمایت و صبوری توصیه می‌شود.",pregnancy:0}]; function getDayData(d,t){const a=4,e=Math.max(10,t-14);let o;if(d<=a)o={...cycleData[d]};else if(d<e){const t=Math.round(5+(d-5)/(e-5-1)*11);o={...cycleData[Math.min(16,t)]}}else if(d===e)o={...cycleData[17]};else{const a=Math.round(18+(d-e-1)/(t-e-1)*13);o={...cycleData[Math.min(31,a)]}}return t-d<=7&&d>e&&(o.special="pms"),o} function toJalali(a,e,t){const n=[0,31,59,90,120,151,181,212,243,273,304,334],o=e>2?a+1:a;let r=355666+365*a+Math.floor((o+3)/4)-Math.floor((o+99)/100)+Math.floor((o+399)/400)+t+n[e-1];let i=-1595+33*Math.floor(r/12053);r%=12053,i+=4*Math.floor(r/1461),r%=1461,r>365&&(i+=Math.floor((r-1)/365),r=(r-1)%365);const l=r<186?1+Math.floor(r/31):7+Math.floor((r-186)/30),s=1+(r<186?r%31:(r-186)%30);return{jy:i,jm:l,jd:s}}function getJalaliMonthLength(a,e){return e<=6?31:e<=11?30:((a-474)%2820+512)*682%2816<682?30:29}function createDatePickerModal(){const a=`<div id="datePickerModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><button id="closeModal" class="btn btn-close">انصراف</button><button id="confirmDate" class="btn btn-confirm">تایید</button></div><div class="selectors-container"><div id="pdp-year" class="selector-column"></div><div id="pdp-month" class="selector-column"></div><div id="pdp-day" class="selector-column"></div></div></div></div>`;document.body.insertAdjacentHTML("beforeend",a)}function initializePersianDatePicker(a){createDatePickerModal();const e=toJalali(new Date().getFullYear(),new Date().getMonth()+1,new Date().getDate()),t=document.getElementById("datePickerModal"),n=()=>t.classList.add("visible"),o=()=>t.classList.remove("visible");function r(){const e=a=>{document.getElementById(a).addEventListener("click",n)};e("lastPeriodDate"),e("settingsPeriodDate"),document.getElementById("closeModal").addEventListener("click",o),t.addEventListener("click",a=>{a.target===t&&o()}),document.getElementById("confirmDate").addEventListener("click",()=>{const t=parseInt(i.getValue()),n=parseInt(l.getValue()),r=parseInt(s.getValue()),d=a=>(a<10?"0":"")+a,c=document.getElementById(a),g=document.getElementById("settingsPeriodDate");c&&(c.value=`${t}/${d(n)}/${d(r)}`,c.dataset.jalaliDate=`${t}-${n}-${r}`),g&&(g.value=`${t}/${d(n)}/${d(r)}`,g.dataset.jalaliDate=`${t}-${n}-${r}`),o()})}class d{constructor(a){this.el=document.querySelector(a.el),this.source=a.source,this.itemHeight=44,this.middleIndex=2,this.onChange=a.onChange||function(){},this._init(a.selectedIndex||0)}_init(a){this.el.innerHTML=`<ul class="selector-list">${this.source.map(a=>`<li class="selector-item">${a.text}</li>`).join("")}</ul><div class="selector-highlight"></div>`,this.list=this.el.querySelector("ul"),this.items=this.el.querySelectorAll("li"),this.select(a,!1),this._attachEvents()}_attachEvents(){let a=0,e=0,t=!1;const n=(n=>{n.stopPropagation(),a=n.touches?n.touches[0].clientY:n.clientY,e=parseFloat(this.list.style.transform.replace("translateY(",""))||0,this.list.style.transition="none",t=!0}),o=(n=>{if(!t)return;n.preventDefault();let o=(n.touches?n.touches[0].clientY:n.clientY)-a;this.list.style.transform=`translateY(${e+o}px)`}),r=(()=>{t&&(t=!1,this._snap())});this.el.addEventListener("mousedown",n),document.addEventListener("mousemove",o),document.addEventListener("mouseup",r),this.el.addEventListener("touchstart",n,{passive:!1}),this.el.addEventListener("touchmove",o,{passive:!1}),this.el.addEventListener("touchend",r)}_snap(){let a=parseFloat(this.list.style.transform.replace("translateY(",""))||0,e=Math.round((a-this.middleIndex*this.itemHeight)/-this.itemHeight);this.select(e)}select(a,e=!0){a=Math.max(0,Math.min(a,this.source.length-1));const t=this.selectedIndex!==a;this.selectedIndex=a,this.list.style.transition="transform 0.2s ease-out",this.list.style.transform=`translateY(${(this.middleIndex-this.selectedIndex)*this.itemHeight}px)`,this.items.forEach((e,t)=>{e.classList.toggle("selected",t===a)}),t&&e&&this.onChange()}updateSource(a){this.source=a,this.list.innerHTML=this.source.map(a=>`<li class="selector-item">${a.text}</li>`).join(""),this.items=this.el.querySelectorAll("li");const e=Math.min(this.selectedIndex,this.source.length-1);this.select(e,!1)}getValue(){return this.source[this.selectedIndex].value}}const c=(a,e)=>Array.from({length:e-a+1},(_,t)=>({value:a+t,text:a+t})),g=(a,e)=>c(1,getJalaliMonthLength(a,e)),p=()=>[{value:1,text:"فروردین"},{value:2,text:"اردیبهشت"},{value:3,text:"خرداد"},{value:4,text:"تیر"},{value:5,text:"مرداد"},{value:6,text:"شهریور"},{value:7,text:"مهر"},{value:8,text:"آبان"},{value:9,text:"آذر"},{value:10,text:"دی"},{value:11,text:"بهمن"},{value:12,text:"اسفند"}],u=()=>{const a=parseInt(i.getValue()),e=parseInt(l.getValue());s.updateSource(g(a,e))};let i=new d({el:"#pdp-year",source:c(1390,e.jy+1),selectedIndex:e.jy-1390,onChange:u}),l=new d({el:"#pdp-month",source:p(),selectedIndex:e.jm-1,onChange:u}),s=new d({el:"#pdp-day",source:g(e.jy,e.jm),selectedIndex:e.jd-1});r()}
-            initializePersianDatePicker("lastPeriodDate");
+        const appState = { startDate: null, cycleLength: 28, currentDisplayDate: new Date() };
+        
+        const toPersian = str => str.toString().replace(/[0-9]/g, w => '۰۱۲۳۴۵۶۷۸۹'[w]);
+        const jalaliToDate = str => { const [y, m, d] = str.split('-').map(Number); const g = y + 621; return new Date(Date.UTC(g, m + 1, d + 20)); };
+        const dateDiff = (a, b) => Math.floor((b - a) / (1000 * 60 * 60 * 24));
+        const getQualitativeText = (val) => { if (val >= 8) return 'بالا'; if (val >= 4) return 'متوسط'; if (val > 0) return 'کم'; return '—'; };
+        
+        const renderUI = () => {
+            if (!appState.startDate) return;
+            const dayDiff = dateDiff(appState.startDate, appState.currentDisplayDate);
+            if (dayDiff < 0) return;
+            const dayOfCycle = (dayDiff % appState.cycleLength) + 1;
+            const data = getDayData(dayOfCycle, appState.cycleLength);
             
-            const dom = {
-                html: document.documentElement, setupView: document.getElementById('setupView'), trackerView: document.getElementById('trackerView'),
-                startTrackingBtn: document.getElementById('startTrackingBtn'), openSettingsBtn: document.getElementById('openSettingsBtn'),
-                settingsOverlay: document.getElementById('settingsOverlay'), settingsPanel: document.getElementById('settingsPanel'),
-                saveSettingsBtn: document.getElementById('saveSettingsBtn'), cancelSettingsBtn: document.getElementById('cancelSettingsBtn'),
-                themeToggle: document.getElementById('themeToggle'), lastPeriodDateInput: document.getElementById('lastPeriodDate'),
-                cycleLengthInput: document.getElementById('cycleLength'), settingsPeriodDateInput: document.getElementById('settingsPeriodDate'),
-                settingsCycleLengthInput: document.getElementById('settingsCycleLength'), progressCircleFg: document.getElementById('progress-circle-fg'),
-                progressDayNumber: document.getElementById('progressDayNumber'), phaseIcon: document.getElementById('phaseIcon'),
-                cyclePhaseTitle: document.getElementById('cyclePhaseTitle'), detailsGrid: document.getElementById('detailsGrid'),
-                prevDayBtn: document.getElementById('prevDayBtn'), nextDayBtn: document.getElementById('nextDayBtn'), todayBtn: document.getElementById('todayBtn'),
-                specialDayBanner: document.getElementById('specialDayBanner'), displayedJalaliDate: document.getElementById('displayedJalaliDate'),
-                periodAlertCard: document.getElementById('periodAlertCard'),
-                aboutBtn: document.getElementById('aboutBtn'), aboutOverlay: document.getElementById('aboutOverlay'),
-                aboutPanel: document.getElementById('aboutPanel'), closeAboutBtn: document.getElementById('closeAboutBtn'),
-            };
+            let phaseColor = data.color, phaseIcon = data.icon, bannerHTML = '', bannerClass = '';
+            
+            dom.html.style.setProperty('--phase-theme-color', data.color);
 
-            const appState = { startDate: null, cycleLength: 28, currentDisplayDate: new Date() };
+            // Handle Banners (PMS, Ovulation)
+            dom.specialDayBanner.style.display = 'none'; // Reset banner
+            if (data.special === 'ovulation') { 
+                bannerClass = 'ovulation'; 
+                bannerHTML = `<i class="fa-solid fa-star"></i> روز تخمک‌گذاری! شانس باروری در اوج است.`; 
+                dom.specialDayBanner.innerHTML = bannerHTML;
+                dom.specialDayBanner.className = `special-banner ${bannerClass}`;
+                dom.specialDayBanner.style.display = 'flex';
+            } else if (data.special === 'pms') { 
+                bannerClass = 'pms'; 
+                bannerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> احتمال علائم PMS. مراقب خود باشید.`; 
+                phaseColor = 'var(--c-pms)'; 
+                phaseIcon = 'fa-cloud-bolt';
+                dom.html.style.setProperty('--phase-theme-color', phaseColor);
+                dom.specialDayBanner.innerHTML = bannerHTML;
+                dom.specialDayBanner.className = `special-banner ${bannerClass}`;
+                dom.specialDayBanner.style.display = 'flex';
+            }
             
-            const toPersian = str => str.toString().replace(/[0-9]/g, w => '۰۱۲۳۴۵۶۷۸۹'[w]);
-            const jalaliToDate = str => { const [y, m, d] = str.split('-').map(Number); const g = y + 621; return new Date(Date.UTC(g, m + 1, d + 20)); };
-            const dateDiff = (a, b) => Math.floor((b - a) / (1000 * 60 * 60 * 24));
-            const getQualitativeText = (val) => { if (val >= 8) return 'بالا'; if (val >= 4) return 'متوسط'; if (val > 0) return 'کم'; return '—'; };
-            
-            const renderUI = () => {
-                if (!appState.startDate) return;
-                const dayDiff = dateDiff(appState.startDate, appState.currentDisplayDate);
-                if (dayDiff < 0) return;
-                const dayOfCycle = (dayDiff % appState.cycleLength) + 1;
-                const data = getDayData(dayOfCycle, appState.cycleLength);
-                
-                let phaseColor = data.color, phaseIcon = data.icon, bannerHTML = '', bannerClass = '';
-                
-                dom.html.style.setProperty('--phase-theme-color', data.color);
-
-                // Handle Banners (PMS, Ovulation)
-                dom.specialDayBanner.style.display = 'none'; // Reset banner
-                if (data.special === 'ovulation') { 
-                    bannerClass = 'ovulation'; 
-                    bannerHTML = `<i class="fa-solid fa-star"></i> روز تخمک‌گذاری! شانس باروری در اوج است.`; 
-                    dom.specialDayBanner.innerHTML = bannerHTML;
-                    dom.specialDayBanner.className = `special-banner ${bannerClass}`;
-                    dom.specialDayBanner.style.display = 'flex';
-                } else if (data.special === 'pms') { 
-                    bannerClass = 'pms'; 
-                    bannerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> احتمال علائم PMS. مراقب خود باشید.`; 
-                    phaseColor = 'var(--c-pms)'; 
-                    phaseIcon = 'fa-cloud-bolt';
-                    dom.html.style.setProperty('--phase-theme-color', phaseColor);
-                    dom.specialDayBanner.innerHTML = bannerHTML;
-                    dom.specialDayBanner.className = `special-banner ${bannerClass}`;
-                    dom.specialDayBanner.style.display = 'flex';
+            // Handle Period Alert Card
+            const daysRemaining = appState.cycleLength - dayOfCycle;
+            if (daysRemaining >= 0 && daysRemaining <= 2) {
+                let alertText = `پریود شما تا <b>${toPersian(daysRemaining + 1)} روز دیگر</b> شروع می‌شود.`;
+                if (daysRemaining === 0) {
+                    alertText = "پریود شما احتمالاً از <b>فردا</b> شروع می‌شود.";
                 }
-                
-                // Handle Period Alert Card
-                const daysRemaining = appState.cycleLength - dayOfCycle;
-                if (daysRemaining >= 0 && daysRemaining <= 2) {
-                    let alertText = `پریود شما تا <b>${toPersian(daysRemaining + 1)} روز دیگر</b> شروع می‌شود.`;
-                    if (daysRemaining === 0) {
-                        alertText = "پریود شما احتمالاً از <b>فردا</b> شروع می‌شود.";
-                    }
-                    dom.periodAlertCard.innerHTML = `<i class="fa-solid fa-bell"></i>${alertText}`;
-                    dom.periodAlertCard.style.display = 'flex';
-                } else {
-                    dom.periodAlertCard.style.display = 'none';
-                }
-
-                // Main UI Update
-                dom.progressCircleFg.style.stroke = phaseColor;
-                const r = 45, circ = 2 * Math.PI * r;
-                dom.progressCircleFg.style.strokeDasharray = circ;
-                dom.progressCircleFg.style.strokeDashoffset = circ - (dayOfCycle / appState.cycleLength) * circ;
-
-                dom.progressDayNumber.textContent = toPersian(dayOfCycle);
-                dom.phaseIcon.className = `fa-solid ${phaseIcon}`;
-                dom.phaseIcon.style.color = phaseColor;
-                dom.cyclePhaseTitle.textContent = data.phase;
-                
-                const jDate = toJalali(appState.currentDisplayDate.getFullYear(), appState.currentDisplayDate.getMonth() + 1, appState.currentDisplayDate.getDate());
-                dom.displayedJalaliDate.textContent = toPersian(`${jDate.jy}/${String(jDate.jm).padStart(2,'0')}/${String(jDate.jd).padStart(2,'0')}`);
-
-                const renderStat = (label, value) => `<div class="stat-item"><div class="stat-label"><span>${label}</span><span class="qualitative-text">${getQualitativeText(value)}</span></div><div class="progress-bar-container"><div class="progress-bar" style="width: ${value * 10}%"></div></div></div>`;
-                dom.detailsGrid.innerHTML = `
-                    <div class="card-base"><div class="detail-card-header"><i class="detail-card-icon fa-solid fa-book-open"></i><h3 class="detail-card-title">توضیحات روز</h3></div><div class="detail-card-content"><p>${data.description}</p></div></div>
-                    <div class="card-base"><div class="detail-card-header"><i class="detail-card-icon fa-solid fa-face-grin-beam"></i><h3 class="detail-card-title">وضعیت احساسی</h3></div><div class="detail-card-content"><p>${data.mood}</p></div></div>
-                    <div class="card-base"><div class="detail-card-header"><i class="detail-card-icon fa-solid fa-heart-pulse"></i><h3 class="detail-card-title">وضعیت فیزیکی</h3></div><div class="detail-card-content"><div class="stats-grid">${renderStat('سطح انرژی', data.energy)}${renderStat('میل جنسی', data.libido)}${renderStat('خونریزی', data.bleeding)}${renderStat('احتمال باروری', data.pregnancy)}</div></div></div>
-                    <div class="card-base"><div class="detail-card-header"><i class="detail-card-icon fa-solid fa-hand-holding-heart"></i><h3 class="detail-card-title">راهنمایی</h3></div><div class="detail-card-content"><p><b>تغییرات هورمونی:</b> ${data.hormones}<br><b>توصیه به شریک:</b> ${data.partner}</p></div></div>
-                `;
-            };
-            
-            const showTracker = settings => {
-                appState.startDate = jalaliToDate(settings.startDate);
-                appState.cycleLength = settings.cycleLength;
-                appState.currentDisplayDate = new Date();
-                dom.setupView.style.display = 'none';
-                dom.trackerView.style.display = 'flex';
-                renderUI();
-            };
-
-            const saveSettings = () => {
-                const settings = {
-                    startDate: dom.settingsPeriodDateInput.dataset.jalaliDate,
-                    cycleLength: parseInt(dom.settingsCycleLengthInput.value, 10),
-                };
-                localStorage.setItem('lunaAppSettings', JSON.stringify(settings));
-                return settings;
-            };
-            
-            const togglePanel = (overlay, panel, show) => {
-                overlay.classList.toggle('active', show);
-                panel.classList.toggle('active', show);
-            };
-
-            const toggleSettingsPanel = show => {
-                if (show) {
-                    const settings = JSON.parse(localStorage.getItem('lunaAppSettings'));
-                    if (settings) {
-                        const [y, m, d] = settings.startDate.split('-');
-                        dom.settingsPeriodDateInput.value = toPersian(`${y}/${m.padStart(2,'0')}/${d.padStart(2,'0')}`);
-                        dom.settingsPeriodDateInput.dataset.jalaliDate = settings.startDate;
-                        dom.settingsCycleLengthInput.value = settings.cycleLength;
-                    }
-                }
-                togglePanel(dom.settingsOverlay, dom.settingsPanel, show);
-            };
-            
-            const setTheme = theme => {
-                dom.themeToggle.checked = theme === 'dark';
-                dom.html.classList.toggle('dark-mode', theme === 'dark');
-                localStorage.setItem('lunaTheme', theme);
-            };
-            
-            // --- Event Listeners ---
-            dom.themeToggle.addEventListener('change', () => setTheme(dom.themeToggle.checked ? 'dark' : 'light'));
-            
-            dom.openSettingsBtn.addEventListener('click', () => toggleSettingsPanel(true));
-            dom.cancelSettingsBtn.addEventListener('click', () => toggleSettingsPanel(false));
-            dom.settingsOverlay.addEventListener('click', () => toggleSettingsPanel(false));
-            
-            dom.aboutBtn.addEventListener('click', () => togglePanel(dom.aboutOverlay, dom.aboutPanel, true));
-            dom.closeAboutBtn.addEventListener('click', () => togglePanel(dom.aboutOverlay, dom.aboutPanel, false));
-            dom.aboutOverlay.addEventListener('click', () => togglePanel(dom.aboutOverlay, dom.aboutPanel, false));
-
-            dom.saveSettingsBtn.addEventListener('click', () => {
-                if (!dom.settingsPeriodDateInput.dataset.jalaliDate) { alert('لطفا تاریخ را انتخاب کنید.'); return; }
-                const newSettings = saveSettings();
-                showTracker(newSettings);
-                toggleSettingsPanel(false);
-            });
-
-            dom.startTrackingBtn.addEventListener('click', () => {
-                const date = dom.lastPeriodDateInput.dataset.jalaliDate;
-                const length = parseInt(dom.cycleLengthInput.value, 10);
-                if (!date) { alert('لطفا تاریخ را انتخاب کنید.'); return; }
-                localStorage.setItem('lunaAppSettings', JSON.stringify({ startDate: date, cycleLength: length }));
-                showTracker({ startDate: date, cycleLength: length });
-            });
-
-            dom.prevDayBtn.addEventListener('click', () => { appState.currentDisplayDate.setDate(appState.currentDisplayDate.getDate() - 1); renderUI(); });
-            dom.nextDayBtn.addEventListener('click', () => { appState.currentDisplayDate.setDate(appState.currentDisplayDate.getDate() + 1); renderUI(); });
-            dom.todayBtn.addEventListener('click', () => { appState.currentDisplayDate = new Date(); renderUI(); });
-            
-            // --- Initial Load ---
-            const savedTheme = localStorage.getItem('lunaTheme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            setTheme(savedTheme);
-
-            const savedSettings = JSON.parse(localStorage.getItem('lunaAppSettings'));
-            if (savedSettings && savedSettings.startDate) {
-                showTracker(savedSettings);
+                dom.periodAlertCard.innerHTML = `<i class="fa-solid fa-bell"></i>${alertText}`;
+                dom.periodAlertCard.style.display = 'flex';
             } else {
-                dom.trackerView.style.display = 'none';
-                dom.setupView.style.display = 'block';
+                dom.periodAlertCard.style.display = 'none';
             }
+
+            // Main UI Update
+            dom.progressCircleFg.style.stroke = phaseColor;
+            const r = 45, circ = 2 * Math.PI * r;
+            dom.progressCircleFg.style.strokeDasharray = circ;
+            dom.progressCircleFg.style.strokeDashoffset = circ - (dayOfCycle / appState.cycleLength) * circ;
+
+            dom.progressDayNumber.textContent = toPersian(dayOfCycle);
+            dom.phaseIcon.className = `fa-solid ${phaseIcon}`;
+            dom.phaseIcon.style.color = phaseColor;
+            dom.cyclePhaseTitle.textContent = data.phase;
             
-            // --- PWA Service Worker Registration ---
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('service-worker.js').then(registration => {
-                        console.log('ServiceWorker registration successful');
-                    }, err => {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
-                });
+            const jDate = toJalali(appState.currentDisplayDate.getFullYear(), appState.currentDisplayDate.getMonth() + 1, appState.currentDisplayDate.getDate());
+            dom.displayedJalaliDate.textContent = toPersian(`${jDate.jy}/${String(jDate.jm).padStart(2,'0')}/${String(jDate.jd).padStart(2,'0')}`);
+
+            const renderStat = (label, value) => `<div class="stat-item"><div class="stat-label"><span>${label}</span><span class="qualitative-text">${getQualitativeText(value)}</span></div><div class="progress-bar-container"><div class="progress-bar" style="width: ${value * 10}%"></div></div></div>`;
+            dom.detailsGrid.innerHTML = `
+                <div class="card-base"><div class="detail-card-header"><i class="detail-card-icon fa-solid fa-book-open"></i><h3 class="detail-card-title">توضیحات روز</h3></div><div class="detail-card-content"><p>${data.description}</p></div></div>
+                <div class="card-base"><div class="detail-card-header"><i class="detail-card-icon fa-solid fa-face-grin-beam"></i><h3 class="detail-card-title">وضعیت احساسی</h3></div><div class="detail-card-content"><p>${data.mood}</p></div></div>
+                <div class="card-base"><div class="detail-card-header"><i class="detail-card-icon fa-solid fa-heart-pulse"></i><h3 class="detail-card-title">وضعیت فیزیکی</h3></div><div class="detail-card-content"><div class="stats-grid">${renderStat('سطح انرژی', data.energy)}${renderStat('میل جنسی', data.libido)}${renderStat('خونریزی', data.bleeding)}${renderStat('احتمال باروری', data.pregnancy)}</div></div></div>
+                <div class="card-base"><div class="detail-card-header"><i class="detail-card-icon fa-solid fa-hand-holding-heart"></i><h3 class="detail-card-title">راهنمایی</h3></div><div class="detail-card-content"><p><b>تغییرات هورمونی:</b> ${data.hormones}<br><b>توصیه به شریک:</b> ${data.partner}</p></div></div>
+            `;
+        };
+        
+        const showTracker = settings => {
+            appState.startDate = jalaliToDate(settings.startDate);
+            appState.cycleLength = settings.cycleLength;
+            appState.currentDisplayDate = new Date();
+            dom.setupView.style.display = 'none';
+            dom.trackerView.style.display = 'flex';
+            renderUI();
+        };
+
+        const saveSettings = () => {
+            const settings = {
+                startDate: dom.settingsPeriodDateInput.dataset.jalaliDate,
+                cycleLength: parseInt(dom.settingsCycleLengthInput.value, 10),
+            };
+            localStorage.setItem('lunaAppSettings', JSON.stringify(settings));
+            return settings;
+        };
+        
+        const togglePanel = (overlay, panel, show) => {
+            overlay.classList.toggle('active', show);
+            panel.classList.toggle('active', show);
+        };
+
+        const toggleSettingsPanel = show => {
+            if (show) {
+                const settings = JSON.parse(localStorage.getItem('lunaAppSettings'));
+                if (settings) {
+                    const [y, m, d] = settings.startDate.split('-');
+                    dom.settingsPeriodDateInput.value = toPersian(`${y}/${m.padStart(2,'0')}/${d.padStart(2,'0')}`);
+                    dom.settingsPeriodDateInput.dataset.jalaliDate = settings.startDate;
+                    dom.settingsCycleLengthInput.value = settings.cycleLength;
+                }
             }
+            togglePanel(dom.settingsOverlay, dom.settingsPanel, show);
+        };
+        
+        const setTheme = theme => {
+            dom.themeToggle.checked = theme === 'dark';
+            dom.html.classList.toggle('dark-mode', theme === 'dark');
+            localStorage.setItem('lunaTheme', theme);
+        };
+        
+        // --- Event Listeners ---
+        dom.themeToggle.addEventListener('change', () => setTheme(dom.themeToggle.checked ? 'dark' : 'light'));
+        
+        dom.openSettingsBtn.addEventListener('click', () => toggleSettingsPanel(true));
+        dom.cancelSettingsBtn.addEventListener('click', () => toggleSettingsPanel(false));
+        dom.settingsOverlay.addEventListener('click', () => toggleSettingsPanel(false));
+        
+        dom.aboutBtn.addEventListener('click', () => togglePanel(dom.aboutOverlay, dom.aboutPanel, true));
+        dom.closeAboutBtn.addEventListener('click', () => togglePanel(dom.aboutOverlay, dom.aboutPanel, false));
+        dom.aboutOverlay.addEventListener('click', () => togglePanel(dom.aboutOverlay, dom.aboutPanel, false));
+
+        dom.saveSettingsBtn.addEventListener('click', () => {
+            if (!dom.settingsPeriodDateInput.dataset.jalaliDate) { alert('لطفا تاریخ را انتخاب کنید.'); return; }
+            const newSettings = saveSettings();
+            showTracker(newSettings);
+            toggleSettingsPanel(false);
         });
+
+        dom.startTrackingBtn.addEventListener('click', () => {
+            const date = dom.lastPeriodDateInput.dataset.jalaliDate;
+            const length = parseInt(dom.cycleLengthInput.value, 10);
+            if (!date) { alert('لطفا تاریخ را انتخاب کنید.'); return; }
+            localStorage.setItem('lunaAppSettings', JSON.stringify({ startDate: date, cycleLength: length }));
+            showTracker({ startDate: date, cycleLength: length });
+        });
+
+        dom.prevDayBtn.addEventListener('click', () => { appState.currentDisplayDate.setDate(appState.currentDisplayDate.getDate() - 1); renderUI(); });
+        dom.nextDayBtn.addEventListener('click', () => { appState.currentDisplayDate.setDate(appState.currentDisplayDate.getDate() + 1); renderUI(); });
+        dom.todayBtn.addEventListener('click', () => { appState.currentDisplayDate = new Date(); renderUI(); });
+        
+        // --- Initial Load ---
+        const savedTheme = localStorage.getItem('lunaTheme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        setTheme(savedTheme);
+
+        const savedSettings = JSON.parse(localStorage.getItem('lunaAppSettings'));
+        if (savedSettings && savedSettings.startDate) {
+            showTracker(savedSettings);
+        } else {
+            dom.trackerView.style.display = 'none';
+            dom.setupView.style.display = 'block';
+        }
+        
+        // --- PWA Service Worker Registration ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js').then(registration => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    });
     </script>
 </body>
 </html>
