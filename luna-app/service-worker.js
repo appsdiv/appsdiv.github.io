@@ -6,7 +6,7 @@ const urlsToCache = [
   'manifest.json',
   'https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.min.css',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css',
-  'https://i.ibb.co/Qvppy5y/luna-app.png',
+  'https://i.postimg.cc/WbCF8vNk/luna-app.png',
   'https://i.postimg.cc/WbCF8vNk/luna-app.png'
 ];
 
