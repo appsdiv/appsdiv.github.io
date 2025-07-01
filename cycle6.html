@@ -19,6 +19,9 @@
             
             /* Phase & Special Colors */
             --c-menstrual: #e57373; --c-follicular: #81c784; --c-ovulation: #64b5f6; --c-luteal: #ffb74d; --c-pms: #d178e2;
+
+            /* Dynamic Phase Theme Color */
+            --phase-theme-color: #e91e63;
         }
 
         html {
@@ -35,7 +38,7 @@
 
         .app-container { max-width: 480px; margin: 0 auto; padding: 15px; min-height: 100vh; }
         .app-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 10px; }
-        .app-title { font-size: 1.5rem; font-weight: 800; }
+        .app-title { font-size: 1.5rem; font-weight: 800; color: var(--phase-theme-color); transition: color 0.5s var(--ease-out-quart); }
         .header-actions { display: flex; align-items: center; gap: 20px; }
         .theme-switch { position: relative; display: inline-block; width: 50px; height: 28px; }
         .theme-switch input { opacity: 0; width: 0; height: 0; }
@@ -43,7 +46,8 @@
         .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--c-ovulation); }
         input:checked + .slider:before { transform: translateX(22px); }
-        .settings-btn { background: none; border: none; font-size: 1.5rem; color: var(--text-subtle); cursor: pointer; }
+        .settings-btn { background: none; border: none; font-size: 1.5rem; color: var(--phase-theme-color); cursor: pointer; opacity: 0.8; transition: opacity 0.2s, color 0.5s var(--ease-out-quart); }
+        .settings-btn:hover { opacity: 1; }
 
         .card-base { background: var(--card-bg); padding: 25px; border-radius: 24px; box-shadow: var(--shadow); transition: background-color 0.4s; }
         .main-btn { width: 100%; padding: 18px; font-size: 1.1rem; font-weight: 700; color: white; border: none; border-radius: 16px; cursor: pointer; transition: all 0.2s ease; font-family: var(--font-family); }
@@ -87,17 +91,17 @@
 
         .details-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
         .detail-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
-        .detail-card-icon { font-size: 1rem; width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background-color: #fce4ec; color: #ad1457; }
-        .detail-card-title { font-size: 1.1rem; font-weight: 600; margin: 0; }
+        .detail-card-icon { font-size: 1rem; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; color: var(--phase-theme-color); background-color: var(--bg-main); border: 1px solid var(--border-color); transition: color 0.5s, background-color 0.4s, border-color 0.4s; }
+        .detail-card-title { font-size: 1.1rem; font-weight: 600; margin: 0; color: var(--phase-theme-color); transition: color 0.5s var(--ease-out-quart); }
         .detail-card-content p { margin: 0; color: var(--text-subtle); line-height: 1.7; }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-top: 15px; }
         .stat-item .progress-bar-container { width: 100%; height: 8px; background-color: var(--border-color); border-radius: 4px; overflow: hidden; margin-top: 8px; }
         .stat-item .progress-bar { height: 100%; background: var(--text-subtle); border-radius: 4px; transition: width 0.5s ease-out; }
         .stat-item .stat-label { display: flex; justify-content: space-between; align-items: center; font-weight: 500; }
         .stat-item .qualitative-text { font-size: 0.85rem; color: var(--text-subtle); font-weight: 400; }
 
-        /* Settings & Date Picker */
+        /* Settings, About & Date Picker Modals */
         .settings-overlay { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transition: opacity 0.3s ease; z-index: 999; }
         .settings-overlay.active { opacity: 1; visibility: visible; }
         .settings-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-main); padding: 20px; border-radius: 28px 28px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.15); transform: translateY(100%); transition: transform 0.4s var(--ease-out-quart), background-color 0.4s; z-index: 1000; }
@@ -106,8 +110,11 @@
         .settings-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;}
         #cancelSettingsBtn { background-color: var(--border-color); color: var(--text-main);}
         #saveSettingsBtn { background-color: #e91e63; color: white;}
+        #closeAboutBtn { background-color: var(--phase-theme-color); transition: background-color 0.5s var(--ease-out-quart); }
+
         .modal-overlay{position:fixed;inset:0;background-color:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s;z-index:1001}.modal-overlay.visible{opacity:1;visibility:visible}.modal-content{background-color:var(--card-bg);color: var(--text-main); border: 1px solid var(--border-color); border-radius:16px 16px 0 0;width:100%;max-width:480px;text-align:center;box-shadow:0 -5px 25px rgba(0,0,0,.1);transform:translateY(100%);transition:transform .3s ease-out, background-color 0.4s, color 0.4s}.modal-overlay.visible .modal-content{transform:translateY(0)}.modal-header{padding:12px 20px;border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center}.selectors-container{display:flex;justify-content:center;gap:0;padding:20px;direction:ltr}.selector-column{flex:1;height:220px;overflow:hidden;position:relative}.selector-list{position:absolute;width:100%;list-style:none;padding:0;margin:0}.selector-item{font-size:1.25rem;line-height:44px;height:44px;color:var(--text-subtle);user-select:none;transition:color .3s,font-weight .3s}.selector-item.selected{color:var(--text-main);font-weight:600}.selector-highlight{position:absolute;top:50%;left:10px;right:10px;height:44px;transform:translateY(-50%);background-color:var(--selector-highlight-bg);border-radius:8px;pointer-events:none}.btn{background:none;border:none;padding:12px 20px;cursor:pointer;font-family:var(--font-family);font-size:1rem;font-weight:500;border-radius:8px}.btn-confirm{color:#e91e63;font-weight:600}.btn-close{color:var(--text-subtle)}
 
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -116,8 +123,9 @@
         <header class="app-header">
             <h1 class="app-title">همراه دوره</h1>
             <div class="header-actions">
+                <button class="settings-btn" id="aboutBtn" title="درباره"><i class="fa-solid fa-circle-info"></i></button>
                 <label class="theme-switch"><input type="checkbox" id="themeToggle"><span class="slider"></span></label>
-                <button class="settings-btn" id="openSettingsBtn"><i class="fa-solid fa-gear"></i></button>
+                <button class="settings-btn" id="openSettingsBtn" title="تنظیمات"><i class="fa-solid fa-gear"></i></button>
             </div>
         </header>
 
@@ -161,6 +169,25 @@
         <div class="input-group"><label for="settingsCycleLength"><i class="fa-solid fa-arrows-rotate"></i> طول معمول چرخه</label><input type="number" id="settingsCycleLength" class="input-field" min="15" max="45" /></div>
         <div class="settings-buttons"><button id="cancelSettingsBtn" class="main-btn">انصراف</button><button id="saveSettingsBtn" class="main-btn">ذخیره</button></div>
     </div>
+
+    <div class="settings-overlay" id="aboutOverlay"></div>
+    <div class="settings-panel" id="aboutPanel">
+        <h2>درباره اپلیکیشن</h2>
+        <div style="text-align: right; line-height: 1.8; padding: 0 15px; color: var(--text-subtle);">
+            <p>این اپلیکیشن یک همراه هوشمند برای درک و پیگیری چرخه قاعدگی شماست. با استفاده از اطلاعاتی که وارد می‌کنید، به شما کمک می‌کند تا در هر روز از دوره، وضعیت بدن، سطح انرژی و تغییرات هورمونی خود را بهتر بشناسید.</p>
+            <p style="color: var(--text-main);"><strong>ویژگی‌ها:</strong></p>
+            <ul style="padding-right: 35px; margin-top: -10px;">
+                <li>نمایش روز و فاز فعلی چرخه</li>
+                <li>توضیحات روزانه درباره وضعیت جسمی و روحی</li>
+                <li>نمودارهای انرژی، میل جنسی و احتمال باروری</li>
+                <li>قابلیت جابجایی بین روزها و تم پویا</li>
+                <li>پشتیبانی از حالت تاریک و روشن</li>
+            </ul>
+        </div>
+        <div class="settings-buttons" style="grid-template-columns: 1fr;">
+            <button id="closeAboutBtn" class="main-btn">بستن</button>
+        </div>
+    </div>
     
     <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -180,40 +207,38 @@
             cyclePhaseTitle: document.getElementById('cyclePhaseTitle'), detailsGrid: document.getElementById('detailsGrid'),
             prevDayBtn: document.getElementById('prevDayBtn'), nextDayBtn: document.getElementById('nextDayBtn'), todayBtn: document.getElementById('todayBtn'),
             specialDayBanner: document.getElementById('specialDayBanner'), displayedJalaliDate: document.getElementById('displayedJalaliDate'),
+            aboutBtn: document.getElementById('aboutBtn'), aboutOverlay: document.getElementById('aboutOverlay'),
+            aboutPanel: document.getElementById('aboutPanel'), closeAboutBtn: document.getElementById('closeAboutBtn'),
         };
 
-        const appState = { startDate: null, cycleLength: 28, currentDisplayDate: new Date(), animationFrameId: null };
+        const appState = { startDate: null, cycleLength: 28, currentDisplayDate: new Date() };
         
         const toPersian = str => str.toString().replace(/[0-9]/g, w => '۰۱۲۳۴۵۶۷۸۹'[w]);
         const jalaliToDate = str => { const [y, m, d] = str.split('-').map(Number); const g = y + 621; return new Date(Date.UTC(g, m + 1, d + 20)); };
         const dateDiff = (a, b) => Math.floor((b - a) / (1000 * 60 * 60 * 24));
         const getQualitativeText = (val) => { if (val >= 8) return 'بالا'; if (val >= 4) return 'متوسط'; if (val > 0) return 'کم'; return '—'; };
         
-        const animateCounter = (target) => {
-            cancelAnimationFrame(appState.animationFrameId);
-            let current = parseInt(dom.progressDayNumber.textContent.replace(/[^0-9]/g, ''), 10) || 1;
-            const duration = 400;
-            const step = (timestamp) => {
-                if (!start) start = timestamp;
-                const progress = timestamp - start;
-                const value = Math.floor((progress / duration) * (target - current) + current);
-                dom.progressDayNumber.textContent = toPersian(Math.min(value, target));
-                if (progress < duration) appState.animationFrameId = requestAnimationFrame(step);
-            };
-            let start = null;
-            appState.animationFrameId = requestAnimationFrame(step);
-        };
-
         const renderUI = () => {
             if (!appState.startDate) return;
             const dayDiff = dateDiff(appState.startDate, appState.currentDisplayDate);
             if (dayDiff < 0) return;
             const dayOfCycle = (dayDiff % appState.cycleLength) + 1;
             const data = getDayData(dayOfCycle, appState.cycleLength);
-
+            
             let phaseColor = data.color, phaseIcon = data.icon, bannerHTML = '', bannerClass = '';
-            if (data.special === 'ovulation') { bannerClass = 'ovulation'; bannerHTML = `<i class="fa-solid fa-star"></i> روز تخمک‌گذاری! شانس باروری در اوج است.`; }
-            else if (data.special === 'pms') { bannerClass = 'pms'; bannerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> احتمال علائم PMS. مراقب خود باشید.`; phaseColor = 'var(--c-pms)'; phaseIcon = 'fa-cloud-bolt'; }
+            
+            dom.html.style.setProperty('--phase-theme-color', data.color);
+
+            if (data.special === 'ovulation') { 
+                bannerClass = 'ovulation'; 
+                bannerHTML = `<i class="fa-solid fa-star"></i> روز تخمک‌گذاری! شانس باروری در اوج است.`; 
+            } else if (data.special === 'pms') { 
+                bannerClass = 'pms'; 
+                bannerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> احتمال علائم PMS. مراقب خود باشید.`; 
+                phaseColor = 'var(--c-pms)'; 
+                phaseIcon = 'fa-cloud-bolt';
+                dom.html.style.setProperty('--phase-theme-color', phaseColor);
+            }
             
             dom.specialDayBanner.innerHTML = bannerHTML;
             dom.specialDayBanner.className = `special-banner ${bannerClass}`;
@@ -224,7 +249,7 @@
             dom.progressCircleFg.style.strokeDasharray = circ;
             dom.progressCircleFg.style.strokeDashoffset = circ - (dayOfCycle / appState.cycleLength) * circ;
 
-            animateCounter(dayOfCycle);
+            dom.progressDayNumber.textContent = toPersian(dayOfCycle);
             dom.phaseIcon.className = `fa-solid ${phaseIcon}`;
             dom.phaseIcon.style.color = phaseColor;
             dom.cyclePhaseTitle.textContent = data.phase;
@@ -235,7 +260,8 @@
             const renderStat = (label, value) => `<div class="stat-item"><div class="stat-label"><span>${label}</span><span class="qualitative-text">${getQualitativeText(value)}</span></div><div class="progress-bar-container"><div class="progress-bar" style="width: ${value * 10}%"></div></div></div>`;
             dom.detailsGrid.innerHTML = `
                 <div class="card-base"><div class="detail-card-header"><i class="detail-card-icon fa-solid fa-book-open"></i><h3 class="detail-card-title">توضیحات روز</h3></div><div class="detail-card-content"><p>${data.description}</p></div></div>
-                <div class="card-base"><div class="detail-card-header"><i class="detail-card-icon fa-solid fa-heart-pulse"></i><h3 class="detail-card-title">وضعیت احساسی و فیزیکی</h3></div><div class="detail-card-content"><p>${data.mood}</p><div class="stats-grid" style="margin-top: 15px;">${renderStat('سطح انرژی', data.energy)}${renderStat('میل جنسی', data.libido)}${renderStat('خونریزی', data.bleeding)}${renderStat('احتمال باروری', data.pregnancy)}</div></div></div>
+                <div class="card-base"><div class="detail-card-header"><i class="detail-card-icon fa-solid fa-face-grin-beam"></i><h3 class="detail-card-title">وضعیت احساسی</h3></div><div class="detail-card-content"><p>${data.mood}</p></div></div>
+                <div class="card-base"><div class="detail-card-header"><i class="detail-card-icon fa-solid fa-heart-pulse"></i><h3 class="detail-card-title">وضعیت فیزیکی</h3></div><div class="detail-card-content"><div class="stats-grid">${renderStat('سطح انرژی', data.energy)}${renderStat('میل جنسی', data.libido)}${renderStat('خونریزی', data.bleeding)}${renderStat('احتمال باروری', data.pregnancy)}</div></div></div>
                 <div class="card-base"><div class="detail-card-header"><i class="detail-card-icon fa-solid fa-hand-holding-heart"></i><h3 class="detail-card-title">راهنمایی</h3></div><div class="detail-card-content"><p><b>تغییرات هورمونی:</b> ${data.hormones}<br><b>توصیه به شریک:</b> ${data.partner}</p></div></div>
             `;
         };
@@ -257,6 +283,11 @@
             localStorage.setItem('periodTrackerSettings', JSON.stringify(settings));
             return settings;
         };
+        
+        const togglePanel = (overlay, panel, show) => {
+            overlay.classList.toggle('active', show);
+            panel.classList.toggle('active', show);
+        };
 
         const toggleSettingsPanel = show => {
             if (show) {
@@ -268,8 +299,7 @@
                     dom.settingsCycleLengthInput.value = settings.cycleLength;
                 }
             }
-            dom.settingsOverlay.classList.toggle('active', show);
-            dom.settingsPanel.classList.toggle('active', show);
+            togglePanel(dom.settingsOverlay, dom.settingsPanel, show);
         };
         
         const setTheme = theme => {
@@ -278,11 +308,17 @@
             localStorage.setItem('theme', theme);
         };
         
+        // --- Event Listeners ---
         dom.themeToggle.addEventListener('change', () => setTheme(dom.themeToggle.checked ? 'dark' : 'light'));
+        
         dom.openSettingsBtn.addEventListener('click', () => toggleSettingsPanel(true));
         dom.cancelSettingsBtn.addEventListener('click', () => toggleSettingsPanel(false));
         dom.settingsOverlay.addEventListener('click', () => toggleSettingsPanel(false));
         
+        dom.aboutBtn.addEventListener('click', () => togglePanel(dom.aboutOverlay, dom.aboutPanel, true));
+        dom.closeAboutBtn.addEventListener('click', () => togglePanel(dom.aboutOverlay, dom.aboutPanel, false));
+        dom.aboutOverlay.addEventListener('click', () => togglePanel(dom.aboutOverlay, dom.aboutPanel, false));
+
         dom.saveSettingsBtn.addEventListener('click', () => {
             if (!dom.settingsPeriodDateInput.dataset.jalaliDate) { alert('لطفا تاریخ را انتخاب کنید.'); return; }
             const newSettings = saveSettings();
@@ -302,7 +338,8 @@
         dom.nextDayBtn.addEventListener('click', () => { appState.currentDisplayDate.setDate(appState.currentDisplayDate.getDate() + 1); renderUI(); });
         dom.todayBtn.addEventListener('click', () => { appState.currentDisplayDate = new Date(); renderUI(); });
         
-        const savedTheme = localStorage.getItem('theme') || 'light';
+        // --- Initial Load ---
+        const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         setTheme(savedTheme);
 
         const savedSettings = JSON.parse(localStorage.getItem('periodTrackerSettings'));

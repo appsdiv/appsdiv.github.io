@@ -1,0 +1,21 @@
+{
+  "name": "لونا | Luna",
+  "short_name": "لونا",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#FEFBFB",
+  "theme_color": "#D98BAA",
+  "description": "اپلیکیشن سلامت زنان لونا، همراه هوشمند شما برای پیگیری چرخه قاعدگی.",
+  "icons": [
+    {
+      "src": "https://i.ibb.co/Qvppy5y/luna-app.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://i.ibb.co/Qvppy5y/luna-app.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
