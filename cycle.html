@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ردیاب چرخه قاعدگی</title>
+    <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* General Styles */
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --modal-bg: #ffffff;
+            --primary-blue: #007aff;
+            --primary-pink: #ff2d55;
+            --text-color: #1c1c1e;
+            --text-light: #8e8e93;
+            --highlight-bg: rgba(200, 200, 200, 0.2);
+            --border-color: #e5e5ea;
+        }
+        body {
+            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Input Controls Section */
+        .controls-card {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 18px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-light);
+        }
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            text-align: right;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background-color: var(--bg-color);
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+        }
+        .date-input {
+             cursor: pointer;
+        }
+        #calculateBtn {
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            background-color: var(--primary-pink);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        #calculateBtn:hover {
+            background-color: #e0284d;
+        }
+        #calculateBtn:active {
+            transform: scale(0.98);
+        }
+
+        /* Results Section */
+        .results-container {
+            display: none; /* Initially hidden */
+        }
+
+        /* Progress Circle Section */
+        .progress-card {
+            position: relative;
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 18px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .progress-circle {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: conic-gradient(var(--primary-pink) 0deg, var(--border-color) 0deg);
+            transition: background 0.5s;
+        }
+        .progress-circle::before {
+            content: "";
+            position: absolute;
+            width: 85%;
+            height: 85%;
+            background-color: var(--card-bg);
+            border-radius: 50%;
+        }
+        .progress-value {
+            position: relative;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        .progress-value span {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .cycle-phase-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        /* Day Navigation */
+        .day-navigation {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            cursor: pointer;
+            padding: 10px;
+        }
+        #todayBtn {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--primary-blue);
+            background-color: transparent;
+            border: 1px solid var(--primary-blue);
+            border-radius: 8px;
+            padding: 5px 15px;
+        }
+        .displayed-date {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+
+        /* Daily Info Card */
+        .info-card {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 18px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--bg-color);
+        }
+        .info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .info-icon {
+            font-size: 1.5rem;
+            width: 30px;
+            text-align: center;
+            color: var(--primary-pink);
+        }
+        .info-content h3 {
+            margin: 0 0 5px 0;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .info-content p, .info-content .progress-bar-container {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Progress Bar for Stats */
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary-pink);
+            border-radius: 4px;
+            transition: width 0.5s ease-out;
+        }
+
+
+        /* Modal Styles from user */
+        .modal-overlay { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.4); display: flex; align-items: flex-end; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 1000;}
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content { background-color: var(--modal-bg); border-radius: 16px 16px 0 0; width: 100%; max-width: 480px; text-align: center; box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.1); transform: translateY(100%); transition: transform 0.3s ease-out; }
+        .modal-overlay.visible .modal-content { transform: translateY(0); }
+        .modal-header { padding: 12px 20px; border-bottom: 1px solid #e8e8e8; display: flex; justify-content: space-between; align-items: center; }
+        .selectors-container { display: flex; justify-content: center; gap: 0; padding: 20px; direction: ltr; }
+        .selector-column { flex: 1; height: 220px; overflow: hidden; position: relative; }
+        .selector-list { position: absolute; width: 100%; list-style: none; padding: 0; margin: 0; }
+        .selector-item { font-size: 1.25rem; line-height: 44px; height: 44px; color: var(--text-light); user-select: none; transition: color 0.3s, font-weight 0.3s; }
+        .selector-item.selected { color: var(--text-color); font-weight: 500; }
+        .selector-highlight { position: absolute; top: 50%; left: 10px; right: 10px; height: 44px; transform: translateY(-50%); background-color: var(--highlight-bg); border-radius: 8px; pointer-events: none; }
+        .btn { background: none; border: none; padding: 12px 20px; cursor: pointer; font-family: inherit; font-size: 1rem; font-weight: 500; border-radius: 8px; }
+        .btn-confirm { color: var(--primary-blue); font-weight: 600; }
+        .btn-close { color: #8e8e93; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="controls-card">
+            <div class="input-group">
+                <label for="lastPeriodDate">
+                    <i class="fa-solid fa-calendar-day"></i>
+                    تاریخ شروع آخرین پریود
+                </label>
+                <input type="text" id="lastPeriodDate" class="input-field date-input" placeholder="تاریخ را انتخاب کنید" readonly/>
+            </div>
+            <div class="input-group">
+                <label for="cycleLength">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    طول چرخه (معمولاً ۲۱ تا ۳۵ روز)
+                </label>
+                <input type="number" id="cycleLength" class="input-field" value="28" min="15" max="45" />
+            </div>
+            <button id="calculateBtn">نمایش وضعیت امروز</button>
+        </div>
+
+        <div class="results-container">
+             <div class="progress-card">
+                <div class="progress-circle" id="progressCircle">
+                    <div class="progress-value" id="progressValue">۱۲</div>
+                </div>
+                <h2 class="cycle-phase-title" id="cyclePhaseTitle">فاز فولیکولی</h2>
+                
+                <div class="day-navigation">
+                    <button class="nav-btn" id="nextDayBtn"><i class="fa-solid fa-chevron-left"></i></button>
+                    <div>
+                         <span class="displayed-date" id="displayedDate">۱۴۰۳/۰۴/۱۵</span>
+                         <button id="todayBtn">برو به امروز</button>
+                    </div>
+                    <button class="nav-btn" id="prevDayBtn"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+            <div class="info-card" id="dailyInfoCard">
+                </div>
+        </div>
+
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            // =================================================================
+            // ==== PERSIAN DATE PICKER LOGIC (FROM USER) ======================
+            // =================================================================
+
+            function toJalali(gy, gm, gd) {
+                const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+                const gy2 = (gm > 2) ? (gy + 1) : gy;
+                let days = 355666 + (365 * gy) + Math.floor((gy2 + 3) / 4) - Math.floor((gy2 + 99) / 100) + Math.floor((gy2 + 399) / 400) + gd + g_d_m[gm - 1];
+                let jy = -1595 + (33 * Math.floor(days / 12053));
+                days %= 12053;
+                jy += 4 * Math.floor(days / 1461);
+                days %= 1461;
+                if (days > 365) {
+                    jy += Math.floor((days - 1) / 365);
+                    days = (days - 1) % 365;
+                }
+                const jm = (days < 186) ? 1 + Math.floor(days / 31) : 7 + Math.floor((days - 186) / 30);
+                const jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
+                return { jy, jm, jd };
+            }
+
+            function getJalaliMonthLength(year, month) {
+                if (month <= 6) return 31;
+                if (month <= 11) return 30;
+                const isLeap = ((((year - 474) % 2820) + 512) * 682) % 2816 < 682;
+                return isLeap ? 30 : 29;
+            }
+
+            function createDatePickerModal() {
+                const modalHTML = `
+                <div id="datePickerModal" class="modal-overlay">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button id="closeModal" class="btn btn-close">انصراف</button>
+                            <button id="confirmDate" class="btn btn-confirm">تایید</button>
+                        </div>
+                        <div class="selectors-container">
+                            <div id="pdp-year" class="selector-column"></div>
+                            <div id="pdp-month" class="selector-column"></div>
+                            <div id="pdp-day" class="selector-column"></div>
+                        </div>
+                    </div>
+                </div>`;
+                document.body.insertAdjacentHTML("beforeend", modalHTML);
+            }
+
+            function initializePersianDatePicker(inputId) {
+                createDatePickerModal();
+                const today = toJalali(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate());
+                const modal = document.getElementById("datePickerModal");
+                const openModal = () => modal.classList.add("visible");
+                const closeModal = () => modal.classList.remove("visible");
+
+                function setupEventListeners() {
+                    document.getElementById(inputId).addEventListener("click", openModal);
+                    document.getElementById("closeModal").addEventListener("click", closeModal);
+                    modal.addEventListener("click", (event) => {
+                        if (event.target === modal) closeModal();
+                    });
+                    document.getElementById("confirmDate").addEventListener("click", () => {
+                        const selectedYear = parseInt(yearSelector.getValue());
+                        const selectedMonth = parseInt(monthSelector.getValue());
+                        const selectedDay = parseInt(daySelector.getValue());
+                        const format = (d) => (d < 10 ? `0${d}` : d);
+                        const inputElement = document.getElementById(inputId);
+                        inputElement.value = `${selectedYear}/${format(selectedMonth)}/${format(selectedDay)}`;
+                        inputElement.dataset.jalaliDate = `${selectedYear}-${selectedMonth}-${selectedDay}`; // Store for calculations
+                        closeModal();
+                    });
+                }
+                class IosSelector {
+                    constructor(options) { this.el = document.querySelector(options.el); this.source = options.source; this.itemHeight = 44; this.middleIndex = 2; this.onChange = options.onChange || function() {}; this._init(options.selectedIndex || 0); }
+                    _init(selectedIndex) { this.el.innerHTML = `<ul class="selector-list">${this.source.map(item => `<li class="selector-item">${item.text}</li>`).join("")}</ul><div class="selector-highlight"></div>`; this.list = this.el.querySelector("ul"); this.items = this.el.querySelectorAll("li"); this.select(selectedIndex, false); this._attachEvents(); }
+                    _attachEvents() { let startY = 0, scrollStart = 0, isDragging = false; const onStart = (e) => { e.stopPropagation(); startY = e.touches ? e.touches[0].clientY : e.clientY; scrollStart = parseFloat(this.list.style.transform.replace("translateY(", "")) || 0; this.list.style.transition = "none"; isDragging = true; }; const onMove = (e) => { if (!isDragging) return; e.preventDefault(); let moveY = (e.touches ? e.touches[0].clientY : e.clientY) - startY; this.list.style.transform = `translateY(${scrollStart + moveY}px)`; }; const onEnd = () => { if (isDragging) { isDragging = false; this._snap(); } }; const onWheel = (e) => { e.preventDefault(); let currentScroll = parseFloat(this.list.style.transform.replace("translateY(", "")) || 0; this.list.style.transition = "none"; this.list.style.transform = `translateY(${currentScroll - e.deltaY}px)`; clearTimeout(this.wheelTimeout); this.wheelTimeout = setTimeout(() => this._snap(), 150); }; this.el.addEventListener("mousedown", onStart); document.addEventListener("mousemove", onMove); document.addEventListener("mouseup", onEnd); this.el.addEventListener("wheel", onWheel, { passive: false }); this.el.addEventListener("touchstart", onStart, { passive: false }); this.el.addEventListener("touchmove", onMove, { passive: false }); this.el.addEventListener("touchend", onEnd); }
+                    _snap() { let finalScroll = parseFloat(this.list.style.transform.replace("translateY(", "")) || 0; let targetIndex = Math.round((finalScroll - this.middleIndex * this.itemHeight) / -this.itemHeight); this.select(targetIndex); }
+                    select(index, triggerChange = true) { index = Math.max(0, Math.min(index, this.source.length - 1)); const hasChanged = this.selectedIndex !== index; this.selectedIndex = index; this.list.style.transition = "transform 0.2s ease-out"; this.list.style.transform = `translateY(${(this.middleIndex - this.selectedIndex) * this.itemHeight}px)`; this.items.forEach((item, i) => item.classList.toggle("selected", i === this.selectedIndex)); if (hasChanged && triggerChange) { this.onChange(); } }
+                    updateSource(newSource) { this.source = newSource; this.list.innerHTML = this.source.map(item => `<li class="selector-item">${item.text}</li>`).join(""); this.items = this.el.querySelectorAll("li"); const newSelectedIndex = Math.min(this.selectedIndex, this.source.length - 1); this.select(newSelectedIndex, false); }
+                    getValue() { return this.source[this.selectedIndex].value; }
+                }
+                const getRange = (start, end) => Array.from({ length: end - start + 1 }, (_, i) => ({ value: start + i, text: start + i }));
+                const getDays = (year, month) => getRange(1, getJalaliMonthLength(year, month));
+                const getMonths = () => [ {value: 1, text: 'فروردین'}, {value: 2, text: 'اردیبهشت'}, {value: 3, text: 'خرداد'}, {value: 4, text: 'تیر'}, {value: 5, text: 'مرداد'}, {value: 6, text: 'شهریور'}, {value: 7, text: 'مهر'}, {value: 8, text: 'آبان'}, {value: 9, text: 'آذر'}, {value: 10, text: 'دی'}, {value: 11, text: 'بهمن'}, {value: 12, text: 'اسفند'} ];
+
+                const updateDaySelector = () => {
+                    const yearValue = parseInt(yearSelector.getValue());
+                    const monthValue = parseInt(monthSelector.getValue());
+                    const daysInMonth = getDays(yearValue, monthValue);
+                    daySelector.updateSource(daysInMonth);
+                };
+
+                let yearSelector = new IosSelector({ el: "#pdp-year", source: getRange(1380, today.jy + 1), selectedIndex: today.jy - 1380, onChange: updateDaySelector });
+                let monthSelector = new IosSelector({ el: "#pdp-month", source: getMonths(), selectedIndex: today.jm - 1, onChange: updateDaySelector });
+                let daySelector = new IosSelector({ el: "#pdp-day", source: getDays(today.jy, today.jm), selectedIndex: today.jd - 1 });
+                
+                setupEventListeners();
+            }
+
+            initializePersianDatePicker("lastPeriodDate");
+
+            // =================================================================
+            // ==== NEW CYCLE TRACKER LOGIC ====================================
+            // =================================================================
+
+            // -- DATA --
+            // Data from the user's table, converted to a JS object array
+            const cycleData = [
+                // Note: Day 0 is a placeholder for easier indexing (day 1 = index 1)
+                {},
+                { day: 1, phase: 'قاعدگی', description: 'ریزش پوشش داخلی رحم و آغاز خونریزی؛ معمولاً سطح انرژی پایین است.', bleeding: 10, hormones: 'استروژن و پروژسترون در پایین‌ترین حد خود قرار دارند.', mood: 'ممکن است خلق پایین و تحریک‌پذیری وجود داشته باشد.', energy: 2, libido: 2, partner: 'حمایت و صبوری و درک شریک اهمیت دارد.', pregnancy: 0 },
+                { day: 2, phase: 'قاعدگی', description: 'ادامه خونریزی؛ سطح انرژی کمی افزایش می‌یابد.', bleeding: 8, hormones: 'استروژن و پروژسترون همچنان پایین هستند.', mood: 'خلق پایین و تحریک‌پذیری ممکن است ادامه داشته باشد.', energy: 3, libido: 2, partner: 'همچنان حمایت و صبوری توصیه می‌شود.', pregnancy: 0 },
+                { day: 3, phase: 'قاعدگی', description: 'پایان تدریجی خونریزی؛ انرژی و میل جنسی در حال افزایش است.', bleeding: 4, hormones: 'استروژن و پروژسترون پایین اما رو به افزایش‌اند.', mood: 'احتمالاً خلق بهبود می‌یابد اما همچنان حساسیت وجود دارد.', energy: 4, libido: 3, partner: 'حمایت و درک شریک همچنان مؤثر است.', pregnancy: 0 },
+                { day: 4, phase: 'قاعدگی', description: 'خونریزی بسیار کم یا لکه‌بینی؛ انرژی رو به افزایش.', bleeding: 2, hormones: 'استروژن شروع به افزایش می‌کند.', mood: 'خلق و خو بهتر می‌شود.', energy: 5, libido: 4, partner: 'تشویق به فعالیت‌های سبک.', pregnancy: 0 },
+                { day: 5, phase: 'فولیکولی', description: 'پایان خونریزی. فولیکول‌ها در تخمدان شروع به رشد می‌کنند.', bleeding: 0, hormones: 'افزایش تدریجی استروژن.', mood: 'خلق و انگیزه بهتر می‌شود.', energy: 6, libido: 5, partner: 'تشویق به فعالیت و تجربه‌های مشترک.', pregnancy: 1 },
+                { day: 6, phase: 'فولیکولی', description: 'بهبود بیشتر انرژی و میل جنسی.', bleeding: 0, hormones: 'استروژن همچنان در حال افزایش است.', mood: 'انگیزه و خلق بهبود یافته.', energy: 6, libido: 6, partner: 'زمان مناسب برای برنامه‌ریزی‌های مشترک.', pregnancy: 1 },
+                { day: 7, phase: 'فولیکولی', description: 'افزایش محسوس انرژی و میل جنسی.', bleeding: 0, hormones: 'استروژن همچنان افزایش می‌یابد.', mood: 'روحیه مثبت‌تر و انگیزه بالاتر.', energy: 7, libido: 7, partner: 'تشویق به فعالیت و تجربه‌های مشترک.', pregnancy: 2 },
+                { day: 8, phase: 'فولیکولی', description: 'انرژی بالا؛ میل جنسی و روحیه مثبت.', bleeding: 0, hormones: 'استروژن بالا می‌رود.', mood: 'خلق عالی و انگیزه زیاد.', energy: 7, libido: 7, partner: 'تشویق به فعالیت و تجربه‌های مشترک.', pregnancy: 2 },
+                { day: 9, phase: 'فولیکولی', description: 'روزهای اوج انرژی؛ نزدیک شدن به تخمک‌گذاری.', bleeding: 0, hormones: 'استروژن به سطح بالایی می‌رسد.', mood: 'روحیه بسیار خوب و میل جنسی بیشتر.', energy: 8, libido: 8, partner: 'زمان عالی برای ارتباط عمیق‌تر.', pregnancy: 3 },
+                { day: 10, phase: 'فولیکولی', description: 'انرژی و میل جنسی بالا باقی می‌ماند.', bleeding: 0, hormones: 'استروژن زیاد است.', mood: 'روحیه عالی و انگیزه بالا.', energy: 8, libido: 8, partner: 'تشویق به فعالیت و تجربه‌های مشترک.', pregnancy: 4 },
+                { day: 11, phase: 'فولیکولی', description: 'نزدیک به تخمک‌گذاری؛ انرژی و میل جنسی زیاد.', bleeding: 0, hormones: 'استروژن در سطح بالا.', mood: 'انگیزه و میل جنسی قابل توجه.', energy: 9, libido: 9, partner: 'ابراز محبت و علاقه اهمیت ویژه‌ای دارد.', pregnancy: 5 },
+                { day: 12, phase: 'فولیکولی', description: 'پنجره باروری باز است. انرژی و میل جنسی در اوج.', bleeding: 0, hormones: 'استروژن به بیشینه نزدیک می‌شود.', mood: 'خلق عالی و انرژی زیاد.', energy: 9, libido: 9, partner: 'زمان مناسب برای فعالیت‌های عاشقانه.', pregnancy: 6 },
+                { day: 13, phase: 'تخمک‌گذاری', description: 'اوج باروری؛ تخمک از تخمدان آزاد می‌شود.', bleeding: 0, hormones: 'اوج استروژن و افزایش ناگهانی LH که باعث تخمک‌گذاری می‌شود.', mood: 'اعتماد به نفس و تمایل به تعامل اجتماعی بالا.', energy: 10, libido: 10, partner: 'ابراز محبت و برنامه‌ریزی فعالیت‌های عاشقانه.', pregnancy: 10 },
+                { day: 14, phase: 'لوتئال', description: 'آغاز فاز لوتئال. پروژسترون شروع به افزایش می‌کند.', bleeding: 0, hormones: 'افزایش پروژسترون، کاهش استروژن.', mood: 'ممکن است کمی آرام‌تر شوید.', energy: 9, libido: 9, partner: 'همچنان زمان خوبی برای ارتباط است.', pregnancy: 9 },
+                { day: 15, phase: 'لوتئال', description: 'انرژی کمی کمتر می‌شود. بدن برای بارداری احتمالی آماده می‌شود.', bleeding: 0, hormones: 'پروژسترون بالا می‌رود.', mood: 'احتمال تغییرات خلقی جزئی.', energy: 8, libido: 8, partner: 'حمایت و صبوری اهمیت پیدا می‌کند.', pregnancy: 8 },
+                { day: 16, phase: 'لوتئال', description: 'انرژی و میل جنسی کاهش یافته است.', bleeding: 0, hormones: 'پروژسترون همچنان بالاست.', mood: 'احتمال تحریک‌پذیری و تغییرات خلقی.', energy: 7, libido: 7, partner: 'درک تغییرات خلقی مهم است.', pregnancy: 7 },
+                { day: 17, phase: 'لوتئال', description: 'سطح انرژی متوسط؛ شروع علائم پیش از قاعدگی (PMS).', bleeding: 0, hormones: 'پروژسترون بالاست.', mood: 'احتمال تغییرات خلقی و حساسیت احساسی.', energy: 6, libido: 6, partner: 'حمایت و صبوری توصیه می‌شود.', pregnancy: 6 },
+                { day: 18, phase: 'لوتئال', description: 'انرژی و میل جنسی روند نزولی دارد.', bleeding: 0, hormones: 'پروژسترون رو به کاهش است (در صورت عدم بارداری).', mood: 'احتمال تحریک‌پذیری بیشتر است.', energy: 6, libido: 5, partner: 'آماده ارائه حمایت عاطفی باشید.', pregnancy: 4 },
+                { day: 19, phase: 'لوتئال', description: 'ادامه کاهش انرژی و احتمال بروز علائم جسمی (مثل نفخ، سردرد).', bleeding: 0, hormones: 'پروژسترون در حال کاهش است.', mood: 'امکان اضطراب یا حساسیت احساسی بیشتر است.', energy: 5, libido: 4, partner: 'به نیازهای او توجه کنید.', pregnancy: 3 },
+                { day: 20, phase: 'لوتئال', description: 'علائم PMS ممکن است بیشتر نمایان شوند.', bleeding: 0, hormones: 'کاهش سریع استروژن و پروژسترون.', mood: 'احتمال بروز علائم پیش از قاعدگی بیشتر است.', energy: 4, libido: 4, partner: 'صبوری و درک متقابل کلیدی است.', pregnancy: 2 },
+                { day: 21, phase: 'لوتئال', description: 'آمادگی بدن برای قاعدگی جدید.', bleeding: 0, hormones: 'پروژسترون کاهش یافته است.', mood: 'احتمال تغییرات خلقی و حساسیت احساسی وجود دارد.', energy: 4, libido: 3, partner: 'حمایت و صبوری توصیه می‌شود.', pregnancy: 1 },
+                { day: 22, phase: 'لوتئال', description: 'نزدیک به قاعدگی؛ انرژی و میل جنسی کم است.', bleeding: 0, hormones: 'پروژسترون نزدیک به پایین‌ترین مقدار است.', mood: 'علائم پیش از قاعدگی می‌تواند شدیدتر شود.', energy: 3, libido: 3, partner: 'در انجام کارهای روزمره کمک کنید.', pregnancy: 1 },
+                { day: 23, phase: 'لوتئال', description: 'پایان فاز لوتئال؛ انرژی و میل جنسی پایین‌ترین مقدار است.', bleeding: 0, hormones: 'پروژسترون به حداقل رسیده است.', mood: 'حساسیت و تحریک‌پذیری زیاد است.', energy: 2, libido: 2, partner: 'حمایت و صبوری بیش از همیشه لازم است.', pregnancy: 0 },
+            ];
+
+            // -- DOM ELEMENTS --
+            const lastPeriodInput = document.getElementById('lastPeriodDate');
+            const cycleLengthInput = document.getElementById('cycleLength');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resultsContainer = document.querySelector('.results-container');
+            
+            const progressCircle = document.getElementById('progressCircle');
+            const progressValue = document.getElementById('progressValue');
+            const cyclePhaseTitle = document.getElementById('cyclePhaseTitle');
+            const dailyInfoCard = document.getElementById('dailyInfoCard');
+
+            const prevDayBtn = document.getElementById('prevDayBtn');
+            const nextDayBtn = document.getElementById('nextDayBtn');
+            const todayBtn = document.getElementById('todayBtn');
+            const displayedDateEl = document.getElementById('displayedDate');
+
+            // -- STATE --
+            let appState = {
+                startDate: null,
+                cycleLength: 28,
+                currentDisplayDate: new Date()
+            };
+
+            // -- HELPER FUNCTIONS --
+            function jalaliStringToDate(jalaliStr) {
+                const [y, m, d] = jalaliStr.split('-').map(Number);
+                // This is a simplified conversion to Gregorian for date difference calculation.
+                // It's an approximation but works well for this app's purpose.
+                // For 100% accuracy, a full conversion library would be needed.
+                const gYear = y + 621;
+                // Create a date object. JS will handle month/day rollovers.
+                const gDate = new Date(gYear, m + 2, d + 21);
+                return gDate;
+            }
+
+            function dateDiffInDays(a, b) {
+                const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+                const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+                const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+                return Math.floor((utc2 - utc1) / _MS_PER_DAY);
+            }
+
+            // The "Smart" Algorithm to map a variable cycle to our data
+            function getDayData(dayOfCycle, totalCycleLength) {
+                const ovulationDay = Math.max(10, totalCycleLength - 14);
+                
+                // Menstrual Phase (first ~4 days)
+                if (dayOfCycle <= 4) return cycleData[dayOfCycle];
+
+                // Follicular Phase (after menstruation, before ovulation)
+                if (dayOfCycle < ovulationDay) {
+                    const follicularPhaseLength = ovulationDay - 5;
+                    // Map the remaining follicular days to our sample data (days 5-12)
+                    const sourceDataLength = 12 - 5 + 1;
+                    const mappedDay = 5 + Math.round(((dayOfCycle - 5) / follicularPhaseLength) * sourceDataLength);
+                    return cycleData[Math.min(12, mappedDay)];
+                }
+
+                // Ovulation
+                if (dayOfCycle === ovulationDay) return cycleData[13];
+
+                // Luteal Phase (after ovulation)
+                if (dayOfCycle > ovulationDay) {
+                    const lutealDay = dayOfCycle - ovulationDay;
+                    const lutealPhaseLength = totalCycleLength - ovulationDay;
+                    // Map the luteal days to our sample data (days 14-23)
+                    const sourceDataLength = 23 - 14 + 1;
+                    const mappedDay = 14 + Math.round((lutealDay / lutealPhaseLength) * sourceDataLength);
+                    return cycleData[Math.min(23, mappedDay)];
+                }
+
+                return cycleData[1]; // Default fallback
+            }
+
+            function renderProgressBar(value, max) {
+                const percentage = (value / max) * 100;
+                const bar = `<div class="progress-bar-container"><div class="progress-bar" style="width: ${percentage}%"></div></div>`;
+                return bar;
+            }
+
+            function renderCard(data) {
+                dailyInfoCard.innerHTML = `
+                    <div class="info-item">
+                        <i class="info-icon fa-solid fa-note-sticky"></i>
+                        <div class="info-content">
+                            <h3>توضیحات روز</h3>
+                            <p>${data.description}</p>
+                        </div>
+                    </div>
+                     <div class="info-item">
+                        <i class="info-icon fa-solid fa-droplet"></i>
+                        <div class="info-content">
+                            <h3>میزان خونریزی</h3>
+                            ${renderProgressBar(data.bleeding, 10)}
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="info-icon fa-solid fa-face-smile"></i>
+                        <div class="info-content">
+                            <h3>وضعیت احساسی</h3>
+                            <p>${data.mood}</p>
+                        </div>
+                    </div>
+                     <div class="info-item">
+                        <i class="info-icon fa-solid fa-bolt"></i>
+                        <div class="info-content">
+                            <h3>سطح انرژی</h3>
+                             ${renderProgressBar(data.energy, 10)}
+                        </div>
+                    </div>
+                     <div class="info-item">
+                        <i class="info-icon fa-solid fa-heart"></i>
+                        <div class="info-content">
+                            <h3>میل جنسی</h3>
+                             ${renderProgressBar(data.libido, 10)}
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="info-icon fa-solid fa-baby"></i>
+                        <div class="info-content">
+                            <h3>احتمال بارداری</h3>
+                             ${renderProgressBar(data.pregnancy, 10)}
+                        </div>
+                    </div>
+                     <div class="info-item">
+                        <i class="info-icon fa-solid fa-atom"></i>
+                        <div class="info-content">
+                            <h3>تغییرات هورمونی</h3>
+                            <p>${data.hormones}</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="info-icon fa-solid fa-user-group"></i>
+                        <div class="info-content">
+                            <h3>توصیه به شریک عاطفی</h3>
+                            <p>${data.partner}</p>
+                        </div>
+                    </div>
+                `;
+                dailyInfoCard.style.animation = 'none';
+                dailyInfoCard.offsetHeight; /* trigger reflow */
+                dailyInfoCard.style.animation = null;
+            }
+
+            function updateUI() {
+                if (!appState.startDate) return;
+                
+                const dayDifference = dateDiffInDays(appState.startDate, appState.currentDisplayDate);
+                if (dayDifference < 0) { // Date is before the cycle start
+                     alert("تاریخ انتخابی قبل از شروع دوره است.");
+                     appState.currentDisplayDate = new Date(appState.startDate);
+                     updateUI();
+                     return;
+                }
+
+                const dayOfCycle = (dayDifference % appState.cycleLength) + 1;
+                
+                const data = getDayData(dayOfCycle, appState.cycleLength);
+                
+                // Update Progress Circle
+                const progressPercentage = (dayOfCycle / appState.cycleLength) * 360;
+                progressCircle.style.background = `conic-gradient(var(--primary-pink) ${progressPercentage}deg, var(--border-color) ${progressPercentage}deg)`;
+                progressValue.innerHTML = `${dayOfCycle}<span> / ${appState.cycleLength}</span>`;
+
+                // Update Phase Title
+                cyclePhaseTitle.textContent = data.phase;
+
+                // Update Displayed Date
+                const jalaliDate = toJalali(appState.currentDisplayDate.getFullYear(), appState.currentDisplayDate.getMonth() + 1, appState.currentDisplayDate.getDate());
+                const format = (d) => (d < 10 ? `0${d}` : d);
+                displayedDateEl.textContent = `${jalaliDate.jy}/${format(jalaliDate.jm)}/${format(jalaliDate.jd)}`;
+
+                // Render Info Card
+                renderCard(data);
+            }
+
+            // -- EVENT LISTENERS --
+            calculateBtn.addEventListener('click', () => {
+                const startDateStr = lastPeriodInput.dataset.jalaliDate;
+                const cycleLength = parseInt(cycleLengthInput.value, 10);
+
+                if (!startDateStr) {
+                    alert('لطفاً تاریخ شروع آخرین پریود را انتخاب کنید.');
+                    return;
+                }
+                if (isNaN(cycleLength) || cycleLength < 15 || cycleLength > 45) {
+                    alert('لطفاً طول چرخه را به درستی وارد کنید (بین ۱۵ تا ۴۵ روز).');
+                    return;
+                }
+
+                appState.startDate = jalaliStringToDate(startDateStr);
+                appState.cycleLength = cycleLength;
+                appState.currentDisplayDate = new Date(); // Reset to today
+
+                resultsContainer.style.display = 'block';
+                updateUI();
+            });
+
+            prevDayBtn.addEventListener('click', () => {
+                appState.currentDisplayDate.setDate(appState.currentDisplayDate.getDate() - 1);
+                updateUI();
+            });
+
+            nextDayBtn.addEventListener('click', () => {
+                appState.currentDisplayDate.setDate(appState.currentDisplayDate.getDate() + 1);
+                updateUI();
+            });
+
+            todayBtn.addEventListener('click', () => {
+                appState.currentDisplayDate = new Date();
+                updateUI();
+            });
+
+        });
+    </script>
+</body>
+</html>

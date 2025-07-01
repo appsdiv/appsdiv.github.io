@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>استفاده از کتابخانه تاریخ</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.min.css" rel="stylesheet"/>
+    
+    <link rel="stylesheet" href="persian-datepicker.css" />
+</head>
+<body>
+
+    <input type="text" id="myDate" placeholder="تاریخ را انتخاب کنید" />
+
+    <script src="persian-datepicker.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            new PersianDatePicker('#myDate');
+        });
+    </script>
+</body>
+</html>

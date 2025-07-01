@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>انتخابگر تاریخ iOS</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.min.css"
+        rel="stylesheet"
+    />
+    <style>
+        /* General Styles */
+        :root {
+            --bg-color: #f0f2f5;
+            --input-bg: #ffffff;
+            --modal-bg: #ffffff;
+            --selector-bg: #f9f9f9;
+            --highlight-bg: rgba(200, 200, 200, 0.2);
+            --primary-blue: #007aff;
+            --primary-gray: #e5e5ea;
+            --text-color: #1c1c1e;
+            --text-light: #8e8e93;
+        }
+        body {
+            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .date-input {
+            width: 288px;
+            max-width: 90%;
+            padding: 12px;
+            text-align: center;
+            font-size: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            background-color: var(--input-bg);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: box-shadow 0.2s, border-color 0.2s;
+        }
+        .date-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: flex-end; /* Position modal at the bottom */
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: var(--modal-bg);
+            border-radius: 16px 16px 0 0; /* Rounded corners only at the top */
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.1);
+            transform: translateY(100%);
+            transition: transform 0.3s ease-out;
+        }
+        .modal-overlay.visible .modal-content {
+            transform: translateY(0);
+        }
+        .modal-header {
+            padding: 12px 20px;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .selectors-container {
+            display: flex;
+            justify-content: center;
+            gap: 0; /* No gap for seamless look */
+            padding: 20px;
+            direction: ltr;
+        }
+
+        /* iOS-style Selector Styles */
+        .selector-column {
+            flex: 1;
+            height: 220px; /* Standard iOS height */
+            overflow: hidden;
+            position: relative;
+        }
+        .selector-list {
+            position: absolute;
+            width: 100%;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .selector-item {
+            font-size: 1.25rem;
+            line-height: 44px;
+            height: 44px;
+            color: var(--text-light);
+            user-select: none;
+            transition: color 0.3s, font-weight 0.3s;
+        }
+        .selector-item.selected {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        .selector-highlight {
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            right: 10px;
+            height: 44px;
+            transform: translateY(-50%);
+            background-color: var(--highlight-bg);
+            border-radius: 8px;
+            pointer-events: none;
+        }
+
+        /* Button Styles */
+        .btn {
+            background: none;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 8px;
+        }
+        .btn-confirm {
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+        .btn-close {
+            color: #8e8e93;
+        }
+    </style>
+</head>
+<body>
+    <input
+        type="text"
+        id="deliveryDate"
+        class="date-input"
+        placeholder="تاریخ را انتخاب کنید"
+        readonly
+    />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            function toJalali(gy, gm, gd) {
+                const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+                const gy2 = (gm > 2) ? (gy + 1) : gy;
+                let days = 355666 + (365 * gy) + Math.floor((gy2 + 3) / 4) - Math.floor((gy2 + 99) / 100) + Math.floor((gy2 + 399) / 400) + gd + g_d_m[gm - 1];
+                let jy = -1595 + (33 * Math.floor(days / 12053));
+                days %= 12053;
+                jy += 4 * Math.floor(days / 1461);
+                days %= 1461;
+                if (days > 365) {
+                    jy += Math.floor((days - 1) / 365);
+                    days = (days - 1) % 365;
+                }
+                const jm = (days < 186) ? 1 + Math.floor(days / 31) : 7 + Math.floor((days - 186) / 30);
+                const jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
+                return { jy, jm, jd };
+            }
+
+            function getJalaliMonthLength(year, month) {
+                if (month <= 6) return 31;
+                if (month <= 11) return 30;
+                const isLeap = ((((year - 474) % 2820) + 512) * 682) % 2816 < 682;
+                return isLeap ? 30 : 29;
+            }
+
+            function createDatePickerModal() {
+                const modalHTML = `
+                <div id="datePickerModal" class="modal-overlay">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button id="closeModal" class="btn btn-close">انصراف</button>
+                            <button id="confirmDate" class="btn btn-confirm">تایید</button>
+                        </div>
+                        <div class="selectors-container">
+                            <div id="pdp-year" class="selector-column"></div>
+                            <div id="pdp-month" class="selector-column"></div>
+                            <div id="pdp-day" class="selector-column"></div>
+                        </div>
+                    </div>
+                </div>`;
+                document.body.insertAdjacentHTML("beforeend", modalHTML);
+            }
+
+            function initializePersianDatePicker(inputId) {
+                createDatePickerModal();
+
+                const today = toJalali(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate());
+                const modal = document.getElementById("datePickerModal");
+
+                const openModal = () => modal.classList.add("visible");
+                const closeModal = () => modal.classList.remove("visible");
+
+                function setupEventListeners() {
+                    document.getElementById(inputId).addEventListener("click", openModal);
+                    document.getElementById("closeModal").addEventListener("click", closeModal);
+                    modal.addEventListener("click", (event) => {
+                        if (event.target === modal) closeModal();
+                    });
+
+                    document.getElementById("confirmDate").addEventListener("click", () => {
+                        const selectedYear = parseInt(yearSelector.getValue());
+                        const selectedMonth = parseInt(monthSelector.getValue());
+                        const selectedDay = parseInt(daySelector.getValue());
+                        const format = (d) => (d < 10 ? `0${d}` : d);
+                        document.getElementById(inputId).value = `${selectedYear}/${format(selectedMonth)}/${format(selectedDay)}`;
+                        closeModal();
+                    });
+                }
+
+                class IosSelector {
+                    constructor(options) {
+                        this.el = document.querySelector(options.el);
+                        this.source = options.source;
+                        this.itemHeight = 44;
+                        this.middleIndex = 2; // Math.floor(5 / 2)
+                        this.onChange = options.onChange || function() {};
+                        this._init(options.selectedIndex || 0);
+                    }
+
+                    _init(selectedIndex) {
+                        this.el.innerHTML = `<ul class="selector-list">${this.source
+                            .map(item => `<li class="selector-item">${item.text}</li>`)
+                            .join("")}</ul><div class="selector-highlight"></div>`;
+                        this.list = this.el.querySelector("ul");
+                        this.items = this.el.querySelectorAll("li");
+                        this.select(selectedIndex, false);
+                        this._attachEvents();
+                    }
+
+                    _attachEvents() {
+                        let startY = 0, scrollStart = 0, isDragging = false;
+                        const onStart = (e) => {
+                            e.stopPropagation();
+                            startY = e.touches ? e.touches[0].clientY : e.clientY;
+                            scrollStart = parseFloat(this.list.style.transform.replace("translateY(", "")) || 0;
+                            this.list.style.transition = "none";
+                            isDragging = true;
+                        };
+                        const onMove = (e) => {
+                            if (!isDragging) return;
+                            e.preventDefault();
+                            let moveY = (e.touches ? e.touches[0].clientY : e.clientY) - startY;
+                            this.list.style.transform = `translateY(${scrollStart + moveY}px)`;
+                        };
+                        const onEnd = () => { if (isDragging) { isDragging = false; this._snap(); } };
+                        const onWheel = (e) => {
+                            e.preventDefault();
+                            let currentScroll = parseFloat(this.list.style.transform.replace("translateY(", "")) || 0;
+                            this.list.style.transition = "none";
+                            this.list.style.transform = `translateY(${currentScroll - e.deltaY}px)`;
+                            clearTimeout(this.wheelTimeout);
+                            this.wheelTimeout = setTimeout(() => this._snap(), 150);
+                        };
+
+                        this.el.addEventListener("mousedown", onStart);
+                        document.addEventListener("mousemove", onMove);
+                        document.addEventListener("mouseup", onEnd);
+                        this.el.addEventListener("wheel", onWheel);
+                        this.el.addEventListener("touchstart", onStart, { passive: false });
+                        this.el.addEventListener("touchmove", onMove, { passive: false });
+                        this.el.addEventListener("touchend", onEnd);
+                    }
+
+                    _snap() {
+                        let finalScroll = parseFloat(this.list.style.transform.replace("translateY(", "")) || 0;
+                        let targetIndex = Math.round((finalScroll - this.middleIndex * this.itemHeight) / -this.itemHeight);
+                        this.select(targetIndex);
+                    }
+                    
+                    // --- ✨ BUG FIX IS HERE ---
+                    // This method now updates the index *before* calling the onChange callback.
+                    select(index, triggerChange = true) {
+                        index = Math.max(0, Math.min(index, this.source.length - 1));
+                        const hasChanged = this.selectedIndex !== index;
+
+                        // 1. Update the internal state first
+                        this.selectedIndex = index;
+
+                        // 2. Update the UI
+                        this.list.style.transition = "transform 0.2s ease-out";
+                        this.list.style.transform = `translateY(${(this.middleIndex - this.selectedIndex) * this.itemHeight}px)`;
+                        this.items.forEach((item, i) => item.classList.toggle("selected", i === this.selectedIndex));
+                        
+                        // 3. Trigger callback only if the index actually changed
+                        if (hasChanged && triggerChange) {
+                            this.onChange();
+                        }
+                    }
+
+                    updateSource(newSource) {
+                        this.source = newSource;
+                        this.list.innerHTML = this.source
+                            .map(item => `<li class="selector-item">${item.text}</li>`)
+                            .join("");
+                        this.items = this.el.querySelectorAll("li");
+                        const newSelectedIndex = Math.min(this.selectedIndex, this.source.length - 1);
+                        this.select(newSelectedIndex, false);
+                    }
+
+                    getValue() { return this.source[this.selectedIndex].value; }
+                }
+
+                const getRange = (start, end) => Array.from({ length: end - start + 1 }, (_, i) => ({ value: start + i, text: start + i }));
+                const getDays = (year, month) => getRange(1, getJalaliMonthLength(year, month));
+                const getMonths = () => getRange(1, 12);
+
+                const updateDaySelector = () => {
+                    const yearValue = parseInt(yearSelector.getValue());
+                    const monthValue = parseInt(monthSelector.getValue());
+                    const daysInMonth = getDays(yearValue, monthValue);
+                    daySelector.updateSource(daysInMonth);
+                };
+
+                let yearSelector = new IosSelector({
+                    el: "#pdp-year",
+                    source: getRange(1350, 1450),
+                    selectedIndex: today.jy - 1350,
+                    onChange: updateDaySelector
+                });
+                let monthSelector = new IosSelector({
+                    el: "#pdp-month",
+                    source: getMonths(),
+                    selectedIndex: today.jm - 1,
+                    onChange: updateDaySelector
+                });
+                let daySelector = new IosSelector({
+                    el: "#pdp-day",
+                    source: getDays(today.jy, today.jm),
+                    selectedIndex: today.jd - 1,
+                });
+
+                setupEventListeners();
+            }
+
+            initializePersianDatePicker("deliveryDate");
+        });
+    </script>
+</body>
+</html>
