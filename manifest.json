@@ -1,0 +1,28 @@
+{
+  "name": "شمارا",
+  "short_name": "شمارا",
+  "description": "مدیریت مالی شخصی شمارا",
+  "start_url": "shomara-app.html",
+  "display": "standalone",
+  "background_color": "#f2f2f7",
+  "theme_color": "#007AFF",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://i.postimg.cc/pX061LJC/shomara-app.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://i.postimg.cc/pX061LJC/shomara-app.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "https://i.postimg.cc/pX061LJC/shomara-app.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}
