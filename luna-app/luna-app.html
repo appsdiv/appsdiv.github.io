@@ -20,50 +20,64 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         /* CSS for Modern PWA Launch Screen */
-        #launch-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 10000;
-            background-color: #FEFBFB;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s ease-out, visibility 0.5s;
-            visibility: visible;
-            opacity: 1;
-        }
-        #launch-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-        .launch-logo {
-            width: 100px;
-            height: 100px;
-            border-radius: 22px;
-            margin-bottom: 25px;
-        }
-        .loader {
-            width: 48px;
-            height: 48px;
-            border: 3px solid #F3EAEB;
-            border-bottom-color: #D98BAA;
-            border-radius: 50%;
-            display: inline-block;
-            box-sizing: border-box;
-            animation: rotation 1s linear infinite;
-        }
-        @keyframes rotation {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        html.dark-mode #launch-screen {
-            background-color: #2A2428;
-        }
-        html.dark-mode .loader {
-            border: 3px solid #524A4E;
-            border-bottom-color: #D98BAA;
-        }
+   /* CSS for Modern PWA Launch Screen */
+#launch-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background-color: #FEFBFB;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease-out, visibility 0.5s;
+    visibility: visible;
+    opacity: 1;
+}
+#launch-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+.launch-content {
+    text-align: center;
+}
+.launch-logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 22px;
+}
+.launch-title {
+    color: #B4A0C2; /* Muted Purple */
+    font-weight: 500;
+    font-size: 1rem;
+    margin-top: 15px;
+}
+.loader {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    border: 3px solid #F3EAEB;
+    border-bottom-color: #D98BAA;
+    border-radius: 50%;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+}
+@keyframes rotation {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+html.dark-mode #launch-screen {
+    background-color: #2A2428;
+}
+html.dark-mode .launch-title {
+    color: #A8A1A4;
+}
+html.dark-mode .loader {
+    border: 3px solid #524A4E;
+    border-bottom-color: #D98BAA;
+}
 
 
         /* Main App Styles */
@@ -190,10 +204,13 @@
 </head>
 <body>
     
-    <div id="launch-screen">
-        <img src="https://i.postimg.cc/WbCF8vNk/luna-app.png" alt="لوگوی لونا" class="launch-logo">
-        <span class="loader"></span>
+<div id="launch-screen">
+    <div class="launch-content">
+        <img src="https://i.ibb.co/Qvppy5y/luna-app.png" alt="لوگوی لونا" class="launch-logo">
+        <p class="launch-title">مدیریت سلامت زنان لونا</p>
     </div>
+    <span class="loader"></span>
+</div>
 
     <div class="app-container">
         <header class="app-header">
