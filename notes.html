@@ -115,92 +115,92 @@
         }
         .btn-link:hover { background-color: var(--c-border); transform: none; box-shadow: none;}
 
-        /* --- ✅ NEW MODERN NOTEBOOK SHELF DESIGN --- */
+        /* --- ✅ 3D NOTEBOOK SHELF DESIGN --- */
         .notebook-shelf { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
-            gap: var(--spacing-lg); 
-            padding: var(--spacing-md) 0; 
+            gap: 40px var(--spacing-lg); 
+            padding: var(--spacing-md) 0;
+            perspective: 1000px;
         }
 
         .notebook-cover {
-            --notebook-color-light: color-mix(in srgb, var(--notebook-color) 80%, white);
-            --notebook-color-dark: color-mix(in srgb, var(--notebook-color) 80%, black);
+            --notebook-depth: 8px;
+            --notebook-spine-color: color-mix(in srgb, var(--notebook-color) 70%, black);
+            --notebook-page-color: #F1F1F1;
+            --notebook-page-shadow: #D8D8D8;
 
             aspect-ratio: 3 / 4;
-            border-radius: 20px;
-            cursor: pointer; 
             position: relative;
-            overflow: hidden; /* Important for pseudo-elements */
+            cursor: pointer; 
+            background-color: var(--notebook-color);
+            border-radius: 4px 8px 8px 4px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 20px;
-            box-shadow: 0 5px 15px var(--shadow-color-light);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
             
-            /* Main Gradient Background */
-            background: linear-gradient(135deg, var(--notebook-color-light) 0%, var(--notebook-color) 50%, var(--notebook-color-dark) 100%);
+            transform-style: preserve-3d;
+            transform: rotateY(-15deg);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .notebook-cover:hover { 
-            transform: translateY(-8px);
-            box-shadow: 0 12px 25px var(--shadow-color-dark);
+            transform: rotateY(0deg) scale(1.05);
         }
 
-        /* Abstract Wave Pattern */
+        /* Spine of the book */
         .notebook-cover::before {
             content: '';
             position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 100% 100%, transparent 60%, rgba(255,255,255,0.08) 61%, rgba(255,255,255,0.15) 65%, transparent 66%);
-            background-repeat: no-repeat;
-            transform: rotate(-30deg);
+            top: 2px;
+            right: 100%;
+            bottom: 2px;
+            width: var(--notebook-depth);
+            background-color: var(--notebook-spine-color);
+            transform-origin: right;
+            transform: rotateY(90deg);
+            border-radius: 2px 0 0 2px;
         }
         
-        /* Glossy Shine Effect */
+        /* Pages of the book */
         .notebook-cover::after {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -25%;
-            width: 50%;
-            height: 200%;
-            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
-            transform: rotate(25deg);
-            transition: transform 0.4s ease;
-        }
-        .notebook-cover:hover::after {
-            transform: rotate(25deg) translateX(100px);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                to bottom,
+                var(--notebook-page-shadow),
+                var(--notebook-page-shadow) 1px,
+                var(--notebook-page-color) 1px,
+                var(--notebook-page-color) 2px
+            );
+            transform: translateZ(calc(-1 * var(--notebook-depth)));
+            border-radius: 2px 8px 8px 2px;
+            box-shadow: -2px 1px 4px rgba(0,0,0,0.1);
         }
 
         .notebook-cover .title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: white;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
             pointer-events: none;
-            z-index: 2;
         }
 
         .notebook-cover .note-count {
             font-size: 0.8rem;
             font-weight: 500;
-            pointer-events: none;
-            background-color: rgba(0,0,0,0.25);
-            backdrop-filter: blur(4px);
             color: white;
-            padding: 4px 10px;
-            border-radius: 30px;
-            z-index: 2;
-            align-self: flex-start;
+            opacity: 0.8;
+            pointer-events: none;
         }
 
         .notebook-cover.sortable-ghost { 
-            transform: scale(0.95);
+            transform: rotateY(0deg) scale(1.05);
             opacity: 0.7; 
             cursor: grabbing; 
         }
@@ -210,11 +210,12 @@
             color: var(--c-text-secondary); 
             display: flex; align-items: center; 
             justify-content: center; flex-direction: column; 
-            background: none; box-shadow: none; 
+            background: var(--c-card-bg); 
+            box-shadow: none; 
             font-size: 1rem; cursor: pointer; 
             transition: background-color 0.2s, color 0.2s, border-color 0.2s;
             aspect-ratio: 3 / 4;
-            border-radius: 20px;
+            border-radius: 8px;
         }
         .new-notebook-btn:hover {
             border-color: var(--c-primary); 
@@ -597,7 +598,7 @@
                         <img src="https://i.postimg.cc/SKgT4hTn/notes-app.png" alt="لوگوی برنامه همراه من" class="app-logo">
                         <h3>همراه من</h3>
                         <p class="about-text">
-                            <strong>نسخه ۱.۳</strong>
+                            <strong>نسخه ۱.۴</strong>
                             <br>
                             یک دفترچه یادداشت ساده و زیبا برای ثبت افکار، احساسات و خاطرات شما. تمام اطلاعات شما به صورت امن روی دستگاه خودتان ذخیره می‌شود.
                         </p>
@@ -650,7 +651,7 @@
                 let shelfHTML = '<div id="notebookShelf" class="notebook-shelf">';
                 notebooks.forEach(nb => {
                     const count = notes.filter(n => n.notebookId === nb.id).length;
-                    shelfHTML += `<div class="notebook-cover" data-action="open-notebook" data-id="${nb.id}" style="--notebook-color: ${nb.color};">
+                    shelfHTML += `<div class="notebook-cover" data-id="${nb.id}" style="--notebook-color: ${nb.color};">
                         <div class="title">${nb.title}</div>
                         <div class="note-count">${toPersianDigits(count)} یادداشت</div>
                     </div>`;
@@ -661,7 +662,7 @@
                 app.innerHTML = `<div class="page shelf-view"><div class="container">${renderHeader('همراه من', false, true)}${shelfHTML}</div></div>`;
                 
                 initSortableNotebooks();
-                setupLongPressListeners();
+                setupNotebookListeners();
             }
 
             function renderNotebookView(notebookId, searchTerm = '') {
@@ -892,35 +893,38 @@
                 });
             }
             
-            // ✅ Bug-fixed long-press logic
-            function setupLongPressListeners() {
+            // ✅ Bug-fixed long-press and click logic
+            function setupNotebookListeners() {
                 const notebookCovers = document.querySelectorAll('.notebook-cover:not(.new-notebook-btn)');
                 notebookCovers.forEach(cover => {
+                    const notebookId = parseInt(cover.dataset.id);
+
                     const pressStart = (e) => {
                         isLongPress = false;
                         clearTimeout(longPressTimer);
                         longPressTimer = setTimeout(() => {
                             isLongPress = true;
-                            const notebookId = parseInt(cover.dataset.id);
                             const notebook = getNotebooks().find(nb => nb.id === notebookId);
                             if (notebook) {
                                 renderNotebookModal({ isEditing: true, notebook });
                             }
-                        }, 500);
+                        }, 500); // 500ms for long press
                     };
 
                     const pressEnd = () => {
                         clearTimeout(longPressTimer);
                     };
-
+                    
                     const clickHandler = (e) => {
                         if (isLongPress) {
                             e.preventDefault();
+                        } else {
+                           navigateTo('notebook', notebookId);
                         }
                     };
 
                     cover.addEventListener('mousedown', pressStart);
-                    cover.addEventListener('touchstart', pressStart);
+                    cover.addEventListener('touchstart', pressStart, { passive: true });
                     
                     cover.addEventListener('mouseup', pressEnd);
                     cover.addEventListener('mouseleave', pressEnd);
@@ -1027,7 +1031,7 @@
                 const { action, id, noteId, notebookId, mode, color } = actionTarget.dataset;
 
                 switch(action) {
-                    case 'open-notebook': navigateTo('notebook', parseInt(id)); break;
+                    // Clicks on notebooks are now handled by setupNotebookListeners to avoid conflicts
                     case 'new-note': navigateTo('editor', { notebookId: parseInt(notebookId) }); break;
                     case 'edit-note': {
                         const noteToEdit = getNotes().find(n => n.id === parseInt(noteId));
