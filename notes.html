@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>همراه من</title>
 
-    <!-- ✅ PWA & Favicon Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="همراه من">
@@ -30,6 +29,7 @@
             --c-mood-happy: #F8C8A8; --c-mood-calm: #EAA2A2; --c-mood-creative: #C5B0E0;
             --c-mood-grateful: #F3B396; --c-mood-neutral: #B4A0C2;
             --c-danger: #e74c3c;
+            --c-danger-light: color-mix(in srgb, var(--c-danger) 15%, transparent);
 
             /* Light Theme */
             --c-bg-light: #F8F4F5; --c-card-bg-light: #FFFFFF; --c-text-primary-light: #332C33;
@@ -97,6 +97,8 @@
         .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 10px var(--shadow-color); }
         .btn-primary { background: var(--c-primary); color: white; }
         .btn-secondary { background-color: var(--c-card-bg); color: var(--c-primary); border: 1px solid var(--c-border); }
+        .btn-danger { background: none; color: var(--c-danger); border: 1px solid var(--c-danger-light); flex-grow: 0; }
+        .btn-danger:hover { background: var(--c-danger-light); color: var(--c-danger); }
         .btn-float {
             position: fixed; bottom: 30px; left: 30px; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center;
             justify-content: center; font-size: 1.5rem; z-index: 100; box-shadow: 0 8px 25px color-mix(in srgb, var(--c-primary) 40%, transparent);
@@ -117,21 +119,17 @@
         .notebook-cover {
             aspect-ratio: 3 / 4; background-color: var(--notebook-color, #ccc); border-radius: 8px 12px 12px 8px;
             padding: var(--spacing-md); display: flex; flex-direction: column; justify-content: space-between; color: white;
-            font-weight: 700; cursor: grab; position: relative;
+            font-weight: 700; cursor: pointer; position: relative;
             box-shadow: -6px 0 0 rgba(0,0,0,0.15) inset, 2px 2px 10px var(--shadow-color);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .notebook-cover:hover { transform: scale(1.05) rotate(-2deg); box-shadow: -6px 0 0 rgba(0,0,0,0.15) inset, 5px 5px 20px var(--shadow-color); }
-        .notebook-cover.sortable-ghost { transform: scale(1.05) rotate(-2deg); opacity: 0.5;}
+        .notebook-cover.sortable-ghost { transform: scale(1.05) rotate(-2deg); opacity: 0.5; cursor: grabbing; }
         .notebook-cover .title { font-size: 1.1rem; pointer-events: none; }
         .notebook-cover .note-count { font-size: 0.9rem; opacity: 0.8; pointer-events: none; }
         .new-notebook-btn { border: 2px dashed var(--c-border); color: var(--c-text-secondary); display: flex; align-items: center; justify-content: center; flex-direction: column; background: none; box-shadow: none; font-size: 1rem; cursor: pointer; transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
         .new-notebook-btn:hover { border-color: var(--c-primary); color: var(--c-primary); background-color: var(--c-pinned-bg-light); }
         .new-notebook-btn i { font-size: 2rem; margin-bottom: 0.5rem; }
-        .notebook-actions { position: absolute; top: 4px; left: 4px; display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s; z-index: 5; }
-        .notebook-cover:hover .notebook-actions { opacity: 1; }
-        .notebook-actions .btn-icon { background: rgba(0,0,0,0.2); color: white; width: 28px; height: 28px; font-size: 0.8rem; backdrop-filter: blur(2px);}
-        .notebook-actions .btn-icon:hover { background: rgba(0,0,0,0.4); }
 
         /* --- MODALS --- */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; z-index: 200; opacity: 0; visibility: hidden; transition: opacity 0.4s, visibility 0.4s; backdrop-filter: blur(5px); }
@@ -149,7 +147,7 @@
         .color-palette .color-dot:hover { transform: scale(1.1); }
         .color-palette .color-dot.selected { border-color: var(--c-primary); transform: scale(1.1); }
         .modal-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
-        .modal-actions .btn { width: 100%; }
+        .modal-actions .btn { flex-grow: 1; } /* Allow buttons to grow */
         
         /* --- ABOUT MODAL --- */
         .app-logo { width: 80px; height: 80px; border-radius: 20px; margin: 0 auto 1rem; display: block; }
@@ -352,6 +350,7 @@
             let autosaveTimeout = null;
             let unsavedChanges = false;
             let sortableNotebooks = null;
+            let longPressTimer = null; // ✅ For long tap detection
 
             // --- DATA MODELS & STORAGE ---
             const getNotebooks = () => JSON.parse(localStorage.getItem('myCompanionNotebooks')) || [];
@@ -446,6 +445,10 @@
                 const buttonText = isEditing ? 'ذخیره تغییرات' : 'ساختن';
                 const selectedColor = notebook.color || notebookColors[0];
 
+                // ✅ Conditionally render Delete button for editing modal
+                const deleteButtonHTML = isEditing ? 
+                    `<button type="button" class="btn btn-danger" data-action="delete-notebook">${'حذف'}</button>` : '';
+
                 modalContainer.innerHTML = `
                     <div class="modal-content">
                         <h3>${title}</h3>
@@ -464,6 +467,7 @@
                                 </div>
                             </div>
                             <div class="modal-actions">
+                                ${deleteButtonHTML}
                                 <button type="button" class="btn btn-secondary" data-action="close-modal">انصراف</button>
                                 <button type="submit" class="btn btn-primary">${buttonText}</button>
                             </div>
@@ -493,14 +497,13 @@
                 modalContainer.classList.add('visible');
             }
 
-            // ✅ New "About" Modal Renderer
             function renderAboutModal() {
                  modalContainer.innerHTML = `
                     <div class="modal-content">
                         <img src="https://i.postimg.cc/SKgT4hTn/notes-app.png" alt="لوگوی برنامه همراه من" class="app-logo">
                         <h3>همراه من</h3>
                         <p class="about-text">
-                            <strong>نسخه ۱.۰</strong>
+                            <strong>نسخه ۱.۱</strong>
                             <br>
                             یک دفترچه یادداشت ساده و زیبا برای ثبت افکار، احساسات و خاطرات شما. تمام اطلاعات شما به صورت امن روی دستگاه خودتان ذخیره می‌شود.
                         </p>
@@ -515,7 +518,6 @@
             function renderHeader(title, showBackButton = false, showSettingsButton = false) {
                 const backBtnHTML = showBackButton ? `<button class="btn btn-icon" data-action="back"><i class="fas fa-arrow-right"></i></button>` : `<div></div>`;
                 
-                // ✅ Updated Settings Button with Dropdown
                 const settingsBtnHTML = showSettingsButton ? `
                     <div class="settings-container">
                         <button class="btn btn-icon" data-action="toggle-settings-menu" title="تنظیمات">
@@ -554,11 +556,8 @@
                 let shelfHTML = '<div id="notebookShelf" class="notebook-shelf">';
                 notebooks.forEach(nb => {
                     const count = notes.filter(n => n.notebookId === nb.id).length;
+                    // ✅ Removed notebook-actions div
                     shelfHTML += `<div class="notebook-cover" data-action="open-notebook" data-id="${nb.id}" style="--notebook-color: ${nb.color};">
-                        <div class="notebook-actions">
-                            <button class="btn btn-icon" data-action="edit-notebook" data-id="${nb.id}" title="ویرایش"><i class="fas fa-pen"></i></button>
-                            <button class="btn btn-icon" data-action="delete-notebook" data-id="${nb.id}" title="حذف"><i class="fas fa-trash"></i></button>
-                        </div>
                         <div class="title">${nb.title}</div>
                         <div class="note-count">${toPersianDigits(count)} یادداشت</div>
                     </div>`;
@@ -567,7 +566,9 @@
                 shelfHTML += '</div>';
 
                 app.innerHTML = `<div class="page shelf-view"><div class="container">${renderHeader('همراه من', false, true)}${shelfHTML}</div></div>`;
+                
                 initSortableNotebooks();
+                setupLongPressListeners(); // ✅ Set up long-press
             }
 
             function renderNotebookView(notebookId, searchTerm = '') {
@@ -782,10 +783,13 @@
 
                 sortableNotebooks = new Sortable(shelf, {
                     animation: 150,
-                    delay: 200,
-                    delayOnTouchOnly: true,
                     ghostClass: 'sortable-ghost',
-                    filter: '.new-notebook-btn, .notebook-actions, .btn-icon',
+                    filter: '.new-notebook-btn', // Only the "new" button is not draggable
+                    preventOnFilter: true,
+                    onStart: () => {
+                        // When dragging starts, cancel any pending long press
+                        clearTimeout(longPressTimer);
+                    },
                     onEnd: (evt) => {
                         let notebooks = getNotebooks();
                         const element = notebooks.splice(evt.oldIndex, 1)[0];
@@ -793,6 +797,36 @@
                         notebooks.forEach((nb, index) => nb.order = index + 1);
                         saveNotebooks(notebooks);
                     }
+                });
+            }
+
+            // ✅ Setup long-press listeners for notebook covers
+            function setupLongPressListeners() {
+                const notebookCovers = document.querySelectorAll('.notebook-cover:not(.new-notebook-btn)');
+                notebookCovers.forEach(cover => {
+                    const pressStart = (e) => {
+                        // Prevent context menu on long press
+                        e.preventDefault();
+                        const notebookId = parseInt(cover.dataset.id);
+                        longPressTimer = setTimeout(() => {
+                            const notebook = getNotebooks().find(nb => nb.id === notebookId);
+                            if (notebook) {
+                                renderNotebookModal({ isEditing: true, notebook });
+                            }
+                        }, 500); // 500ms for a long press
+                    };
+
+                    const pressEnd = () => {
+                        clearTimeout(longPressTimer);
+                    };
+
+                    cover.addEventListener('mousedown', pressStart);
+                    cover.addEventListener('touchstart', pressStart, { passive: false });
+
+                    cover.addEventListener('mouseup', pressEnd);
+                    cover.addEventListener('mouseleave', pressEnd);
+                    cover.addEventListener('touchend', pressEnd);
+                    cover.addEventListener('touchcancel', pressEnd);
                 });
             }
             
@@ -881,7 +915,6 @@
             document.body.addEventListener('click', (e) => {
                 const actionTarget = e.target.closest('[data-action]');
                 
-                // ✅ Close settings dropdown if clicking outside
                 const settingsContainer = e.target.closest('.settings-container');
                 const dropdown = document.getElementById('settings-dropdown');
                 if (dropdown && !settingsContainer) {
@@ -889,7 +922,10 @@
                 }
 
                 if (!actionTarget) return;
-
+                
+                // If a drag was initiated, don't process the click
+                if (sortableNotebooks && sortableNotebooks.option('disabled')) return;
+                
                 e.stopPropagation(); 
 
                 const { action, id, noteId, notebookId, mode, color } = actionTarget.dataset;
@@ -927,26 +963,23 @@
                         if (unsavedChanges) saveNote();
                         goBack();
                         break;
-                    case 'new-notebook': renderNotebookModal(); break;
-                    case 'edit-notebook': {
-                        const notebook = getNotebooks().find(nb => nb.id === parseInt(id));
-                        if (notebook) renderNotebookModal({ isEditing: true, notebook });
-                        break;
-                    }
+                    case 'new-notebook': renderNotebookModal({}); break;
+                    
+                    // ✅ Delete notebook from modal
                     case 'delete-notebook': {
+                        const notebookIdToDelete = parseInt(document.getElementById('notebookId').value);
                         if (confirm('آیا از حذف این دفتر مطمئن هستید؟ تمام یادداشت‌های داخل آن نیز حذف خواهند شد!')) {
-                            const notebookIdToDelete = parseInt(id);
                             let notebooks = getNotebooks().filter(nb => nb.id !== notebookIdToDelete);
                             let notes = getNotes().filter(n => n.notebookId !== notebookIdToDelete);
                             saveNotebooks(notebooks);
                             saveNotes(notes);
+                            modalContainer.classList.remove('visible');
                             navigateTo('shelf', null, true);
                         }
                         break;
                     }
+
                     case 'close-modal': modalContainer.classList.remove('visible'); break;
-                    
-                    // ✅ Handle new menu actions
                     case 'toggle-settings-menu':
                         document.getElementById('settings-dropdown')?.classList.toggle('visible');
                         break;
@@ -958,7 +991,6 @@
                         renderAboutModal();
                         document.getElementById('settings-dropdown')?.classList.remove('visible');
                         break;
-
                     case 'backup-data': handleBackup(); break;
                     case 'trigger-restore': document.getElementById('restore-input').click(); break;
                     case 'select-color':
