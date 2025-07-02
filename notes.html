@@ -115,17 +115,16 @@
         }
         .btn-link:hover { background-color: var(--c-border); transform: none; box-shadow: none;}
 
-        /* --- ✅ FLAT NOTEBOOK DESIGN WITH SIDE VIEW (NEW) --- */
+        /* --- ✅ FLAT NOTEBOOK DESIGN WITH INCREASED DEPTH (NEW) --- */
         .notebook-shelf {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            /* Increased column gap to account for the visible spine */
             gap: 40px 32px;
             padding: var(--spacing-md) 0;
         }
 
         .notebook-cover {
-            --notebook-depth: 10px; /* Depth of the spine/pages */
+            --notebook-depth: 14px; /* Increased depth as requested */
             --notebook-spine-color: color-mix(in srgb, var(--notebook-color) 65%, black);
             --notebook-page-color: #FDFDFD;
             --notebook-page-shadow: #EAEAEA;
@@ -134,18 +133,16 @@
             position: relative;
             cursor: pointer;
             background-color: var(--notebook-color);
-            /* Spine is on the left (RTL right side), so left corners are sharp */
             border-radius: 2px 8px 8px 2px;
             padding: 20px;
-            padding-left: 16px; /* A bit less padding on the spine side */
+            padding-left: 16px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
 
-            /* Add a margin to make space for the side element */
+            /* Make space for the side element */
             margin-left: var(--notebook-depth);
 
-            /* Flat design transition */
             transition: transform 0.25s ease, box-shadow 0.25s ease;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
@@ -178,11 +175,6 @@
             /* A darker edge to simulate the actual spine cover */
             border-left: 2px solid var(--notebook-spine-color);
             box-shadow: -1px 0 3px rgba(0,0,0,0.1) inset; /* Inner shadow for depth */
-        }
-
-        /* We don't need the back cover element anymore */
-        .notebook-cover::after {
-            display: none;
         }
 
         .notebook-cover .title {
@@ -244,7 +236,7 @@
         .color-palette .color-dot:hover { transform: scale(1.1); }
         .color-palette .color-dot.selected { border-color: var(--c-primary); transform: scale(1.1); }
         .modal-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
-        .modal-actions .btn { flex-grow: 1; } /* Allow buttons to grow */
+        .modal-actions .btn { flex-grow: 1; }
         
         /* --- ABOUT MODAL --- */
         .app-logo { width: 80px; height: 80px; border-radius: 20px; margin: 0 auto 1rem; display: block; }
@@ -566,7 +558,7 @@
                             <div class="modal-actions">
                                 ${deleteButtonHTML}
                                 <button type="button" class="btn btn-secondary" data-action="close-modal">انصراف</button>
-                                <button type="submit" class="btn btn-primary">${buttonText}</button>
+                                <button type="button" data-action="save-notebook" class="btn btn-primary">${buttonText}</button>
                             </div>
                         </form>
                     </div>`;
@@ -579,7 +571,7 @@
                         <h3>پشتیبان‌گیری و بازیابی</h3>
                         <p>می‌توانید از تمام دفترها و یادداشت‌های خود یک فایل پشتیبان تهیه کنید یا اطلاعات خود را از یک فایل پشتیبان بازگردانی نمایید.</p>
                         <div class="modal-actions">
-                            <button type="button" class="btn btn-secondary" data-action="trigger-restore">
+                             <button type="button" class="btn btn-secondary" data-action="trigger-restore">
                                 <i class="fas fa-upload" style="margin-left: 8px;"></i>بازیابی
                             </button>
                             <button type="button" class="btn btn-primary" data-action="backup-data">
@@ -587,9 +579,9 @@
                             </button>
                         </div>
                         <input type="file" id="restore-input" style="display: none;" accept=".json">
-                        <div class="modal-actions" style="margin-top: 24px;">
-                            <button type="button" class="btn" data-action="close-modal" style="width: 100%; background: none; color: var(--c-text-secondary);">بستن</button>
-                        </div>
+                         <div class="modal-actions" style="margin-top: 24px;">
+                             <button type="button" class="btn" data-action="close-modal" style="width: 100%; background: none; color: var(--c-text-secondary);">بستن</button>
+                         </div>
                     </div>`;
                 modalContainer.classList.add('visible');
             }
@@ -600,13 +592,13 @@
                         <img src="https://i.postimg.cc/SKgT4hTn/notes-app.png" alt="لوگوی برنامه همراه من" class="app-logo">
                         <h3>همراه من</h3>
                         <p class="about-text">
-                            <strong>نسخه ۱.۴</strong>
+                            <strong>نسخه ۱.۶</strong>
                             <br>
                             یک دفترچه یادداشت ساده و زیبا برای ثبت افکار، احساسات و خاطرات شما. تمام اطلاعات شما به صورت امن روی دستگاه خودتان ذخیره می‌شود.
                         </p>
-                        <div class="modal-actions" style="margin-top: 24px;">
-                            <button type="button" class="btn btn-primary" data-action="close-modal" style="width: 100%;">فهمیدم</button>
-                        </div>
+                         <div class="modal-actions" style="margin-top: 24px;">
+                             <button type="button" class="btn btn-primary" data-action="close-modal" style="width: 100%;">فهمیدم</button>
+                         </div>
                     </div>`;
                 modalContainer.classList.add('visible');
             }
@@ -712,7 +704,7 @@
                                 <span class="month">${dateParts.month}</span>
                             </div>
                             <div class="note-card-clickable-area" data-action="edit-note" data-note-id="${note.id}">
-                                <h3><i class="fas ${moodInfo.icon}" style="color: ${moodInfo.color}"></i>${note.title || 'بدون عنوان'}</h3>
+                                <h3><i class="fas ${moodInfo.icon}" style="--dynamic-mood-color: ${moodInfo.color}"></i>${note.title || 'بدون عنوان'}</h3>
                                 <p>${shortContent || 'بدون محتوا'}</p>
                             </div>
                             <div class="note-actions">
@@ -1066,6 +1058,28 @@
                         goBack();
                         break;
                     case 'new-notebook': renderNotebookModal({}); break;
+                    case 'save-notebook': {
+                        const form = document.getElementById('notebookForm');
+                        if (form) {
+                            const title = form.querySelector('#notebookTitle').value.trim();
+                            const color = form.querySelector('.color-dot.selected')?.dataset.color;
+                            if (!title) { alert('لطفا یک عنوان برای دفترت انتخاب کن.'); return; }
+                            if (!color) { alert('لطفا یک رنگ برای دفترت انتخاب کن.'); return; }
+                            const notebookIdInput = form.querySelector('#notebookId');
+                            const notebookId = notebookIdInput && notebookIdInput.value ? parseInt(notebookIdInput.value) : null;
+                            let notebooks = getNotebooks();
+                            if (notebookId) {
+                                notebooks = notebooks.map(nb => nb.id === notebookId ? { ...nb, title, color } : nb);
+                            } else {
+                                const maxOrder = notebooks.reduce((max, nb) => Math.max(max, nb.order || 0), 0);
+                                notebooks.push({ id: Date.now(), title, color, viewMode: 'grid', order: maxOrder + 1 });
+                            }
+                            saveNotebooks(notebooks);
+                            modalContainer.classList.remove('visible');
+                            renderCurrentView();
+                        }
+                        break;
+                    }
                     case 'delete-notebook': {
                         const notebookIdToDelete = parseInt(document.getElementById('notebookId').value);
                         if (confirm('آیا از حذف این دفتر مطمئن هستید؟ تمام یادداشت‌های داخل آن نیز حذف خواهند شد!')) {
@@ -1108,28 +1122,6 @@
                 }
             });
             
-            modalContainer.addEventListener('submit', e => {
-                e.preventDefault();
-                if (e.target.id === 'notebookForm') {
-                    const title = document.getElementById('notebookTitle').value.trim();
-                    const color = document.querySelector('.color-dot.selected').dataset.color;
-                    const notebookId = parseInt(document.getElementById('notebookId').value);
-
-                    if (!title) { alert('لطفا یک عنوان برای دفترت انتخاب کن.'); return; }
-                    
-                    let notebooks = getNotebooks();
-                    if (notebookId) {
-                        notebooks = notebooks.map(nb => nb.id === notebookId ? { ...nb, title, color } : nb);
-                    } else {
-                        notebooks.push({ id: Date.now(), title, color, viewMode: 'grid', order: notebooks.length + 1 });
-                    }
-                    
-                    saveNotebooks(notebooks);
-                    modalContainer.classList.remove('visible');
-                    renderCurrentView();
-                }
-            });
-
             document.body.addEventListener('change', e => {
                 if (e.target.id === 'theme-toggle') {
                     const newTheme = e.target.checked ? 'dark' : 'light';
