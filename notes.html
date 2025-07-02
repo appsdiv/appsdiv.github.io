@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>همراه من</title>
+
+    <!-- ✅ PWA & Favicon Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="همراه من">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/SKgT4hTn/notes-app.png">
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/SKgT4hTn/notes-app.png">
+
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+
+    <style>
+        /* --- CORE DESIGN SYSTEM --- */
+        :root {
+            /* Colors */
+            --c-primary: #D98BAA;
+            --c-primary-light: color-mix(in srgb, var(--c-primary) 20%, white);
+            --c-mood-happy: #F8C8A8; --c-mood-calm: #EAA2A2; --c-mood-creative: #C5B0E0;
+            --c-mood-grateful: #F3B396; --c-mood-neutral: #B4A0C2;
+            --c-danger: #e74c3c;
+
+            /* Light Theme */
+            --c-bg-light: #F8F4F5; --c-card-bg-light: #FFFFFF; --c-text-primary-light: #332C33;
+            --c-text-secondary-light: #7E787E; --c-border-light: #F3EAEB; --shadow-color-light: rgba(149, 157, 165, 0.1);
+            --c-pinned-bg-light: color-mix(in srgb, var(--c-primary) 5%, var(--c-card-bg-light));
+
+            /* Dark Theme */
+            --c-bg-dark: #2A2428; --c-card-bg-dark: #3D3539; --c-text-primary-dark: #F5F1F2;
+            --c-text-secondary-dark: #A8A1A4; --c-border-dark: #524A4E; --shadow-color-dark: rgba(0, 0, 0, 0.2);
+            --c-pinned-bg-dark: color-mix(in srgb, var(--c-primary) 10%, var(--c-card-bg-dark));
+
+            /* Typography & Layout */
+            --font-family: 'Vazirmatn', sans-serif;
+            --radius-card: 24px; --radius-btn: 16px;
+            --spacing-md: 16px; --spacing-lg: 24px;
+            --transition-speed: 0.3s;
+        }
+
+        /* --- THEME SETUP --- */
+        body {
+            background-color: var(--c-bg, var(--c-bg-light));
+            color: var(--c-text-primary, var(--c-text-primary-light));
+            font-family: var(--font-family);
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+            margin: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body.dark-theme {
+            --c-bg: var(--c-bg-dark); --c-card-bg: var(--c-card-bg-dark); --c-text-primary: var(--c-text-primary-dark);
+            --c-text-secondary: var(--c-text-secondary-dark); --c-border: var(--c-border-dark); --shadow-color: var(--shadow-color-dark);
+            --c-pinned-bg: var(--c-pinned-bg-dark);
+        }
+        body:not(.dark-theme) {
+            --c-bg: var(--c-bg-light); --c-card-bg: var(--c-card-bg-light); --c-text-primary: var(--c-text-primary-light);
+            --c-text-secondary: var(--c-text-secondary-light); --c-border: var(--c-border-light); --shadow-color: var(--shadow-color-light);
+            --c-pinned-bg: var(--c-pinned-bg-light);
+        }
+
+        /* --- GENERAL & PAGE TRANSITIONS --- */
+        .page {
+            min-height: 100vh;
+            animation: page-enter 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        @keyframes page-enter { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .container { max-width: 520px; margin: 0 auto; padding: var(--spacing-md); }
+        header { display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-md) 0; gap: var(--spacing-md);}
+        h1 { font-size: 1.8rem; font-weight: 800; color: var(--c-primary); transition: color 0.3s ease; margin: 0; }
+        .header-controls { display: flex; align-items: center; gap: 12px; }
+
+        /* --- THEME SWITCHER --- */
+        .theme-switcher { display: flex; align-items: center; gap: 8px; color: var(--c-text-secondary); }
+        .theme-switcher .icon { font-size: 1.2rem; }
+        .theme-switcher .fa-sun { display: none; }
+        body.dark-theme .theme-switcher .fa-sun { display: inline-block; }
+        body.dark-theme .theme-switcher .fa-moon { display: none; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; inset: 0; background-color: var(--c-border); transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--c-primary); }
+        input:checked + .slider:before { transform: translateX(24px); }
+        
+        /* --- BUTTONS --- */
+        .btn { padding: 12px 20px; border-radius: var(--radius-btn); border: none; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 10px var(--shadow-color); }
+        .btn-primary { background: var(--c-primary); color: white; }
+        .btn-secondary { background-color: var(--c-card-bg); color: var(--c-primary); border: 1px solid var(--c-border); }
+        .btn-float {
+            position: fixed; bottom: 30px; left: 30px; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 1.5rem; z-index: 100; box-shadow: 0 8px 25px color-mix(in srgb, var(--c-primary) 40%, transparent);
+            transform: scale(1); transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .btn-float:hover { transform: scale(1.1) rotate(15deg); }
+        .btn-icon { background: none; color: var(--c-text-secondary); font-size: 1.2rem; border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center; border: none; transition: background-color 0.2s, color 0.2s;}
+        .btn-icon:hover { background-color: var(--c-border); color: var(--c-primary); transform: none; box-shadow: none; }
+        .btn-link {
+            background: none; border: none; color: var(--c-primary); font-weight: 700;
+            font-family: var(--font-family); font-size: 1rem; cursor: pointer; display: flex; align-items: center;
+            gap: 8px; padding: 8px; border-radius: var(--radius-btn); transition: background-color 0.2s, color 0.2s;
+        }
+        .btn-link:hover { background-color: var(--c-border); transform: none; box-shadow: none;}
+
+        /* --- NOTEBOOK SHELF (HOME VIEW) --- */
+        .notebook-shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--spacing-lg); padding: var(--spacing-md) 0; }
+        .notebook-cover {
+            aspect-ratio: 3 / 4; background-color: var(--notebook-color, #ccc); border-radius: 8px 12px 12px 8px;
+            padding: var(--spacing-md); display: flex; flex-direction: column; justify-content: space-between; color: white;
+            font-weight: 700; cursor: grab; position: relative;
+            box-shadow: -6px 0 0 rgba(0,0,0,0.15) inset, 2px 2px 10px var(--shadow-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .notebook-cover:hover { transform: scale(1.05) rotate(-2deg); box-shadow: -6px 0 0 rgba(0,0,0,0.15) inset, 5px 5px 20px var(--shadow-color); }
+        .notebook-cover.sortable-ghost { transform: scale(1.05) rotate(-2deg); opacity: 0.5;}
+        .notebook-cover .title { font-size: 1.1rem; pointer-events: none; }
+        .notebook-cover .note-count { font-size: 0.9rem; opacity: 0.8; pointer-events: none; }
+        .new-notebook-btn { border: 2px dashed var(--c-border); color: var(--c-text-secondary); display: flex; align-items: center; justify-content: center; flex-direction: column; background: none; box-shadow: none; font-size: 1rem; cursor: pointer; transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
+        .new-notebook-btn:hover { border-color: var(--c-primary); color: var(--c-primary); background-color: var(--c-pinned-bg-light); }
+        .new-notebook-btn i { font-size: 2rem; margin-bottom: 0.5rem; }
+        .notebook-actions { position: absolute; top: 4px; left: 4px; display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s; z-index: 5; }
+        .notebook-cover:hover .notebook-actions { opacity: 1; }
+        .notebook-actions .btn-icon { background: rgba(0,0,0,0.2); color: white; width: 28px; height: 28px; font-size: 0.8rem; backdrop-filter: blur(2px);}
+        .notebook-actions .btn-icon:hover { background: rgba(0,0,0,0.4); }
+
+        /* --- MODALS --- */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; z-index: 200; opacity: 0; visibility: hidden; transition: opacity 0.4s, visibility 0.4s; backdrop-filter: blur(5px); }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content { background: var(--c-card-bg); padding: var(--spacing-lg); border-radius: var(--radius-card); width: 90%; max-width: 400px; transform: translateY(20px) scale(0.98); opacity: 0; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+        .modal-overlay.visible .modal-content { transform: translateY(0) scale(1); opacity: 1; }
+        .modal-content h3 { margin-top: 0; text-align: center; color: var(--c-primary); }
+        .modal-content p { color: var(--c-text-secondary); text-align: center; font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.5rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; }
+        .form-group input { box-sizing: border-box; width: 100%; padding: 12px; border: 1px solid var(--c-border); border-radius: var(--radius-btn); background: var(--c-bg); font-family: inherit; color: var(--c-text-primary); transition: border-color 0.2s, box-shadow 0.2s;}
+        .form-group input:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px var(--c-primary-light); }
+        .color-palette { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 0.5rem;}
+        .color-palette .color-dot { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: all 0.2s; position: relative; }
+        .color-palette .color-dot:hover { transform: scale(1.1); }
+        .color-palette .color-dot.selected { border-color: var(--c-primary); transform: scale(1.1); }
+        .modal-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
+        .modal-actions .btn { width: 100%; }
+        
+        /* --- ABOUT MODAL --- */
+        .app-logo { width: 80px; height: 80px; border-radius: 20px; margin: 0 auto 1rem; display: block; }
+        .about-text { text-align: center; line-height: 1.7; color: var(--c-text-secondary); }
+        .about-text strong { color: var(--c-text-primary); font-weight: 700; }
+
+        /* --- SETTINGS DROPDOWN MENU --- */
+        .settings-container { position: relative; }
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            background-color: var(--c-card-bg);
+            border-radius: var(--radius-btn);
+            box-shadow: 0 8px 24px var(--shadow-color);
+            border: 1px solid var(--c-border);
+            list-style: none;
+            padding: 8px;
+            margin: 0;
+            width: 200px;
+            z-index: 110;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px) scale(0.95);
+            transition: all 0.2s ease-out;
+        }
+        .dropdown-menu.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        .dropdown-item a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            color: var(--c-text-primary);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .dropdown-item a:hover { background-color: var(--c-border); }
+        .dropdown-item i { width: 20px; text-align: center; color: var(--c-text-secondary); }
+
+        /* --- NOTE EDITOR VIEW --- */
+        .editor-view .editor-header {
+            display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-md);
+            position: sticky; top: 0; background: color-mix(in srgb, var(--c-bg) 80%, transparent); backdrop-filter: blur(10px); z-index: 10;
+            border-bottom: 1px solid var(--c-border);
+        }
+        .editor-view main { padding: 0 var(--spacing-md); }
+        .editor-view #note-title {
+            font-size: 2rem; font-weight: 800; border: none; background: transparent; width: 100%;
+            color: var(--c-text-primary); padding: 16px 0 8px 0; margin-top: var(--spacing-md); box-sizing: border-box;
+            font-family: var(--font-family);
+        }
+        .editor-view #note-title::placeholder, .editor-view #note-content::placeholder { color: var(--c-text-secondary); opacity: 0.7; }
+        .editor-view #note-title:focus, .editor-view #note-content:focus { outline: none; }
+        
+        .editor-view #note-content {
+            font-size: 1.1rem; line-height: 1.8; border: none; background: transparent; width: 100%;
+            min-height: 60vh; color: var(--c-text-primary); resize: none; padding: 8px 0; box-sizing: border-box;
+            font-family: var(--font-family);
+        }
+        
+        .save-status { color: var(--c-text-secondary); font-size: 0.9rem; font-weight: 600; transition: opacity 0.5s, transform 0.5s; opacity: 0; transform: translateY(5px);}
+        .save-status.visible { opacity: 1; transform: translateY(0); }
+        .mood-title { text-align: center; color: var(--c-text-secondary); font-weight: 600; margin-top: 24px; font-size: 0.9rem; }
+        .editor-view .mood-selector { display: flex; justify-content: center; gap: var(--spacing-lg); padding: 1rem 0 1.5rem 0; }
+        .editor-view .mood-selector label {
+            width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+            border-radius: 50%; cursor: pointer; color: var(--c-text-secondary); transition: all 0.3s ease;
+        }
+        .editor-view .mood-selector input[type="radio"] { display: none; }
+        .editor-view .mood-selector input[type="radio"]:checked + label { transform: scale(1.2); color: var(--dynamic-mood-color); }
+
+        /* --- NOTEBOOK VIEW HEADER (SEARCH & VIEW MODE) --- */
+        .notebook-header { display: flex; flex-direction: column; gap: var(--spacing-md); padding: var(--spacing-md) 0; }
+        .notebook-controls { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-md); }
+        .search-box { flex-grow: 1; position: relative; }
+        .search-box input {
+            width: 100%; box-sizing: border-box; padding: 10px 40px 10px 16px; border-radius: var(--radius-btn);
+            border: 1px solid var(--c-border); background-color: var(--c-card-bg); font-family: inherit; color: var(--c-text-primary);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .search-box input:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px var(--c-primary-light); }
+        .search-box .fa-search {
+            position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--c-text-secondary);
+        }
+        .view-switcher { display: flex; align-items: center; background-color: var(--c-card-bg); border-radius: var(--radius-btn); border: 1px solid var(--c-border); padding: 2px;}
+        .view-switcher .btn-icon { width: 36px; height: 36px; font-size: 1rem; color: var(--c-text-secondary); }
+        .view-switcher .btn-icon.active { background-color: var(--c-primary); color: white; }
+        
+        /* --- NOTE CARDS --- */
+        #notes-grid { display: grid; gap: var(--spacing-md); transition: all 0.3s ease; padding-bottom: 80px; }
+        
+        .note-card {
+            background-color: var(--c-card-bg); border-radius: var(--radius-card);
+            box-shadow: 0 4px 16px var(--shadow-color);
+            transition: transform 0.2s ease, box-shadow 0.2s, background-color 0.2s;
+            display: flex; align-items: stretch; position: relative;
+        }
+        .note-card.pinned { background-color: var(--c-pinned-bg); }
+        .note-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px var(--shadow-color); }
+        .note-date {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            flex-shrink: 0; width: 45px; color: var(--c-text-secondary);
+            border-left: 2px solid var(--c-border); padding-left: var(--spacing-md);
+        }
+        .note-date .day { font-size: 1.6rem; font-weight: 700; opacity: 0.9; }
+        .note-date .month { font-size: 0.9rem; font-weight: 600; opacity: 0.7; }
+        .note-card-clickable-area {
+            flex-grow: 1; cursor: pointer; display: flex; flex-direction: column;
+            gap: 8px; min-width: 0; padding: var(--spacing-lg);
+        }
+        .note-card h3 {
+            font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--c-text-primary);
+            line-height: 1.4; display: flex; align-items: center;
+            gap: 10px; word-break: break-word;
+        }
+        .note-card h3 .fas { color: var(--dynamic-mood-color); }
+        .note-card p {
+            margin: 0; font-size: 1rem; color: var(--c-text-secondary); line-height: 1.7;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+            overflow: hidden; flex-grow: 1; padding-bottom: 30px; /* Space for actions */
+        }
+        .note-actions {
+            position: absolute; bottom: 8px; left: 8px; z-index: 5;
+            display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s, transform 0.2s;
+        }
+        .note-card:hover .note-actions { opacity: 1; }
+        .note-actions .btn-icon {
+            color: var(--c-text-secondary); background-color: transparent; width: 32px; height: 32px;
+            font-size: 0.9rem; transition: opacity 0.2s, color 0.2s, background-color 0.2s;
+        }
+        .note-actions .btn-icon:hover { background: var(--c-border); transform: none; box-shadow: none;}
+        .note-actions .btn-icon.delete:hover {
+            color: var(--c-danger); background: color-mix(in srgb, var(--c-danger) 10%, transparent);
+        }
+        .note-actions .btn-icon.pin.active { color: var(--c-primary); }
+
+        /* --- Note View Mode Adjustments --- */
+        #notes-grid.view-list { grid-template-columns: 1fr; }
+        #notes-grid.view-list .note-card {
+            flex-direction: row; padding: 0; padding-left: var(--spacing-md);
+        }
+        
+        #notes-grid.view-grid {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        }
+        #notes-grid.view-grid .note-card { flex-direction: column; }
+        #notes-grid.view-grid .note-date {
+            flex-direction: row; width: auto; border-left: none;
+            border-bottom: 2px solid var(--c-border); padding: 8px var(--spacing-md);
+            justify-content: flex-start; gap: 8px; align-items: center;
+        }
+        #notes-grid.view-grid .note-date .day,
+        #notes-grid.view-grid .note-date .month { font-size: 0.9rem; }
+
+        #notes-grid.view-title { grid-template-columns: 1fr; gap: 8px; }
+        #notes-grid.view-title .note-card {
+            padding: 0;
+            min-height: 56px;
+            align-items: center;
+        }
+        #notes-grid.view-title .note-card-clickable-area {
+             padding: 12px var(--spacing-md);
+        }
+        #notes-grid.view-title .note-card h3 { margin: 0; }
+        #notes-grid.view-title p,
+        #notes-grid.view-title .note-date { display: none; }
+        #notes-grid.view-title .note-actions {
+             left: 8px;
+             right: auto;
+             bottom: 50%;
+             transform: translateY(50%);
+        }
+
+        /* --- Empty State --- */
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--c-text-secondary); }
+        .empty-state .icon { font-size: 4rem; color: var(--c-border); margin-bottom: 1.5rem; display: block; }
+        .empty-state h3 { color: var(--c-text-primary); }
+        .empty-state p { line-height: 1.6; }
+
+    </style>
+</head>
+<body>
+
+    <div id="app"></div>
+    <div id="modalContainer" class="modal-overlay"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const app = document.getElementById('app');
+            const modalContainer = document.getElementById('modalContainer');
+
+            // --- STATE MANAGEMENT ---
+            let editingNoteId = null;
+            let autosaveTimeout = null;
+            let unsavedChanges = false;
+            let sortableNotebooks = null;
+
+            // --- DATA MODELS & STORAGE ---
+            const getNotebooks = () => JSON.parse(localStorage.getItem('myCompanionNotebooks')) || [];
+            const saveNotebooks = (notebooks) => localStorage.setItem('myCompanionNotebooks', JSON.stringify(notebooks));
+            const getNotes = () => JSON.parse(localStorage.getItem('myCompanionNotes')) || [];
+            const saveNotes = (notes) => localStorage.setItem('myCompanionNotes', JSON.stringify(notes));
+            const getTheme = () => localStorage.getItem('myCompanionTheme') || 'light';
+            const saveTheme = (theme) => localStorage.setItem('myCompanionTheme', theme);
+            
+            // --- INITIAL DATA SETUP ---
+            function initializeData() {
+                if (getNotebooks().length === 0) {
+                    saveNotebooks([
+                        { id: 1, title: 'دفتر اصلی من', color: '#D98BAA', viewMode: 'grid', order: 1 }
+                    ]);
+                    saveNotes([
+                        {id: Date.now(), title: "خوش آمدی!", content: "این اولین یادداشت تو در همراه من است. می‌توانی از اینجا شروع به نوشتن کنی یا دفترهای جدید با رنگ‌های مختلف بسازی.", mood: "happy", notebookId: 1, lastModified: Date.now(), isPinned: false}
+                    ]);
+                }
+            }
+            
+            // --- HELPERS & CONSTANTS ---
+            function toPersianDigits(n) {
+                const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+                return n.toString().replace(/\d/g, d => persianDigits[d]);
+            }
+
+            function toJalali(gy, gm, gd) {
+                let g_d_m = [0, 31, (gy % 4 == 0 && gy % 100 != 0) || (gy % 400 == 0) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                let jy, jm, jd;
+                let gy2 = gy - 1600;
+                let gm2 = gm - 1;
+                let gd2 = gd - 1;
+                let g_day_no = 365 * gy2 + Math.floor((gy2 + 3) / 4) - Math.floor((gy2 + 99) / 100) + Math.floor((gy2 + 399) / 400);
+                for (let i = 0; i < gm2; ++i) g_day_no += g_d_m[i + 1];
+                g_day_no += gd2;
+                let j_day_no = g_day_no - 79;
+                let j_np = Math.floor(j_day_no / 12053);
+                j_day_no %= 12053;
+                jy = 979 + 33 * j_np + 4 * Math.floor(j_day_no / 1461);
+                j_day_no %= 1461;
+                if (j_day_no >= 366) {
+                    jy += Math.floor((j_day_no - 1) / 365);
+                    j_day_no = (j_day_no - 1) % 365;
+                }
+                let jmList = [0, 31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29];
+                for (jm = 1; jm <= 12 && j_day_no >= jmList[jm]; ++jm) {
+                    j_day_no -= jmList[jm];
+                }
+                jd = j_day_no + 1;
+                return { year: jy, month: jm, day: jd };
+            }
+
+            const jalaliMonthsFa = ['', 'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+            
+            function getJalaliDateParts(date = new Date()) {
+                 if (!(date instanceof Date) || isNaN(date)) {
+                     return { day: '', month: '', year: ''};
+                 }
+                let gy = date.getFullYear();
+                let gm = date.getMonth() + 1;
+                let gd = date.getDate();
+                let { day, month } = toJalali(gy, gm, gd);
+                return { day: toPersianDigits(day), month: jalaliMonthsFa[month] };
+            }
+
+            const moods = {
+                happy: { icon: 'fa-smile', text: 'شاد', color: 'var(--c-mood-happy)' },
+                calm: { icon: 'fa-leaf', text: 'آرام', color: 'var(--c-mood-calm)' },
+                creative: { icon: 'fa-lightbulb', text: 'خلاق', color: 'var(--c-mood-creative)' },
+                grateful: { icon: 'fa-heart', text: 'شکرگزار', color: 'var(--c-mood-grateful)' },
+                neutral: { icon: 'fa-circle', text: 'خنثی', color: 'var(--c-mood-neutral)' },
+            };
+            const notebookColors = ['#D98BAA', '#EAA2A2', '#F8C8A8', '#C5B0E0', '#B4A0C2', '#A8D8B4', '#A1C9F4', '#F6EAC2'];
+            const journalPrompts = [
+                "امروز چه چیزی باعث لبخندت شد؟", "یک فکر کوچک که دوست داری به خاطر بسپاری...",
+                "چه چیزی رو امروز یاد گرفتی؟", "یک آهنگ که امروز حالت رو خوب کرد...",
+                "یک حس خوب...", "چه چیزی نگرانت کرده؟ راحت بنویس..."
+            ];
+
+            // --- THEME & COLOR ---
+            const applyTheme = (theme) => document.body.classList.toggle('dark-theme', theme === 'dark');
+            
+            function setAppColor(color = null) {
+                const root = document.documentElement;
+                root.style.setProperty('--c-primary', color || '#D98BAA');
+            }
+
+            // --- MODAL RENDERING ---
+            function renderNotebookModal({ isEditing = false, notebook = {} } = {}) {
+                const title = isEditing ? 'ویرایش دفتر' : 'دفتر جدیدت رو بساز';
+                const buttonText = isEditing ? 'ذخیره تغییرات' : 'ساختن';
+                const selectedColor = notebook.color || notebookColors[0];
+
+                modalContainer.innerHTML = `
+                    <div class="modal-content">
+                        <h3>${title}</h3>
+                        <form id="notebookForm">
+                            <input type="hidden" id="notebookId" value="${notebook.id || ''}">
+                            <div class="form-group">
+                                <label for="notebookTitle">عنوان دفتر</label>
+                                <input type="text" id="notebookTitle" placeholder="مثلا: خاطرات من" required value="${notebook.title || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label>رنگ جلد</label>
+                                <div class="color-palette">
+                                ${notebookColors.map(color => 
+                                    `<div class="color-dot ${color === selectedColor ? 'selected' : ''}" style="background-color: ${color};" data-action="select-color" data-color="${color}"></div>`
+                                ).join('')}
+                                </div>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn btn-secondary" data-action="close-modal">انصراف</button>
+                                <button type="submit" class="btn btn-primary">${buttonText}</button>
+                            </div>
+                        </form>
+                    </div>`;
+                modalContainer.classList.add('visible');
+            }
+            
+            function renderBackupModal() {
+                 modalContainer.innerHTML = `
+                    <div class="modal-content">
+                        <h3>پشتیبان‌گیری و بازیابی</h3>
+                        <p>می‌توانید از تمام دفترها و یادداشت‌های خود یک فایل پشتیبان تهیه کنید یا اطلاعات خود را از یک فایل پشتیبان بازگردانی نمایید.</p>
+                        <div class="modal-actions">
+                             <button type="button" class="btn btn-secondary" data-action="trigger-restore">
+                                 <i class="fas fa-upload" style="margin-left: 8px;"></i>بازیابی
+                            </button>
+                            <button type="button" class="btn btn-primary" data-action="backup-data">
+                                <i class="fas fa-download" style="margin-left: 8px;"></i>پشتیبان‌گیری
+                            </button>
+                        </div>
+                        <input type="file" id="restore-input" style="display: none;" accept=".json">
+                         <div class="modal-actions" style="margin-top: 24px;">
+                             <button type="button" class="btn" data-action="close-modal" style="width: 100%; background: none; color: var(--c-text-secondary);">بستن</button>
+                         </div>
+                    </div>`;
+                modalContainer.classList.add('visible');
+            }
+
+            // ✅ New "About" Modal Renderer
+            function renderAboutModal() {
+                 modalContainer.innerHTML = `
+                    <div class="modal-content">
+                        <img src="https://i.postimg.cc/SKgT4hTn/notes-app.png" alt="لوگوی برنامه همراه من" class="app-logo">
+                        <h3>همراه من</h3>
+                        <p class="about-text">
+                            <strong>نسخه ۱.۰</strong>
+                            <br>
+                            یک دفترچه یادداشت ساده و زیبا برای ثبت افکار، احساسات و خاطرات شما. تمام اطلاعات شما به صورت امن روی دستگاه خودتان ذخیره می‌شود.
+                        </p>
+                         <div class="modal-actions" style="margin-top: 24px;">
+                             <button type="button" class="btn btn-primary" data-action="close-modal" style="width: 100%;">فهمیدم</button>
+                         </div>
+                    </div>`;
+                modalContainer.classList.add('visible');
+            }
+
+            // --- VIEW RENDERING ---
+            function renderHeader(title, showBackButton = false, showSettingsButton = false) {
+                const backBtnHTML = showBackButton ? `<button class="btn btn-icon" data-action="back"><i class="fas fa-arrow-right"></i></button>` : `<div></div>`;
+                
+                // ✅ Updated Settings Button with Dropdown
+                const settingsBtnHTML = showSettingsButton ? `
+                    <div class="settings-container">
+                        <button class="btn btn-icon" data-action="toggle-settings-menu" title="تنظیمات">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                        <ul class="dropdown-menu" id="settings-dropdown">
+                            <li class="dropdown-item">
+                                <a href="#" data-action="open-backup-modal">
+                                    <i class="fas fa-save"></i>
+                                    <span>پشتیبان‌گیری و بازیابی</span>
+                                </a>
+                            </li>
+                            <li class="dropdown-item">
+                                <a href="#" data-action="open-about-modal">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>درباره</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                ` : '';
+
+                const themeSwitcherHTML = `<div class="theme-switcher">
+                    <i class="fas fa-moon icon"></i>
+                    <label class="switch"><input type="checkbox" id="theme-toggle" ${getTheme() === 'dark' ? 'checked' : ''}><span class="slider"></span></label>
+                    <i class="fas fa-sun icon"></i>
+                </div>`;
+                return `<header>${backBtnHTML}<h1>${title}</h1><div class="header-controls">${settingsBtnHTML}${themeSwitcherHTML}</div></header>`;
+            }
+
+            function renderNotebookShelf() {
+                setAppColor(null);
+                const notebooks = getNotebooks().sort((a,b) => a.order - b.order);
+                const notes = getNotes();
+                
+                let shelfHTML = '<div id="notebookShelf" class="notebook-shelf">';
+                notebooks.forEach(nb => {
+                    const count = notes.filter(n => n.notebookId === nb.id).length;
+                    shelfHTML += `<div class="notebook-cover" data-action="open-notebook" data-id="${nb.id}" style="--notebook-color: ${nb.color};">
+                        <div class="notebook-actions">
+                            <button class="btn btn-icon" data-action="edit-notebook" data-id="${nb.id}" title="ویرایش"><i class="fas fa-pen"></i></button>
+                            <button class="btn btn-icon" data-action="delete-notebook" data-id="${nb.id}" title="حذف"><i class="fas fa-trash"></i></button>
+                        </div>
+                        <div class="title">${nb.title}</div>
+                        <div class="note-count">${toPersianDigits(count)} یادداشت</div>
+                    </div>`;
+                });
+                shelfHTML += `<div class="notebook-cover new-notebook-btn" data-action="new-notebook"><i class="fas fa-plus"></i><span>دفتر جدید</span></div>`;
+                shelfHTML += '</div>';
+
+                app.innerHTML = `<div class="page shelf-view"><div class="container">${renderHeader('همراه من', false, true)}${shelfHTML}</div></div>`;
+                initSortableNotebooks();
+            }
+
+            function renderNotebookView(notebookId, searchTerm = '') {
+                const notebook = getNotebooks().find(nb => nb.id === notebookId);
+                if (!notebook) {
+                    navigateTo('shelf', null, true); 
+                    return; 
+                }
+
+                setAppColor(notebook.color);
+                
+                const viewMode = notebook.viewMode || 'grid';
+
+                let notesInNotebook = getNotes()
+                    .filter(n => n.notebookId === notebookId)
+                    .sort((a, b) => {
+                        if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
+                        return b.lastModified - a.lastModified;
+                    });
+
+                if (searchTerm) {
+                    const lowerCaseSearch = searchTerm.toLowerCase();
+                    notesInNotebook = notesInNotebook.filter(n => 
+                        (n.title && n.title.toLowerCase().includes(lowerCaseSearch)) ||
+                        (n.content && n.content.toLowerCase().includes(lowerCaseSearch))
+                    );
+                }
+
+                let notesHTML = '';
+                if (notesInNotebook.length === 0) {
+                    notesHTML = searchTerm
+                        ? `<div class="empty-state"><div class="icon"><i class="fas fa-search"></i></div><h3>نتیجه‌ای یافت نشد</h3><p>برای عبارت «${searchTerm}» یادداشتی پیدا نکردیم.</p></div>`
+                        : `<div class="empty-state"><div class="icon"><i class="fas fa-feather-alt"></i></div><h3>این دفتر هنوز خالیه</h3><p>اولین یادداشتت رو با دکمه + پایین صفحه بنویس.</p></div>`;
+                } else {
+                    notesHTML = `<div id="notes-grid" class="view-${viewMode}">`;
+                    notesInNotebook.forEach(note => {
+                        const moodInfo = moods[note.mood] || moods.neutral;
+                        const shortContent = note.content ? (note.content.substring(0, 120) + (note.content.length > 120 ? '...' : '')) : '';
+                        const dateParts = getJalaliDateParts(new Date(note.lastModified));
+                        
+                        notesHTML += `
+                        <div class="note-card ${note.isPinned ? 'pinned' : ''}" data-note-id="${note.id}">
+                            <div class="note-date">
+                                <span class="day">${dateParts.day}</span>
+                                <span class="month">${dateParts.month}</span>
+                            </div>
+                            <div class="note-card-clickable-area" data-action="edit-note" data-note-id="${note.id}">
+                                <h3><i class="fas ${moodInfo.icon}" style="color: ${moodInfo.color}"></i>${note.title || 'بدون عنوان'}</h3>
+                                <p>${shortContent || 'بدون محتوا'}</p>
+                            </div>
+                            <div class="note-actions">
+                                <button class="btn btn-icon pin ${note.isPinned ? 'active' : ''}" data-action="toggle-pin-note" data-note-id="${note.id}" title="پین کردن">
+                                    <i class="fas fa-thumbtack"></i>
+                                </button>
+                                <button class="btn btn-icon delete" data-action="delete-note" data-note-id="${note.id}" title="حذف">
+                                    <i class="fas fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>`;
+                    });
+                    notesHTML += '</div>';
+                }
+
+                const notebookControls = `
+                    <div class="notebook-header">
+                        <div class="notebook-controls">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="search" id="noteSearchInput" placeholder="جستجو در یادداشت‌ها..." value="${searchTerm || ''}">
+                            </div>
+                            <div class="view-switcher">
+                                <button class="btn btn-icon ${viewMode === 'grid' ? 'active' : ''}" data-action="set-view-mode" data-mode="grid" title="شبکه‌ای"><i class="fas fa-grip"></i></button>
+                                <button class="btn btn-icon ${viewMode === 'list' ? 'active' : ''}" data-action="set-view-mode" data-mode="list" title="لیستی"><i class="fas fa-list"></i></button>
+                                <button class="btn btn-icon ${viewMode === 'title' ? 'active' : ''}" data-action="set-view-mode" data-mode="title" title="فقط عنوان"><i class="fas fa-align-justify"></i></button>
+                            </div>
+                        </div>
+                    </div>`;
+
+                app.innerHTML = `<div class="page notebook-view">
+                    <div class="container">
+                        ${renderHeader(notebook.title, true)}
+                        ${notebookControls}
+                        ${notesHTML}
+                    </div>
+                    <button class="btn btn-primary btn-float" data-action="new-note" data-notebook-id="${notebookId}" title="یادداشت جدید">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>`;
+
+                const searchInput = document.getElementById('noteSearchInput');
+                if (searchInput) {
+                    searchInput.addEventListener('input', (e) => {
+                        renderNotebookView(notebookId, e.target.value);
+                    });
+                }
+            }
+            
+            function renderEditorPage(context) {
+                unsavedChanges = false;
+                clearTimeout(autosaveTimeout);
+
+                let note = { id: null, title: '', content: '', mood: 'happy', notebookId: context.notebookId, isPinned: false };
+                
+                if (context.noteId) {
+                    const foundNote = getNotes().find(n => n.id === context.noteId);
+                    if (foundNote) note = { ...foundNote };
+                }
+
+                editingNoteId = note.id;
+
+                const currentNotebook = getNotebooks().find(nb => nb.id === note.notebookId);
+                if (currentNotebook) setAppColor(currentNotebook.color);
+
+                const randomPrompt = journalPrompts[Math.floor(Math.random() * journalPrompts.length)];
+                
+                let moodSelectorsHTML = Object.entries(moods).map(([key, val]) => `
+                    <div style="--dynamic-mood-color: ${val.color};">
+                        <input type="radio" id="mood-${key}" name="mood" value="${key}" ${key === note.mood ? 'checked' : ''}>
+                        <label for="mood-${key}" title="${val.text}"><i class="fas ${val.icon}"></i></label>
+                    </div>`).join('');
+                
+                app.innerHTML = `
+                    <div class="page editor-view">
+                        <div class="editor-header container">
+                             <button class="btn-link" data-action="confirm-exit-editor">
+                                 <i class="fas fa-check"></i>
+                                 <span>انجام شد</span>
+                             </button>
+                             <div id="save-status" class="save-status"></div>
+                        </div>
+                        <main class="container">
+                            <input type="hidden" id="note-notebook-id" value="${note.notebookId}">
+                            <input type="text" id="note-title" placeholder="یک عنوان برای حست..." value="${note.title || ''}" required>
+                            <textarea id="note-content" placeholder="${randomPrompt}" required>${note.content || ''}</textarea>
+                            <div class="mood-title">حس و حالت رو انتخاب کن:</div>
+                            <div class="mood-selector">${moodSelectorsHTML}</div>
+                        </main>
+                    </div>`;
+
+                setupAutosave();
+                document.getElementById('note-title').focus();
+            }
+
+            function saveNote() {
+                const titleInput = document.getElementById('note-title');
+                const contentInput = document.getElementById('note-content');
+                if (!titleInput || !contentInput) return;
+
+                const title = titleInput.value;
+                const content = contentInput.value;
+                const mood = document.querySelector('input[name="mood"]:checked').value;
+                const notebookId = parseInt(document.getElementById('note-notebook-id').value);
+                const lastModified = Date.now();
+
+                if (!editingNoteId && !title.trim() && !content.trim()) {
+                    return;
+                }
+
+                let notes = getNotes();
+                if (editingNoteId) {
+                    notes = notes.map(n => n.id === editingNoteId ? { ...n, title, content, mood, lastModified } : n);
+                } else {
+                    const newNote = { id: Date.now(), title, content, mood, notebookId, lastModified, isPinned: false };
+                    notes.push(newNote);
+                    editingNoteId = newNote.id; 
+                }
+                saveNotes(notes);
+                unsavedChanges = false;
+                
+                const statusEl = document.getElementById('save-status');
+                if(statusEl) {
+                    statusEl.textContent = 'ذخیره شد';
+                    statusEl.classList.add('visible');
+                }
+            }
+
+            function setupAutosave() {
+                const titleInput = document.getElementById('note-title');
+                const contentInput = document.getElementById('note-content');
+                const moodInputs = document.querySelectorAll('input[name="mood"]');
+                const statusEl = document.getElementById('save-status');
+                
+                if (editingNoteId) {
+                    statusEl.textContent = 'ذخیره شده';
+                    statusEl.classList.add('visible');
+                } else {
+                    statusEl.textContent = 'آماده نوشتن...';
+                    statusEl.classList.add('visible');
+                }
+
+                const handleInput = () => {
+                    unsavedChanges = true;
+                    statusEl.textContent = 'در حال نوشتن...';
+                    statusEl.classList.add('visible');
+                    clearTimeout(autosaveTimeout);
+                    autosaveTimeout = setTimeout(() => {
+                        saveNote();
+                        statusEl.textContent = 'ذخیره شد';
+                    }, 1500);
+                };
+
+                titleInput.addEventListener('input', handleInput);
+                contentInput.addEventListener('input', handleInput);
+                moodInputs.forEach(input => input.addEventListener('change', handleInput));
+            }
+            
+            // --- DRAG & DROP INITIALIZATION ---
+            function initSortableNotebooks() {
+                const shelf = document.getElementById('notebookShelf');
+                if (!shelf) return;
+                if (sortableNotebooks) sortableNotebooks.destroy();
+
+                sortableNotebooks = new Sortable(shelf, {
+                    animation: 150,
+                    delay: 200,
+                    delayOnTouchOnly: true,
+                    ghostClass: 'sortable-ghost',
+                    filter: '.new-notebook-btn, .notebook-actions, .btn-icon',
+                    onEnd: (evt) => {
+                        let notebooks = getNotebooks();
+                        const element = notebooks.splice(evt.oldIndex, 1)[0];
+                        notebooks.splice(evt.newIndex, 0, element);
+                        notebooks.forEach((nb, index) => nb.order = index + 1);
+                        saveNotebooks(notebooks);
+                    }
+                });
+            }
+            
+            // --- BACKUP & RESTORE LOGIC ---
+            function handleBackup() {
+                const backupData = {
+                    metadata: { appName: "Hamrahe Man", backupDate: new Date().toISOString() },
+                    notebooks: getNotebooks(),
+                    notes: getNotes()
+                };
+                
+                const dataStr = JSON.stringify(backupData, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                const date = new Date().toISOString().slice(0, 10);
+                a.download = `hamrahe-man-backup-${date}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            function handleRestore(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (!data.notebooks || !data.notes || !Array.isArray(data.notebooks) || !Array.isArray(data.notes)) {
+                            alert('فایل پشتیبان معتبر نیست.');
+                            return;
+                        }
+
+                        if (confirm('آیا مطمئنید؟ تمام اطلاعات فعلی شما با اطلاعات فایل پشتیبان جایگزین خواهد شد.')) {
+                            saveNotebooks(data.notebooks);
+                            saveNotes(data.notes);
+                            alert('اطلاعات با موفقیت بازگردانی شد.');
+                            modalContainer.classList.remove('visible');
+                            navigateTo('shelf', null, true);
+                        }
+                    } catch (error) {
+                        alert('خطا در خواندن فایل. لطفا از معتبر بودن فایل پشتیبان اطمینان حاصل کنید.');
+                    }
+                };
+                reader.readAsText(file);
+                event.target.value = '';
+            }
+
+            // --- NAVIGATION LOGIC ---
+            let historyStack = [{page: 'shelf', context: null}];
+
+            function navigateTo(page, context = null, force = false) {
+                if (force) {
+                    historyStack = [{page, context}];
+                } else {
+                    historyStack.push({page, context});
+                }
+                renderCurrentView();
+            }
+
+            function goBack() {
+                if (historyStack.length <= 1) return;
+                historyStack.pop();
+                renderCurrentView();
+            }
+
+            function renderCurrentView() {
+                const state = historyStack[historyStack.length - 1];
+                if (!state) return;
+                
+                switch(state.page) {
+                    case 'shelf': renderNotebookShelf(); break;
+                    case 'notebook': renderNotebookView(state.context); break;
+                    case 'editor': renderEditorPage(state.context); break;
+                }
+                
+                applyTheme(getTheme());
+            }
+            
+            // --- EVENT LISTENERS ---
+            document.body.addEventListener('click', (e) => {
+                const actionTarget = e.target.closest('[data-action]');
+                
+                // ✅ Close settings dropdown if clicking outside
+                const settingsContainer = e.target.closest('.settings-container');
+                const dropdown = document.getElementById('settings-dropdown');
+                if (dropdown && !settingsContainer) {
+                    dropdown.classList.remove('visible');
+                }
+
+                if (!actionTarget) return;
+
+                e.stopPropagation(); 
+
+                const { action, id, noteId, notebookId, mode, color } = actionTarget.dataset;
+
+                switch(action) {
+                    case 'open-notebook': navigateTo('notebook', parseInt(id)); break;
+                    case 'new-note': navigateTo('editor', { notebookId: parseInt(notebookId) }); break;
+                    case 'edit-note': {
+                        const noteToEdit = getNotes().find(n => n.id === parseInt(noteId));
+                        if(noteToEdit) navigateTo('editor', { notebookId: noteToEdit.notebookId, noteId: noteToEdit.id });
+                        break;
+                    }
+                    case 'delete-note': {
+                         if (confirm('آیا از حذف این یادداشت مطمئن هستید؟ این عمل قابل بازگشت نیست.')) {
+                            let notes = getNotes().filter(n => n.id !== parseInt(noteId));
+                            saveNotes(notes);
+                            renderCurrentView();
+                         }
+                        break;
+                    }
+                    case 'toggle-pin-note': {
+                        let notes = getNotes();
+                        const noteToPin = notes.find(n => n.id === parseInt(noteId));
+                        if (noteToPin) {
+                            noteToPin.isPinned = !noteToPin.isPinned;
+                            noteToPin.lastModified = Date.now();
+                            saveNotes(notes);
+                            renderCurrentView();
+                        }
+                        break;
+                    }
+                    case 'back': goBack(); break;
+                    case 'confirm-exit-editor':
+                        clearTimeout(autosaveTimeout);
+                        if (unsavedChanges) saveNote();
+                        goBack();
+                        break;
+                    case 'new-notebook': renderNotebookModal(); break;
+                    case 'edit-notebook': {
+                        const notebook = getNotebooks().find(nb => nb.id === parseInt(id));
+                        if (notebook) renderNotebookModal({ isEditing: true, notebook });
+                        break;
+                    }
+                    case 'delete-notebook': {
+                        if (confirm('آیا از حذف این دفتر مطمئن هستید؟ تمام یادداشت‌های داخل آن نیز حذف خواهند شد!')) {
+                            const notebookIdToDelete = parseInt(id);
+                            let notebooks = getNotebooks().filter(nb => nb.id !== notebookIdToDelete);
+                            let notes = getNotes().filter(n => n.notebookId !== notebookIdToDelete);
+                            saveNotebooks(notebooks);
+                            saveNotes(notes);
+                            navigateTo('shelf', null, true);
+                        }
+                        break;
+                    }
+                    case 'close-modal': modalContainer.classList.remove('visible'); break;
+                    
+                    // ✅ Handle new menu actions
+                    case 'toggle-settings-menu':
+                        document.getElementById('settings-dropdown')?.classList.toggle('visible');
+                        break;
+                    case 'open-backup-modal': 
+                        renderBackupModal();
+                        document.getElementById('settings-dropdown')?.classList.remove('visible');
+                        break;
+                    case 'open-about-modal':
+                        renderAboutModal();
+                        document.getElementById('settings-dropdown')?.classList.remove('visible');
+                        break;
+
+                    case 'backup-data': handleBackup(); break;
+                    case 'trigger-restore': document.getElementById('restore-input').click(); break;
+                    case 'select-color':
+                        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
+                        actionTarget.classList.add('selected');
+                        break;
+                    case 'set-view-mode': {
+                        const state = historyStack[historyStack.length - 1];
+                        const currentNotebookId = state.context;
+                        const notebooks = getNotebooks().map(nb => nb.id === currentNotebookId ? { ...nb, viewMode: mode } : nb);
+                        saveNotebooks(notebooks);
+                        renderCurrentView();
+                        break;
+                    }
+                }
+            });
+            
+            modalContainer.addEventListener('submit', e => {
+                e.preventDefault();
+                if (e.target.id === 'notebookForm') {
+                    const title = document.getElementById('notebookTitle').value.trim();
+                    const color = document.querySelector('.color-dot.selected').dataset.color;
+                    const notebookId = parseInt(document.getElementById('notebookId').value);
+
+                    if (!title) { alert('لطفا یک عنوان برای دفترت انتخاب کن.'); return; }
+                    
+                    let notebooks = getNotebooks();
+                    if (notebookId) {
+                        notebooks = notebooks.map(nb => nb.id === notebookId ? { ...nb, title, color } : nb);
+                    } else {
+                        notebooks.push({ id: Date.now(), title, color, viewMode: 'grid', order: notebooks.length + 1 });
+                    }
+                    
+                    saveNotebooks(notebooks);
+                    modalContainer.classList.remove('visible');
+                    renderCurrentView();
+                }
+            });
+
+            document.body.addEventListener('change', e => {
+                if (e.target.id === 'theme-toggle') {
+                    const newTheme = e.target.checked ? 'dark' : 'light';
+                    saveTheme(newTheme);
+                    applyTheme(newTheme);
+                }
+                if (e.target.id === 'restore-input') {
+                    handleRestore(e);
+                }
+            });
+            
+            window.onbeforeunload = () => {
+                const currentState = historyStack[historyStack.length - 1];
+                if (currentState && currentState.page === 'editor' && unsavedChanges) {
+                    saveNote();
+                }
+            };
+
+            // --- INITIAL LOAD ---
+            initializeData();
+            renderCurrentView();
+        });
+    </script>
+</body>
+</html>
