@@ -199,17 +199,24 @@
             cursor: grabbing; 
         }
 
+        /* ✅ FIX: Adjusted new notebook button to match dimensions */
         .new-notebook-btn { 
+            aspect-ratio: 3 / 4; /* Match aspect ratio */
             border: 2px dashed var(--c-border); 
             color: var(--c-text-secondary); 
-            display: flex; align-items: center; 
-            justify-content: center; flex-direction: column; 
-            background: var(--c-card-bg); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            flex-direction: column; 
+            background: transparent; /* Changed for better theme support */
             box-shadow: none; 
-            font-size: 1rem; cursor: pointer; 
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer; 
             transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-            aspect-ratio: 3 / 4;
-            border-radius: 8px;
+            border-radius: 8px; /* Match border radius */
+            padding: 20px;
+            box-sizing: border-box; /* Important for consistent sizing */
         }
         .new-notebook-btn:hover {
             border-color: var(--c-primary); 
@@ -218,7 +225,11 @@
             transform: none;
             box-shadow: none;
         }
+        body.dark-theme .new-notebook-btn:hover {
+            background-color: var(--c-pinned-bg-dark);
+        }
         .new-notebook-btn i { font-size: 2rem; margin-bottom: 0.5rem; }
+
 
         /* --- MODALS --- */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; z-index: 200; opacity: 0; visibility: hidden; transition: opacity 0.4s, visibility 0.4s; backdrop-filter: blur(5px); }
@@ -572,7 +583,7 @@
                         <p>می‌توانید از تمام دفترها و یادداشت‌های خود یک فایل پشتیبان تهیه کنید یا اطلاعات خود را از یک فایل پشتیبان بازگردانی نمایید.</p>
                         <div class="modal-actions">
                              <button type="button" class="btn btn-secondary" data-action="trigger-restore">
-                                <i class="fas fa-upload" style="margin-left: 8px;"></i>بازیابی
+                                 <i class="fas fa-upload" style="margin-left: 8px;"></i>بازیابی
                             </button>
                             <button type="button" class="btn btn-primary" data-action="backup-data">
                                 <i class="fas fa-download" style="margin-left: 8px;"></i>پشتیبان‌گیری
@@ -887,9 +898,9 @@
                 });
             }
             
-            // ✅ Bug-fixed long-press and click logic
+            // --- ✅ FIX: Separated long-press and click logic for better mobile support ---
             function setupNotebookListeners() {
-                const notebookCovers = document.querySelectorAll('.notebook-cover:not(.new-notebook-btn)');
+                const notebookCovers = document.querySelectorAll('.notebook-cover');
                 notebookCovers.forEach(cover => {
                     const notebookId = parseInt(cover.dataset.id);
 
@@ -905,13 +916,12 @@
                         }, 500); // 500ms for long press
                     };
 
-                    const pressEnd = () => {
-                        clearTimeout(longPressTimer);
-                    };
+                    const pressEnd = () => clearTimeout(longPressTimer);
                     
                     const clickHandler = (e) => {
                         if (isLongPress) {
                             e.preventDefault();
+                            e.stopPropagation();
                         } else {
                             navigateTo('notebook', notebookId);
                         }
@@ -1022,10 +1032,9 @@
 
                 if (!actionTarget) return;
 
-                const { action, id, noteId, notebookId, mode, color } = actionTarget.dataset;
+                const { action, noteId, notebookId, mode } = actionTarget.dataset;
 
                 switch(action) {
-                    // Clicks on notebooks are now handled by setupNotebookListeners to avoid conflicts
                     case 'new-note': navigateTo('editor', { notebookId: parseInt(notebookId) }); break;
                     case 'edit-note': {
                         const noteToEdit = getNotes().find(n => n.id === parseInt(noteId));
@@ -1057,7 +1066,10 @@
                         if (unsavedChanges) saveNote();
                         goBack();
                         break;
-                    case 'new-notebook': renderNotebookModal({}); break;
+                    // ✅ FIX: This is now the dedicated handler for the new notebook button
+                    case 'new-notebook': 
+                        renderNotebookModal({}); 
+                        break;
                     case 'save-notebook': {
                         const form = document.getElementById('notebookForm');
                         if (form) {
@@ -1082,10 +1094,15 @@
                     }
                     case 'delete-notebook': {
                         const notebookIdToDelete = parseInt(document.getElementById('notebookId').value);
+                        const notebooks = getNotebooks();
+                        if(notebooks.length <= 1) {
+                            alert("شما نمی‌توانید آخرین دفتر خود را حذف کنید.");
+                            return;
+                        }
                         if (confirm('آیا از حذف این دفتر مطمئن هستید؟ تمام یادداشت‌های داخل آن نیز حذف خواهند شد!')) {
-                            let notebooks = getNotebooks().filter(nb => nb.id !== notebookIdToDelete);
+                            let updatedNotebooks = notebooks.filter(nb => nb.id !== notebookIdToDelete);
                             let notes = getNotes().filter(n => n.notebookId !== notebookIdToDelete);
-                            saveNotebooks(notebooks);
+                            saveNotebooks(updatedNotebooks);
                             saveNotes(notes);
                             modalContainer.classList.remove('visible');
                             navigateTo('shelf', null, true);
