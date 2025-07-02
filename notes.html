@@ -114,6 +114,11 @@
             gap: 8px; padding: 8px; border-radius: var(--radius-btn); transition: background-color 0.2s, color 0.2s;
         }
         .btn-link:hover { background-color: var(--c-border); transform: none; box-shadow: none;}
+        
+        /* FIX: Ensure Sortable.js ghost element doesn't interfere with clicks */
+        .sortable-ghost {
+            pointer-events: none;
+        }
 
         /* --- FLAT NOTEBOOK DESIGN --- */
         .notebook-shelf {
@@ -581,9 +586,9 @@
                             </button>
                         </div>
                         <input type="file" id="restore-input" style="display: none;" accept=".json">
-                         <div class="modal-actions" style="margin-top: 24px;">
-                             <button type="button" class="btn" data-action="close-modal" style="width: 100%; background: none; color: var(--c-text-secondary);">بستن</button>
-                         </div>
+                           <div class="modal-actions" style="margin-top: 24px;">
+                                 <button type="button" class="btn" data-action="close-modal" style="width: 100%; background: none; color: var(--c-text-secondary);">بستن</button>
+                           </div>
                     </div>`;
                 modalContainer.classList.add('visible');
             }
@@ -598,9 +603,9 @@
                             <br>
                             یک دفترچه یادداشت ساده و زیبا برای ثبت افکار، احساسات و خاطرات شما. تمام اطلاعات شما به صورت امن روی دستگاه خودتان ذخیره می‌شود.
                         </p>
-                         <div class="modal-actions" style="margin-top: 24px;">
-                             <button type="button" class="btn btn-primary" data-action="close-modal" style="width: 100%;">فهمیدم</button>
-                         </div>
+                           <div class="modal-actions" style="margin-top: 24px;">
+                                 <button type="button" class="btn btn-primary" data-action="close-modal" style="width: 100%;">فهمیدم</button>
+                           </div>
                     </div>`;
                 modalContainer.classList.add('visible');
             }
@@ -874,7 +879,7 @@
                 sortableNotebooks = new Sortable(shelf, {
                     animation: 200,
                     ghostClass: 'sortable-ghost',
-                    filter: '.new-notebook-btn',
+                    filter: '.new-notebook-btn', // Ensure this filter is present
                     preventOnFilter: true,
                     onStart: () => {
                         clearTimeout(longPressTimer);
