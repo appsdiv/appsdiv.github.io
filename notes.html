@@ -115,7 +115,7 @@
         }
         .btn-link:hover { background-color: var(--c-border); transform: none; box-shadow: none;}
 
-        /* --- ✅ FLAT NOTEBOOK DESIGN WITH INCREASED DEPTH --- */
+        /* --- FLAT NOTEBOOK DESIGN --- */
         .notebook-shelf {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -124,7 +124,7 @@
         }
 
         .notebook-cover {
-            --notebook-depth: 14px; /* Increased depth as requested */
+            --notebook-depth: 14px;
             --notebook-spine-color: color-mix(in srgb, var(--notebook-color) 65%, black);
             --notebook-page-color: #FDFDFD;
             --notebook-page-shadow: #EAEAEA;
@@ -139,10 +139,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-
-            /* Make space for the side element */
             margin-left: var(--notebook-depth);
-
             transition: transform 0.25s ease, box-shadow 0.25s ease;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
@@ -152,29 +149,24 @@
             box-shadow: 0 8px 20px -4px var(--shadow-color);
         }
 
-        /* The combined spine and pages element */
         .notebook-cover::before {
             content: '';
             position: absolute;
-            top: 4px;   /* Inset the pages slightly */
+            top: 4px;
             bottom: 4px;
             left: 0;
             width: var(--notebook-depth);
-            transform: translateX(-100%); /* Position it to the left of the cover */
-
-            /* Gradient for the pages effect - with VERTICAL lines */
+            transform: translateX(-100%);
             background: repeating-linear-gradient(
-                to right, /* This creates vertical lines */
+                to right,
                 var(--notebook-page-shadow),
                 var(--notebook-page-shadow) 1px,
                 var(--notebook-page-color) 1px,
                 var(--notebook-page-color) 2px
             );
-            border-radius: 3px 0 0 3px; /* Slightly rounded spine */
-            
-            /* A darker edge to simulate the actual spine cover */
+            border-radius: 3px 0 0 3px;
             border-left: 0.5px solid var(--notebook-spine-color);
-            box-shadow: -1px 0 3px rgba(0,0,0,0.1) inset; /* Inner shadow for depth */
+            box-shadow: -1px 0 3px rgba(0,0,0,0.1) inset;
         }
 
         .notebook-cover .title {
@@ -199,24 +191,23 @@
             cursor: grabbing; 
         }
 
-        /* ✅ FIX: Adjusted new notebook button to match dimensions */
         .new-notebook-btn { 
-            aspect-ratio: 3 / 4; /* Match aspect ratio */
+            aspect-ratio: 3 / 4;
             border: 2px dashed var(--c-border); 
             color: var(--c-text-secondary); 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             flex-direction: column; 
-            background: transparent; /* Changed for better theme support */
+            background: transparent;
             box-shadow: none; 
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer; 
             transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-            border-radius: 8px; /* Match border radius */
+            border-radius: 8px;
             padding: 20px;
-            box-sizing: border-box; /* Important for consistent sizing */
+            box-sizing: border-box;
         }
         .new-notebook-btn:hover {
             border-color: var(--c-primary); 
@@ -603,7 +594,7 @@
                         <img src="https://i.postimg.cc/SKgT4hTn/notes-app.png" alt="لوگوی برنامه همراه من" class="app-logo">
                         <h3>همراه من</h3>
                         <p class="about-text">
-                            <strong>نسخه ۱.۷</strong>
+                            <strong>نسخه ۱.۸</strong>
                             <br>
                             یک دفترچه یادداشت ساده و زیبا برای ثبت افکار، احساسات و خاطرات شما. تمام اطلاعات شما به صورت امن روی دستگاه خودتان ذخیره می‌شود.
                         </p>
@@ -898,7 +889,7 @@
                 });
             }
             
-            // --- ✅ FIX: Separated long-press and click logic for better mobile support ---
+            // --- NOTEBOOK CLICK & LONG-PRESS LOGIC ---
             function setupNotebookListeners() {
                 const notebookCovers = document.querySelectorAll('.notebook-cover');
                 notebookCovers.forEach(cover => {
@@ -913,7 +904,7 @@
                             if (notebook) {
                                 renderNotebookModal({ isEditing: true, notebook });
                             }
-                        }, 500); // 500ms for long press
+                        }, 500);
                     };
 
                     const pressEnd = () => clearTimeout(longPressTimer);
@@ -1020,7 +1011,7 @@
                 applyTheme(getTheme());
             }
             
-            // --- EVENT LISTENERS ---
+            // --- GLOBAL EVENT LISTENERS ---
             document.body.addEventListener('click', (e) => {
                 const actionTarget = e.target.closest('[data-action]');
                 
@@ -1066,7 +1057,6 @@
                         if (unsavedChanges) saveNote();
                         goBack();
                         break;
-                    // ✅ FIX: This is now the dedicated handler for the new notebook button
                     case 'new-notebook': 
                         renderNotebookModal({}); 
                         break;
@@ -1078,10 +1068,10 @@
                             if (!title) { alert('لطفا یک عنوان برای دفترت انتخاب کن.'); return; }
                             if (!color) { alert('لطفا یک رنگ برای دفترت انتخاب کن.'); return; }
                             const notebookIdInput = form.querySelector('#notebookId');
-                            const notebookId = notebookIdInput && notebookIdInput.value ? parseInt(notebookIdInput.value) : null;
+                            const id = notebookIdInput && notebookIdInput.value ? parseInt(notebookIdInput.value) : null;
                             let notebooks = getNotebooks();
-                            if (notebookId) {
-                                notebooks = notebooks.map(nb => nb.id === notebookId ? { ...nb, title, color } : nb);
+                            if (id) {
+                                notebooks = notebooks.map(nb => nb.id === id ? { ...nb, title, color } : nb);
                             } else {
                                 const maxOrder = notebooks.reduce((max, nb) => Math.max(max, nb.order || 0), 0);
                                 notebooks.push({ id: Date.now(), title, color, viewMode: 'grid', order: maxOrder + 1 });
