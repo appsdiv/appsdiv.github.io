@@ -14,7 +14,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
@@ -32,8 +32,9 @@
             --c-danger-light: color-mix(in srgb, var(--c-danger) 15%, transparent);
 
             /* Light Theme */
-            --c-bg-light: #F8F4F5; --c-card-bg-light: #FFFFFF; --c-text-primary-light: #332C33;
-            --c-text-secondary-light: #7E787E; --c-border-light: #F3EAEB; --shadow-color-light: rgba(149, 157, 165, 0.1);
+            --c-bg-light: #F4F0F1;
+            --c-card-bg-light: #FFFFFF; --c-text-primary-light: #332C33;
+            --c-text-secondary-light: #7E787E; --c-border-light: #EAE3E4; --shadow-color-light: rgba(149, 157, 165, 0.1);
             --c-pinned-bg-light: color-mix(in srgb, var(--c-primary) 5%, var(--c-card-bg-light));
 
             /* Dark Theme */
@@ -114,21 +115,114 @@
         }
         .btn-link:hover { background-color: var(--c-border); transform: none; box-shadow: none;}
 
-        /* --- NOTEBOOK SHELF (HOME VIEW) --- */
-        .notebook-shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--spacing-lg); padding: var(--spacing-md) 0; }
-        .notebook-cover {
-            aspect-ratio: 3 / 4; background-color: var(--notebook-color, #ccc); border-radius: 8px 12px 12px 8px;
-            padding: var(--spacing-md); display: flex; flex-direction: column; justify-content: space-between; color: white;
-            font-weight: 700; cursor: pointer; position: relative;
-            box-shadow: -6px 0 0 rgba(0,0,0,0.15) inset, 2px 2px 10px var(--shadow-color);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        /* --- ✅ NEW MODERN NOTEBOOK SHELF DESIGN --- */
+        .notebook-shelf { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+            gap: var(--spacing-lg); 
+            padding: var(--spacing-md) 0; 
         }
-        .notebook-cover:hover { transform: scale(1.05) rotate(-2deg); box-shadow: -6px 0 0 rgba(0,0,0,0.15) inset, 5px 5px 20px var(--shadow-color); }
-        .notebook-cover.sortable-ghost { transform: scale(1.05) rotate(-2deg); opacity: 0.5; cursor: grabbing; }
-        .notebook-cover .title { font-size: 1.1rem; pointer-events: none; }
-        .notebook-cover .note-count { font-size: 0.9rem; opacity: 0.8; pointer-events: none; }
-        .new-notebook-btn { border: 2px dashed var(--c-border); color: var(--c-text-secondary); display: flex; align-items: center; justify-content: center; flex-direction: column; background: none; box-shadow: none; font-size: 1rem; cursor: pointer; transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
-        .new-notebook-btn:hover { border-color: var(--c-primary); color: var(--c-primary); background-color: var(--c-pinned-bg-light); }
+
+        .notebook-cover {
+            --notebook-color-light: color-mix(in srgb, var(--notebook-color) 80%, white);
+            --notebook-color-dark: color-mix(in srgb, var(--notebook-color) 80%, black);
+
+            aspect-ratio: 3 / 4;
+            border-radius: 20px;
+            cursor: pointer; 
+            position: relative;
+            overflow: hidden; /* Important for pseudo-elements */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            box-shadow: 0 5px 15px var(--shadow-color-light);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            
+            /* Main Gradient Background */
+            background: linear-gradient(135deg, var(--notebook-color-light) 0%, var(--notebook-color) 50%, var(--notebook-color-dark) 100%);
+        }
+
+        .notebook-cover:hover { 
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px var(--shadow-color-dark);
+        }
+
+        /* Abstract Wave Pattern */
+        .notebook-cover::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 100% 100%, transparent 60%, rgba(255,255,255,0.08) 61%, rgba(255,255,255,0.15) 65%, transparent 66%);
+            background-repeat: no-repeat;
+            transform: rotate(-30deg);
+        }
+        
+        /* Glossy Shine Effect */
+        .notebook-cover::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -25%;
+            width: 50%;
+            height: 200%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+            transform: rotate(25deg);
+            transition: transform 0.4s ease;
+        }
+        .notebook-cover:hover::after {
+            transform: rotate(25deg) translateX(100px);
+        }
+
+        .notebook-cover .title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .notebook-cover .note-count {
+            font-size: 0.8rem;
+            font-weight: 500;
+            pointer-events: none;
+            background-color: rgba(0,0,0,0.25);
+            backdrop-filter: blur(4px);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 30px;
+            z-index: 2;
+            align-self: flex-start;
+        }
+
+        .notebook-cover.sortable-ghost { 
+            transform: scale(0.95);
+            opacity: 0.7; 
+            cursor: grabbing; 
+        }
+
+        .new-notebook-btn { 
+            border: 2px dashed var(--c-border); 
+            color: var(--c-text-secondary); 
+            display: flex; align-items: center; 
+            justify-content: center; flex-direction: column; 
+            background: none; box-shadow: none; 
+            font-size: 1rem; cursor: pointer; 
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+            aspect-ratio: 3 / 4;
+            border-radius: 20px;
+        }
+        .new-notebook-btn:hover {
+            border-color: var(--c-primary); 
+            color: var(--c-primary); 
+            background-color: var(--c-pinned-bg-light);
+            transform: none;
+            box-shadow: none;
+        }
         .new-notebook-btn i { font-size: 2rem; margin-bottom: 0.5rem; }
 
         /* --- MODALS --- */
@@ -350,7 +444,8 @@
             let autosaveTimeout = null;
             let unsavedChanges = false;
             let sortableNotebooks = null;
-            let longPressTimer = null; // ✅ For long tap detection
+            let longPressTimer = null;
+            let isLongPress = false;
 
             // --- DATA MODELS & STORAGE ---
             const getNotebooks = () => JSON.parse(localStorage.getItem('myCompanionNotebooks')) || [];
@@ -445,7 +540,6 @@
                 const buttonText = isEditing ? 'ذخیره تغییرات' : 'ساختن';
                 const selectedColor = notebook.color || notebookColors[0];
 
-                // ✅ Conditionally render Delete button for editing modal
                 const deleteButtonHTML = isEditing ? 
                     `<button type="button" class="btn btn-danger" data-action="delete-notebook">${'حذف'}</button>` : '';
 
@@ -503,7 +597,7 @@
                         <img src="https://i.postimg.cc/SKgT4hTn/notes-app.png" alt="لوگوی برنامه همراه من" class="app-logo">
                         <h3>همراه من</h3>
                         <p class="about-text">
-                            <strong>نسخه ۱.۱</strong>
+                            <strong>نسخه ۱.۳</strong>
                             <br>
                             یک دفترچه یادداشت ساده و زیبا برای ثبت افکار، احساسات و خاطرات شما. تمام اطلاعات شما به صورت امن روی دستگاه خودتان ذخیره می‌شود.
                         </p>
@@ -556,19 +650,18 @@
                 let shelfHTML = '<div id="notebookShelf" class="notebook-shelf">';
                 notebooks.forEach(nb => {
                     const count = notes.filter(n => n.notebookId === nb.id).length;
-                    // ✅ Removed notebook-actions div
                     shelfHTML += `<div class="notebook-cover" data-action="open-notebook" data-id="${nb.id}" style="--notebook-color: ${nb.color};">
                         <div class="title">${nb.title}</div>
                         <div class="note-count">${toPersianDigits(count)} یادداشت</div>
                     </div>`;
                 });
-                shelfHTML += `<div class="notebook-cover new-notebook-btn" data-action="new-notebook"><i class="fas fa-plus"></i><span>دفتر جدید</span></div>`;
+                shelfHTML += `<div class="new-notebook-btn" data-action="new-notebook"><i class="fas fa-plus"></i><span>دفتر جدید</span></div>`;
                 shelfHTML += '</div>';
 
                 app.innerHTML = `<div class="page shelf-view"><div class="container">${renderHeader('همراه من', false, true)}${shelfHTML}</div></div>`;
                 
                 initSortableNotebooks();
-                setupLongPressListeners(); // ✅ Set up long-press
+                setupLongPressListeners();
             }
 
             function renderNotebookView(notebookId, searchTerm = '') {
@@ -782,12 +875,11 @@
                 if (sortableNotebooks) sortableNotebooks.destroy();
 
                 sortableNotebooks = new Sortable(shelf, {
-                    animation: 150,
+                    animation: 200,
                     ghostClass: 'sortable-ghost',
-                    filter: '.new-notebook-btn', // Only the "new" button is not draggable
+                    filter: '.new-notebook-btn',
                     preventOnFilter: true,
                     onStart: () => {
-                        // When dragging starts, cancel any pending long press
                         clearTimeout(longPressTimer);
                     },
                     onEnd: (evt) => {
@@ -799,34 +891,43 @@
                     }
                 });
             }
-
-            // ✅ Setup long-press listeners for notebook covers
+            
+            // ✅ Bug-fixed long-press logic
             function setupLongPressListeners() {
                 const notebookCovers = document.querySelectorAll('.notebook-cover:not(.new-notebook-btn)');
                 notebookCovers.forEach(cover => {
                     const pressStart = (e) => {
-                        // Prevent context menu on long press
-                        e.preventDefault();
-                        const notebookId = parseInt(cover.dataset.id);
+                        isLongPress = false;
+                        clearTimeout(longPressTimer);
                         longPressTimer = setTimeout(() => {
+                            isLongPress = true;
+                            const notebookId = parseInt(cover.dataset.id);
                             const notebook = getNotebooks().find(nb => nb.id === notebookId);
                             if (notebook) {
                                 renderNotebookModal({ isEditing: true, notebook });
                             }
-                        }, 500); // 500ms for a long press
+                        }, 500);
                     };
 
                     const pressEnd = () => {
                         clearTimeout(longPressTimer);
                     };
 
-                    cover.addEventListener('mousedown', pressStart);
-                    cover.addEventListener('touchstart', pressStart, { passive: false });
+                    const clickHandler = (e) => {
+                        if (isLongPress) {
+                            e.preventDefault();
+                        }
+                    };
 
+                    cover.addEventListener('mousedown', pressStart);
+                    cover.addEventListener('touchstart', pressStart);
+                    
                     cover.addEventListener('mouseup', pressEnd);
                     cover.addEventListener('mouseleave', pressEnd);
                     cover.addEventListener('touchend', pressEnd);
                     cover.addEventListener('touchcancel', pressEnd);
+                    
+                    cover.addEventListener('click', clickHandler);
                 });
             }
             
@@ -922,11 +1023,6 @@
                 }
 
                 if (!actionTarget) return;
-                
-                // If a drag was initiated, don't process the click
-                if (sortableNotebooks && sortableNotebooks.option('disabled')) return;
-                
-                e.stopPropagation(); 
 
                 const { action, id, noteId, notebookId, mode, color } = actionTarget.dataset;
 
@@ -964,8 +1060,6 @@
                         goBack();
                         break;
                     case 'new-notebook': renderNotebookModal({}); break;
-                    
-                    // ✅ Delete notebook from modal
                     case 'delete-notebook': {
                         const notebookIdToDelete = parseInt(document.getElementById('notebookId').value);
                         if (confirm('آیا از حذف این دفتر مطمئن هستید؟ تمام یادداشت‌های داخل آن نیز حذف خواهند شد!')) {
