@@ -2,11 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bilingual English Practice</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>انگلیسی من</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="انگلیسی من">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/FKprRmNz/App-Icon-2x.png">
+    <link rel="icon" href="https://i.postimg.cc/FKprRmNz/App-Icon-2x.png" type="image/png">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Vazirmatn:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="en2.js" defer></script>
     <script>
@@ -27,6 +34,10 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+        @keyframes modal-fade-in {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
         @keyframes trophy-animation {
             0% { transform: translateY(20px); opacity: 0; }
             100% { transform: translateY(0); opacity: 1; }
@@ -37,7 +48,7 @@
         }
 
         body {
-            background: linear-gradient(-45deg, #2c3e50, #3498db, #2980b9, #4a5568);
+            background: linear-gradient(-45deg, #111827, #1e3a8a, #312e81, #0c4a6e);
             background-size: 400% 400%;
             animation: gradient-animation 20s ease infinite;
             perspective: 1000px;
@@ -48,6 +59,7 @@
         }
         .screen.hidden {
             position: absolute;
+            top: 0; left: 0; right: 0;
             opacity: 0;
             transform: scale(0.95);
             pointer-events: none;
@@ -58,7 +70,7 @@
         }
         .interactive-card:hover {
             transform: translateY(-5px) rotateX(2deg);
-            box-shadow: 0 20px 30px -10px rgba(0,0,0,0.2);
+            box-shadow: 0 25px 35px -10px rgba(0,0,0,0.25);
         }
         .expandable-content {
             max-height: 0;
@@ -70,7 +82,7 @@
             padding-top: 1rem;
         }
         .revealed-area-quiz {
-             max-height: 0;
+            max-height: 0;
             overflow: hidden;
             transition: max-height 0.6s ease-in-out, margin-top 0.6s ease-in-out;
         }
@@ -87,118 +99,143 @@
         .persian-text {
             direction: rtl;
         }
+        #about-modal .modal-content {
+            animation: modal-fade-in 0.3s ease-out forwards;
+        }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen text-slate-800">
+<body class="flex items-center justify-center min-h-screen text-slate-800 antialiased">
 
-    <div id="app-wrapper" class="w-full max-w-md mx-auto p-4">
+    <div id="app-wrapper" class="relative w-full max-w-sm mx-auto p-4">
+        
+        <div class="absolute top-5 right-5 z-20">
+            <button id="about-btn" class="interactive-card bg-white/20 backdrop-blur-lg text-white p-2.5 rounded-full shadow-md active:scale-95 transition-transform">
+                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                </svg>
+            </button>
+        </div>
+
         <div id="error-container" class="hidden text-center text-white bg-red-500/80 p-4 rounded-xl"></div>
     
         <div id="home-screen" class="screen space-y-8 text-center">
-            <header>
-                <h1 class="text-4xl lg:text-5xl font-bold text-white drop-shadow-lg">Language Practice</h1>
-                <p class="text-white/80 mt-2 font-persian text-xl">تمرین زبان</p>
+            <header class="pt-12">
+                <img src="https://i.postimg.cc/FKprRmNz/App-Icon-2x.png" alt="App Icon" class="w-24 h-24 mx-auto mb-4 rounded-3xl shadow-lg border-2 border-white/50">
+                <h1 class="text-4xl lg:text-5xl font-bold text-white drop-shadow-lg font-persian">انگلیسی من</h1>
+                <p class="text-white/80 mt-2 text-xl">My English</p>
             </header>
             <div class="space-y-4">
-                <button data-mode="quiz" class="mode-btn interactive-card w-full bg-white/70 backdrop-blur-xl p-6 rounded-2xl shadow-lg text-left">
-                    <h2 class="text-xl font-semibold">Quiz Mode</h2>
-                    <p class="text-slate-600 font-persian">حالت آزمون</p>
+                <button data-mode="quiz" class="mode-btn interactive-card w-full bg-white/50 backdrop-blur-xl p-6 rounded-2xl shadow-lg flex items-center justify-between border border-white/20 active:scale-95 transition-transform">
+                    <div class="text-left">
+                        <h2 class="text-xl font-semibold">Quiz Mode</h2>
+                        <p class="text-slate-700 font-persian">حالت آزمون</p>
+                    </div>
+                    <svg class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </button>
-                <button data-mode="learning" class="mode-btn interactive-card w-full bg-white/70 backdrop-blur-xl p-6 rounded-2xl shadow-lg text-left">
-                    <h2 class="text-xl font-semibold">Learning Mode</h2>
-                    <p class="text-slate-600 font-persian">حالت یادگیری</p>
+                <button data-mode="learning" class="mode-btn interactive-card w-full bg-white/50 backdrop-blur-xl p-6 rounded-2xl shadow-lg flex items-center justify-between border border-white/20 active:scale-95 transition-transform">
+                    <div class="text-left">
+                        <h2 class="text-xl font-semibold">Learning Mode</h2>
+                        <p class="text-slate-700 font-persian">حالت یادگیری</p>
+                    </div>
+                    <svg class="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                 </button>
             </div>
         </div>
         
         <div id="quiz-screen" class="screen hidden">
-             <header class="mb-4">
-                <p id="quiz-progress-text" class="text-sm font-medium text-white/80 text-center mb-1"></p>
-                <div class="w-full bg-white/30 rounded-full h-2.5"><div id="quiz-progress-bar" class="bg-white h-2.5 rounded-full transition-all duration-500"></div></div>
-            </header>
-            <div id="quiz-card-wrapper">
-                <div id="quiz-card" class="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg p-6 space-y-4">
-                    <div id="quiz-question-area" class="space-y-2">
-                        <p id="quiz-speaker-role" class="text-sm font-semibold text-indigo-600"></p>
-                        <div class="flex justify-between items-start space-x-2">
-                            <div class="flex-1">
-                                <p id="quiz-question-text" class="text-xl font-semibold"></p>
-                                <p id="quiz-question-persian" class="persian-text font-persian text-slate-500 text-md mt-1"></p>
-                            </div>
-                            <button class="voice-btn text-slate-500 hover:text-indigo-500 p-1 flex-shrink-0"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg></button>
-                        </div>
-                    </div>
-                    <button id="quiz-reveal-btn" class="w-full bg-slate-800 text-white font-semibold py-3 px-4 rounded-xl hover:bg-slate-700 transition-all duration-300 shadow-md">Reveal Responses</button>
-                    <div id="quiz-revealed-area" class="revealed-area-quiz">
-                        <hr class="border-slate-200"><div class="mt-4 space-y-2">
-                             <p id="quiz-responder-role" class="text-sm font-semibold text-emerald-600"></p>
-                             <div id="quiz-answer-options" class="space-y-3"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-6 flex justify-between items-center space-x-4">
-                    <button class="home-btn bg-white/70 backdrop-blur-xl p-3 rounded-xl shadow-md"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg></button>
-                    <button id="quiz-next-btn" class="flex-grow bg-indigo-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-indigo-600 transition-all duration-300 shadow-lg shadow-indigo-500/30">Next</button>
-                </div>
-            </div>
-            <div id="quiz-completion-state" class="hidden text-center bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg p-8">
-                <div class="trophy-icon w-20 h-20 mx-auto mb-4 text-amber-400"><svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.25 2.25a.75.75 0 00-1.5 0v1.164a13.43 13.43 0 00-3.322 2.296C5.073 6.83 4.5 8.353 4.5 10c0 1.55.022 3.32.062 4.802.035 1.284.162 2.441.385 3.498a.75.75 0 00.728.65h7.65a.75.75 0 00.728-.65c.223-1.057.35-2.214.385-3.498.04-1.482.062-3.252.062-4.802 0-1.647-.573-3.17-1.928-4.29a13.43 13.43 0 00-3.322-2.296V2.25zM8.625 10a.75.75 0 00-1.5 0v.63c-.881.25-1.7.64-2.438 1.156a.75.75 0 00.825 1.185 8.92 8.92 0 011.613-.801V10zm2.75 0v2.17c.563.218 1.096.52 1.613.801a.75.75 0 10.825-1.185c-.738-.516-1.557-.905-2.438-1.156V10a.75.75 0 00-1.5 0z" clip-rule="evenodd" /></svg></div>
-                <h2 class="text-2xl font-bold mb-2">Quiz Complete!</h2>
-                <p class="text-slate-600 mb-6">Well done! You've completed all the questions.</p>
-                <div class="space-y-3">
-                    <button id="start-new-quiz-btn" class="w-full bg-indigo-500 text-white font-bold py-3 rounded-xl hover:bg-indigo-600 transition-colors">Start New Quiz</button>
-                    <button class="home-btn w-full bg-slate-200 font-semibold py-3 rounded-xl hover:bg-slate-300 transition-colors">Return Home</button>
-                </div>
-            </div>
+             <header class="mb-4 pt-12">
+                 <p id="quiz-progress-text" class="text-sm font-medium text-white/80 text-center mb-1"></p>
+                 <div class="w-full bg-white/30 rounded-full h-2.5"><div id="quiz-progress-bar" class="bg-white h-2.5 rounded-full transition-all duration-500"></div></div>
+             </header>
+             <div id="quiz-card-wrapper">
+                 <div id="quiz-card" class="bg-white/60 backdrop-blur-xl rounded-2xl shadow-lg p-6 space-y-4 border border-white/20">
+                     <div id="quiz-question-area" class="space-y-2">
+                         <p id="quiz-speaker-role" class="text-sm font-semibold text-indigo-600"></p>
+                         <div class="flex justify-between items-start space-x-2">
+                             <div class="flex-1">
+                                 <p id="quiz-question-text" class="text-xl font-semibold"></p>
+                                 <p id="quiz-question-persian" class="persian-text font-persian text-slate-600 text-md mt-1"></p>
+                             </div>
+                             <button class="voice-btn text-slate-500 hover:text-indigo-500 p-1 flex-shrink-0 active:scale-95 transition-transform"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg></button>
+                         </div>
+                     </div>
+                     <button id="quiz-reveal-btn" class="w-full bg-slate-800 text-white font-semibold py-3 px-4 rounded-xl hover:bg-slate-700 transition-all duration-300 shadow-md active:scale-95">Reveal Responses</button>
+                     <div id="quiz-revealed-area" class="revealed-area-quiz">
+                         <hr class="border-slate-300/70"><div class="mt-4 space-y-2">
+                              <p id="quiz-responder-role" class="text-sm font-semibold text-emerald-600"></p>
+                              <div id="quiz-answer-options" class="space-y-3"></div>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="mt-6 flex justify-between items-center space-x-4">
+                     <button class="home-btn bg-white/60 backdrop-blur-xl p-3 rounded-xl shadow-md active:scale-95 transition-transform"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg></button>
+                     <button id="quiz-next-btn" class="flex-grow bg-indigo-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-indigo-600 transition-all duration-300 shadow-lg shadow-indigo-500/30 active:scale-95">Next</button>
+                 </div>
+             </div>
+             <div id="quiz-completion-state" class="hidden text-center bg-white/60 backdrop-blur-xl rounded-2xl shadow-lg p-8 border border-white/20">
+                 <div class="trophy-icon w-20 h-20 mx-auto mb-4 text-amber-400"><svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.25 2.25a.75.75 0 00-1.5 0v1.164a13.43 13.43 0 00-3.322 2.296C5.073 6.83 4.5 8.353 4.5 10c0 1.55.022 3.32.062 4.802.035 1.284.162 2.441.385 3.498a.75.75 0 00.728.65h7.65a.75.75 0 00.728-.65c.223-1.057.35-2.214.385-3.498.04-1.482.062-3.252.062-4.802 0-1.647-.573-3.17-1.928-4.29a13.43 13.43 0 00-3.322-2.296V2.25zM8.625 10a.75.75 0 00-1.5 0v.63c-.881.25-1.7.64-2.438 1.156a.75.75 0 00.825 1.185 8.92 8.92 0 011.613-.801V10zm2.75 0v2.17c.563.218 1.096.52 1.613.801a.75.75 0 10.825-1.185c-.738-.516-1.557-.905-2.438-1.156V10a.75.75 0 00-1.5 0z" clip-rule="evenodd" /></svg></div>
+                 <h2 class="text-2xl font-bold mb-2">Quiz Complete!</h2>
+                 <p class="text-slate-600 mb-6">Well done! You've completed all the questions.</p>
+                 <div class="space-y-3">
+                     <button id="start-new-quiz-btn" class="w-full bg-indigo-500 text-white font-bold py-3 rounded-xl hover:bg-indigo-600 transition-colors active:scale-95">Start New Quiz</button>
+                     <button class="home-btn w-full bg-slate-200 font-semibold py-3 rounded-xl hover:bg-slate-300 transition-colors active:scale-95">Return Home</button>
+                 </div>
+             </div>
         </div>
         
         <div id="learning-screen" class="screen hidden">
-             <header class="mb-6 flex justify-between items-center">
+             <header class="mb-6 pt-12 flex justify-between items-center">
                  <h2 id="learning-title" class="text-3xl font-bold text-white drop-shadow-md">Topics</h2>
-                 <button class="home-btn bg-white/30 text-white p-2 rounded-xl"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg></button>
+                 <button class="home-btn bg-white/30 text-white p-2 rounded-xl active:scale-95 transition-transform"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg></button>
              </header>
-             <div id="learning-content" class="space-y-3"></div>
+             <div id="learning-content-wrapper" class="space-y-3">
+                </div>
         </div>
     </div>
 
+    <div id="about-modal" class="hidden">
+        <div id="modal-backdrop" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"></div>
+        <div class="fixed inset-0 flex items-center justify-center z-50 p-4">
+            <div class="modal-content bg-slate-100/80 backdrop-blur-2xl rounded-3xl shadow-2xl p-6 pt-0 text-center w-full max-w-xs space-y-4 border border-white/20">
+                <img src="https://i.postimg.cc/FKprRmNz/App-Icon-2x.png" alt="App Icon" class="w-24 h-24 mx-auto -mt-12 rounded-3xl shadow-lg border-4 border-slate-100">
+                <div class="pt-2">
+                    <h3 class="text-2xl font-bold font-persian text-slate-800">انگلیسی من</h3>
+                    <p class="text-sm text-slate-600 font-persian leading-relaxed mt-2">
+                        برنامه نویسی و توسعه:
+                        <span class="block font-semibold mt-1">پیمان</span>
+                    </p>
+                </div>
+                <button id="close-modal-btn" class="w-full bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl hover:bg-indigo-600 transition-all active:scale-95">
+                    بستن
+                </button>
+            </div>
+        </div>
+    </div>
+
+
     <script>
-        // Note: appData is now loaded from en2.js and is globally available
+        // Data and State
         let shuffledData = [];
         let quizCurrentIndex = 0;
+        
+        // DOM Elements
         const screens = { home: document.getElementById('home-screen'), quiz: document.getElementById('quiz-screen'), learning: document.getElementById('learning-screen') };
         const speakerIconSvg = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>`;
-
+        
+        // Helper Functions
         const shuffleArray = (array) => [...array].sort(() => Math.random() - 0.5);
         
-  const speak = (text, btn) => {
-            if (speechSynthesis.speaking) {
-                speechSynthesis.cancel();
-            }
-
+        const speak = (text, btn) => {
+            if (speechSynthesis.speaking) speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'en-US';
-            utterance.rate = 0.8; // Slower speed for beginners
-
-            // --- New Improvement Starts Here ---
-
-            // Find a higher-quality voice if available
+            utterance.rate = 0.85;
             let voices = speechSynthesis.getVoices();
-            let googleVoice = voices.find(voice => voice.name === 'Google US English');
-            let ukFemaleVoice = voices.find(voice => voice.name === 'Google UK English Female');
-
-            if (ukFemaleVoice) { // Prefer the UK Female voice if it exists
-                utterance.voice = ukFemaleVoice;
-            } else if (googleVoice) { // Fallback to the US Google voice
-                utterance.voice = googleVoice;
-            }
-            // If neither is found, it will use the browser's default voice.
-            
-            // --- New Improvement Ends Here ---
-
+            let preferredVoice = voices.find(v => v.name === 'Google UK English Female') || voices.find(v => v.name === 'Google US English');
+            if (preferredVoice) utterance.voice = preferredVoice;
             const icon = btn.querySelector('svg');
-            utterance.onstart = () => icon.classList.add('text-amber-500');
-            utterance.onend = () => icon.classList.remove('text-amber-500');
-            
+            utterance.onstart = () => icon.classList.add('text-amber-400');
+            utterance.onend = () => icon.classList.remove('text-amber-400');
             speechSynthesis.speak(utterance);
         };
         
@@ -207,6 +244,7 @@
             screens[screenName].classList.remove('hidden');
         };
 
+        // Quiz Module
         const quiz = {
             cardWrapper: document.getElementById('quiz-card-wrapper'),
             completionState: document.getElementById('quiz-completion-state'),
@@ -245,21 +283,17 @@
                 quiz.answerOptions.innerHTML = '';
                 item.a.forEach((answer, index) => {
                     const answerDiv = document.createElement('div');
-                    answerDiv.className = "staggered-item w-full text-left p-3 bg-slate-50 rounded-lg flex justify-between items-center group";
+                    answerDiv.className = "staggered-item w-full text-left p-3 bg-slate-50/80 rounded-lg flex justify-between items-center group";
                     answerDiv.style.animationDelay = `${index * 100}ms`;
-                    answerDiv.innerHTML = `<div><p>${answer}</p><p class="persian-text font-persian text-slate-500 text-md mt-1">${item.a_persien[index] || ''}</p></div><button class="voice-btn text-slate-400 group-hover:text-indigo-500 p-1 flex-shrink-0">${speakerIconSvg}</button>`;
+                    answerDiv.innerHTML = `<div><p>${answer}</p><p class="persian-text font-persian text-slate-600 text-md mt-1">${item.a_persien[index] || ''}</p></div><button class="voice-btn text-slate-400 group-hover:text-indigo-500 p-1 flex-shrink-0 active:scale-95 transition-transform">${speakerIconSvg}</button>`;
                     answerDiv.querySelector('.voice-btn').onclick = (e) => { e.stopPropagation(); speak(answer, e.currentTarget); };
                     quiz.answerOptions.appendChild(answerDiv);
                 });
                 quiz.updateProgress();
             },
             next: () => {
-                if (quizCurrentIndex >= shuffledData.length - 1) {
-                    quiz.showCompletion();
-                } else {
-                    quizCurrentIndex++;
-                    quiz.displayItem();
-                }
+                if (quizCurrentIndex >= shuffledData.length - 1) quiz.showCompletion();
+                else { quizCurrentIndex++; quiz.displayItem(); }
             },
             reveal: () => {
                 quiz.revealedArea.classList.add('expanded');
@@ -275,75 +309,86 @@
             }
         };
 
+        // Learning Module
         const learning = {
             title: document.getElementById('learning-title'),
-            content: document.getElementById('learning-content'),
+            contentWrapper: document.getElementById('learning-content-wrapper'),
             init: () => { learning.displayTopics(); showScreen('learning'); },
             displayTopics: () => {
                 learning.title.innerHTML = `Topics <span class="font-persian text-2xl">موضوعات</span>`;
                 const topics = [...new Set(appData.map(item => item.topic))];
-                learning.content.innerHTML = '';
+                learning.contentWrapper.className = "grid grid-cols-2 gap-3";
+                learning.contentWrapper.innerHTML = '';
                 topics.forEach(topic => {
                     const topicBtn = document.createElement('button');
-                    topicBtn.className = "interactive-card w-full bg-white/70 backdrop-blur-xl p-5 rounded-xl shadow-md text-left text-lg font-semibold";
+                    topicBtn.className = "interactive-card w-full bg-white/50 backdrop-blur-xl p-4 rounded-xl shadow-md text-center text-base font-semibold border border-white/20 active:scale-95 transition-transform";
                     topicBtn.textContent = topic;
                     topicBtn.onclick = () => learning.displayQuestions(topic);
-                    learning.content.appendChild(topicBtn);
+                    learning.contentWrapper.appendChild(topicBtn);
                 });
             },
             displayQuestions: (topic) => {
-                learning.title.innerHTML = `<button id="back-to-topics" class="text-xl font-bold mr-2">&larr;</button> ${topic}`;
+                learning.title.innerHTML = `<button id="back-to-topics" class="text-xl font-bold mr-2 align-middle inline-block">&larr;</button> ${topic}`;
                 document.getElementById('back-to-topics').onclick = learning.displayTopics;
                 const questions = appData.filter(item => item.topic === topic);
-                learning.content.innerHTML = '';
+                learning.contentWrapper.className = 'space-y-3';
+                learning.contentWrapper.innerHTML = '';
                 questions.forEach(item => {
                     const card = document.createElement('div');
-                    card.className = "bg-white/70 backdrop-blur-xl rounded-xl shadow-md overflow-hidden";
-                    
+                    card.className = "bg-white/60 backdrop-blur-xl rounded-xl shadow-md overflow-hidden border border-white/20";
                     const questionHeader = document.createElement('div');
                     questionHeader.className = "question-header p-4 cursor-pointer flex justify-between items-center";
-                    questionHeader.innerHTML = `<div class="flex-1 pr-2"><p class="font-semibold">${item.q}</p><p class="persian-text font-persian text-slate-500 text-sm mt-1">${item.q_persien}</p></div><div class="flex items-center flex-shrink-0"><button class="voice-btn text-slate-500 p-1 mr-2">${speakerIconSvg}</button><svg class="expand-arrow h-5 w-5 transition-transform text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></div>`;
-                    
+                    questionHeader.innerHTML = `<div class="flex-1 pr-2"><p class="font-semibold">${item.q}</p><p class="persian-text font-persian text-slate-600 text-sm mt-1">${item.q_persien}</p></div><div class="flex items-center flex-shrink-0"><button class="voice-btn text-slate-500 p-1 mr-2 active:scale-95 transition-transform">${speakerIconSvg}</button><svg class="expand-arrow h-5 w-5 transition-transform text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></div>`;
                     const expandableContent = document.createElement('div');
                     expandableContent.className = "expandable-content px-4 pb-2";
                     const answerList = document.createElement('ul');
-                    
                     item.a.forEach((answer, index) => {
                         const li = document.createElement('li');
-                        li.className = 'flex justify-between items-center border-t p-3';
-                        li.innerHTML = `<div><p>${answer}</p><p class="persian-text font-persian text-slate-500 text-sm mt-1">${item.a_persien[index] || ''}</p></div><button class="voice-btn text-slate-500 p-1 flex-shrink-0">${speakerIconSvg}</button>`;
+                        li.className = 'flex justify-between items-center border-t border-slate-300/70 p-3';
+                        li.innerHTML = `<div><p>${answer}</p><p class="persian-text font-persian text-slate-600 text-sm mt-1">${item.a_persien[index] || ''}</p></div><button class="voice-btn text-slate-500 p-1 flex-shrink-0 active:scale-95 transition-transform">${speakerIconSvg}</button>`;
                         li.querySelector('.voice-btn').onclick = (e) => { e.stopPropagation(); speak(answer, e.currentTarget); };
                         answerList.appendChild(li);
                     });
-                    
                     expandableContent.appendChild(answerList);
                     card.appendChild(questionHeader);
                     card.appendChild(expandableContent);
-
                     questionHeader.querySelector('.voice-btn').onclick = (e) => { e.stopPropagation(); speak(item.q, e.currentTarget); };
                     questionHeader.onclick = () => { expandableContent.classList.toggle('expanded'); questionHeader.querySelector('.expand-arrow').classList.toggle('rotate-180'); };
-                    learning.content.appendChild(card);
+                    learning.contentWrapper.appendChild(card);
                 });
             }
         };
 
+        // Modal Module
+        const aboutModal = {
+            el: document.getElementById('about-modal'),
+            btn: document.getElementById('about-btn'),
+            closeBtn: document.getElementById('close-modal-btn'),
+            backdrop: document.getElementById('modal-backdrop'),
+            open: () => aboutModal.el.classList.remove('hidden'),
+            close: () => aboutModal.el.classList.add('hidden'),
+            init: () => {
+                aboutModal.btn.addEventListener('click', aboutModal.open);
+                aboutModal.closeBtn.addEventListener('click', aboutModal.close);
+                aboutModal.backdrop.addEventListener('click', aboutModal.close);
+            }
+        };
+        
+        // App Initialization
         document.addEventListener('DOMContentLoaded', () => {
             const errorContainer = document.getElementById('error-container');
-
-            // Check if appData was loaded from en2.js
             if (typeof appData === 'undefined' || !Array.isArray(appData) || appData.length === 0) {
-                errorContainer.textContent = 'Error: Could not load data from en2.js. Make sure the file exists and is linked correctly in index.html.';
+                errorContainer.textContent = 'Error: Could not load data from en2.js.';
                 errorContainer.classList.remove('hidden');
                 document.getElementById('home-screen').classList.add('hidden');
                 return;
             }
-
-            // Setup event listeners now that data is loaded
             document.querySelectorAll('.mode-btn').forEach(btn => btn.onclick = () => btn.dataset.mode === 'quiz' ? quiz.init() : learning.init());
             document.querySelectorAll('.home-btn').forEach(btn => btn.onclick = () => showScreen('home'));
             quiz.nextBtn.addEventListener('click', quiz.next);
             quiz.revealBtn.addEventListener('click', quiz.reveal);
             document.getElementById('start-new-quiz-btn').addEventListener('click', () => quiz.init(true));
+            aboutModal.init();
         });
     </script>
 </body>
