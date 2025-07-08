@@ -1,997 +1,1015 @@
-<!DOCTYPE html>
-<html lang="fa" dir="ltr" class="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>MyFrench</title>
+<!DOCTYPE html> 
+ <html lang="fa" dir="ltr" class="light"> 
+ <head> 
+ 	<meta charset="UTF-8"> 
+ 	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"> 
+ 	<title>MyFrench</title> 
 
-    <link rel="manifest" href="manifest.json">
+ 	<link rel="manifest" href="manifest.json"> 
 
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="MyFrench">
-    <link rel="apple-touch-icon" href="https://i.postimg.cc/DwZd2dNQ/myfrench.png">
+ 	<meta name="apple-mobile-web-app-capable" content="yes"> 
+ 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"> 
+ 	<meta name="apple-mobile-web-app-title" content="MyFrench"> 
+ 	<link rel="apple-touch-icon" href="https://i.postimg.cc/DwZd2dNQ/myfrench.png"> 
 
-    <meta name="theme-color" content="#4f46e5">
-    <link rel="icon" href="https://i.postimg.cc/DwZd2dNQ/myfrench.png">
+ 	<meta name="theme-color" content="#4f46e5"> 
+ 	<link rel="icon" href="https://i.postimg.cc/DwZd2dNQ/myfrench.png"> 
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/feather-icons"></script>
-    <script>
-        // Set dark mode based on saved preference or system setting
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    padding: {
-                        'safe-top': 'env(safe-area-inset-top)',
-                        'safe-bottom': 'env(safe-area-inset-bottom)',
-                        'safe-left': 'env(safe-area-inset-left)',
-                        'safe-right': 'env(safe-area-inset-right)',
-                    },
-                },
-            },
-        }
-    </script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            touch-action: manipulation;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        .font-persian, .persian-ui {
-            font-family: 'Vazirmatn', sans-serif;
-        }
-        .font-persian {
-            font-size: 1.1rem; /* Increased font size for Persian */
-        }
-        .perspective-1000 { perspective: 1000px; }
-        .card-inner {
-            transform-style: preserve-3d;
-            transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
-        }
-        .card.flipped .card-inner {
-            transform: rotateY(180deg);
-        }
-        .card-front, .card-back {
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-        }
-        .card-back {
-            transform: rotateY(180deg);
-        }
-        .nav-btn-active {
-            background-color: #4f46e5;
-            color: white;
-        }
-        .progress-bar-fill {
-            transition: width 0.5s ease-in-out;
-        }
-        .modal {
-            transition: opacity 0.25s ease;
-        }
-        .modal-content {
-            transition: transform 0.25s ease;
-        }
+ 	<script src="https://cdn.tailwindcss.com"></script> 
+ 	<link rel="preconnect" href="https://fonts.googleapis.com"> 
+ 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+ 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet"> 
+ 	<script src="https://unpkg.com/feather-icons"></script> 
+ 	<script> 
+ 		// Set dark mode based on saved preference or system setting 
+ 		if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) { 
+ 			document.documentElement.classList.add('dark'); 
+ 		} else { 
+ 			document.documentElement.classList.remove('dark'); 
+ 		} 
+ 		tailwind.config = { 
+ 			darkMode: 'class', 
+ 			theme: { 
+ 				extend: { 
+ 					padding: { 
+ 						'safe-top': 'env(safe-area-inset-top)', 
+ 						'safe-bottom': 'env(safe-area-inset-bottom)', 
+ 						'safe-left': 'env(safe-area-inset-left)', 
+ 						'safe-right': 'env(safe-area-inset-right)', 
+ 					}, 
+ 				}, 
+ 			}, 
+ 		} 
+ 	</script> 
+ 	<style> 
+ 		body { 
+ 			font-family: 'Inter', sans-serif; 
+ 			touch-action: manipulation; 
+ 			-webkit-font-smoothing: antialiased; 
+ 			-moz-osx-font-smoothing: grayscale; 
+ 		} 
+ 		.font-persian, .persian-ui { 
+ 			font-family: 'Vazirmatn', sans-serif; 
+ 		} 
+ 		.font-persian { 
+ 			font-size: 1.1rem; /* Increased font size for Persian */ 
+ 		} 
+ 		.perspective-1000 { perspective: 1000px; } 
+ 		.card-inner { 
+ 			transform-style: preserve-3d; 
+ 			transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1); 
+ 		} 
+ 		.card.flipped .card-inner { 
+ 			transform: rotateY(180deg); 
+ 		} 
+ 		.card-front, .card-back { 
+ 			-webkit-backface-visibility: hidden; 
+ 			backface-visibility: hidden; 
+ 		} 
+ 		.card-back { 
+ 			transform: rotateY(180deg); 
+ 		} 
+ 		.nav-btn-active { 
+ 			background-color: #4f46e5; 
+ 			color: white; 
+ 		} 
+ 		.progress-bar-fill { 
+ 			transition: width 0.5s ease-in-out; 
+ 		} 
+ 		.modal { 
+ 			transition: opacity 0.25s ease; 
+ 		} 
+ 		.modal-content { 
+ 			transition: transform 0.25s ease; 
+ 		} 
 
-        /* Added style for fixed footer */
-        .fixed-footer-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 30; /* Above card, below modal */
-        }
+ 		/* Added style for fixed footer */ 
+ 		.fixed-footer-nav { 
+ 			position: fixed; 
+ 			bottom: 0; 
+ 			left: 0; 
+ 			right: 0; 
+ 			z-index: 30; /* Above card, below modal */ 
+ 		} 
 
-        /* Dynamic height transition for card-container */
-        #card-container {
-            transition: height 0.5s ease-in-out; /* Smooth transition for height changes */
-        }
-        /* Ensure card backs use flex-grow to fill available space */
-        #question-card .card-back .flex-grow.space-y-2 > div,
-        #word-card .card-back .flex-grow.space-y-2 > div {
-            /* If individual sections overflow, enable scrolling for them */
-            max-height: fit-content; /* Allow content to grow */
-            overflow: hidden; /* Hide overflow initially, let parent handle */
-        }
-        /* Ensure that when the card expands, the content within fills the space */
-        #question-card .card-back .flex-grow.space-y-2,
-        #word-card .card-back .flex-grow.space-y-2 {
-            display: flex;
-            flex-direction: column;
-        }
-        #question-card .card-back .flex-grow.space-y-2 > div {
-            flex-shrink: 0; /* Prevent sections from shrinking */
-        }
-    </style>
-</head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 flex flex-col h-screen antialiased pb-16">
+ 		/* Dynamic height transition for card-container */ 
+ 		#card-container { 
+ 			transition: height 0.5s ease-in-out; /* Smooth transition for height changes */ 
+ 		} 
+ 		/* Ensure card backs use flex-grow to fill available space */ 
+ 		#question-card .card-back .flex-grow.space-y-2 > div, 
+ 		#word-card .card-back .flex-grow.space-y-2 > div { 
+ 			max-height: fit-content; 
+ 			overflow: hidden; 
+ 		} 
+ 		/* Ensure that when the card expands, the content within fills the space */ 
+ 		#question-card .card-back .flex-grow.space-y-2, 
+ 		#word-card .card-back .flex-grow.space-y-2 { 
+ 			display: flex; 
+ 			flex-direction: column; 
+ 		} 
+ 		#question-card .card-back .flex-grow.space-y-2 > div { 
+ 			flex-shrink: 0; /* Prevent sections from shrinking */ 
+ 		} 
+ 	</style> 
+ </head> 
+ <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 flex flex-col h-screen antialiased pb-16"> 
 
-    <header class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-md p-4 sticky top-0 z-20 pt-safe-top">
-        <div class="max-w-md mx-auto">
-            <div class="flex justify-between items-center mb-4">
-                <button id="info-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
-                    <i data-feather="info" class="w-5 h-5 text-gray-600 dark:text-gray-300"></i>
-                </button>
-                <h1 class="text-xl font-bold text-indigo-600 dark:text-indigo-400">MyFrench</h1>
-                <button id="dark-mode-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
-                    <i data-feather="moon" class="w-5 h-5 text-gray-600 dark:text-gray-300 hidden dark:inline"></i>
-                    <i data-feather="sun" class="w-5 h-5 text-gray-600 dark:text-gray-300 inline dark:hidden"></i>
-                </button>
-            </div>
-            <div id="word-filters" class="flex justify-around mt-2 text-sm persian-ui">
-                <button id="show-all-words-btn" class="nav-btn-active flex items-center space-x-1.5 px-3 py-1.5 rounded-full transition-colors">
-                    <i data-feather="grid" class="w-4 h-4"></i>
-                    <span id="total-words-counter">همه (۰)</span>
-                </button>
-                <button id="show-bookmarked-words-btn" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                    <i data-feather="bookmark" class="w-4 h-4"></i>
-                    <span id="bookmarked-words-counter">نشان شده (۰)</span>
-                </button>
-                <button id="show-learned-words-btn" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                    <i data-feather="check-circle" class="w-4 h-4"></i>
-                    <span id="learned-words-counter">یادگرفته (۰)</span>
-                </button>
-            </div>
-            <div id="question-filters" class="flex justify-around mt-2 text-sm persian-ui hidden">
-                <button id="show-all-questions-btn" class="nav-btn-active flex items-center space-x-1.5 px-3 py-1.5 rounded-full transition-colors">
-                    <i data-feather="grid" class="w-4 h-4"></i>
-                    <span id="total-questions-counter">همه (۰)</span>
-                </button>
-                <button id="show-bookmarked-questions-btn" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                    <i data-feather="bookmark" class="w-4 h-4"></i>
-                    <span id="bookmarked-questions-counter">نشان شده (۰)</span>
-                </button>
-                <button id="show-learned-questions-btn" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                    <i data-feather="check-circle" class="w-4 h-4"></i>
-                    <span id="learned-questions-counter">یادگرفته (۰)</span>
-                </button>
-            </div>
-            <div class="mt-4 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                <div id="progress-bar" class="bg-indigo-500 h-2 rounded-full progress-bar-fill"></div>
-            </div>
-        </div>
-    </header>
+ 	<header class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-md p-4 sticky top-0 z-20 pt-safe-top"> 
+ 		<div class="max-w-md mx-auto"> 
+ 			<div class="flex justify-between items-center mb-4"> 
+ 				<button id="info-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"> 
+ 					<i data-feather="info" class="w-5 h-5 text-gray-600 dark:text-gray-300"></i> 
+ 				</button> 
+ 				<h1 class="text-xl font-bold text-indigo-600 dark:text-indigo-400">MyFrench</h1> 
+ 				<button id="dark-mode-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"> 
+ 					<i data-feather="moon" class="w-5 h-5 text-gray-600 dark:text-gray-300 hidden dark:inline"></i> 
+ 					<i data-feather="sun" class="w-5 h-5 text-gray-600 dark:text-gray-300 inline dark:hidden"></i> 
+ 				</button> 
+ 			</div> 
+ 			<div id="word-filters" class="flex justify-around mt-2 text-sm persian-ui"> 
+ 				<button id="show-all-words-btn" class="nav-btn-active flex items-center space-x-1.5 px-3 py-1.5 rounded-full transition-colors"> 
+ 					<i data-feather="grid" class="w-4 h-4"></i> 
+ 					<span id="total-words-counter">همه (۰)</span> 
+ 				</button> 
+ 				<button id="show-bookmarked-words-btn" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"> 
+ 					<i data-feather="bookmark" class="w-4 h-4"></i> 
+ 					<span id="bookmarked-words-counter">نشان شده (۰)</span> 
+ 				</button> 
+ 				<button id="show-learned-words-btn" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"> 
+ 					<i data-feather="check-circle" class="w-4 h-4"></i> 
+ 					<span id="learned-words-counter">یادگرفته (۰)</span> 
+ 				</button> 
+ 			</div> 
+ 			<div id="question-filters" class="flex justify-around mt-2 text-sm persian-ui hidden"> 
+ 				<button id="show-all-questions-btn" class="nav-btn-active flex items-center space-x-1.5 px-3 py-1.5 rounded-full transition-colors"> 
+ 					<i data-feather="grid" class="w-4 h-4"></i> 
+ 					<span id="total-questions-counter">همه (۰)</span> 
+ 				</button> 
+ 				<button id="show-bookmarked-questions-btn" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"> 
+ 					<i data-feather="bookmark" class="w-4 h-4"></i> 
+ 					<span id="bookmarked-questions-counter">نشان شده (۰)</span> 
+ 				</button> 
+ 				<button id="show-learned-questions-btn" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"> 
+ 					<i data-feather="check-circle" class="w-4 h-4"></i> 
+ 					<span id="learned-questions-counter">یادگرفته (۰)</span> 
+ 				</button> 
+ 			</div> 
+ 			<div class="mt-4 bg-gray-200 dark:bg-gray-700 rounded-full h-2"> 
+ 				<div id="progress-bar" class="bg-indigo-500 h-2 rounded-full progress-bar-fill"></div> 
+ 			</div> 
+ 		</div> 
+ 	</header> 
 
-    <main class="flex-grow flex flex-col items-center justify-center p-4 perspective-1000">
-        <div id="no-content-message" class="text-center hidden persian-ui">
-            <p class="text-lg font-semibold">محتوایی در این دسته وجود ندارد.</p>
-            <p class="text-gray-500 dark:text-gray-400">برای ادامه، دسته دیگری را انتخاب کنید!</p>
-        </div>
+ 	<main class="flex-grow flex flex-col items-center justify-center p-4 perspective-1000"> 
+ 		<div id="no-content-message" class="text-center hidden persian-ui"> 
+ 			<p class="text-lg font-semibold">محتوایی در این دسته وجود ندارد.</p> 
+ 			<p class="text-gray-500 dark:text-gray-400">برای ادامه، دسته دیگری را انتخاب کنید!</p> 
+ 		</div> 
 
-        <div id="card-container" class="w-full max-w-md relative flex flex-col">
-            <div id="word-card" class="card w-full h-full absolute">
-                <div class="card-inner w-full h-full relative">
-                    <div class="card-front w-full h-full absolute bg-white dark:bg-gray-800 rounded-2xl shadow-xl flex flex-col justify-between p-6">
-                        <div class="flex justify-between items-start">
-                            <span id="word-card-counter" class="text-sm text-gray-500 dark:text-gray-400"></span>
-                            <div class="flex space-x-3">
-                                <button id="bookmark-word-btn" class="text-gray-400 hover:text-indigo-500 transition-colors">
-                                    <i data-feather="bookmark" class="w-6 h-6"></i>
-                                </button>
-                                <button id="learned-word-btn" class="text-gray-400 hover:text-green-500 transition-colors">
-                                    <i data-feather="check-circle" class="w-6 h-6"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="text-center flex items-center justify-center gap-4 flex-grow">
-                            <h2 id="word" class="text-5xl font-bold text-gray-800 dark:text-gray-100" lang="fr"></h2>
-                            <button id="speak-word-front-btn" class="text-gray-500 hover:text-indigo-500 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors">
-                                <i data-feather="volume-2" class="w-8 h-8"></i>
-                            </button>
-                        </div>
-                        <button id="reveal-word-btn" class="persian-ui bg-indigo-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-all transform hover:scale-105 w-full">نمایش جزئیات</button>
-                    </div>
+ 		<div id="card-container" class="w-full max-w-md relative flex flex-col"> 
+ 			<div id="word-card" class="card w-full h-full absolute"> 
+ 				<div class="card-inner w-full h-full relative"> 
+ 					<div class="card-front w-full h-full absolute bg-white dark:bg-gray-800 rounded-2xl shadow-xl flex flex-col justify-between p-6"> 
+ 						<div class="flex justify-between items-start"> 
+ 							<span id="word-card-counter" class="text-sm text-gray-500 dark:text-gray-400"></span> 
+ 							<div class="flex space-x-3"> 
+ 								<button id="bookmark-word-btn" class="text-gray-400 hover:text-indigo-500 transition-colors"> 
+ 									<i data-feather="bookmark" class="w-6 h-6"></i> 
+ 								</button> 
+ 								<button id="learned-word-btn" class="text-gray-400 hover:text-green-500 transition-colors"> 
+ 									<i data-feather="check-circle" class="w-6 h-6"></i> 
+ 								</button> 
+ 							</div> 
+ 						</div> 
+ 						<div class="text-center flex items-center justify-center gap-4 flex-grow"> 
+ 							<h2 id="word" class="text-5xl font-bold text-gray-800 dark:text-gray-100" lang="fr"></h2> 
+ 							<button id="speak-word-front-btn" class="text-gray-500 hover:text-indigo-500 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"> 
+ 								<i data-feather="volume-2" class="w-8 h-8"></i> 
+ 							</button> 
+ 						</div> 
+ 						<button id="reveal-word-btn" class="persian-ui bg-indigo-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-all transform hover:scale-105 w-full">نمایش جزئیات</button> 
+ 					</div> 
 
-                    <div class="card-back w-full h-full absolute bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-xl flex flex-col p-6 overflow-y-auto">
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="persian-ui text-lg font-bold text-indigo-600 dark:text-indigo-400">جزئیات</span>
-                            <button id="unreveal-word-btn" class="text-gray-400 hover:text-indigo-500">
-                                <i data-feather="x" class="w-6 h-6"></i>
-                            </button>
-                        </div>
-                        <div class="flex-grow space-y-2 text-sm">
-                            <div class="bg-white dark:bg-gray-700/50 p-3 rounded-lg">
-                                <p id="translation-english" class="text-lg font-medium text-gray-800 dark:text-gray-100" lang="en"></p>
-                                <p id="persian" class="font-persian text-gray-700 dark:text-gray-200" dir="rtl"></p>
-                            </div>
-                            <div class="bg-white dark:bg-gray-700/50 p-3 rounded-lg">
-                                <h3 class="persian-ui flex items-center text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-1">
-                                    <i data-feather="mic" class="w-4 h-4 mr-2"></i>تلفظ
-                                </h3>
-                                <div class="flex items-center justify-between">
-                                    <p id="pronunciation-english" class="text-base" lang="en"></p>
-                                    <button id="speak-pronunciation-btn" class="text-indigo-500 hover:text-indigo-400 p-1">
-                                        <i data-feather="volume-2" class="w-5 h-5"></i>
-                                    </button>
-                                </div>
-                                <p id="pronunciation-ipa" class="text-gray-500 dark:text-gray-400 text-sm" lang="en"></p>
-                                <p id="pronunciation-persian" class="font-persian text-gray-500 dark:text-gray-400 mt-1" dir="rtl"></p>
-                            </div>
-                            <div class="bg-white dark:bg-gray-700/50 p-3 rounded-lg">
-                                <h3 class="persian-ui flex items-center text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-1">
-                                    <i data-feather="file-text" class="w-4 h-4 mr-2"></i>مثال
-                                </h3>
-                                <div class="flex items-center justify-between">
-                                    <p id="sample-sentence" class="text-base italic" lang="fr"></p>
-                                    <button id="speak-sentence-btn" class="text-indigo-500 hover:text-indigo-400 p-1">
-                                        <i data-feather="volume-2" class="w-5 h-5"></i>
-                                    </button>
-                                </div>
-                                <p id="sentence-translation-english" class="text-gray-600 dark:text-gray-300 mt-1" lang="en"></p>
-                                <p id="sentence-persian" class="font-persian text-gray-600 dark:text-gray-300" dir="rtl"></p>
-                                <div class="mt-1 pt-1 border-t border-gray-200 dark:border-gray-600 text-xs text-gray-400 dark:text-gray-500">
-                                    <p id="sentence_pronunciation_ipa" lang="en"></p>
-                                    <p id="sentence_pronunciation_english" lang="en"></p>
-                                    <p id="sentence_pronunciation_persian" class="font-persian" dir="rtl"></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+ 					<div class="card-back w-full h-full absolute bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-xl flex flex-col p-6 overflow-y-auto"> 
+ 						<div class="flex justify-between items-center mb-3"> 
+ 							<span class="persian-ui text-lg font-bold text-indigo-600 dark:text-indigo-400">جزئیات</span> 
+ 							<button id="unreveal-word-btn" class="text-gray-400 hover:text-indigo-500"> 
+ 								<i data-feather="x" class="w-6 h-6"></i> 
+ 							</button> 
+ 						</div> 
+ 						<div class="flex-grow space-y-2 text-sm"> 
+ 							<div class="bg-white dark:bg-gray-700/50 p-3 rounded-lg"> 
+ 								<p id="translation-english" class="text-lg font-medium text-gray-800 dark:text-gray-100" lang="en"></p> 
+ 								<p id="persian" class="font-persian text-gray-700 dark:text-gray-200" dir="rtl"></p> 
+ 							</div> 
+ 							<div class="bg-white dark:bg-gray-700/50 p-3 rounded-lg"> 
+ 								<h3 class="persian-ui flex items-center text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-1"> 
+ 									<i data-feather="mic" class="w-4 h-4 mr-2"></i>تلفظ 
+ 								</h3> 
+ 								<div class="flex items-center justify-between"> 
+ 									<p id="pronunciation-english" class="text-base" lang="en"></p> 
+ 									<button id="speak-pronunciation-btn" class="text-indigo-500 hover:text-indigo-400 p-1"> 
+ 										<i data-feather="volume-2" class="w-5 h-5"></i> 
+ 									</button> 
+ 								</div> 
+ 								<p id="pronunciation-ipa" class="text-gray-500 dark:text-gray-400 text-sm" lang="en"></p> 
+ 								<p id="pronunciation-persian" class="font-persian text-gray-500 dark:text-gray-400 mt-1" dir="rtl"></p> 
+ 							</div> 
+ 							<div class="bg-white dark:bg-gray-700/50 p-3 rounded-lg"> 
+ 								<h3 class="persian-ui flex items-center text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-1"> 
+ 									<i data-feather="file-text" class="w-4 h-4 mr-2"></i>مثال 
+ 								</h3> 
+ 								<div class="flex items-center justify-between"> 
+ 									<p id="sample-sentence" class="text-base italic" lang="fr"></p> 
+ 									<button id="speak-sentence-btn" class="text-indigo-500 hover:text-indigo-400 p-1"> 
+ 										<i data-feather="volume-2" class="w-5 h-5"></i> 
+ 									</button> 
+ 								</div> 
+ 								<p id="sentence-translation-english" class="text-gray-600 dark:text-gray-300 mt-1" lang="en"></p> 
+ 								<p id="sentence-persian" class="font-persian text-gray-600 dark:text-gray-300" dir="rtl"></p> 
+ 								<div class="mt-1 pt-1 border-t border-gray-200 dark:border-gray-600 text-xs text-gray-400 dark:text-gray-500"> 
+ 									<p id="sentence_pronunciation_ipa" lang="en"></p> 
+ 									<p id="sentence_pronunciation_english" lang="en"></p> 
+ 									<p id="sentence_pronunciation_persian" class="font-persian" dir="rtl"></p> 
+ 								</div> 
+ 							</div> 
+ 						</div> 
+ 					</div> 
+ 				</div> 
+ 			</div> 
 
-            <div id="question-card" class="card w-full h-full absolute">
-                <div class="card-inner w-full h-full relative">
-                    <div class="card-front w-full h-full absolute bg-white dark:bg-gray-800 rounded-2xl shadow-xl flex flex-col justify-between p-6">
-                        <div class="flex justify-between items-start">
-                            <span id="question-card-counter" class="text-sm text-gray-500 dark:text-gray-400"></span>
-                            <div class="flex space-x-3">
-                                <button id="bookmark-question-btn" class="text-gray-400 hover:text-indigo-500 transition-colors">
-                                    <i data-feather="bookmark" class="w-6 h-6"></i>
-                                </button>
-                                <button id="learned-question-btn" class="text-gray-400 hover:text-green-500 transition-colors">
-                                    <i data-feather="check-circle" class="w-6 h-6"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="text-center flex flex-col items-center justify-center gap-4 flex-grow">
-                            <span id="question-topic" class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase"></span>
-                            <h2 id="french-question" class="text-4xl font-bold text-gray-800 dark:text-gray-100" lang="fr"></h2>
-                            <button id="speak-question-front-btn" class="text-gray-500 hover:text-indigo-500 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors">
-                                <i data-feather="volume-2" class="w-8 h-8"></i>
-                            </button>
-                        </div>
-                        <button id="reveal-question-btn" class="persian-ui bg-indigo-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-all transform hover:scale-105 w-full">نمایش پاسخ</button>
-                    </div>
+ 			<div id="question-card" class="card w-full h-full absolute"> 
+ 				<div class="card-inner w-full h-full relative"> 
+ 					<div class="card-front w-full h-full absolute bg-white dark:bg-gray-800 rounded-2xl shadow-xl flex flex-col justify-between p-6"> 
+ 						<div class="flex justify-between items-start"> 
+ 							<span id="question-card-counter" class="text-sm text-gray-500 dark:text-gray-400"></span> 
+ 							<div class="flex space-x-3"> 
+ 								<button id="bookmark-question-btn" class="text-gray-400 hover:text-indigo-500 transition-colors"> 
+ 									<i data-feather="bookmark" class="w-6 h-6"></i> 
+ 								</button> 
+ 								<button id="learned-question-btn" class="text-gray-400 hover:text-green-500 transition-colors"> 
+ 									<i data-feather="check-circle" class="w-6 h-6"></i> 
+ 								</button> 
+ 							</div> 
+ 						</div> 
+ 						<div class="text-center flex flex-col items-center justify-center gap-4 flex-grow"> 
+ 							<span id="question-topic" class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase"></span> 
+ 							<h2 id="french-question" class="text-4xl font-bold text-gray-800 dark:text-gray-100" lang="fr"></h2> 
+ 							<button id="speak-question-front-btn" class="text-gray-500 hover:text-indigo-500 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"> 
+ 								<i data-feather="volume-2" class="w-8 h-8"></i> 
+ 							</button> 
+ 						</div> 
+ 						<button id="reveal-question-btn" class="persian-ui bg-indigo-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-all transform hover:scale-105 w-full">نمایش پاسخ</button> 
+ 					</div> 
 
-                    <div class="card-back w-full h-full absolute bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-xl flex flex-col p-4">
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="persian-ui text-lg font-bold text-indigo-600 dark:text-indigo-400">پاسخ‌ها</span>
-                            <button id="unreveal-question-btn" class="text-gray-400 hover:text-indigo-500">
-                                <i data-feather="x" class="w-6 h-6"></i>
-                            </button>
-                        </div>
-                        <div id="question-back-content" class="flex-grow space-y-2 text-sm"> <div class="bg-white dark:bg-gray-700/50 p-3 rounded-lg">
-                                <h3 class="persian-ui flex items-center text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-1">
-                                    <i data-feather="user" class="w-4 h-4 mr-2"></i>پرسش
-                                </h3>
-                                <p id="question-translation-english" class="text-lg font-medium text-gray-800 dark:text-gray-100" lang="en"></p>
-                                <p id="question-persian" class="font-persian text-gray-700 dark:text-gray-200" dir="rtl"></p>
-                                <div class="mt-1 pt-1 border-t border-gray-200 dark:border-gray-600 text-xs text-gray-400 dark:text-gray-500">
-                                    <p id="question-pronunciation-ipa" lang="en"></p>
-                                    <p id="question-pronunciation-english" lang="en"></p>
-                                    <p id="question-pronunciation-persian" class="font-persian" dir="rtl"></p>
-                                </div>
-                                <button id="speak-question-back-btn" class="mt-2 text-indigo-500 hover:text-indigo-400 p-1">
-                                    <i data-feather="volume-2" class="w-5 h-5"></i>
-                                </button>
-                            </div>
-                            
-                            <div class="bg-white dark:bg-gray-700/50 p-3 rounded-lg">
-                                <h3 class="persian-ui flex items-center text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-1">
-                                    <i data-feather="check-square" class="w-4 h-4 mr-2"></i>پاسخ رسمی
-                                </h3>
-                                <p id="answer-formal-french" class="text-base italic text-gray-800 dark:text-gray-100" lang="fr"></p>
-                                <p id="answer-formal-translation-english" class="text-gray-600 dark:text-gray-300 mt-1" lang="en"></p>
-                                <p id="answer-formal-persian" class="font-persian text-gray-600 dark:text-gray-300" dir="rtl"></p>
-                                <div class="mt-1 pt-1 border-t border-gray-200 dark:border-gray-600 text-xs text-gray-400 dark:text-gray-500">
-                                    <p id="answer-formal-pronunciation-ipa" lang="en"></p>
-                                    <p id="answer-formal-pronunciation-english" lang="en"></p>
-                                    <p id="answer-formal-pronunciation-persian" class="font-persian" dir="rtl"></p>
-                                </div>
-                                <button id="speak-answer-formal-btn" class="mt-2 text-indigo-500 hover:text-indigo-400 p-1">
-                                    <i data-feather="volume-2" class="w-5 h-5"></i>
-                                </button>
-                            </div>
+ 					<div class="card-back w-full h-full absolute bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-xl flex flex-col p-4"> 
+ 						<div class="flex justify-between items-center mb-3"> 
+ 							<span class="persian-ui text-lg font-bold text-indigo-600 dark:text-indigo-400">پاسخ‌ها</span> 
+ 							<button id="unreveal-question-btn" class="text-gray-400 hover:text-indigo-500"> 
+ 								<i data-feather="x" class="w-6 h-6"></i> 
+ 							</button> 
+ 						</div> 
+ 						<div id="question-back-content" class="flex-grow space-y-2 text-sm overflow-y-auto"> 
+ 							<div class="bg-white dark:bg-gray-700/50 p-3 rounded-lg"> 
+ 								<h3 class="persian-ui flex items-center text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-1"> 
+ 									<i data-feather="user" class="w-4 h-4 mr-2"></i>پرسش 
+ 								</h3> 
+ 								<p id="question-translation-english" class="text-lg font-medium text-gray-800 dark:text-gray-100" lang="en"></p> 
+ 								<p id="question-persian" class="font-persian text-gray-700 dark:text-gray-200" dir="rtl"></p> 
+ 								<div class="mt-1 pt-1 border-t border-gray-200 dark:border-gray-600 text-xs text-gray-400 dark:text-gray-500"> 
+ 									<p id="question-pronunciation-ipa" lang="en"></p> 
+ 									<p id="question-pronunciation-english" lang="en"></p> 
+ 									<p id="question-pronunciation-persian" class="font-persian" dir="rtl"></p> 
+ 								</div> 
+ 								<button id="speak-question-back-btn" class="mt-2 text-indigo-500 hover:text-indigo-400 p-1"> 
+ 									<i data-feather="volume-2" class="w-5 h-5"></i> 
+ 								</button> 
+ 							</div> 
+ 							 
+ 							<div class="bg-white dark:bg-gray-700/50 p-3 rounded-lg"> 
+ 								<h3 class="persian-ui flex items-center text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-1"> 
+ 									<i data-feather="check-square" class="w-4 h-4 mr-2"></i>پاسخ رسمی 
+ 								</h3> 
+ 								<p id="answer-formal-french" class="text-base italic text-gray-800 dark:text-gray-100" lang="fr"></p> 
+ 								<p id="answer-formal-translation-english" class="text-gray-600 dark:text-gray-300 mt-1" lang="en"></p> 
+ 								<p id="answer-formal-persian" class="font-persian text-gray-600 dark:text-gray-300" dir="rtl"></p> 
+ 								<div class="mt-1 pt-1 border-t border-gray-200 dark:border-gray-600 text-xs text-gray-400 dark:text-gray-500"> 
+ 									<p id="answer-formal-pronunciation-ipa" lang="en"></p> 
+ 									<p id="answer-formal-pronunciation-english" lang="en"></p> 
+ 									<p id="answer-formal-pronunciation-persian" class="font-persian" dir="rtl"></p> 
+ 								</div> 
+ 								<button id="speak-answer-formal-btn" class="mt-2 text-indigo-500 hover:text-indigo-400 p-1"> 
+ 									<i data-feather="volume-2" class="w-5 h-5"></i> 
+ 								</button> 
+ 							</div> 
 
-                            <div class="bg-white dark:bg-gray-700/50 p-3 rounded-lg">
-                                <h3 class="persian-ui flex items-center text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-1">
-                                    <i data-feather="message-square" class="w-4 h-4 mr-2"></i>پاسخ غیررسمی
-                                </h3>
-                                <p id="answer-informal-french" class="text-base italic text-gray-800 dark:text-gray-100" lang="fr"></p>
-                                <p id="answer-informal-translation-english" class="text-gray-600 dark:text-gray-300 mt-1" lang="en"></p>
-                                <p id="answer-informal-persian" class="font-persian text-gray-600 dark:text-gray-300" dir="rtl"></p>
-                                <div class="mt-1 pt-1 border-t border-gray-200 dark:border-gray-600 text-xs text-gray-400 dark:text-gray-500">
-                                    <p id="answer-informal-pronunciation-ipa" lang="en"></p>
-                                    <p id="answer-informal-pronunciation-english" lang="en"></p>
-                                    <p id="answer-informal-pronunciation-persian" class="font-persian" dir="rtl"></p>
-                                </div>
-                                <button id="speak-answer-informal-btn" class="mt-2 text-indigo-500 hover:text-indigo-400 p-1">
-                                    <i data-feather="volume-2" class="w-5 h-5"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+ 							<div class="bg-white dark:bg-gray-700/50 p-3 rounded-lg"> 
+ 								<h3 class="persian-ui flex items-center text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-1"> 
+ 									<i data-feather="message-square" class="w-4 h-4 mr-2"></i>پاسخ غیررسمی 
+ 								</h3> 
+ 								<p id="answer-informal-french" class="text-base italic text-gray-800 dark:text-gray-100" lang="fr"></p> 
+ 								<p id="answer-informal-translation-english" class="text-gray-600 dark:text-gray-300 mt-1" lang="en"></p> 
+ 								<p id="answer-informal-persian" class="font-persian text-gray-600 dark:text-gray-300" dir="rtl"></p> 
+ 								<div class="mt-1 pt-1 border-t border-gray-200 dark:border-gray-600 text-xs text-gray-400 dark:text-gray-500"> 
+ 									<p id="answer-informal-pronunciation-ipa" lang="en"></p> 
+ 									<p id="answer-informal-pronunciation-english" lang="en"></p> 
+ 									<p id="answer-informal-pronunciation-persian" class="font-persian" dir="rtl"></p> 
+ 								</div> 
+ 								<button id="speak-answer-informal-btn" class="mt-2 text-indigo-500 hover:text-indigo-400 p-1"> 
+ 									<i data-feather="volume-2" class="w-5 h-5"></i> 
+ 								</button> 
+ 							</div> 
+ 						</div> 
+ 					</div> 
+ 				</div> 
+ 			</div> 
+ 		</div> 
 
-        <div class="flex justify-between items-center mt-6 w-full max-w-md">
-            <button id="prev-btn" class="p-4 bg-white dark:bg-gray-700 rounded-full shadow-lg hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
-                <i data-feather="arrow-left" class="w-6 h-6"></i>
-            </button>
-            <span id="nav-counter" class="text-lg font-semibold text-gray-600 dark:text-gray-300"></span>
-            <button id="next-btn" class="p-4 bg-white dark:bg-gray-700 rounded-full shadow-lg hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
-                <i data-feather="arrow-right" class="w-6 h-6"></i>
-            </button>
-        </div>
-    </main>
+ 		<div class="flex justify-between items-center mt-6 w-full max-w-md"> 
+ 			<button id="prev-btn" class="p-4 bg-white dark:bg-gray-700 rounded-full shadow-lg hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"> 
+ 				<i data-feather="arrow-left" class="w-6 h-6"></i> 
+ 			</button> 
+ 			<span id="nav-counter" class="text-lg font-semibold text-gray-600 dark:text-gray-300"></span> 
+ 			<button id="next-btn" class="p-4 bg-white dark:bg-gray-700 rounded-full shadow-lg hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"> 
+ 				<i data-feather="arrow-right" class="w-6 h-6"></i> 
+ 			</button> 
+ 		</div> 
+ 	</main> 
 
-    <div id="about-modal" class="modal fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-50 p-4 opacity-0 pointer-events-none">
-        <div id="modal-content" class="modal-content bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-sm p-6 text-center transform scale-95 persian-ui">
-            <img src="https://i.postimg.cc/DwZd2dNQ/myfrench.png" alt="MyFrench App Logo" class="w-20 h-20 mx-auto rounded-full mb-4">
-            <h2 class="text-xl font-bold text-indigo-600 dark:text-indigo-400">درباره مای‌فرنچ</h2>
-            <div class="mt-4 text-gray-600 dark:text-gray-300 space-y-2 text-sm">
-                <p>مای‌فرنچ یک اپلیکیشن فلش‌کارت ساده و زیبا برای کمک به یادگیری لغات فرانسوی است.</p>
-                <p>نسخه: 0.01</p>
-                <p>طراحی و توسعه : پیمان عابدین پور</p>
-            </div>
-            <button id="close-modal-btn" class="mt-6 bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors w-full">بستن</button>
-        </div>
-    </div>
-    
-    <footer class="fixed-footer-nav bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg p-2 text-xs">
-        <div class="max-w-md mx-auto flex justify-around">
-            <button id="show-words-category-btn" class="nav-btn-active flex flex-col items-center px-3 py-1.5 rounded-full transition-colors w-1/2">
-                <i data-feather="book-open" class="w-6 h-6"></i>
-            </button>
-            <button id="show-questions-category-btn" class="flex flex-col items-center px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors w-1/2">
-                <i data-feather="message-circle" class="w-6 h-6"></i> </button>
-        </div>
-    </footer>
+ 	<div id="about-modal" class="modal fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-50 p-4 opacity-0 pointer-events-none"> 
+ 		<div id="modal-content" class="modal-content bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-sm p-6 text-center transform scale-95 persian-ui"> 
+ 			<img src="https://i.postimg.cc/DwZd2dNQ/myfrench.png" alt="MyFrench App Logo" class="w-20 h-20 mx-auto rounded-full mb-4"> 
+ 			<h2 class="text-xl font-bold text-indigo-600 dark:text-indigo-400">درباره مای‌فرنچ</h2> 
+ 			<div class="mt-4 text-gray-600 dark:text-gray-300 space-y-2 text-sm"> 
+ 				<p>مای‌فرنچ یک اپلیکیشن فلش‌کارت ساده و زیبا برای کمک به یادگیری لغات فرانسوی است.</p> 
+ 				<p>نسخه: 0.01</p> 
+ 				<p>طراحی و توسعه : پیمان عابدین پور</p> 
+ 			</div> 
+ 			<button id="close-modal-btn" class="mt-6 bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors w-full">بستن</button> 
+ 		</div> 
+ 	</div> 
+ 	 
+ 	<footer class="fixed-footer-nav bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg p-2 text-xs"> 
+ 		<div class="max-w-md mx-auto flex justify-around"> 
+ 			<button id="show-words-category-btn" class="nav-btn-active flex flex-col items-center px-3 py-1.5 rounded-full transition-colors w-1/2"> 
+ 				<i data-feather="book-open" class="w-6 h-6"></i> 
+ 			</button> 
+ 			<button id="show-questions-category-btn" class="flex flex-col items-center px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors w-1/2"> 
+ 				<i data-feather="message-circle" class="w-6 h-6"></i> 
+ 			</button> 
+ 		</div> 
+ 	</footer> 
 
-    <script src="./french.js"></script>
-    <script src="./french2.js"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-    // --- DOM Elements ---
-    const wordCard = document.getElementById('word-card');
-    const questionCard = document.getElementById('question-card');
-    const cardContainer = document.getElementById('card-container');
-    const noWordsMessage = document.getElementById('no-content-message');
-    
-    // Word Card Front
-    const wordEl = document.getElementById('word');
-    const wordCardCounterEl = document.getElementById('word-card-counter');
-    const bookmarkWordBtn = document.getElementById('bookmark-word-btn');
-    const learnedWordBtn = document.getElementById('learned-word-btn');
-    const revealWordBtn = document.getElementById('reveal-word-btn');
-    const speakWordFrontBtn = document.getElementById('speak-word-front-btn');
+ 	<script src="./french.js"></script> 
+ 	<script src="./french2.js"></script> 
+ 	<script> 
+ 	document.addEventListener('DOMContentLoaded', () => { 
+ 	// --- DOM Elements --- 
+ 	const wordCard = document.getElementById('word-card'); 
+ 	const questionCard = document.getElementById('question-card'); 
+ 	const cardContainer = document.getElementById('card-container'); 
+ 	const noWordsMessage = document.getElementById('no-content-message'); 
+ 	 
+ 	// Word Card Front 
+ 	const wordEl = document.getElementById('word'); 
+ 	const wordCardCounterEl = document.getElementById('word-card-counter'); 
+ 	const bookmarkWordBtn = document.getElementById('bookmark-word-btn'); 
+ 	const learnedWordBtn = document.getElementById('learned-word-btn'); 
+ 	const revealWordBtn = document.getElementById('reveal-word-btn'); 
+ 	const speakWordFrontBtn = document.getElementById('speak-word-front-btn'); 
 
-    // Word Card Back
-    const unrevealWordBtn = document.getElementById('unreveal-word-btn');
-    const pronunciationIpaEl = document.getElementById('pronunciation-ipa');
-    const pronunciationEnglishEl = document.getElementById('pronunciation-english');
-    const pronunciationPersianEl = document.getElementById('pronunciation-persian');
-    const translationEnglishEl = document.getElementById('translation-english');
-    const persianEl = document.getElementById('persian');
-    const sampleSentenceEl = document.getElementById('sample-sentence');
-    const sentenceTranslationEnglishEl = document.getElementById('sentence-translation-english');
-    const sentencePersianEl = document.getElementById('sentence-persian');
-    const sentencePronunciationIpaEl = document.getElementById('sentence_pronunciation_ipa');
-    const sentencePronunciationEnglishEl = document.getElementById('sentence_pronunciation_english');
-    const sentencePronunciationPersianEl = document.getElementById('sentence_pronunciation_persian');
-    const speakPronunciationBtn = document.getElementById('speak-pronunciation-btn');
-    const speakSentenceBtn = document.getElementById('speak-sentence-btn');
-    
-    // Question Card Front
-    const questionTopicEl = document.getElementById('question-topic');
-    const frenchQuestionEl = document.getElementById('french-question');
-    const questionCardCounterEl = document.getElementById('question-card-counter');
-    const bookmarkQuestionBtn = document.getElementById('bookmark-question-btn');
-    const learnedQuestionBtn = document.getElementById('learned-question-btn');
-    const revealQuestionBtn = document.getElementById('reveal-question-btn');
-    const speakQuestionFrontBtn = document.getElementById('speak-question-front-btn');
+ 	// Word Card Back 
+ 	const unrevealWordBtn = document.getElementById('unreveal-word-btn'); 
+ 	const pronunciationIpaEl = document.getElementById('pronunciation-ipa'); 
+ 	const pronunciationEnglishEl = document.getElementById('pronunciation-english'); 
+ 	const pronunciationPersianEl = document.getElementById('pronunciation-persian'); 
+ 	const translationEnglishEl = document.getElementById('translation-english'); 
+ 	const persianEl = document.getElementById('persian'); 
+ 	const sampleSentenceEl = document.getElementById('sample-sentence'); 
+ 	const sentenceTranslationEnglishEl = document.getElementById('sentence-translation-english'); 
+ 	const sentencePersianEl = document.getElementById('sentence-persian'); 
+ 	const sentencePronunciationIpaEl = document.getElementById('sentence_pronunciation_ipa'); 
+ 	const sentencePronunciationEnglishEl = document.getElementById('sentence_pronunciation_english'); 
+ 	const sentencePronunciationPersianEl = document.getElementById('sentence_pronunciation_persian'); 
+ 	const speakPronunciationBtn = document.getElementById('speak-pronunciation-btn'); 
+ 	const speakSentenceBtn = document.getElementById('speak-sentence-btn'); 
+ 	 
+ 	// Question Card Front 
+ 	const questionTopicEl = document.getElementById('question-topic'); 
+ 	const frenchQuestionEl = document.getElementById('french-question'); 
+ 	const questionCardCounterEl = document.getElementById('question-card-counter'); 
+ 	const bookmarkQuestionBtn = document.getElementById('bookmark-question-btn'); 
+ 	const learnedQuestionBtn = document.getElementById('learned-question-btn'); 
+ 	const revealQuestionBtn = document.getElementById('reveal-question-btn'); 
+ 	const speakQuestionFrontBtn = document.getElementById('speak-question-front-btn'); 
 
-    // Question Card Back
-    const unrevealQuestionBtn = document.getElementById('unreveal-question-btn');
-    const questionTranslationEnglishEl = document.getElementById('question-translation-english');
-    const questionPersianEl = document.getElementById('question-persian');
-    const questionPronunciationIpaEl = document.getElementById('question-pronunciation-ipa');
-    const questionPronunciationEnglishEl = document.getElementById('question-pronunciation-english');
-    const questionPronunciationPersianEl = document.getElementById('question-pronunciation-persian');
-    const speakQuestionBackBtn = document.getElementById('speak-question-back-btn');
-    const questionBackContent = document.getElementById('question-back-content'); // Get the content div on the back
+ 	// Question Card Back 
+ 	const unrevealQuestionBtn = document.getElementById('unreveal-question-btn'); 
+ 	const questionTranslationEnglishEl = document.getElementById('question-translation-english'); 
+ 	const questionPersianEl = document.getElementById('question-persian'); 
+ 	const questionPronunciationIpaEl = document.getElementById('question-pronunciation-ipa'); 
+ 	const questionPronunciationEnglishEl = document.getElementById('question-pronunciation-english'); 
+ 	const questionPronunciationPersianEl = document.getElementById('question-pronunciation-persian'); 
+ 	const speakQuestionBackBtn = document.getElementById('speak-question-back-btn'); 
+ 	const questionBackContent = document.getElementById('question-back-content'); 
 
-    const answerFormalFrenchEl = document.getElementById('answer-formal-french');
-    const answerFormalTranslationEnglishEl = document.getElementById('answer-formal-translation-english');
-    const answerFormalPersianEl = document.getElementById('answer-formal-persian');
-    const answerFormalPronunciationIpaEl = document.getElementById('answer-formal-pronunciation-ipa');
-    const answerFormalPronunciationEnglishEl = document.getElementById('answer-formal-pronunciation-english');
-    const answerFormalPronunciationPersianEl = document.getElementById('answer-formal-pronunciation-persian');
-    const speakAnswerFormalBtn = document.getElementById('speak-answer-formal-btn');
+ 	const answerFormalFrenchEl = document.getElementById('answer-formal-french'); 
+ 	const answerFormalTranslationEnglishEl = document.getElementById('answer-formal-translation-english'); 
+ 	const answerFormalPersianEl = document.getElementById('answer-formal-persian'); 
+ 	const answerFormalPronunciationIpaEl = document.getElementById('answer-formal-pronunciation-ipa'); 
+ 	const answerFormalPronunciationEnglishEl = document.getElementById('answer-formal-pronunciation-english'); 
+ 	const answerFormalPronunciationPersianEl = document.getElementById('answer-formal-pronunciation-persian'); 
+ 	const speakAnswerFormalBtn = document.getElementById('speak-answer-formal-btn'); 
 
-    const answerInformalFrenchEl = document.getElementById('answer-informal-french');
-    const answerInformalTranslationEnglishEl = document.getElementById('answer-informal-translation-english');
-    const answerInformalPersianEl = document.getElementById('answer-informal-persian');
-    const answerInformalPronunciationIpaEl = document.getElementById('answer-informal-pronunciation-ipa');
-    const answerInformalPronunciationEnglishEl = document.getElementById('answer-informal-pronunciation-english');
-    const answerInformalPronunciationPersianEl = document.getElementById('answer-informal-pronunciation-persian');
-    const speakAnswerInformalBtn = document.getElementById('speak-answer-informal-btn');
-
-
-    // Header & Progress
-    const totalWordsCounterEl = document.getElementById('total-words-counter');
-    const bookmarkedWordsCounterEl = document.getElementById('bookmarked-words-counter');
-    const learnedWordsCounterEl = document.getElementById('learned-words-counter');
-    const totalQuestionsCounterEl = document.getElementById('total-questions-counter');
-    const bookmarkedQuestionsCounterEl = document.getElementById('bookmarked-questions-counter');
-    const learnedQuestionsCounterEl = document.getElementById('learned-questions-counter');
-    
-    const progressBar = document.getElementById('progress-bar');
-    
-    const showWordsCategoryBtn = document.getElementById('show-words-category-btn');
-    const showQuestionsCategoryBtn = document.getElementById('show-questions-category-btn');
-
-    const wordFiltersDiv = document.getElementById('word-filters');
-    const questionFiltersDiv = document.getElementById('question-filters');
-
-    const showAllWordsBtn = document.getElementById('show-all-words-btn');
-    const showBookmarkedWordsBtn = document.getElementById('show-bookmarked-words-btn');
-    const showLearnedWordsBtn = document.getElementById('show-learned-words-btn');
-
-    const showAllQuestionsBtn = document.getElementById('show-all-questions-btn');
-    const showBookmarkedQuestionsBtn = document.getElementById('show-bookmarked-questions-btn');
-    const showLearnedQuestionsBtn = document.getElementById('show-learned-questions-btn');
+ 	const answerInformalFrenchEl = document.getElementById('answer-informal-french'); 
+ 	const answerInformalTranslationEnglishEl = document.getElementById('answer-informal-translation-english'); 
+ 	const answerInformalPersianEl = document.getElementById('answer-informal-persian'); 
+ 	const answerInformalPronunciationIpaEl = document.getElementById('answer-informal-pronunciation-ipa'); 
+ 	const answerInformalPronunciationEnglishEl = document.getElementById('answer-informal-pronunciation-english'); 
+ 	const answerInformalPronunciationPersianEl = document.getElementById('answer-informal-pronunciation-persian'); 
+ 	const speakAnswerInformalBtn = document.getElementById('speak-answer-informal-btn'); 
 
 
-    // Navigation
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const navCounterEl = document.getElementById('nav-counter');
+ 	// Header & Progress 
+ 	const totalWordsCounterEl = document.getElementById('total-words-counter'); 
+ 	const bookmarkedWordsCounterEl = document.getElementById('bookmarked-words-counter'); 
+ 	const learnedWordsCounterEl = document.getElementById('learned-words-counter'); 
+ 	const totalQuestionsCounterEl = document.getElementById('total-questions-counter'); 
+ 	const bookmarkedQuestionsCounterEl = document.getElementById('bookmarked-questions-counter'); 
+ 	const learnedQuestionsCounterEl = document.getElementById('learned-questions-counter'); 
+ 	 
+ 	const progressBar = document.getElementById('progress-bar'); 
+ 	 
+ 	const showWordsCategoryBtn = document.getElementById('show-words-category-btn'); 
+ 	const showQuestionsCategoryBtn = document.getElementById('show-questions-category-btn'); 
 
-    // Dark Mode
-    const darkModeToggle = document.getElementById('dark-mode-toggle');
+ 	const wordFiltersDiv = document.getElementById('word-filters'); 
+ 	const questionFiltersDiv = document.getElementById('question-filters'); 
 
-    // Modal
-    const aboutModal = document.getElementById('about-modal');
-    const modalContent = document.getElementById('modal-content');
-    const infoBtn = document.getElementById('info-btn');
-    const closeModalBtn = document.getElementById('close-modal-btn');
+ 	const showAllWordsBtn = document.getElementById('show-all-words-btn'); 
+ 	const showBookmarkedWordsBtn = document.getElementById('show-bookmarked-words-btn'); 
+ 	const showLearnedWordsBtn = document.getElementById('show-learned-words-btn'); 
 
-    // --- State ---
-    let allWords = [];
-    let allQuestions = [];
-    let displayedContent = [];
-    let currentIndex = 0;
+ 	const showAllQuestionsBtn = document.getElementById('show-all-questions-btn'); 
+ 	const showBookmarkedQuestionsBtn = document.getElementById('show-bookmarked-questions-btn'); 
+ 	const showLearnedQuestionsBtn = document.getElementById('show-learned-questions-btn'); 
 
-    let bookmarkedWords = new Set(JSON.parse(localStorage.getItem('bookmarkedWords')) || []);
-    let learnedWords = new Set(JSON.parse(localStorage.getItem('learnedWords')) || []);
-    let bookmarkedQuestions = new Set(JSON.parse(localStorage.getItem('bookmarkedQuestions')) || []);
-    let learnedQuestions = new Set(JSON.parse(localStorage.getItem('learnedQuestions')) || []);
 
-    let currentCategory = 'words'; // 'words' or 'questions'
-    let currentFilter = 'all'; // 'all', 'bookmarked', 'learned'
+ 	// Navigation 
+ 	const prevBtn = document.getElementById('prev-btn'); 
+ 	const nextBtn = document.getElementById('next-btn'); 
+ 	const navCounterEl = document.getElementById('nav-counter'); 
 
-    const synth = window.speechSynthesis;
-    let frenchVoice = null;
-    let voices = [];
+ 	// Dark Mode 
+ 	const darkModeToggle = document.getElementById('dark-mode-toggle'); 
 
-    // --- Constants ---
-    const WORD_CARD_HEIGHT = '30rem'; // Adjusted to make word cards initially shorter
-    const QUESTION_CARD_INITIAL_HEIGHT = '30rem'; // Initial height for question card
-    const PADDING_FOR_CARD_CONTENT = 24 * 2; // p-6 top/bottom for card front/back = 48px
-    const HEADER_HEIGHT = 150; // Approximate header height to subtract
-    const FOOTER_HEIGHT = 64; // Approximate footer height to subtract
+ 	// Modal 
+ 	const aboutModal = document.getElementById('about-modal'); 
+ 	const modalContent = document.getElementById('modal-content'); 
+ 	const infoBtn = document.getElementById('info-btn'); 
+ 	const closeModalBtn = document.getElementById('close-modal-btn'); 
 
-    // --- Functions ---
-    
-    const toPersianNumber = (n) => {
-        if (n === undefined || n === null) return '';
-        const persian = { 0: '۰', 1: '۱', 2: '۲', 3: '۳', 4: '۴', 5: '۵', 6: '۶', 7: '۷', 8: '۸', 9: '۹' };
-        return String(n).split('').map(char => persian[char] || char).join('');
-    }
+ 	// --- State --- 
+ 	let allWords = []; 
+ 	let allQuestions = []; 
+ 	let displayedContent = []; 
+ 	let currentIndex = 0; 
 
-    function loadVoices() {
-        voices = synth.getVoices();
-        frenchVoice = voices.find(voice => voice.lang === 'fr-FR' && voice.name.includes('Enhanced')) ||
-                      voices.find(voice => voice.lang === 'fr-FR' && voice.localService) || 
-                      voices.find(voice => voice.lang === 'fr-FR') || 
-                      voices.find(voice => voice.lang.startsWith('fr'));
-        
-        if (!frenchVoice) {
-            console.warn("No French voice found. Speech synthesis will use the default voice.");
-        }
-    }
-    
-    function getPhoneticCorrection(text) {
-        return text.replace(/ça/g, 'sa');
-    }
-    
-    function speak(text) {
-        if (synth.speaking) {
-            synth.cancel();
-        }
-        if (text) {
-            const correctedText = getPhoneticCorrection(text);
-            const utterThis = new SpeechSynthesisUtterance(correctedText);
-            
-            if (!frenchVoice) {
-                loadVoices();
+ 	let bookmarkedWords = new Set(JSON.parse(localStorage.getItem('bookmarkedWords')) || []); 
+ 	let learnedWords = new Set(JSON.parse(localStorage.getItem('learnedWords')) || []); 
+ 	let bookmarkedQuestions = new Set(JSON.parse(localStorage.getItem('bookmarkedQuestions')) || []); 
+ 	let learnedQuestions = new Set(JSON.parse(localStorage.getItem('learnedQuestions')) || []); 
+
+ 	let currentCategory = 'words'; // 'words' or 'questions' 
+ 	let currentFilter = 'all'; // 'all', 'bookmarked', 'learned' 
+
+ 	const synth = window.speechSynthesis; 
+ 	let frenchVoice = null; 
+ 	let voices = []; 
+
+ 	// --- Constants --- 
+ 	const WORD_CARD_INITIAL_HEIGHT = '30rem'; 
+ 	const QUESTION_CARD_INITIAL_HEIGHT = '30rem';  
+ 	const CARD_BACK_VERTICAL_PADDING = 48; // p-6 on word-card back is 24px top/bottom, so 48 total
+
+ 	// --- Functions --- 
+ 	 
+ 	const toPersianNumber = (n) => { 
+ 		if (n === undefined || n === null) return ''; 
+ 		const persian = { 0: '۰', 1: '۱', 2: '۲', 3: '۳', 4: '۴', 5: '۵', 6: '۶', 7: '۷', 8: '۸', 9: '۹' }; 
+ 		return String(n).split('').map(char => persian[char] || char).join(''); 
+ 	} 
+
+ 	function loadVoices() { 
+ 		voices = synth.getVoices(); 
+ 		frenchVoice = voices.find(voice => voice.lang === 'fr-FR' && voice.name.includes('Enhanced')) || 
+ 					  voices.find(voice => voice.lang === 'fr-FR' && voice.localService) ||  
+ 					  voices.find(voice => voice.lang === 'fr-FR') ||  
+ 					  voices.find(voice => voice.lang.startsWith('fr')); 
+ 		 
+ 		if (!frenchVoice) { 
+ 			console.warn("No French voice found. Speech synthesis will use the default voice."); 
+ 		} 
+ 	} 
+ 	 
+ 	function getPhoneticCorrection(text) { 
+        if (!text) return '';
+ 		return text.replace(/ça/g, 'sa'); 
+ 	} 
+ 	 
+ 	function speak(text) { 
+ 		if (synth.speaking) { 
+ 			synth.cancel(); 
+ 		} 
+ 		if (text) { 
+ 			const correctedText = getPhoneticCorrection(text); 
+ 			const utterThis = new SpeechSynthesisUtterance(correctedText); 
+ 			 
+ 			if (!frenchVoice) { 
+ 				loadVoices(); 
+ 			} 
+ 			 
+ 			utterThis.voice = frenchVoice; 
+ 			utterThis.lang = 'fr-FR'; 
+ 			utterThis.pitch = 1.0; 
+ 			utterThis.rate = 0.95; 
+ 			 
+ 			utterThis.onerror = function (event) { 
+ 				console.error('SpeechSynthesisUtterance.onerror', event); 
+ 			} 
+
+ 			synth.speak(utterThis); 
+ 		} 
+ 	} 
+
+    /**
+     * NEW: Disables/enables filter buttons based on their counts.
+     */
+    function updateFilterButtonStates() {
+        const setButtonState = (button, count) => {
+            if (count === 0) {
+                button.disabled = true;
+                button.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                button.disabled = false;
+                button.classList.remove('opacity-50', 'cursor-not-allowed');
             }
-            
-            utterThis.voice = frenchVoice;
-            utterThis.lang = 'fr-FR';
-            utterThis.pitch = 1.0;
-            utterThis.rate = 0.95;
-            
-            utterThis.onerror = function (event) {
-                console.error('SpeechSynthesisUtterance.onerror', event);
-            };
+        };
 
-            synth.speak(utterThis);
-        }
+        setButtonState(showBookmarkedWordsBtn, bookmarkedWords.size);
+        setButtonState(showLearnedWordsBtn, learnedWords.size);
+        setButtonState(showBookmarkedQuestionsBtn, bookmarkedQuestions.size);
+        setButtonState(showLearnedQuestionsBtn, learnedQuestions.size);
     }
 
-    function updateCounters() {
-        totalWordsCounterEl.textContent = `همه (${toPersianNumber(allWords.length)})`;
-        bookmarkedWordsCounterEl.textContent = `نشان شده (${toPersianNumber(bookmarkedWords.size)})`;
-        learnedWordsCounterEl.textContent = `یادگرفته (${toPersianNumber(learnedWords.size)})`;
+ 	function updateCounters() { 
+ 		totalWordsCounterEl.textContent = `همه (${toPersianNumber(allWords.length)})`; 
+ 		bookmarkedWordsCounterEl.textContent = `نشان شده (${toPersianNumber(bookmarkedWords.size)})`; 
+ 		learnedWordsCounterEl.textContent = `یادگرفته (${toPersianNumber(learnedWords.size)})`; 
 
-        totalQuestionsCounterEl.textContent = `همه (${toPersianNumber(allQuestions.length)})`;
-        bookmarkedQuestionsCounterEl.textContent = `نشان شده (${toPersianNumber(bookmarkedQuestions.size)})`;
-        learnedQuestionsCounterEl.textContent = `یادگرفته (${toPersianNumber(learnedQuestions.size)})`;
-        
-        const learnedPercentage = allWords.length > 0 ? (learnedWords.size / allWords.length) * 100 : 0;
-        progressBar.style.width = `${learnedPercentage}%`;
-    }
+ 		totalQuestionsCounterEl.textContent = `همه (${toPersianNumber(allQuestions.length)})`; 
+ 		bookmarkedQuestionsCounterEl.textContent = `نشان شده (${toPersianNumber(bookmarkedQuestions.size)})`; 
+ 		learnedQuestionsCounterEl.textContent = `یادگرفته (${toPersianNumber(learnedQuestions.size)})`; 
+ 		 
+ 		const learnedPercentage = allWords.length > 0 ? (learnedWords.size / allWords.length) * 100 : 0; 
+ 		progressBar.style.width = `${learnedPercentage}%`; 
 
-    function renderCard(index) {
+        // UPDATED: Always update button states when counters change.
+        updateFilterButtonStates();
+ 	} 
+
+ 	function renderCard(index) {
         wordCard.classList.add('hidden');
         questionCard.classList.add('hidden');
         wordCard.classList.remove('flipped');
         questionCard.classList.remove('flipped');
 
-        if (displayedContent.length === 0 || index < 0 || index >= displayedContent.length) {
+        const hasValidContent = displayedContent.length > 0 && index >= 0 && index < displayedContent.length;
+
+        if (hasValidContent) {
+            cardContainer.classList.remove('hidden');
+            noWordsMessage.classList.add('hidden');
+
+            const currentItem = displayedContent[index];
+
+            if (currentCategory === 'words') {
+                wordCard.classList.remove('hidden');
+                cardContainer.style.height = WORD_CARD_INITIAL_HEIGHT;
+                
+                wordEl.textContent = currentItem.word;
+                translationEnglishEl.textContent = currentItem.translation_english;
+                persianEl.textContent = currentItem.persian;
+                pronunciationIpaEl.textContent = currentItem.pronunciation_ipa;
+                pronunciationEnglishEl.textContent = currentItem.pronunciation_english;
+                pronunciationPersianEl.textContent = currentItem.pronunciation_persian;
+                sampleSentenceEl.textContent = currentItem.sample_sentence;
+                sentenceTranslationEnglishEl.textContent = currentItem.sentence_translation_english;
+                sentencePersianEl.textContent = currentItem.sentence_persian;
+                sentencePronunciationIpaEl.textContent = currentItem.sentence_pronunciation_ipa || '';
+                sentencePronunciationEnglishEl.textContent = currentItem.sentence_pronunciation_english || '';
+                sentencePronunciationPersianEl.textContent = currentItem.sentence_pronunciation_persian || '';
+
+                updateBookmarkButton(currentItem, bookmarkWordBtn, bookmarkedWords);
+                updateLearnedButton(currentItem, learnedWordBtn, learnedWords);
+
+            } else if (currentCategory === 'questions') {
+                questionCard.classList.remove('hidden');
+                cardContainer.style.height = QUESTION_CARD_INITIAL_HEIGHT;
+                
+                frenchQuestionEl.textContent = currentItem.french_question;
+                questionTopicEl.textContent = currentItem.topic + (currentItem.role ? ` (${currentItem.role})` : '');
+                questionTranslationEnglishEl.textContent = currentItem.question_translation_english;
+                questionPersianEl.textContent = currentItem.question_translation_persian;
+                questionPronunciationIpaEl.textContent = currentItem.question_pronunciation_ipa;
+                questionPronunciationEnglishEl.textContent = currentItem.question_pronunciation_english;
+                questionPronunciationPersianEl.textContent = currentItem.question_pronunciation_persian;
+                answerFormalFrenchEl.textContent = currentItem.french_answerformal;
+                answerFormalTranslationEnglishEl.textContent = currentItem.answerformal_translation_english;
+                answerFormalPersianEl.textContent = currentItem.answerformal_translation_persian;
+                answerFormalPronunciationIpaEl.textContent = currentItem.answerformal_pronunciation_ipa;
+                answerFormalPronunciationEnglishEl.textContent = currentItem.answerformal_pronunciation_english;
+                answerFormalPronunciationPersianEl.textContent = currentItem.answerformal_pronunciation_persian;
+                answerInformalFrenchEl.textContent = currentItem.french_answerinformal;
+                answerInformalTranslationEnglishEl.textContent = currentItem.answerinformal_translation_english;
+                answerInformalPersianEl.textContent = currentItem.answerinformal_translation_persian;
+                answerInformalPronunciationIpaEl.textContent = currentItem.answerinformal_pronunciation_ipa;
+                answerInformalPronunciationEnglishEl.textContent = currentItem.answerinformal_pronunciation_english;
+                answerInformalPronunciationPersianEl.textContent = currentItem.answerinformal_pronunciation_persian;
+
+                updateBookmarkButton(currentItem, bookmarkQuestionBtn, bookmarkedQuestions, 'french_question');
+                updateLearnedButton(currentItem, learnedQuestionBtn, learnedQuestions, 'french_question');
+            }
+
+            const counterEl = currentCategory === 'words' ? wordCardCounterEl : questionCardCounterEl;
+            counterEl.textContent = `${toPersianNumber(index + 1)} / ${toPersianNumber(displayedContent.length)}`;
+            navCounterEl.textContent = `${toPersianNumber(index + 1)} / ${toPersianNumber(displayedContent.length)}`;
+
+        } else {
             cardContainer.classList.add('hidden');
             noWordsMessage.classList.remove('hidden');
             navCounterEl.textContent = `${toPersianNumber(0)} / ${toPersianNumber(0)}`;
-            prevBtn.disabled = true;
-            nextBtn.disabled = true;
-            return;
+            cardContainer.style.height = QUESTION_CARD_INITIAL_HEIGHT;
         }
-        
-        cardContainer.classList.remove('hidden');
-        noWordsMessage.classList.add('hidden');
 
-        const currentItem = displayedContent[index];
-        
-        if (currentCategory === 'words') {
-            wordCard.classList.remove('hidden');
-            cardContainer.style.height = WORD_CARD_HEIGHT; // Set initial height for word card
-            wordEl.textContent = currentItem.word;
-            wordCardCounterEl.textContent = `${toPersianNumber(index + 1)} / ${toPersianNumber(displayedContent.length)}`;
-
-            translationEnglishEl.textContent = currentItem.translation_english;
-            persianEl.textContent = currentItem.persian;
-            pronunciationIpaEl.textContent = currentItem.pronunciation_ipa;
-            pronunciationEnglishEl.textContent = currentItem.pronunciation_english;
-            pronunciationPersianEl.textContent = currentItem.pronunciation_persian;
-            sampleSentenceEl.textContent = currentItem.sample_sentence;
-            sentenceTranslationEnglishEl.textContent = currentItem.sentence_translation_english;
-            sentencePersianEl.textContent = currentItem.sentence_persian;
-            sentencePronunciationIpaEl.textContent = currentItem.sentence_pronunciation_ipa || '';
-            sentencePronunciationEnglishEl.textContent = currentItem.sentence_pronunciation_english || '';
-            sentencePronunciationPersianEl.textContent = currentItem.sentence_pronunciation_persian || '';
-
-            updateBookmarkButton(currentItem, bookmarkWordBtn, bookmarkedWords);
-            updateLearnedButton(currentItem, learnedWordBtn, learnedWords);
-
-        } else if (currentCategory === 'questions') {
-            questionCard.classList.remove('hidden');
-            cardContainer.style.height = QUESTION_CARD_INITIAL_HEIGHT; // Set initial height for question card
-            frenchQuestionEl.textContent = currentItem.french_question;
-            questionTopicEl.textContent = currentItem.topic + (currentItem.role ? ` (${currentItem.role})` : '');
-            questionCardCounterEl.textContent = `${toPersianNumber(index + 1)} / ${toPersianNumber(displayedContent.length)}`;
-
-            questionTranslationEnglishEl.textContent = currentItem.question_translation_english;
-            questionPersianEl.textContent = currentItem.question_translation_persian;
-            questionPronunciationIpaEl.textContent = currentItem.question_pronunciation_ipa;
-            questionPronunciationEnglishEl.textContent = currentItem.question_pronunciation_english;
-            questionPronunciationPersianEl.textContent = currentItem.question_pronunciation_persian;
-
-            answerFormalFrenchEl.textContent = currentItem.french_answerformal;
-            answerFormalTranslationEnglishEl.textContent = currentItem.answerformal_translation_english;
-            answerFormalPersianEl.textContent = currentItem.answerformal_translation_persian;
-            answerFormalPronunciationIpaEl.textContent = currentItem.answerformal_pronunciation_ipa;
-            answerFormalPronunciationEnglishEl.textContent = currentItem.answerformal_pronunciation_english;
-            answerFormalPronunciationPersianEl.textContent = currentItem.answerformal_pronunciation_persian;
-
-            answerInformalFrenchEl.textContent = currentItem.french_answerinformal;
-            answerInformalTranslationEnglishEl.textContent = currentItem.answerinformal_translation_english;
-            answerInformalPersianEl.textContent = currentItem.answerinformal_translation_persian;
-            answerInformalPronunciationIpaEl.textContent = currentItem.answerinformal_pronunciation_ipa;
-            answerInformalPronunciationEnglishEl.textContent = currentItem.answerinformal_pronunciation_english;
-            answerInformalPronunciationPersianEl.textContent = currentItem.answerinformal_pronunciation_persian;
-
-            updateBookmarkButton(currentItem, bookmarkQuestionBtn, bookmarkedQuestions, 'french_question');
-            updateLearnedButton(currentItem, learnedQuestionBtn, learnedQuestions, 'french_question');
-        }
-        
         updateNavButtons();
-        navCounterEl.textContent = `${toPersianNumber(index + 1)} / ${toPersianNumber(displayedContent.length)}`;
     }
-    
-    function goToNextCard() {
-        if (currentIndex < displayedContent.length - 1) {
-            currentIndex++;
-            renderCard(currentIndex);
-        }
+ 	 
+ 	function goToNextCard() { 
+ 		if (currentIndex < displayedContent.length - 1) { 
+ 			currentIndex++; 
+ 			renderCard(currentIndex); 
+ 		} 
+ 	} 
+ 	 
+ 	function goToPrevCard() { 
+ 		if (currentIndex > 0) { 
+ 			currentIndex--; 
+ 			renderCard(currentIndex); 
+ 		} 
+ 	} 
+
+ 	function updateBookmarkButton(item, buttonElement, set, key = 'word') { 
+ 		const icon = buttonElement.querySelector('i'); 
+ 		if (!item) return;
+ 		const itemId = item[key]; 
+ 		if (set.has(itemId)) { 
+ 			buttonElement.classList.add('text-indigo-500'); 
+ 			icon.setAttribute('fill', 'currentColor'); 
+ 		} else { 
+ 			buttonElement.classList.remove('text-indigo-500'); 
+ 			icon.setAttribute('fill', 'none'); 
+ 		} 
+ 	} 
+
+ 	function updateLearnedButton(item, buttonElement, set, key = 'word') { 
+ 		const icon = buttonElement.querySelector('i'); 
+ 		if (!item) return;
+ 		const itemId = item[key]; 
+ 		if (set.has(itemId)) { 
+ 			buttonElement.classList.add('text-green-500'); 
+ 			icon.setAttribute('fill', 'currentColor'); 
+ 		} else { 
+ 			buttonElement.classList.remove('text-green-500'); 
+ 			icon.setAttribute('fill', 'none'); 
+ 		} 
+ 	} 
+
+ 	function updateNavButtons() {
+        const hasContent = displayedContent.length > 0;
+        prevBtn.disabled = !hasContent || currentIndex <= 0;
+        nextBtn.disabled = !hasContent || currentIndex >= displayedContent.length - 1;
     }
-    
-    function goToPrevCard() {
-        if (currentIndex > 0) {
-            currentIndex--;
-            renderCard(currentIndex);
-        }
-    }
+ 	 
+    /**
+     * REFACTORED: This function now also handles switching back to 'all' if a filtered list becomes empty.
+     */
+ 	function applyContentFilter() { 
+ 		wordCard.classList.remove('flipped'); 
+ 		questionCard.classList.remove('flipped'); 
 
-    function updateBookmarkButton(item, buttonElement, set, key = 'word') {
-        const icon = buttonElement.querySelector('i');
-        const itemId = item[key];
-        if (item && set.has(itemId)) {
-            buttonElement.classList.add('text-indigo-500');
-            icon.setAttribute('fill', 'currentColor');
-        } else {
-            buttonElement.classList.remove('text-indigo-500');
-            icon.setAttribute('fill', 'none');
-        }
-    }
+        let sourceData = currentCategory === 'words' ? allWords : allQuestions;
+        let bookmarkedSet = currentCategory === 'words' ? bookmarkedWords : bookmarkedQuestions;
+        let learnedSet = currentCategory === 'words' ? learnedWords : learnedQuestions;
+        let key = currentCategory === 'words' ? 'word' : 'french_question';
 
-    function updateLearnedButton(item, buttonElement, set, key = 'word') {
-        const icon = buttonElement.querySelector('i');
-        const itemId = item[key];
-        if (item && set.has(itemId)) {
-            buttonElement.classList.add('text-green-500');
-            icon.setAttribute('fill', 'currentColor');
-        } else {
-            buttonElement.classList.remove('text-green-500');
-            icon.setAttribute('fill', 'none');
-        }
-    }
+ 		switch(currentFilter) { 
+ 			case 'bookmarked': 
+ 				displayedContent = sourceData.filter(item => bookmarkedSet.has(item[key])); 
+ 				break; 
+ 			case 'learned': 
+ 				displayedContent = sourceData.filter(item => learnedSet.has(item[key])); 
+ 				break; 
+ 			default: 
+ 				displayedContent = [...sourceData]; 
+ 				break; 
+ 		} 
 
-    function updateNavButtons() {
-        prevBtn.disabled = currentIndex === 0;
-        nextBtn.disabled = currentIndex >= displayedContent.length - 1;
-    }
-    
-    function applyContentFilter() {
-        if (currentCategory === 'words') {
-            switch(currentFilter) {
-                case 'bookmarked':
-                    displayedContent = allWords.filter(w => bookmarkedWords.has(w.word));
-                    break;
-                case 'learned':
-                    displayedContent = allWords.filter(w => learnedWords.has(w.word));
-                    break;
-                default: // 'all'
-                    displayedContent = [...allWords];
-                    break;
-            }
-        } else { // currentCategory === 'questions'
-            switch(currentFilter) {
-                case 'bookmarked':
-                    displayedContent = allQuestions.filter(q => bookmarkedQuestions.has(q.french_question));
-                    break;
-                case 'learned':
-                    displayedContent = allQuestions.filter(q => learnedQuestions.has(q.french_question));
-                    break;
-                default: // 'all'
-                    displayedContent = [...allQuestions];
-                    break;
-            }
+        // NEW: If the filtered view is now empty, automatically switch back to 'all'.
+        if (displayedContent.length === 0 && currentFilter !== 'all') {
+            currentFilter = 'all'; 
+            displayedContent = [...sourceData]; 
+            updateActiveNavButton(); 
         }
 
-        if (currentIndex >= displayedContent.length) {
-            currentIndex = Math.max(0, displayedContent.length - 1);
-        }
-        renderCard(currentIndex);
-    }
-    
-    function updateActiveNavButton() {
-        // Reset all category buttons (in footer)
-        [showWordsCategoryBtn, showQuestionsCategoryBtn].forEach(btn => {
-            btn.classList.remove('nav-btn-active', 'text-white');
-            btn.classList.add('hover:bg-gray-200', 'dark:hover:bg-gray-700');
-        });
-
-        // Reset all filter buttons (in header)
-        const allFilterButtons = [
-            showAllWordsBtn, showBookmarkedWordsBtn, showLearnedWordsBtn,
-            showAllQuestionsBtn, showBookmarkedQuestionsBtn, showLearnedQuestionsBtn
-        ];
-        allFilterButtons.forEach(btn => {
-            btn.classList.remove('nav-btn-active', 'text-white');
-            btn.classList.add('hover:bg-gray-200', 'dark:hover:bg-gray-700');
-        });
-
-
-        if (currentCategory === 'words') {
-            showWordsCategoryBtn.classList.add('nav-btn-active', 'text-white');
-            showWordsCategoryBtn.classList.remove('hover:bg-gray-200', 'dark:hover:bg-gray-700');
-            
-            wordFiltersDiv.classList.remove('hidden');
-            questionFiltersDiv.classList.add('hidden');
-
-            const activeWordFilterBtn = {
-                'all': showAllWordsBtn,
-                'bookmarked': showBookmarkedWordsBtn,
-                'learned': showLearnedWordsBtn
-            }[currentFilter];
-            activeWordFilterBtn.classList.add('nav-btn-active', 'text-white');
-            activeWordFilterBtn.classList.remove('hover:bg-gray-200', 'dark:hover:bg-gray-700');
-
-        } else if (currentCategory === 'questions') {
-            showQuestionsCategoryBtn.classList.add('nav-btn-active', 'text-white');
-            showQuestionsCategoryBtn.classList.remove('hover:bg-gray-200', 'dark:hover:bg-gray-700');
-            
-            wordFiltersDiv.classList.add('hidden');
-            questionFiltersDiv.classList.remove('hidden');
-
-            const activeQuestionFilterBtn = {
-                'all': showAllQuestionsBtn,
-                'bookmarked': showBookmarkedQuestionsBtn,
-                'learned': showLearnedQuestionsBtn
-            }[currentFilter];
-            activeQuestionFilterBtn.classList.add('nav-btn-active', 'text-white');
-            activeQuestionFilterBtn.classList.remove('hover:bg-gray-200', 'dark:hover:bg-gray-700');
-        }
-    }
-    
-    function saveState() {
-        localStorage.setItem('bookmarkedWords', JSON.stringify(Array.from(bookmarkedWords)));
-        localStorage.setItem('learnedWords', JSON.stringify(Array.from(learnedWords)));
-        localStorage.setItem('bookmarkedQuestions', JSON.stringify(Array.from(bookmarkedQuestions)));
-        localStorage.setItem('learnedQuestions', JSON.stringify(Array.from(learnedQuestions)));
-    }
-
-    // --- Event Listeners ---
-    
-    // Unified reveal/unreveal logic
-    revealWordBtn.addEventListener('click', () => {
-        cardContainer.style.height = '40rem'; // Fixed height for word card reveal
-        setTimeout(() => wordCard.classList.add('flipped'), 300); // Wait for height transition
-    });
-    unrevealWordBtn.addEventListener('click', () => {
-        wordCard.classList.remove('flipped');
-        setTimeout(() => cardContainer.style.height = WORD_CARD_HEIGHT, 300); // Shrink after flip
-    });
-
-    revealQuestionBtn.addEventListener('click', () => {
-        const tempCard = questionCard.cloneNode(true);
-        tempCard.style.visibility = 'hidden';
-        tempCard.style.position = 'absolute';
-        tempCard.style.top = '0';
-        tempCard.style.left = '0';
-        tempCard.style.height = 'auto'; // Let content define height
-        tempCard.classList.remove('hidden'); // Ensure it's visible for calculation
-
-        // Temporarily put the back content into temp card's back
-        const tempBackContent = tempCard.querySelector('#question-back-content');
-        const currentBackContentHtml = questionBackContent.innerHTML; // Get current content
-        tempBackContent.innerHTML = currentBackContentHtml; // Put it in temp element
-
-        document.body.appendChild(tempCard);
-        const desiredHeight = tempCard.scrollHeight; // Get calculated height of content
-        document.body.removeChild(tempCard);
-
-        // Add padding and header/footer height approximation
-        const finalHeight = desiredHeight + PADDING_FOR_CARD_CONTENT + HEADER_HEIGHT + FOOTER_HEIGHT; // Add approximate padding and header/footer space
-
-        cardContainer.style.height = `${Math.min(window.innerHeight * 0.9, finalHeight)}px`; // Ensure it doesn't exceed 90% of viewport
-        
-        setTimeout(() => questionCard.classList.add('flipped'), 300); // Wait for height transition
-    });
-
-    unrevealQuestionBtn.addEventListener('click', () => {
-        questionCard.classList.remove('flipped');
-        setTimeout(() => cardContainer.style.height = QUESTION_CARD_INITIAL_HEIGHT, 300); // Shrink after flip
-    });
-
-
-    nextBtn.addEventListener('click', goToNextCard);
-    prevBtn.addEventListener('click', goToPrevCard);
-
-    // Word Bookmark/Learned
-    bookmarkWordBtn.addEventListener('click', () => {
-        const currentWordObject = displayedContent[currentIndex];
-        if (!currentWordObject) return;
-        const word = currentWordObject.word;
-        if (bookmarkedWords.has(word)) {
-            bookmarkedWords.delete(word);
-        } else {
-            bookmarkedWords.add(word);
-        }
-        saveState();
-        updateCounters();
-        if (currentFilter === 'bookmarked') {
-            applyContentFilter();
-        } else {
-            updateBookmarkButton(currentWordObject, bookmarkWordBtn, bookmarkedWords);
-        }
-    });
-
-    learnedWordBtn.addEventListener('click', () => {
-        const currentWordObject = displayedContent[currentIndex];
-        if (!currentWordObject) return;
-        const word = currentWordObject.word;
-        if (learnedWords.has(word)) {
-            learnedWords.delete(word);
-        } else {
-            learnedWords.add(word);
-        }
-        saveState();
-        updateCounters();
-        if (currentFilter === 'learned') {
-            applyContentFilter();
-        } else {
-            updateLearnedButton(currentWordObject, learnedWordBtn, learnedWords);
-        }
-    });
-
-    // Question Bookmark/Learned
-    bookmarkQuestionBtn.addEventListener('click', () => {
-        const currentQuestionObject = displayedContent[currentIndex];
-        if (!currentQuestionObject) return;
-        const questionText = currentQuestionObject.french_question;
-        if (bookmarkedQuestions.has(questionText)) {
-            bookmarkedQuestions.delete(questionText);
-        } else {
-            bookmarkedQuestions.add(questionText);
-        }
-        saveState();
-        updateCounters();
-        if (currentFilter === 'bookmarked') {
-            applyContentFilter();
-        } else {
-            updateBookmarkButton(currentQuestionObject, bookmarkQuestionBtn, bookmarkedQuestions, 'french_question');
-        }
-    });
-
-    learnedQuestionBtn.addEventListener('click', () => {
-        const currentQuestionObject = displayedContent[currentIndex];
-        if (!currentQuestionObject) return;
-        const questionText = currentQuestionObject.french_question;
-        if (learnedQuestions.has(questionText)) {
-            learnedQuestions.delete(questionText);
-        } else {
-            learnedQuestions.add(questionText);
-        }
-        saveState();
-        updateCounters();
-        if (currentFilter === 'learned') {
-            applyContentFilter();
-        } else {
-            updateLearnedButton(currentQuestionObject, learnedQuestionBtn, learnedQuestions, 'french_question');
-        }
-    });
-
-    // Speech for Words
-    const speakCurrentWord = () => speak(displayedContent[currentIndex]?.word);
-    speakPronunciationBtn.addEventListener('click', speakCurrentWord);
-    speakWordFrontBtn.addEventListener('click', speakCurrentWord);
-    speakSentenceBtn.addEventListener('click', () => speak(displayedContent[currentIndex]?.sample_sentence));
-    
-    // Speech for Questions and Answers
-    speakQuestionFrontBtn.addEventListener('click', () => speak(displayedContent[currentIndex]?.french_question));
-    speakQuestionBackBtn.addEventListener('click', () => speak(displayedContent[currentIndex]?.french_question));
-    speakAnswerFormalBtn.addEventListener('click', () => speak(displayedContent[currentIndex]?.french_answerformal));
-    speakAnswerInformalBtn.addEventListener('click', () => speak(displayedContent[currentIndex]?.french_answerinformal));
-
-
-    // Category Navigation (now in footer)
-    showWordsCategoryBtn.addEventListener('click', () => { 
-        currentCategory = 'words'; 
-        currentFilter = 'all'; 
-        currentIndex = 0; 
-        updateActiveNavButton(); 
-        applyContentFilter(); 
-    });
-    showQuestionsCategoryBtn.addEventListener('click', () => { 
-        currentCategory = 'questions'; 
-        currentFilter = 'all';
-        currentIndex = 0; 
-        updateActiveNavButton(); 
-        applyContentFilter(); 
-    });
-
-    // Word Filters
-    showAllWordsBtn.addEventListener('click', () => { currentFilter = 'all'; currentIndex = 0; updateActiveNavButton(); applyContentFilter(); });
-    showBookmarkedWordsBtn.addEventListener('click', () => { currentFilter = 'bookmarked'; currentIndex = 0; updateActiveNavButton(); applyContentFilter(); });
-    showLearnedWordsBtn.addEventListener('click', () => { currentFilter = 'learned'; currentIndex = 0; updateActiveNavButton(); applyContentFilter(); });
-
-    // Question Filters
-    showAllQuestionsBtn.addEventListener('click', () => { currentFilter = 'all'; currentIndex = 0; updateActiveNavButton(); applyContentFilter(); });
-    showBookmarkedQuestionsBtn.addEventListener('click', () => { currentFilter = 'bookmarked'; currentIndex = 0; updateActiveNavButton(); applyContentFilter(); });
-    showLearnedQuestionsBtn.addEventListener('click', () => { currentFilter = 'learned'; currentIndex = 0; updateActiveNavButton(); applyContentFilter(); });
-
-    darkModeToggle.addEventListener('click', () => {
-        document.documentElement.classList.toggle('dark');
-        localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-    });
-
-    const openModal = () => {
-        aboutModal.classList.remove('opacity-0', 'pointer-events-none');
-        modalContent.classList.remove('scale-95');
-    };
-    const closeModal = () => {
-        aboutModal.classList.add('opacity-0');
-        modalContent.classList.add('scale-95');
-        setTimeout(() => aboutModal.classList.add('pointer-events-none'), 250);
-    };
-
-    infoBtn.addEventListener('click', openModal);
-    closeModalBtn.addEventListener('click', closeModal);
-    aboutModal.addEventListener('click', (e) => {
-        if (e.target === aboutModal) closeModal();
-    });
-
-    // --- Initialization ---
-    function initializeApp() {
-        if (typeof words !== 'undefined' && Array.isArray(words)) {
-            allWords = words;
-        } else {
-            console.error("The 'words' variable is not defined or not an array. Please check your french.js file.");
-            wordCard.innerHTML = `<div class="persian-ui text-center text-red-500 p-4 bg-red-100 dark:bg-red-900/50 rounded-lg">خطا: بارگذاری کلمات از french.js ممکن نیست.</div>`;
-            questionCard.classList.add('hidden');
-            return;
+        currentIndex = 0;
+        if (displayedContent.length === 0) {
+            currentIndex = -1;
         }
 
-        if (typeof frenchQuestions !== 'undefined' && Array.isArray(frenchQuestions)) {
-            allQuestions = frenchQuestions;
-        } else {
-            console.warn("The 'frenchQuestions' variable is not defined or not an array. French Questions section will be empty.");
-        }
-        
-        if (synth.onvoiceschanged !== undefined) {
-            synth.onvoiceschanged = loadVoices;
-        }
-        loadVoices();
-        if (voices.length === 0) {
-            const voiceInterval = setInterval(() => {
-                loadVoices();
-                if (voices.length > 0) {
-                    clearInterval(voiceInterval);
-                }
-            }, 250);
-        }
+ 		renderCard(currentIndex); 
+ 	} 
+ 	 
+ 	function updateActiveNavButton() { 
+ 		[showWordsCategoryBtn, showQuestionsCategoryBtn].forEach(btn => { 
+ 			btn.classList.remove('nav-btn-active'); 
+ 			btn.classList.add('hover:bg-gray-200', 'dark:hover:bg-gray-700'); 
+ 		}); 
 
-        feather.replace();
-        updateCounters();
-        currentCategory = 'words';
-        currentFilter = 'all';
-        updateActiveNavButton();
-        applyContentFilter();
+ 		const allFilterButtons = [ 
+ 			showAllWordsBtn, showBookmarkedWordsBtn, showLearnedWordsBtn, 
+ 			showAllQuestionsBtn, showBookmarkedQuestionsBtn, showLearnedQuestionsBtn 
+ 		]; 
+ 		allFilterButtons.forEach(btn => { 
+ 			btn.classList.remove('nav-btn-active'); 
+ 			btn.classList.add('hover:bg-gray-200', 'dark:hover:bg-gray-700'); 
+ 		}); 
 
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(err => console.log('ServiceWorker registration failed: ', err));
-            });
-        }
-    }
 
-    initializeApp();
-});
-    </script>
-</body>
-</html>
+ 		if (currentCategory === 'words') { 
+ 			showWordsCategoryBtn.classList.add('nav-btn-active'); 
+ 			showWordsCategoryBtn.classList.remove('hover:bg-gray-200', 'dark:hover:bg-gray-700'); 
+ 			 
+ 			wordFiltersDiv.classList.remove('hidden'); 
+ 			questionFiltersDiv.classList.add('hidden'); 
+
+ 			const activeWordFilterBtn = { 
+ 				'all': showAllWordsBtn, 
+ 				'bookmarked': showBookmarkedWordsBtn, 
+ 				'learned': showLearnedWordsBtn 
+ 			}[currentFilter]; 
+ 			if (activeWordFilterBtn) { 
+ 				activeWordFilterBtn.classList.add('nav-btn-active'); 
+ 				activeWordFilterBtn.classList.remove('hover:bg-gray-200', 'dark:hover:bg-gray-700'); 
+ 			} 
+
+
+ 		} else if (currentCategory === 'questions') { 
+ 			showQuestionsCategoryBtn.classList.add('nav-btn-active'); 
+ 			showQuestionsCategoryBtn.classList.remove('hover:bg-gray-200', 'dark:hover:bg-gray-700'); 
+ 			 
+ 			wordFiltersDiv.classList.add('hidden'); 
+ 			questionFiltersDiv.classList.remove('hidden'); 
+
+ 			const activeQuestionFilterBtn = { 
+ 				'all': showAllQuestionsBtn, 
+ 				'bookmarked': showBookmarkedQuestionsBtn, 
+ 				'learned': showLearnedQuestionsBtn 
+ 			}[currentFilter]; 
+ 			if (activeQuestionFilterBtn) { 
+ 				activeQuestionFilterBtn.classList.add('nav-btn-active'); 
+ 				activeQuestionFilterBtn.classList.remove('hover:bg-gray-200', 'dark:hover:bg-gray-700'); 
+ 			} 
+ 		} 
+ 	} 
+ 	 
+ 	function saveState() { 
+ 		localStorage.setItem('bookmarkedWords', JSON.stringify(Array.from(bookmarkedWords))); 
+ 		localStorage.setItem('learnedWords', JSON.stringify(Array.from(learnedWords))); 
+ 		localStorage.setItem('bookmarkedQuestions', JSON.stringify(Array.from(bookmarkedQuestions))); 
+ 		localStorage.setItem('learnedQuestions', JSON.stringify(Array.from(learnedQuestions))); 
+ 	} 
+
+ 	// --- Event Listeners --- 
+ 	 
+ 	revealWordBtn.addEventListener('click', () => { 
+ 		cardContainer.style.height = '40rem'; 
+ 		wordCard.classList.add('flipped'); 
+ 	}); 
+ 	unrevealWordBtn.addEventListener('click', () => { 
+ 		wordCard.classList.remove('flipped'); 
+ 		cardContainer.style.height = WORD_CARD_INITIAL_HEIGHT; 
+ 	}); 
+
+ 	revealQuestionBtn.addEventListener('click', () => { 
+ 		const tempMeasuringDiv = document.createElement('div'); 
+ 		tempMeasuringDiv.style.visibility = 'hidden'; 
+ 		tempMeasuringDiv.style.position = 'absolute'; 
+ 		tempMeasuringDiv.style.width = cardContainer.clientWidth + 'px'; 
+ 		tempMeasuringDiv.style.padding = '1rem'; 
+ 		tempMeasuringDiv.style.boxSizing = 'border-box'; 
+ 		tempMeasuringDiv.innerHTML = questionBackContent.innerHTML; 
+
+ 		document.body.appendChild(tempMeasuringDiv); 
+ 		const contentHeight = tempMeasuringDiv.scrollHeight; 
+ 		document.body.removeChild(tempMeasuringDiv); 
+
+ 		const finalCardContainerHeight = contentHeight + CARD_BACK_VERTICAL_PADDING + 20; 
+ 		cardContainer.style.height = `${finalCardContainerHeight}px`; 
+ 		 
+ 		questionCard.classList.add('flipped'); 
+ 	}); 
+
+ 	unrevealQuestionBtn.addEventListener('click', () => { 
+ 		questionCard.classList.remove('flipped'); 
+ 		setTimeout(() => cardContainer.style.height = QUESTION_CARD_INITIAL_HEIGHT, 300); 
+ 	}); 
+
+
+ 	nextBtn.addEventListener('click', goToNextCard); 
+ 	prevBtn.addEventListener('click', goToPrevCard); 
+
+ 	bookmarkWordBtn.addEventListener('click', () => { 
+ 		const currentWordObject = displayedContent[currentIndex]; 
+ 		if (!currentWordObject) return; 
+ 		const word = currentWordObject.word; 
+ 		if (bookmarkedWords.has(word)) { 
+ 			bookmarkedWords.delete(word); 
+ 		} else { 
+ 			bookmarkedWords.add(word); 
+ 		} 
+ 		saveState(); 
+ 		updateCounters(); 
+ 		if (currentFilter === 'bookmarked') { 
+ 			applyContentFilter(); 
+ 		} else { 
+ 			updateBookmarkButton(currentWordObject, bookmarkWordBtn, bookmarkedWords); 
+ 		} 
+ 	}); 
+
+ 	learnedWordBtn.addEventListener('click', () => { 
+ 		const currentWordObject = displayedContent[currentIndex]; 
+ 		if (!currentWordObject) return; 
+ 		const word = currentWordObject.word; 
+ 		if (learnedWords.has(word)) { 
+ 			learnedWords.delete(word); 
+ 		} else { 
+ 			learnedWords.add(word); 
+ 		} 
+ 		saveState(); 
+ 		updateCounters(); 
+ 		if (currentFilter === 'learned') { 
+ 			applyContentFilter(); 
+ 		} else { 
+ 			updateLearnedButton(currentWordObject, learnedWordBtn, learnedWords); 
+ 		} 
+ 	}); 
+
+ 	bookmarkQuestionBtn.addEventListener('click', () => { 
+ 		const currentQuestionObject = displayedContent[currentIndex]; 
+ 		if (!currentQuestionObject) return; 
+ 		const questionText = currentQuestionObject.french_question; 
+ 		if (bookmarkedQuestions.has(questionText)) { 
+ 			bookmarkedQuestions.delete(questionText); 
+ 		} else { 
+ 			bookmarkedQuestions.add(questionText); 
+ 		} 
+ 		saveState(); 
+ 		updateCounters(); 
+ 		if (currentFilter === 'bookmarked') { 
+ 			applyContentFilter(); 
+ 		} else { 
+ 			updateBookmarkButton(currentQuestionObject, bookmarkQuestionBtn, bookmarkedQuestions, 'french_question'); 
+ 		} 
+ 	}); 
+
+ 	learnedQuestionBtn.addEventListener('click', () => { 
+ 		const currentQuestionObject = displayedContent[currentIndex]; 
+ 		if (!currentQuestionObject) return; 
+ 		const questionText = currentQuestionObject.french_question; 
+ 		if (learnedQuestions.has(questionText)) { 
+ 			learnedQuestions.delete(questionText); 
+ 		} else { 
+ 			learnedQuestions.add(questionText); 
+ 		} 
+ 		saveState(); 
+ 		updateCounters(); 
+ 		if (currentFilter === 'learned') { 
+ 			applyContentFilter(); 
+ 		} else { 
+ 			updateLearnedButton(currentQuestionObject, learnedQuestionBtn, learnedQuestions, 'french_question'); 
+ 		} 
+ 	}); 
+
+ 	// Speech Synthesis 
+ 	const speakCurrentWord = () => speak(displayedContent[currentIndex]?.word); 
+ 	speakPronunciationBtn.addEventListener('click', speakCurrentWord); 
+ 	speakWordFrontBtn.addEventListener('click', speakCurrentWord); 
+ 	speakSentenceBtn.addEventListener('click', () => speak(displayedContent[currentIndex]?.sample_sentence)); 
+ 	speakQuestionFrontBtn.addEventListener('click', () => speak(displayedContent[currentIndex]?.french_question)); 
+ 	speakQuestionBackBtn.addEventListener('click', () => speak(displayedContent[currentIndex]?.french_question)); 
+ 	speakAnswerFormalBtn.addEventListener('click', () => speak(displayedContent[currentIndex]?.french_answerformal)); 
+ 	speakAnswerInformalBtn.addEventListener('click', () => speak(displayedContent[currentIndex]?.french_answerinformal)); 
+
+ 	showWordsCategoryBtn.addEventListener('click', () => {  
+ 		currentCategory = 'words';  
+ 		currentFilter = 'all';  
+ 		updateActiveNavButton();  
+ 		applyContentFilter();  
+ 	}); 
+ 	showQuestionsCategoryBtn.addEventListener('click', () => {  
+ 		currentCategory = 'questions';  
+ 		currentFilter = 'all'; 
+ 		updateActiveNavButton();  
+ 		applyContentFilter();  
+ 	}); 
+
+ 	showAllWordsBtn.addEventListener('click', () => { currentFilter = 'all'; updateActiveNavButton(); applyContentFilter(); }); 
+ 	showBookmarkedWordsBtn.addEventListener('click', () => { currentFilter = 'bookmarked'; updateActiveNavButton(); applyContentFilter(); }); 
+ 	showLearnedWordsBtn.addEventListener('click', () => { currentFilter = 'learned'; updateActiveNavButton(); applyContentFilter(); }); 
+
+ 	showAllQuestionsBtn.addEventListener('click', () => { currentFilter = 'all'; updateActiveNavButton(); applyContentFilter(); }); 
+ 	showBookmarkedQuestionsBtn.addEventListener('click', () => { currentFilter = 'bookmarked'; updateActiveNavButton(); applyContentFilter(); }); 
+ 	showLearnedQuestionsBtn.addEventListener('click', () => { currentFilter = 'learned'; updateActiveNavButton(); applyContentFilter(); }); 
+
+ 	// Dark Mode & Modal
+ 	darkModeToggle.addEventListener('click', () => { 
+ 		document.documentElement.classList.toggle('dark'); 
+ 		localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light'; 
+ 	}); 
+
+ 	const openModal = () => { 
+ 		aboutModal.classList.remove('opacity-0', 'pointer-events-none'); 
+ 		modalContent.classList.remove('scale-95'); 
+ 	}; 
+ 	const closeModal = () => { 
+ 		aboutModal.classList.add('opacity-0'); 
+ 		modalContent.classList.add('scale-95'); 
+ 		setTimeout(() => aboutModal.classList.add('pointer-events-none'), 250); 
+ 	}; 
+
+ 	infoBtn.addEventListener('click', openModal); 
+ 	closeModalBtn.addEventListener('click', closeModal); 
+ 	aboutModal.addEventListener('click', (e) => { 
+ 		if (e.target === aboutModal) closeModal(); 
+ 	}); 
+
+ 	// --- Initialization --- 
+ 	function initializeApp() { 
+ 		if (typeof words !== 'undefined' && Array.isArray(words)) { 
+ 			allWords = words; 
+ 		} else { 
+ 			console.error("The 'words' variable is not defined or not an array. Please check your french.js file."); 
+ 			wordCard.innerHTML = `<div class="persian-ui text-center text-red-500 p-4 bg-red-100 dark:bg-red-900/50 rounded-lg">خطا: بارگذاری کلمات از french.js ممکن نیست.</div>`; 
+ 			questionCard.classList.add('hidden'); 
+ 			return; 
+ 		} 
+
+ 		if (typeof frenchQuestions !== 'undefined' && Array.isArray(frenchQuestions)) { 
+ 			allQuestions = frenchQuestions; 
+ 		} else { 
+ 			console.warn("The 'frenchQuestions' variable is not defined or not an array. French Questions section will be empty."); 
+ 		} 
+ 		 
+ 		if (synth.onvoiceschanged !== undefined) { 
+ 			synth.onvoiceschanged = loadVoices; 
+ 		} 
+ 		loadVoices(); 
+ 		if (voices.length === 0) { 
+ 			const voiceInterval = setInterval(() => { 
+ 				loadVoices(); 
+ 				if (voices.length > 0) { 
+ 					clearInterval(voiceInterval); 
+ 				} 
+ 			}, 250); 
+ 		} 
+
+ 		feather.replace(); 
+ 		updateCounters(); 
+ 		currentCategory = 'words'; 
+ 		currentFilter = 'all'; 
+ 		updateActiveNavButton(); 
+ 		applyContentFilter(); 
+
+ 		if ('serviceWorker' in navigator) { 
+ 			window.addEventListener('load', () => { 
+ 				navigator.serviceWorker.register('/sw.js').catch(err => console.log('ServiceWorker registration failed: ', err)); 
+ 			}); 
+ 		} 
+ 	} 
+
+ 	initializeApp(); 
+ }); 
+ 	</script> 
+ </body> 
+ </html>
