@@ -1,1013 +1,997 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="ltr" class="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>انگلیسی من</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>MyFrench</title>
+
+    <link rel="manifest" href="manifest.json">
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="انگلیسی من">
-    <link rel="apple-touch-icon" href="https://i.postimg.cc/L87ZdT7C/App-Icon-2x.jpg">
-    <link rel="icon" href="https://i.postimg.cc/L87ZdT7C/App-Icon-2x.jpg" type="image/png">
-    
+    <meta name="apple-mobile-web-app-title" content="MyFrench">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/DwZd2dNQ/myfrench.png">
+
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="icon" href="https://i.postimg.cc/DwZd2dNQ/myfrench.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="en2.js" defer></script>
-    <script src="words.js" defer></script> 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
     <script>
+        // Set dark mode based on saved preference or system setting
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Poppins', 'sans-serif'],
-                        persian: ['Vazirmatn', 'sans-serif'],
+                    padding: {
+                        'safe-top': 'env(safe-area-inset-top)',
+                        'safe-bottom': 'env(safe-area-inset-bottom)',
+                        'safe-left': 'env(safe-area-inset-left)',
+                        'safe-right': 'env(safe-area-inset-right)',
                     },
                 },
             },
-        };
+        }
     </script>
     <style>
-        @keyframes gradient-animation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        body {
+            font-family: 'Inter', sans-serif;
+            touch-action: manipulation;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-        @keyframes modal-fade-in {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+        .font-persian, .persian-ui {
+            font-family: 'Vazirmatn', sans-serif;
         }
-        @keyframes trophy-animation {
-            0% { transform: translateY(20px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
+        .font-persian {
+            font-size: 1.1rem; /* Increased font size for Persian */
         }
-        @keyframes staggered-fade-in {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
+        .perspective-1000 { perspective: 1000px; }
+        .card-inner {
+            transform-style: preserve-3d;
+            transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+        .nav-btn-active {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .progress-bar-fill {
+            transition: width 0.5s ease-in-out;
+        }
+        .modal {
+            transition: opacity 0.25s ease;
+        }
+        .modal-content {
+            transition: transform 0.25s ease;
         }
 
-        body {
-            background: linear-gradient(-45deg, #111827, #1e3a8a, #312e81, #0c4a6e);
-            background-size: 400% 400%;
-            animation: gradient-animation 20s ease infinite;
-            perspective: 1000px;
+        /* Added style for fixed footer */
+        .fixed-footer-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 30; /* Above card, below modal */
         }
-        .screen {
-            transition: opacity 0.5s ease, transform 0.5s ease;
-            will-change: opacity, transform;
+
+        /* Dynamic height transition for card-container */
+        #card-container {
+            transition: height 0.5s ease-in-out; /* Smooth transition for height changes */
         }
-        .screen.hidden {
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            opacity: 0;
-            transform: scale(0.95);
-            pointer-events: none;
+        /* Ensure card backs use flex-grow to fill available space */
+        #question-card .card-back .flex-grow.space-y-2 > div,
+        #word-card .card-back .flex-grow.space-y-2 > div {
+            /* If individual sections overflow, enable scrolling for them */
+            max-height: fit-content; /* Allow content to grow */
+            overflow: hidden; /* Hide overflow initially, let parent handle */
         }
-        .interactive-card {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            transform-style: preserve-3d;
+        /* Ensure that when the card expands, the content within fills the space */
+        #question-card .card-back .flex-grow.space-y-2,
+        #word-card .card-back .flex-grow.space-y-2 {
+            display: flex;
+            flex-direction: column;
         }
-        .interactive-card:hover {
-            transform: translateY(-5px) rotateX(2deg);
-            box-shadow: 0 25px 35px -10px rgba(0,0,0,0.25);
-        }
-        .expandable-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-in-out, padding-top 0.5s ease-in-out;
-        }
-        .expandable-content.expanded {
-            max-height: 1000px;
-            padding-top: 1rem;
-        }
-        .revealed-area-quiz {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.6s ease-in-out, margin-top 0.6s ease-in-out;
-        }
-        .revealed-area-quiz.expanded {
-            max-height: 1000px;
-            margin-top: 1rem;
-        }
-        .revealed-area-quiz.expanded .staggered-item {
-            animation: staggered-fade-in 0.5s ease-out both;
-        }
-        .trophy-icon {
-            animation: trophy-animation 0.8s ease-out forwards;
-        }
-        .persian-text {
-            direction: rtl;
-        }
-        #about-modal .modal-content {
-            animation: modal-fade-in 0.3s ease-out forwards;
-        }
-        /* New styles for word learning reveal */
-        .revealed-area-word {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.6s ease-in-out, opacity 0.6s ease-in-out;
-            opacity: 0;
-        }
-        .revealed-area-word.expanded {
-            max-height: 500px; /* Adjust as needed */
-            opacity: 1;
-        }
-        /* Custom scrollbar for learned/bookmarked lists */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.5);
-        }
-        .prev-btn.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        #question-card .card-back .flex-grow.space-y-2 > div {
+            flex-shrink: 0; /* Prevent sections from shrinking */
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen text-slate-800 antialiased">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 flex flex-col h-screen antialiased pb-16">
 
-    <div id="app-wrapper" class="relative w-full max-w-sm mx-auto p-4">
-        
-        <div class="absolute top-5 right-5 z-20">
-            <button id="about-btn" class="interactive-card bg-white/20 backdrop-blur-lg text-white p-2.5 rounded-full shadow-md active:scale-95 transition-transform">
-                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
-                </svg>
-            </button>
-        </div>
-
-        <div id="error-container" class="hidden text-center text-white bg-red-500/80 p-4 rounded-xl"></div>
-    
-        <div id="home-screen" class="screen space-y-8 text-center">
-            <header class="pt-12">
-                <img src="https://i.postimg.cc/L87ZdT7C/App-Icon-2x.jpg" alt="App Icon" class="w-24 h-24 mx-auto mb-4 rounded-3xl shadow-lg border-2 border-white/50">
-                <h1 class="text-4xl lg:text-5xl font-bold text-white drop-shadow-lg font-persian">انگلیسی من</h1>
-                <p class="text-white/80 mt-2 text-xl">My English</p>
-            </header>
-            <div class="space-y-4">
-                <button data-mode="quiz" class="mode-btn interactive-card w-full bg-white/50 backdrop-blur-xl p-6 rounded-2xl shadow-lg flex items-center justify-between border border-white/20 active:scale-95 transition-transform">
-                    <div class="text-left">
-                        <h2 class="text-xl font-semibold">Sentence Learning</h2>
-                        <p class="text-slate-700 font-persian">یادگیری جملات</p>
-                    </div>
-                    <svg class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+    <header class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-md p-4 sticky top-0 z-20 pt-safe-top">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between items-center mb-4">
+                <button id="info-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                    <i data-feather="info" class="w-5 h-5 text-gray-600 dark:text-gray-300"></i>
                 </button>
-                <button data-mode="word-learning" class="mode-btn interactive-card w-full bg-white/50 backdrop-blur-xl p-6 rounded-2xl shadow-lg flex items-center justify-between border border-white/20 active:scale-95 transition-transform">
-                    <div class="text-left">
-                        <h2 class="text-xl font-semibold">Word Learning</h2>
-                        <p class="text-slate-700 font-persian">یادگیری لغات</p>
-                    </div>
-                    <svg class="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253zM12 21.253V11m0 10.253C13.168 20.477 14.754 20 16.5 20s3.332.477 4.5 1.253m-9 0C10.832 20.477 9.246 20 7.5 20S4.168 20.477 3 21.253" />
-                    </svg>
-                </button>
-                <button data-mode="learning" class="mode-btn interactive-card w-full bg-white/50 backdrop-blur-xl p-6 rounded-2xl shadow-lg flex items-center justify-between border border-white/20 active:scale-95 transition-transform">
-                    <div class="text-left">
-                        <h2 class="text-xl font-semibold"> Topics</h2>
-                        <p class="text-slate-700 font-persian">موضوعات </p>
-                    </div>
-                    <svg class="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                <h1 class="text-xl font-bold text-indigo-600 dark:text-indigo-400">MyFrench</h1>
+                <button id="dark-mode-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                    <i data-feather="moon" class="w-5 h-5 text-gray-600 dark:text-gray-300 hidden dark:inline"></i>
+                    <i data-feather="sun" class="w-5 h-5 text-gray-600 dark:text-gray-300 inline dark:hidden"></i>
                 </button>
             </div>
+            <div id="word-filters" class="flex justify-around mt-2 text-sm persian-ui">
+                <button id="show-all-words-btn" class="nav-btn-active flex items-center space-x-1.5 px-3 py-1.5 rounded-full transition-colors">
+                    <i data-feather="grid" class="w-4 h-4"></i>
+                    <span id="total-words-counter">همه (۰)</span>
+                </button>
+                <button id="show-bookmarked-words-btn" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <i data-feather="bookmark" class="w-4 h-4"></i>
+                    <span id="bookmarked-words-counter">نشان شده (۰)</span>
+                </button>
+                <button id="show-learned-words-btn" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <i data-feather="check-circle" class="w-4 h-4"></i>
+                    <span id="learned-words-counter">یادگرفته (۰)</span>
+                </button>
+            </div>
+            <div id="question-filters" class="flex justify-around mt-2 text-sm persian-ui hidden">
+                <button id="show-all-questions-btn" class="nav-btn-active flex items-center space-x-1.5 px-3 py-1.5 rounded-full transition-colors">
+                    <i data-feather="grid" class="w-4 h-4"></i>
+                    <span id="total-questions-counter">همه (۰)</span>
+                </button>
+                <button id="show-bookmarked-questions-btn" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <i data-feather="bookmark" class="w-4 h-4"></i>
+                    <span id="bookmarked-questions-counter">نشان شده (۰)</span>
+                </button>
+                <button id="show-learned-questions-btn" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <i data-feather="check-circle" class="w-4 h-4"></i>
+                    <span id="learned-questions-counter">یادگرفته (۰)</span>
+                </button>
+            </div>
+            <div class="mt-4 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div id="progress-bar" class="bg-indigo-500 h-2 rounded-full progress-bar-fill"></div>
+            </div>
         </div>
-        
-        <div id="quiz-screen" class="screen hidden">
-             <header class="mb-4 pt-12 flex justify-between items-center">
-                 <div>
-                    <p id="quiz-progress-text" class="text-sm font-medium text-white/80 mb-1"></p>
-                    <div class="w-full bg-white/30 rounded-full h-2.5"><div id="quiz-progress-bar" class="bg-white h-2.5 rounded-full transition-all duration-500"></div></div>
-                 </div>
-                 <div class="flex items-center space-x-2">
-                    <button id="show-bookmarked-quiz-btn" class="bg-white/30 text-white p-2 rounded-xl active:scale-95 transition-transform">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21l-7.9-4.576a1 1 0 01-1.1 0L2 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
-                        </svg>
-                    </button>
-                    <button id="show-learned-quiz-btn" class="bg-white/30 text-white p-2 rounded-xl active:scale-95 transition-transform">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </button>
-                    <button class="home-btn bg-white/30 text-white p-2 rounded-xl active:scale-95 transition-transform"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg></button>
-                 </div>
-             </header>
-             <div id="quiz-card-wrapper">
-                 <div id="quiz-card" class="bg-white/60 backdrop-blur-xl rounded-2xl shadow-lg p-6 space-y-4 border border-white/20">
-                     <div id="quiz-question-area" class="space-y-2">
-                         <p id="quiz-speaker-role" class="text-sm font-semibold text-indigo-600"></p>
-                         <div class="flex justify-between items-start space-x-2">
-                             <div class="flex-1">
-                                 <p id="quiz-question-text" class="text-xl font-semibold"></p>
-                                 <p id="quiz-question-persian" class="persian-text font-persian text-slate-600 text-md mt-1"></p>
-                             </div>
-                             <button class="voice-btn text-slate-500 hover:text-indigo-500 p-1 flex-shrink-0 active:scale-95 transition-transform"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg></button>
-                         </div>
-                     </div>
-                     <button id="quiz-reveal-btn" class="w-full bg-slate-800 text-white font-semibold py-3 px-4 rounded-xl hover:bg-slate-700 transition-all duration-300 shadow-md active:scale-95">Reveal Responses</button>
-                     <div id="quiz-revealed-area" class="revealed-area-quiz">
-                         <hr class="border-slate-300/70"><div class="mt-4 space-y-2">
-                             <p id="quiz-responder-role" class="text-sm font-semibold text-emerald-600"></p>
-                             <div id="quiz-answer-options" class="space-y-3"></div>
-                         </div>
-                     </div>
-                 </div>
-                 <div class="mt-6 flex justify-between items-center space-x-4">
-                     <button class="home-btn bg-white/60 backdrop-blur-xl p-3 rounded-xl shadow-md active:scale-95 transition-transform"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg></button>
-                        <button id="quiz-bookmark-btn" class="w-12 h-12 bg-yellow-400 text-white flex items-center justify-center rounded-xl hover:bg-yellow-500 transition-all duration-300 shadow-lg shadow-yellow-400/30 active:scale-95">
-                         <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                             <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.128L15.39 5.867l4.032.557a1 1 0 01.69 1.705l-2.923 2.85 1.096 4.025a1 1 0 01-1.45 1.054L12 17.037l-3.593 1.954a1 1 0 01-1.45-1.054l1.096-4.025-2.923-2.85a1 1 0 01.69-1.705l4.032-.557L11.049 2.128z" />
-                         </svg>
-                     </button>
-                     <button id="quiz-learned-btn" class="w-12 h-12 bg-emerald-500 text-white flex items-center justify-center rounded-xl hover:bg-emerald-600 transition-all duration-300 shadow-lg shadow-emerald-500/30 active:scale-95">
-                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                     </button>
-                     <button id="quiz-prev-btn" class="prev-btn w-12 h-12 bg-slate-600 text-white flex items-center justify-center rounded-xl hover:bg-slate-700 transition-all duration-300 shadow-lg shadow-slate-600/30 active:scale-95">
-                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
-                     </button>
-                     <button id="quiz-next-btn" class="flex-grow bg-indigo-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-indigo-600 transition-all duration-300 shadow-lg shadow-indigo-500/30 active:scale-95">Next</button>
-                 </div>
-             </div>
-             <div id="quiz-completion-state" class="hidden text-center bg-white/60 backdrop-blur-xl rounded-2xl shadow-lg p-8 border border-white/20">
-                 <div class="trophy-icon w-20 h-20 mx-auto mb-4 text-amber-400"><svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.25 2.25a.75.75 0 00-1.5 0v1.164a13.43 13.43 0 00-3.322 2.296C5.073 6.83 4.5 8.353 4.5 10c0 1.55.022 3.32.062 4.802.035 1.284.162 2.441.385 3.498a.75.75 0 00.728.65h7.65a.75.75 0 00.728-.65c.223-1.057.35-2.214.385-3.498.04-1.482.062-3.252.062-4.802 0-1.647-.573-3.17-1.928-4.29a13.43 13.43 0 00-3.322-2.296V2.25zM8.625 10a.75.75 0 00-1.5 0v.63c-.881.25-1.7.64-2.438 1.156a.75.75 0 00.825 1.185 8.92 8.92 0 011.613-.801V10zm2.75 0v2.17c.563.218 1.096.52 1.613.801a.75.75 0 10.825-1.185c-.738-.516-1.557-.905-2.438-1.156V10a.75.75 0 00-1.5 0z" clip-rule="evenodd" /></svg></div>
-                 <h2 class="text-2xl font-bold mb-2">Quiz Complete!</h2>
-                 <p class="text-slate-600 mb-6">Well done! You've completed all the questions.</p>
-                 <div class="space-y-3">
-                     <button id="start-new-quiz-btn" class="w-full bg-indigo-500 text-white font-bold py-3 rounded-xl hover:bg-indigo-600 transition-colors active:scale-95">Start New Quiz</button>
-                     <button class="home-btn w-full bg-slate-200 font-semibold py-3 rounded-xl hover:bg-slate-300 transition-colors active:scale-95">Return Home</button>
-                 </div>
-             </div>
-             <div id="learned-quiz-screen" class="hidden text-center bg-white/60 backdrop-blur-xl rounded-2xl shadow-lg p-8 border border-white/20">
-                 <h2 class="text-2xl font-bold mb-4 font-persian">آیتم‌های جملات یادگرفته شده</h2>
-                 <div id="learned-quiz-list" class="text-left space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
-                     </div>
-                 <button id="back-to-quiz-from-learned" class="w-full bg-indigo-500 text-white font-bold py-3 mt-6 rounded-xl hover:bg-indigo-600 transition-colors active:scale-95 font-persian">بازگشت</button>
-             </div>
+    </header>
 
-             <div id="bookmarked-quiz-screen" class="hidden text-center bg-white/60 backdrop-blur-xl rounded-2xl shadow-lg p-8 border border-white/20">
-                 <h2 class="text-2xl font-bold mb-4 font-persian">آیتم‌های جملات بوکمارک شده</h2>
-                 <div id="bookmarked-quiz-list" class="text-left space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
-                     </div>
-                 <button id="back-to-quiz-from-bookmark" class="w-full bg-indigo-500 text-white font-bold py-3 mt-6 rounded-xl hover:bg-indigo-600 transition-colors active:scale-95 font-persian">بازگشت</button>
-             </div>
-        </div>
-        
-        <div id="learning-screen" class="screen hidden">
-             <header class="mb-6 pt-12 flex justify-between items-center">
-                 <h2 id="learning-title" class="text-3xl font-bold text-white drop-shadow-md">Topics</h2>
-                 <button class="home-btn bg-white/30 text-white p-2 rounded-xl active:scale-95 transition-transform"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg></button>
-             </header>
-             <div id="learning-content-wrapper" class="space-y-3">
-             </div>
+    <main class="flex-grow flex flex-col items-center justify-center p-4 perspective-1000">
+        <div id="no-content-message" class="text-center hidden persian-ui">
+            <p class="text-lg font-semibold">محتوایی در این دسته وجود ندارد.</p>
+            <p class="text-gray-500 dark:text-gray-400">برای ادامه، دسته دیگری را انتخاب کنید!</p>
         </div>
 
-        <div id="word-learning-screen" class="screen hidden">
-            <header class="mb-6 pt-12 flex justify-between items-center">
-                <div>
-                    <p id="word-progress-text" class="text-sm font-medium text-white/80 mb-1"></p>
-                    <div class="w-full bg-white/30 rounded-full h-2.5"><div id="word-progress-bar" class="bg-white h-2.5 rounded-full transition-all duration-500"></div></div>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <button id="show-bookmarked-words-btn" class="bg-white/30 text-white p-2 rounded-xl active:scale-95 transition-transform">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21l-7.9-4.576a1 1 0 01-1.1 0L2 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
-                        </svg>
-                    </button>
-                    <button id="show-learned-words-btn" class="bg-white/30 text-white p-2 rounded-xl active:scale-95 transition-transform">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </button>
-                    <button class="home-btn bg-white/30 text-white p-2 rounded-xl active:scale-95 transition-transform">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-                    </button>
-                </div>
-            </header>
-            <div id="word-card-wrapper">
-                <div id="word-card" class="bg-white/60 backdrop-blur-xl rounded-2xl shadow-lg p-6 space-y-4 border border-white/20">
-                    <div id="word-display-area" class="space-y-2 text-center">
-                        <div class="flex justify-center items-center space-x-2">
-                            <p id="current-word" class="text-4xl font-bold text-slate-800 font-persian"></p>
-                            <button class="voice-btn text-slate-500 hover:text-purple-500 p-1 flex-shrink-0 active:scale-95 transition-transform">
-                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+        <div id="card-container" class="w-full max-w-md relative flex flex-col">
+            <div id="word-card" class="card w-full h-full absolute">
+                <div class="card-inner w-full h-full relative">
+                    <div class="card-front w-full h-full absolute bg-white dark:bg-gray-800 rounded-2xl shadow-xl flex flex-col justify-between p-6">
+                        <div class="flex justify-between items-start">
+                            <span id="word-card-counter" class="text-sm text-gray-500 dark:text-gray-400"></span>
+                            <div class="flex space-x-3">
+                                <button id="bookmark-word-btn" class="text-gray-400 hover:text-indigo-500 transition-colors">
+                                    <i data-feather="bookmark" class="w-6 h-6"></i>
+                                </button>
+                                <button id="learned-word-btn" class="text-gray-400 hover:text-green-500 transition-colors">
+                                    <i data-feather="check-circle" class="w-6 h-6"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="text-center flex items-center justify-center gap-4 flex-grow">
+                            <h2 id="word" class="text-5xl font-bold text-gray-800 dark:text-gray-100" lang="fr"></h2>
+                            <button id="speak-word-front-btn" class="text-gray-500 hover:text-indigo-500 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors">
+                                <i data-feather="volume-2" class="w-8 h-8"></i>
                             </button>
                         </div>
+                        <button id="reveal-word-btn" class="persian-ui bg-indigo-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-all transform hover:scale-105 w-full">نمایش جزئیات</button>
                     </div>
-                    <button id="word-reveal-btn" class="w-full bg-slate-800 text-white font-semibold py-3 px-4 rounded-xl hover:bg-slate-700 transition-all duration-300 shadow-md active:scale-95">Reveal Translation</button>
-                    <div id="word-revealed-area" class="revealed-area-word">
-                        <hr class="border-slate-300/70">
-                        <div class="mt-4 space-y-2 text-center">
-                            <p id="word-translation" class="text-xl font-semibold"></p>
-                            <p id="word-persian" class="persian-text font-persian text-slate-600 text-xl mt-1"></p>
+
+                    <div class="card-back w-full h-full absolute bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-xl flex flex-col p-6 overflow-y-auto">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="persian-ui text-lg font-bold text-indigo-600 dark:text-indigo-400">جزئیات</span>
+                            <button id="unreveal-word-btn" class="text-gray-400 hover:text-indigo-500">
+                                <i data-feather="x" class="w-6 h-6"></i>
+                            </button>
+                        </div>
+                        <div class="flex-grow space-y-2 text-sm">
+                            <div class="bg-white dark:bg-gray-700/50 p-3 rounded-lg">
+                                <p id="translation-english" class="text-lg font-medium text-gray-800 dark:text-gray-100" lang="en"></p>
+                                <p id="persian" class="font-persian text-gray-700 dark:text-gray-200" dir="rtl"></p>
+                            </div>
+                            <div class="bg-white dark:bg-gray-700/50 p-3 rounded-lg">
+                                <h3 class="persian-ui flex items-center text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-1">
+                                    <i data-feather="mic" class="w-4 h-4 mr-2"></i>تلفظ
+                                </h3>
+                                <div class="flex items-center justify-between">
+                                    <p id="pronunciation-english" class="text-base" lang="en"></p>
+                                    <button id="speak-pronunciation-btn" class="text-indigo-500 hover:text-indigo-400 p-1">
+                                        <i data-feather="volume-2" class="w-5 h-5"></i>
+                                    </button>
+                                </div>
+                                <p id="pronunciation-ipa" class="text-gray-500 dark:text-gray-400 text-sm" lang="en"></p>
+                                <p id="pronunciation-persian" class="font-persian text-gray-500 dark:text-gray-400 mt-1" dir="rtl"></p>
+                            </div>
+                            <div class="bg-white dark:bg-gray-700/50 p-3 rounded-lg">
+                                <h3 class="persian-ui flex items-center text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-1">
+                                    <i data-feather="file-text" class="w-4 h-4 mr-2"></i>مثال
+                                </h3>
+                                <div class="flex items-center justify-between">
+                                    <p id="sample-sentence" class="text-base italic" lang="fr"></p>
+                                    <button id="speak-sentence-btn" class="text-indigo-500 hover:text-indigo-400 p-1">
+                                        <i data-feather="volume-2" class="w-5 h-5"></i>
+                                    </button>
+                                </div>
+                                <p id="sentence-translation-english" class="text-gray-600 dark:text-gray-300 mt-1" lang="en"></p>
+                                <p id="sentence-persian" class="font-persian text-gray-600 dark:text-gray-300" dir="rtl"></p>
+                                <div class="mt-1 pt-1 border-t border-gray-200 dark:border-gray-600 text-xs text-gray-400 dark:text-gray-500">
+                                    <p id="sentence_pronunciation_ipa" lang="en"></p>
+                                    <p id="sentence_pronunciation_english" lang="en"></p>
+                                    <p id="sentence_pronunciation_persian" class="font-persian" dir="rtl"></p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="mt-6 flex justify-between items-center space-x-4">
-                    <button class="home-btn bg-white/60 backdrop-blur-xl p-3 rounded-xl shadow-md active:scale-95 transition-transform">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-                    </button>
-                    <button id="word-bookmark-btn" class="w-12 h-12 bg-yellow-400 text-white flex items-center justify-center rounded-xl hover:bg-yellow-500 transition-all duration-300 shadow-lg shadow-yellow-400/30 active:scale-95">
-                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.128L15.39 5.867l4.032.557a1 1 0 01.69 1.705l-2.923 2.85 1.096 4.025a1 1 0 01-1.45 1.054L12 17.037l-3.593 1.954a1 1 0 01-1.45-1.054l1.096-4.025-2.923-2.85a1 1 0 01.69-1.705l4.032-.557L11.049 2.128z" />
-                        </svg>
-                    </button>
-                    <button id="word-learned-btn" class="w-12 h-12 bg-emerald-500 text-white flex items-center justify-center rounded-xl hover:bg-emerald-600 transition-all duration-300 shadow-lg shadow-emerald-500/30 active:scale-95">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    </button>
-                    <button id="word-prev-btn" class="prev-btn w-12 h-12 bg-slate-600 text-white flex items-center justify-center rounded-xl hover:bg-slate-700 transition-all duration-300 shadow-lg shadow-slate-600/30 active:scale-95">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
-                    </button>
-                    <button id="word-next-btn" class="flex-grow bg-indigo-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-indigo-600 transition-all duration-300 shadow-lg shadow-indigo-500/30 active:scale-95">Next</button>
+            </div>
+
+            <div id="question-card" class="card w-full h-full absolute">
+                <div class="card-inner w-full h-full relative">
+                    <div class="card-front w-full h-full absolute bg-white dark:bg-gray-800 rounded-2xl shadow-xl flex flex-col justify-between p-6">
+                        <div class="flex justify-between items-start">
+                            <span id="question-card-counter" class="text-sm text-gray-500 dark:text-gray-400"></span>
+                            <div class="flex space-x-3">
+                                <button id="bookmark-question-btn" class="text-gray-400 hover:text-indigo-500 transition-colors">
+                                    <i data-feather="bookmark" class="w-6 h-6"></i>
+                                </button>
+                                <button id="learned-question-btn" class="text-gray-400 hover:text-green-500 transition-colors">
+                                    <i data-feather="check-circle" class="w-6 h-6"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="text-center flex flex-col items-center justify-center gap-4 flex-grow">
+                            <span id="question-topic" class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase"></span>
+                            <h2 id="french-question" class="text-4xl font-bold text-gray-800 dark:text-gray-100" lang="fr"></h2>
+                            <button id="speak-question-front-btn" class="text-gray-500 hover:text-indigo-500 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors">
+                                <i data-feather="volume-2" class="w-8 h-8"></i>
+                            </button>
+                        </div>
+                        <button id="reveal-question-btn" class="persian-ui bg-indigo-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-all transform hover:scale-105 w-full">نمایش پاسخ</button>
+                    </div>
+
+                    <div class="card-back w-full h-full absolute bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-xl flex flex-col p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="persian-ui text-lg font-bold text-indigo-600 dark:text-indigo-400">پاسخ‌ها</span>
+                            <button id="unreveal-question-btn" class="text-gray-400 hover:text-indigo-500">
+                                <i data-feather="x" class="w-6 h-6"></i>
+                            </button>
+                        </div>
+                        <div id="question-back-content" class="flex-grow space-y-2 text-sm"> <div class="bg-white dark:bg-gray-700/50 p-3 rounded-lg">
+                                <h3 class="persian-ui flex items-center text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-1">
+                                    <i data-feather="user" class="w-4 h-4 mr-2"></i>پرسش
+                                </h3>
+                                <p id="question-translation-english" class="text-lg font-medium text-gray-800 dark:text-gray-100" lang="en"></p>
+                                <p id="question-persian" class="font-persian text-gray-700 dark:text-gray-200" dir="rtl"></p>
+                                <div class="mt-1 pt-1 border-t border-gray-200 dark:border-gray-600 text-xs text-gray-400 dark:text-gray-500">
+                                    <p id="question-pronunciation-ipa" lang="en"></p>
+                                    <p id="question-pronunciation-english" lang="en"></p>
+                                    <p id="question-pronunciation-persian" class="font-persian" dir="rtl"></p>
+                                </div>
+                                <button id="speak-question-back-btn" class="mt-2 text-indigo-500 hover:text-indigo-400 p-1">
+                                    <i data-feather="volume-2" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-gray-700/50 p-3 rounded-lg">
+                                <h3 class="persian-ui flex items-center text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-1">
+                                    <i data-feather="check-square" class="w-4 h-4 mr-2"></i>پاسخ رسمی
+                                </h3>
+                                <p id="answer-formal-french" class="text-base italic text-gray-800 dark:text-gray-100" lang="fr"></p>
+                                <p id="answer-formal-translation-english" class="text-gray-600 dark:text-gray-300 mt-1" lang="en"></p>
+                                <p id="answer-formal-persian" class="font-persian text-gray-600 dark:text-gray-300" dir="rtl"></p>
+                                <div class="mt-1 pt-1 border-t border-gray-200 dark:border-gray-600 text-xs text-gray-400 dark:text-gray-500">
+                                    <p id="answer-formal-pronunciation-ipa" lang="en"></p>
+                                    <p id="answer-formal-pronunciation-english" lang="en"></p>
+                                    <p id="answer-formal-pronunciation-persian" class="font-persian" dir="rtl"></p>
+                                </div>
+                                <button id="speak-answer-formal-btn" class="mt-2 text-indigo-500 hover:text-indigo-400 p-1">
+                                    <i data-feather="volume-2" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+
+                            <div class="bg-white dark:bg-gray-700/50 p-3 rounded-lg">
+                                <h3 class="persian-ui flex items-center text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-1">
+                                    <i data-feather="message-square" class="w-4 h-4 mr-2"></i>پاسخ غیررسمی
+                                </h3>
+                                <p id="answer-informal-french" class="text-base italic text-gray-800 dark:text-gray-100" lang="fr"></p>
+                                <p id="answer-informal-translation-english" class="text-gray-600 dark:text-gray-300 mt-1" lang="en"></p>
+                                <p id="answer-informal-persian" class="font-persian text-gray-600 dark:text-gray-300" dir="rtl"></p>
+                                <div class="mt-1 pt-1 border-t border-gray-200 dark:border-gray-600 text-xs text-gray-400 dark:text-gray-500">
+                                    <p id="answer-informal-pronunciation-ipa" lang="en"></p>
+                                    <p id="answer-informal-pronunciation-english" lang="en"></p>
+                                    <p id="answer-informal-pronunciation-persian" class="font-persian" dir="rtl"></p>
+                                </div>
+                                <button id="speak-answer-informal-btn" class="mt-2 text-indigo-500 hover:text-indigo-400 p-1">
+                                    <i data-feather="volume-2" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            <div id="learned-words-screen" class="hidden text-center bg-white/60 backdrop-blur-xl rounded-2xl shadow-lg p-8 border border-white/20">
-                <h2 class="text-2xl font-bold mb-4 font-persian">کلمات یادگرفته شده</h2>
-                <div id="learned-words-list" class="text-left space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
-                    </div>
-                <button id="back-to-word-learning" class="w-full bg-indigo-500 text-white font-bold py-3 mt-6 rounded-xl hover:bg-indigo-600 transition-colors active:scale-95 font-persian">بازگشت</button>
-            </div>
-
-            <div id="bookmarked-words-screen" class="hidden text-center bg-white/60 backdrop-blur-xl rounded-2xl shadow-lg p-8 border border-white/20">
-                <h2 class="text-2xl font-bold mb-4 font-persian">کلمات بوکمارک شده</h2>
-                <div id="bookmarked-words-list" class="text-left space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
-                    </div>
-                <button id="back-to-word-learning-from-bookmark" class="w-full bg-indigo-500 text-white font-bold py-3 mt-6 rounded-xl hover:bg-indigo-600 transition-colors active:scale-95 font-persian">بازگشت</button>
             </div>
         </div>
 
-    </div>
+        <div class="flex justify-between items-center mt-6 w-full max-w-md">
+            <button id="prev-btn" class="p-4 bg-white dark:bg-gray-700 rounded-full shadow-lg hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                <i data-feather="arrow-left" class="w-6 h-6"></i>
+            </button>
+            <span id="nav-counter" class="text-lg font-semibold text-gray-600 dark:text-gray-300"></span>
+            <button id="next-btn" class="p-4 bg-white dark:bg-gray-700 rounded-full shadow-lg hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                <i data-feather="arrow-right" class="w-6 h-6"></i>
+            </button>
+        </div>
+    </main>
 
-    <div id="about-modal" class="hidden">
-        <div id="modal-backdrop" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"></div>
-        <div class="fixed inset-0 flex items-center justify-center z-50 p-4">
-            <div class="modal-content bg-slate-100/80 backdrop-blur-2xl rounded-3xl shadow-2xl p-6 pt-0 text-center w-full max-w-xs space-y-4 border border-white/20">
-                <img src="https://i.postimg.cc/L87ZdT7C/App-Icon-2x.jpg" alt="App Icon" class="w-24 h-24 mx-auto -mt-12 rounded-3xl shadow-lg border-4 border-slate-100">
-                <div class="pt-2">
-                    <h3 class="text-2xl font-bold font-persian text-slate-800">انگلیسی من</h3>
-                    <p class="text-sm text-slate-600 font-persian leading-relaxed mt-2">
-                        برنامه نویسی و توسعه:
-                        <span class="block font-semibold mt-1">پیمان عابدین پور</span>
-                    </p>
-                </div>
-                <button id="close-modal-btn" class="w-full bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl hover:bg-indigo-600 transition-all active:scale-95">
-                    بستن
-                </button>
+    <div id="about-modal" class="modal fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-50 p-4 opacity-0 pointer-events-none">
+        <div id="modal-content" class="modal-content bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-sm p-6 text-center transform scale-95 persian-ui">
+            <img src="https://i.postimg.cc/DwZd2dNQ/myfrench.png" alt="MyFrench App Logo" class="w-20 h-20 mx-auto rounded-full mb-4">
+            <h2 class="text-xl font-bold text-indigo-600 dark:text-indigo-400">درباره مای‌فرنچ</h2>
+            <div class="mt-4 text-gray-600 dark:text-gray-300 space-y-2 text-sm">
+                <p>مای‌فرنچ یک اپلیکیشن فلش‌کارت ساده و زیبا برای کمک به یادگیری لغات فرانسوی است.</p>
+                <p>نسخه: 0.01</p>
+                <p>طراحی و توسعه : پیمان عابدین پور</p>
             </div>
+            <button id="close-modal-btn" class="mt-6 bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors w-full">بستن</button>
         </div>
     </div>
+    
+    <footer class="fixed-footer-nav bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg p-2 text-xs">
+        <div class="max-w-md mx-auto flex justify-around">
+            <button id="show-words-category-btn" class="nav-btn-active flex flex-col items-center px-3 py-1.5 rounded-full transition-colors w-1/2">
+                <i data-feather="book-open" class="w-6 h-6"></i>
+            </button>
+            <button id="show-questions-category-btn" class="flex flex-col items-center px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors w-1/2">
+                <i data-feather="message-circle" class="w-6 h-6"></i> </button>
+        </div>
+    </footer>
 
-
+    <script src="./french.js"></script>
+    <script src="./french2.js"></script>
     <script>
-        // Data and State
-        let shuffledData = [];
-        let quizCurrentIndex = 0;
-        let shuffledWords = [];
-        let wordCurrentIndex = 0;
-        let learnedWords = JSON.parse(localStorage.getItem('learnedWords')) || []; 
-        let bookmarkedWords = JSON.parse(localStorage.getItem('bookmarkedWords')) || [];
-        let learnedQuizItems = JSON.parse(localStorage.getItem('learnedQuizItems')) || [];
-        let bookmarkedQuizItems = JSON.parse(localStorage.getItem('bookmarkedQuizItems')) || [];
+    document.addEventListener('DOMContentLoaded', () => {
+    // --- DOM Elements ---
+    const wordCard = document.getElementById('word-card');
+    const questionCard = document.getElementById('question-card');
+    const cardContainer = document.getElementById('card-container');
+    const noWordsMessage = document.getElementById('no-content-message');
+    
+    // Word Card Front
+    const wordEl = document.getElementById('word');
+    const wordCardCounterEl = document.getElementById('word-card-counter');
+    const bookmarkWordBtn = document.getElementById('bookmark-word-btn');
+    const learnedWordBtn = document.getElementById('learned-word-btn');
+    const revealWordBtn = document.getElementById('reveal-word-btn');
+    const speakWordFrontBtn = document.getElementById('speak-word-front-btn');
 
-        // Define topic translations
-        const topicTranslations = {
-            "Food": "غذا",
-            "Shopping": "خرید",
-            "Services": "خدمات",
-            "Phone": "تلفن",
-            "Banking": "بانکداری",
-            "Emergencies": "موارد اضطراری",
-            "Health": "سلامتی",
-            "Addresses": "آدرس‌ها",
-            "Appointments": "قرار ملاقات‌ها",
-            "Everyday": "روزمره",
-            "Home": "خانه",
-            "School": "مدرسه",
-            "Work": "کار",
-            "Travel": "سفر",
-            "Social": "اجتماعی",
-            "Friendship": "دوستی",
-            "Emotions": "احساسات",
-            "Daily Life": "زندگی روزمره",
-            "Buy SIM": "خرید سیم کارت",
-            "Change SIM": "تغییر سیم کارت",
-            "Block SIM": "مسدود کردن سیم کارت",
-            "Recharge": "شارژ",
-            "Internet": "اینترنت",
-            "Modem": "مودم",
-            "Coverage": "پوشش دهی",
-            "SIM Swap": "تعویض سیم کارت",
-            "SIM Apps": "برنامه‌های سیم کارت",
-            "Payment": "پرداخت",
-            "Support": "پشتیبانی",
-            "Start/End Service": "شروع/پایان خدمات",
-            "Ownership Change": "تغییر مالکیت",
-            "Tourist SIM": "سیم کارت توریست",
-            "General FAQ": "سوالات متداول عمومی",
-            "Colleague Handoff": "تحویل کار به همکار",
-            "Documents": "اسناد",
-            "General": "عمومی",
-            "Directions": "مسیرها",
-            "Contact": "تماس",
-            "Daily": "روزانه"
-        };
+    // Word Card Back
+    const unrevealWordBtn = document.getElementById('unreveal-word-btn');
+    const pronunciationIpaEl = document.getElementById('pronunciation-ipa');
+    const pronunciationEnglishEl = document.getElementById('pronunciation-english');
+    const pronunciationPersianEl = document.getElementById('pronunciation-persian');
+    const translationEnglishEl = document.getElementById('translation-english');
+    const persianEl = document.getElementById('persian');
+    const sampleSentenceEl = document.getElementById('sample-sentence');
+    const sentenceTranslationEnglishEl = document.getElementById('sentence-translation-english');
+    const sentencePersianEl = document.getElementById('sentence-persian');
+    const sentencePronunciationIpaEl = document.getElementById('sentence_pronunciation_ipa');
+    const sentencePronunciationEnglishEl = document.getElementById('sentence_pronunciation_english');
+    const sentencePronunciationPersianEl = document.getElementById('sentence_pronunciation_persian');
+    const speakPronunciationBtn = document.getElementById('speak-pronunciation-btn');
+    const speakSentenceBtn = document.getElementById('speak-sentence-btn');
+    
+    // Question Card Front
+    const questionTopicEl = document.getElementById('question-topic');
+    const frenchQuestionEl = document.getElementById('french-question');
+    const questionCardCounterEl = document.getElementById('question-card-counter');
+    const bookmarkQuestionBtn = document.getElementById('bookmark-question-btn');
+    const learnedQuestionBtn = document.getElementById('learned-question-btn');
+    const revealQuestionBtn = document.getElementById('reveal-question-btn');
+    const speakQuestionFrontBtn = document.getElementById('speak-question-front-btn');
 
-        // DOM Elements
-        const screens = { 
-            home: document.getElementById('home-screen'), 
-            quiz: document.getElementById('quiz-screen'), 
-            learning: document.getElementById('learning-screen'), 
-            wordLearning: document.getElementById('word-learning-screen'), 
-            learnedWordsListScreen: document.getElementById('learned-words-screen'), 
-            bookmarkedWordsListScreen: document.getElementById('bookmarked-words-screen'),
-            learnedQuizScreen: document.getElementById('learned-quiz-screen'),
-            bookmarkedQuizScreen: document.getElementById('bookmarked-quiz-screen')
-        };
-        const aboutBtn = document.getElementById('about-btn');
-        const speakerIconSvg = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>`;
-        const bookmarkIconSvg = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21l-7.9-4.576a1 1 0 01-1.1 0L2 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" /></svg>`;
-        const bookmarkIconFilledSvg = `<svg class="h-6 w-6 text-yellow-400" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.128L15.39 5.867l4.032.557a1 1 0 01.69 1.705l-2.923 2.85 1.096 4.025a1 1 0 01-1.45 1.054L12 17.037l-3.593 1.954a1 1 0 01-1.45-1.054l1.096-4.025-2.923-2.85a1 1 0 01.69-1.705l4.032-.557L11.049 2.128z" />
-        </svg>`;
-        const learnedIconSvg = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
-        // New: Previous icon SVG
-        const prevIconSvg = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>`;
+    // Question Card Back
+    const unrevealQuestionBtn = document.getElementById('unreveal-question-btn');
+    const questionTranslationEnglishEl = document.getElementById('question-translation-english');
+    const questionPersianEl = document.getElementById('question-persian');
+    const questionPronunciationIpaEl = document.getElementById('question-pronunciation-ipa');
+    const questionPronunciationEnglishEl = document.getElementById('question-pronunciation-english');
+    const questionPronunciationPersianEl = document.getElementById('question-pronunciation-persian');
+    const speakQuestionBackBtn = document.getElementById('speak-question-back-btn');
+    const questionBackContent = document.getElementById('question-back-content'); // Get the content div on the back
+
+    const answerFormalFrenchEl = document.getElementById('answer-formal-french');
+    const answerFormalTranslationEnglishEl = document.getElementById('answer-formal-translation-english');
+    const answerFormalPersianEl = document.getElementById('answer-formal-persian');
+    const answerFormalPronunciationIpaEl = document.getElementById('answer-formal-pronunciation-ipa');
+    const answerFormalPronunciationEnglishEl = document.getElementById('answer-formal-pronunciation-english');
+    const answerFormalPronunciationPersianEl = document.getElementById('answer-formal-pronunciation-persian');
+    const speakAnswerFormalBtn = document.getElementById('speak-answer-formal-btn');
+
+    const answerInformalFrenchEl = document.getElementById('answer-informal-french');
+    const answerInformalTranslationEnglishEl = document.getElementById('answer-informal-translation-english');
+    const answerInformalPersianEl = document.getElementById('answer-informal-persian');
+    const answerInformalPronunciationIpaEl = document.getElementById('answer-informal-pronunciation-ipa');
+    const answerInformalPronunciationEnglishEl = document.getElementById('answer-informal-pronunciation-english');
+    const answerInformalPronunciationPersianEl = document.getElementById('answer-informal-pronunciation-persian');
+    const speakAnswerInformalBtn = document.getElementById('speak-answer-informal-btn');
 
 
-        // Helper Functions
-        const shuffleArray = (array) => [...array].sort(() => Math.random() - 0.5);
+    // Header & Progress
+    const totalWordsCounterEl = document.getElementById('total-words-counter');
+    const bookmarkedWordsCounterEl = document.getElementById('bookmarked-words-counter');
+    const learnedWordsCounterEl = document.getElementById('learned-words-counter');
+    const totalQuestionsCounterEl = document.getElementById('total-questions-counter');
+    const bookmarkedQuestionsCounterEl = document.getElementById('bookmarked-questions-counter');
+    const learnedQuestionsCounterEl = document.getElementById('learned-questions-counter');
+    
+    const progressBar = document.getElementById('progress-bar');
+    
+    const showWordsCategoryBtn = document.getElementById('show-words-category-btn');
+    const showQuestionsCategoryBtn = document.getElementById('show-questions-category-btn');
+
+    const wordFiltersDiv = document.getElementById('word-filters');
+    const questionFiltersDiv = document.getElementById('question-filters');
+
+    const showAllWordsBtn = document.getElementById('show-all-words-btn');
+    const showBookmarkedWordsBtn = document.getElementById('show-bookmarked-words-btn');
+    const showLearnedWordsBtn = document.getElementById('show-learned-words-btn');
+
+    const showAllQuestionsBtn = document.getElementById('show-all-questions-btn');
+    const showBookmarkedQuestionsBtn = document.getElementById('show-bookmarked-questions-btn');
+    const showLearnedQuestionsBtn = document.getElementById('show-learned-questions-btn');
+
+
+    // Navigation
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const navCounterEl = document.getElementById('nav-counter');
+
+    // Dark Mode
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+
+    // Modal
+    const aboutModal = document.getElementById('about-modal');
+    const modalContent = document.getElementById('modal-content');
+    const infoBtn = document.getElementById('info-btn');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+
+    // --- State ---
+    let allWords = [];
+    let allQuestions = [];
+    let displayedContent = [];
+    let currentIndex = 0;
+
+    let bookmarkedWords = new Set(JSON.parse(localStorage.getItem('bookmarkedWords')) || []);
+    let learnedWords = new Set(JSON.parse(localStorage.getItem('learnedWords')) || []);
+    let bookmarkedQuestions = new Set(JSON.parse(localStorage.getItem('bookmarkedQuestions')) || []);
+    let learnedQuestions = new Set(JSON.parse(localStorage.getItem('learnedQuestions')) || []);
+
+    let currentCategory = 'words'; // 'words' or 'questions'
+    let currentFilter = 'all'; // 'all', 'bookmarked', 'learned'
+
+    const synth = window.speechSynthesis;
+    let frenchVoice = null;
+    let voices = [];
+
+    // --- Constants ---
+    const WORD_CARD_HEIGHT = '30rem'; // Adjusted to make word cards initially shorter
+    const QUESTION_CARD_INITIAL_HEIGHT = '30rem'; // Initial height for question card
+    const PADDING_FOR_CARD_CONTENT = 24 * 2; // p-6 top/bottom for card front/back = 48px
+    const HEADER_HEIGHT = 150; // Approximate header height to subtract
+    const FOOTER_HEIGHT = 64; // Approximate footer height to subtract
+
+    // --- Functions ---
+    
+    const toPersianNumber = (n) => {
+        if (n === undefined || n === null) return '';
+        const persian = { 0: '۰', 1: '۱', 2: '۲', 3: '۳', 4: '۴', 5: '۵', 6: '۶', 7: '۷', 8: '۸', 9: '۹' };
+        return String(n).split('').map(char => persian[char] || char).join('');
+    }
+
+    function loadVoices() {
+        voices = synth.getVoices();
+        frenchVoice = voices.find(voice => voice.lang === 'fr-FR' && voice.name.includes('Enhanced')) ||
+                      voices.find(voice => voice.lang === 'fr-FR' && voice.localService) || 
+                      voices.find(voice => voice.lang === 'fr-FR') || 
+                      voices.find(voice => voice.lang.startsWith('fr'));
         
-        const speak = (text, btn) => {
-            if (speechSynthesis.speaking) speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-US';
-            utterance.rate = 0.85;
-            let voices = speechSynthesis.getVoices();
-            let preferredVoice = voices.find(v => v.name === 'Google UK English Female') || voices.find(v => v.name === 'Google US English');
-            if (preferredVoice) utterance.voice = preferredVoice;
-            const icon = btn.querySelector('svg');
-            if (icon) {
-                utterance.onstart = () => icon.classList.add('text-amber-400');
-                utterance.onend = () => icon.classList.remove('text-amber-400');
-            }
-            speechSynthesis.speak(utterance);
-        };
-        
-        const showScreen = (screenName) => {
-            Object.values(screens).forEach(s => s.classList.add('hidden'));
-            screens[screenName].classList.remove('hidden');
-
-            if (screenName === 'home') {
-                aboutBtn.classList.remove('hidden');
-            } else {
-                aboutBtn.classList.add('hidden');
-            }
-        };
-
-        // Quiz Module
-        const quiz = {
-            cardWrapper: document.getElementById('quiz-card-wrapper'),
-            completionState: document.getElementById('quiz-completion-state'),
-            progressText: document.getElementById('quiz-progress-text'),
-            progressBar: document.getElementById('quiz-progress-bar'),
-            speakerRole: document.getElementById('quiz-speaker-role'),
-            questionText: document.getElementById('quiz-question-text'),
-            questionPersian: document.getElementById('quiz-question-persian'),
-            questionVoiceBtn: document.querySelector('#quiz-question-area .voice-btn'),
-            answerOptions: document.getElementById('quiz-answer-options'),
-            nextBtn: document.getElementById('quiz-next-btn'),
-            prevBtn: document.getElementById('quiz-prev-btn'), // New
-            revealBtn: document.getElementById('quiz-reveal-btn'),
-            revealedArea: document.getElementById('quiz-revealed-area'),
-            responderRole: document.getElementById('quiz-responder-role'),
-            learnedBtn: document.getElementById('quiz-learned-btn'),
-            bookmarkBtn: document.getElementById('quiz-bookmark-btn'),
-            showLearnedQuizBtn: document.getElementById('show-learned-quiz-btn'),
-            showBookmarkedQuizBtn: document.getElementById('show-bookmarked-quiz-btn'),
-            learnedQuizListEl: document.getElementById('learned-quiz-list'),
-            bookmarkedQuizListEl: document.getElementById('bookmarked-quiz-list'),
-            backToQuizFromLearnedBtn: document.getElementById('back-to-quiz-from-learned'),
-            backToQuizFromBookmarkBtn: document.getElementById('back-to-quiz-from-bookmark'),
-
-            init: (isNewGame = true) => {
-                if (isNewGame) {
-                    const availableQuizItems = appData.filter(item => !learnedQuizItems.some(lqi => lqi.q === item.q));
-                    shuffledData = shuffleArray(availableQuizItems);
-                    quizCurrentIndex = 0;
-                }
-                quiz.cardWrapper.classList.remove('hidden');
-                quiz.completionState.classList.add('hidden');
-                screens.learnedQuizScreen.classList.add('hidden');
-                screens.bookmarkedQuizScreen.classList.add('hidden');
-                quiz.displayItem();
-                showScreen('quiz');
-            },
-            displayItem: () => {
-                if (shuffledData.length === 0) {
-                    quiz.questionText.textContent = "No more quiz items to show!";
-                    quiz.questionPersian.textContent = "";
-                    quiz.speakerRole.textContent = "";
-                    quiz.revealBtn.classList.add('hidden');
-                    quiz.answerOptions.innerHTML = '';
-                    quiz.revealedArea.classList.remove('expanded');
-                    quiz.nextBtn.classList.add('hidden');
-                    quiz.prevBtn.classList.add('hidden'); // Hide prev button
-                    quiz.learnedBtn.classList.add('hidden');
-                    quiz.bookmarkBtn.classList.add('hidden');
-                    quiz.progressText.textContent = "0 / 0";
-                    quiz.progressBar.style.width = "0%";
-                    return;
-                }
-
-                quiz.revealedArea.classList.remove('expanded');
-                quiz.revealBtn.classList.remove('hidden');
-                quiz.revealBtn.textContent = "Reveal Responses"; 
-                quiz.nextBtn.classList.remove('hidden');
-                quiz.learnedBtn.classList.remove('hidden');
-                quiz.bookmarkBtn.classList.remove('hidden');
-
-                const item = shuffledData[quizCurrentIndex];
-                const responderRole = item.role === 'Customer' ? 'Operator' : 'Customer';
-                quiz.speakerRole.textContent = `SPOKEN BY: ${item.role.toUpperCase()}`;
-                quiz.questionText.textContent = item.q;
-                quiz.questionPersian.textContent = item.q_persien;
-                quiz.questionVoiceBtn.onclick = () => speak(item.q, quiz.questionVoiceBtn);
-                quiz.responderRole.textContent = `POSSIBLE RESPONSES FROM: ${responderRole.toUpperCase()}`;
-                quiz.answerOptions.innerHTML = '';
-                item.a.forEach((answer, index) => {
-                    const answerDiv = document.createElement('div');
-                    answerDiv.className = "staggered-item w-full text-left p-3 bg-slate-50/80 rounded-lg flex justify-between items-center group";
-                    answerDiv.style.animationDelay = `${index * 100}ms`;
-                    answerDiv.innerHTML = `<div><p>${answer}</p><p class="persian-text font-persian text-slate-600 text-md mt-1">${item.a_persien[index] || ''}</p></div><button class="voice-btn text-slate-400 group-hover:text-indigo-500 p-1 flex-shrink-0 active:scale-95 transition-transform">${speakerIconSvg}</button>`;
-                    answerDiv.querySelector('.voice-btn').onclick = (e) => { e.stopPropagation(); speak(answer, e.currentTarget); };
-                    quiz.answerOptions.appendChild(answerDiv);
-                });
-                quiz.updateProgress();
-                quiz.updateBookmarkButtonState();
-                quiz.learnedBtn.innerHTML = learnedIconSvg; // Ensure learned icon is always set
-                quiz.updatePrevNextButtons(); // New: Update prev button state
-            },
-            next: () => {
-                if (quizCurrentIndex < shuffledData.length - 1) { 
-                    quizCurrentIndex++; 
-                    quiz.displayItem(); 
-                } else {
-                    quiz.showCompletion();
-                }
-            },
-            prev: () => { // New
-                if (quizCurrentIndex > 0) {
-                    quizCurrentIndex--;
-                    quiz.displayItem();
-                }
-            },
-            updatePrevNextButtons: () => { // New
-                if (quizCurrentIndex === 0) {
-                    quiz.prevBtn.classList.add('disabled');
-                    quiz.prevBtn.disabled = true;
-                } else {
-                    quiz.prevBtn.classList.remove('disabled');
-                    quiz.prevBtn.disabled = false;
-                }
-                if (quizCurrentIndex >= shuffledData.length - 1) {
-                    quiz.nextBtn.textContent = "Complete Quiz";
-                } else {
-                    quiz.nextBtn.textContent = "Next";
-                }
-            },
-            reveal: () => {
-                quiz.revealedArea.classList.add('expanded');
-                quiz.revealBtn.classList.add('hidden');
-            },
-            showCompletion: () => {
-                quiz.cardWrapper.classList.add('hidden');
-                quiz.completionState.classList.remove('hidden');
-            },
-            updateProgress: () => {
-                quiz.progressText.textContent = `Question ${quizCurrentIndex + 1} / ${shuffledData.length}`;
-                quiz.progressBar.style.width = `${((quizCurrentIndex + 1) / shuffledData.length) * 100}%`;
-            },
-            markAsLearned: () => {
-                const currentItem = shuffledData[quizCurrentIndex];
-                if (!learnedQuizItems.some(lqi => lqi.q === currentItem.q)) {
-                    learnedQuizItems.push(currentItem);
-                    localStorage.setItem('learnedQuizItems', JSON.stringify(learnedQuizItems));
-                }
-                quiz.next(); 
-            },
-            toggleBookmark: () => {
-                const currentItem = shuffledData[quizCurrentIndex];
-                const index = bookmarkedQuizItems.findIndex(bqi => bqi.q === currentItem.q);
-                if (index === -1) {
-                    bookmarkedQuizItems.push(currentItem);
-                } else {
-                    bookmarkedQuizItems.splice(index, 1);
-                }
-                localStorage.setItem('bookmarkedQuizItems', JSON.stringify(bookmarkedQuizItems));
-                quiz.updateBookmarkButtonState();
-            },
-            updateBookmarkButtonState: () => {
-                const currentItem = shuffledData[quizCurrentIndex];
-                const isBookmarked = bookmarkedQuizItems.some(bqi => bqi.q === currentItem.q);
-                quiz.bookmarkBtn.innerHTML = isBookmarked ? bookmarkIconFilledSvg : bookmarkIconSvg;
-            },
-            displayLearnedQuizItems: () => {
-                quiz.cardWrapper.classList.add('hidden');
-                quiz.completionState.classList.add('hidden');
-                screens.bookmarkedQuizScreen.classList.add('hidden');
-                screens.learnedQuizScreen.classList.remove('hidden');
-                quiz.learnedQuizListEl.innerHTML = '';
-                if (learnedQuizItems.length === 0) {
-                    quiz.learnedQuizListEl.innerHTML = '<p class="text-slate-600 text-center font-persian">هنوز آیتم جملات یاد نگرفته‌اید.</p>';
-                    return;
-                }
-                learnedQuizItems.forEach(item => {
-                    const quizItemDiv = document.createElement('div');
-                    quizItemDiv.className = 'bg-white/70 backdrop-blur-md rounded-lg p-3 flex flex-col shadow-sm';
-                    quizItemDiv.innerHTML = `
-                        <div class="flex items-center justify-between">
-                            <p class="font-semibold text-lg">${item.q}</p>
-                            <button class="voice-btn text-slate-500 p-1 flex-shrink-0 active:scale-95 transition-transform">${speakerIconSvg}</button>
-                        </div>
-                        <p class="persian-text font-persian text-slate-500 text-sm mt-1">${item.q_persien}</p>
-                        <div class="flex flex-wrap gap-2 mt-2">
-                            ${item.a.map((answer, index) => `<span class="text-xs bg-slate-200 px-2 py-1 rounded">${answer}</span>`).join('')}
-                        </div>
-                        <button class="remove-learned-quiz-btn text-red-500 p-1 mt-2 self-end active:scale-95 transition-transform" data-question="${item.q}">
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        </button>
-                    `;
-                    quizItemDiv.querySelector('.voice-btn').onclick = (e) => { e.stopPropagation(); speak(item.q, e.currentTarget); };
-                    quizItemDiv.querySelector('.remove-learned-quiz-btn').onclick = (e) => {
-                        const questionToRemove = e.currentTarget.dataset.question;
-                        learnedQuizItems = learnedQuizItems.filter(lqi => lqi.q !== questionToRemove);
-                        localStorage.setItem('learnedQuizItems', JSON.stringify(learnedQuizItems));
-                        quiz.displayLearnedQuizItems(); // Re-render the list
-                    };
-                    quiz.learnedQuizListEl.appendChild(quizItemDiv);
-                });
-            },
-            displayBookmarkedQuizItems: () => {
-                quiz.cardWrapper.classList.add('hidden');
-                quiz.completionState.classList.add('hidden');
-                screens.learnedQuizScreen.classList.add('hidden');
-                screens.bookmarkedQuizScreen.classList.remove('hidden');
-                quiz.bookmarkedQuizListEl.innerHTML = '';
-                if (bookmarkedQuizItems.length === 0) {
-                    quiz.bookmarkedQuizListEl.innerHTML = '<p class="text-slate-600 text-center font-persian">هنوز آیتم جملات بوکمارک نکرده‌اید.</p>';
-                    return;
-                }
-                bookmarkedQuizItems.forEach(item => {
-                    const quizItemDiv = document.createElement('div');
-                    quizItemDiv.className = 'bg-white/70 backdrop-blur-md rounded-lg p-3 flex flex-col shadow-sm';
-                    quizItemDiv.innerHTML = `
-                        <div class="flex items-center justify-between">
-                            <p class="font-semibold text-lg">${item.q}</p>
-                            <button class="voice-btn text-slate-500 p-1 flex-shrink-0 active:scale-95 transition-transform">${speakerIconSvg}</button>
-                        </div>
-                        <p class="persian-text font-persian text-slate-500 text-sm mt-1">${item.q_persien}</p>
-                        <div class="flex flex-wrap gap-2 mt-2">
-                            ${item.a.map((answer, index) => `<span class="text-xs bg-slate-200 px-2 py-1 rounded">${answer}</span>`).join('')}
-                        </div>
-                        <button class="remove-bookmarked-quiz-btn text-red-500 p-1 mt-2 self-end active:scale-95 transition-transform" data-question="${item.q}">
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        </button>
-                    `;
-                    quizItemDiv.querySelector('.voice-btn').onclick = (e) => { e.stopPropagation(); speak(item.q, e.currentTarget); };
-                    quizItemDiv.querySelector('.remove-bookmarked-quiz-btn').onclick = (e) => {
-                        const questionToRemove = e.currentTarget.dataset.question;
-                        bookmarkedQuizItems = bookmarkedQuizItems.filter(bqi => bqi.q !== questionToRemove);
-                        localStorage.setItem('bookmarkedQuizItems', JSON.stringify(bookmarkedQuizItems));
-                        quiz.displayBookmarkedQuizItems(); // Re-render the list
-                    };
-                    quiz.bookmarkedQuizListEl.appendChild(quizItemDiv);
-                });
-            }
-        };
-
-        // Learning Module (Existing - no changes here)
-        const learning = {
-            title: document.getElementById('learning-title'),
-            contentWrapper: document.getElementById('learning-content-wrapper'),
-            init: () => { learning.displayTopics(); showScreen('learning'); },
-            displayTopics: () => {
-                learning.title.innerHTML = `Topics <span class="font-persian text-2xl">موضوعات</span>`;
-                const topics = [...new Set(appData.map(item => item.topic))];
-                learning.contentWrapper.className = "grid grid-cols-2 gap-3";
-                learning.contentWrapper.innerHTML = '';
-                topics.forEach(topic => {
-                    const topicBtn = document.createElement('button');
-                    topicBtn.className = "interactive-card w-full bg-white/50 backdrop-blur-xl p-4 rounded-xl shadow-md text-center text-base font-semibold border border-white/20 active:scale-95 transition-transform";
-                    topicBtn.innerHTML = `<div>${topic}</div><div class="persian-text font-persian text-slate-700 text-sm mt-1">${topicTranslations[topic] || ''}</div>`; // Added Persian translation
-                    topicBtn.onclick = () => learning.displayQuestions(topic);
-                    learning.contentWrapper.appendChild(topicBtn);
-                });
-            },
-            displayQuestions: (topic) => {
-                learning.title.innerHTML = `<button id="back-to-topics" class="text-xl font-bold mr-2 align-middle inline-block">&larr;</button> ${topic}`;
-                document.getElementById('back-to-topics').onclick = learning.displayTopics;
-                const questions = appData.filter(item => item.topic === topic);
-                learning.contentWrapper.className = 'space-y-3';
-                learning.contentWrapper.innerHTML = '';
-                questions.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = "bg-white/60 backdrop-blur-xl rounded-xl shadow-md overflow-hidden border border-white/20";
-                    const questionHeader = document.createElement('div');
-                    questionHeader.className = "question-header p-4 cursor-pointer flex justify-between items-center";
-                    questionHeader.innerHTML = `<div class="flex-1 pr-2"><p class="font-semibold">${item.q}</p><p class="persian-text font-persian text-slate-600 text-sm mt-1">${item.q_persien}</p></div><div class="flex items-center flex-shrink-0"><button class="voice-btn text-slate-500 p-1 mr-2 active:scale-95 transition-transform">${speakerIconSvg}</button><svg class="expand-arrow h-5 w-5 transition-transform text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></div>`;
-                    const expandableContent = document.createElement('div');
-                    expandableContent.className = "expandable-content px-4 pb-2";
-                    const answerList = document.createElement('ul');
-                    item.a.forEach((answer, index) => {
-                        const li = document.createElement('li');
-                        li.className = 'flex justify-between items-center border-t border-slate-300/70 p-3';
-                        li.innerHTML = `<div><p>${answer}</p><p class="persian-text font-persian text-slate-600 text-sm mt-1">${item.a_persien[index] || ''}</p></div><button class="voice-btn text-slate-500 p-1 flex-shrink-0 active:scale-95 transition-transform">${speakerIconSvg}</button>`;
-                        li.querySelector('.voice-btn').onclick = (e) => { e.stopPropagation(); speak(answer, e.currentTarget); };
-                        answerList.appendChild(li);
-                    });
-                    expandableContent.appendChild(answerList);
-                    card.appendChild(questionHeader);
-                    card.appendChild(expandableContent);
-                    questionHeader.querySelector('.voice-btn').onclick = (e) => { e.stopPropagation(); speak(item.q, e.currentTarget); };
-                    questionHeader.onclick = () => { expandableContent.classList.toggle('expanded'); questionHeader.querySelector('.expand-arrow').classList.toggle('rotate-180'); };
-                    learning.contentWrapper.appendChild(card);
-                });
-            }
-        };
-
-        // Word Learning Module
-        const wordLearning = {
-            cardWrapper: document.getElementById('word-card-wrapper'),
-            wordDisplayArea: document.getElementById('word-display-area'),
-            currentWordEl: document.getElementById('current-word'),
-            wordVoiceBtn: document.querySelector('#word-display-area .voice-btn'),
-            revealBtn: document.getElementById('word-reveal-btn'),
-            revealedArea: document.getElementById('word-revealed-area'),
-            wordTranslationEl: document.getElementById('word-translation'),
-            wordPersianEl: document.getElementById('word-persian'),
-            learnedBtn: document.getElementById('word-learned-btn'),
-            nextBtn: document.getElementById('word-next-btn'),
-            prevBtn: document.getElementById('word-prev-btn'), // New
-            bookmarkBtn: document.getElementById('word-bookmark-btn'),
-            showLearnedWordsBtn: document.getElementById('show-learned-words-btn'),
-            showBookmarkedWordsBtn: document.getElementById('show-bookmarked-words-btn'),
-            learnedWordsListEl: document.getElementById('learned-words-list'),
-            bookmarkedWordsListEl: document.getElementById('bookmarked-words-list'),
-            backToWordLearningBtn: document.getElementById('back-to-word-learning'),
-            backToWordLearningFromBookmarkBtn: document.getElementById('back-to-word-learning-from-bookmark'),
-            progressText: document.getElementById('word-progress-text'),
-            progressBar: document.getElementById('word-progress-bar'),
-
-
-            init: (isNewSession = true) => {
-                if (isNewSession) {
-                    const availableWords = appWords.filter(word => !learnedWords.some(lw => lw.word === word.word));
-                    shuffledWords = shuffleArray(availableWords);
-                    wordCurrentIndex = 0;
-                }
-                wordLearning.cardWrapper.classList.remove('hidden');
-                screens.learnedWordsListScreen.classList.add('hidden');
-                screens.bookmarkedWordsListScreen.classList.add('hidden'); 
-                wordLearning.displayWord();
-                showScreen('wordLearning');
-            },
-            displayWord: () => {
-                if (shuffledWords.length === 0) {
-                    wordLearning.currentWordEl.textContent = "No more words to learn!";
-                    wordLearning.wordVoiceBtn.classList.add('hidden');
-                    wordLearning.revealBtn.classList.add('hidden');
-                    wordLearning.learnedBtn.classList.add('hidden');
-                    wordLearning.nextBtn.classList.add('hidden');
-                    wordLearning.prevBtn.classList.add('hidden'); // Hide prev button
-                    wordLearning.bookmarkBtn.classList.add('hidden'); 
-                    wordLearning.revealedArea.classList.remove('expanded');
-                    wordLearning.wordTranslationEl.textContent = "";
-                    wordLearning.wordPersianEl.textContent = "";
-                    wordLearning.progressText.textContent = "0 / 0"; 
-                    wordLearning.progressBar.style.width = "0%"; 
-                    return;
-                }
-                wordLearning.wordVoiceBtn.classList.remove('hidden');
-                wordLearning.revealBtn.classList.remove('hidden');
-                wordLearning.learnedBtn.classList.remove('hidden');
-                wordLearning.nextBtn.classList.remove('hidden');
-                wordLearning.bookmarkBtn.classList.remove('hidden'); 
-                wordLearning.revealedArea.classList.remove('expanded');
-                wordLearning.revealBtn.textContent = "Reveal Translation"; 
-                
-                const item = shuffledWords[wordCurrentIndex];
-                wordLearning.currentWordEl.textContent = item.word;
-                wordLearning.wordTranslationEl.textContent = item.translation;
-                wordLearning.wordPersianEl.textContent = item.persian;
-                wordLearning.wordVoiceBtn.onclick = () => speak(item.word, wordLearning.wordVoiceBtn);
-                wordLearning.updateBookmarkButtonState();
-                wordLearning.updateProgress(); 
-                wordLearning.learnedBtn.innerHTML = learnedIconSvg; 
-                wordLearning.updatePrevNextButtons(); // New: Update prev button state
-            },
-            next: () => {
-                if (wordCurrentIndex < shuffledWords.length - 1) {
-                    wordCurrentIndex++;
-                    wordLearning.displayWord();
-                } else {
-                    // Optionally, loop back to start or show a completion message for words
-                    wordLearning.currentWordEl.textContent = "You've gone through all available words!";
-                    // ... (hide/disable buttons as needed)
-                }
-            },
-            prev: () => { // New
-                if (wordCurrentIndex > 0) {
-                    wordCurrentIndex--;
-                    wordLearning.displayWord();
-                }
-            },
-            updatePrevNextButtons: () => { // New
-                if (wordCurrentIndex === 0) {
-                    wordLearning.prevBtn.classList.add('disabled');
-                    wordLearning.prevBtn.disabled = true;
-                } else {
-                    wordLearning.prevBtn.classList.remove('disabled');
-                    wordLearning.prevBtn.disabled = false;
-                }
-            },
-            reveal: () => {
-                wordLearning.revealedArea.classList.add('expanded');
-                wordLearning.revealBtn.textContent = "Translation Revealed";
-            },
-            markAsLearned: () => {
-                const learnedWord = shuffledWords[wordCurrentIndex];
-                if (!learnedWords.some(lw => lw.word === learnedWord.word)) {
-                    learnedWords.push(learnedWord);
-                    localStorage.setItem('learnedWords', JSON.stringify(learnedWords));
-                }
-                wordLearning.next(); 
-            },
-            toggleBookmark: () => {
-                const currentWord = shuffledWords[wordCurrentIndex];
-                const index = bookmarkedWords.findIndex(bw => bw.word === currentWord.word);
-                if (index === -1) {
-                    bookmarkedWords.push(currentWord);
-                } else {
-                    bookmarkedWords.splice(index, 1);
-                }
-                localStorage.setItem('bookmarkedWords', JSON.stringify(bookmarkedWords));
-                wordLearning.updateBookmarkButtonState();
-            },
-            updateBookmarkButtonState: () => {
-                const currentWord = shuffledWords[wordCurrentIndex];
-                const isBookmarked = bookmarkedWords.some(bw => bw.word === currentWord.word);
-                wordLearning.bookmarkBtn.innerHTML = isBookmarked ? bookmarkIconFilledSvg : bookmarkIconSvg;
-            },
-            updateProgress: () => { 
-                wordLearning.progressText.textContent = `Word ${wordCurrentIndex + 1} / ${shuffledWords.length}`;
-                wordLearning.progressBar.style.width = `${((wordCurrentIndex + 1) / shuffledWords.length) * 100}%`;
-            },
-            displayLearnedWords: () => {
-                wordLearning.cardWrapper.classList.add('hidden');
-                screens.bookmarkedWordsListScreen.classList.add('hidden'); 
-                screens.learnedWordsListScreen.classList.remove('hidden');
-                wordLearning.learnedWordsListEl.innerHTML = '';
-                if (learnedWords.length === 0) {
-                    wordLearning.learnedWordsListEl.innerHTML = '<p class="text-slate-600 text-center font-persian">هنوز کلمه‌ای یاد نگرفته‌اید.</p>';
-                    return;
-                }
-                learnedWords.forEach(word => {
-                    const wordItem = document.createElement('div');
-                    wordItem.className = 'bg-white/70 backdrop-blur-md rounded-lg p-3 flex items-center justify-between shadow-sm';
-                    wordItem.innerHTML = `
-                        <div>
-                            <p class="font-semibold text-lg">${word.word}</p>
-                            <p class="text-slate-700">${word.translation}</p>
-                            <p class="persian-text font-persian text-slate-500 text-sm mt-1">${word.persian}</p>
-                        </div>
-                        <button class="voice-btn text-slate-500 p-1 flex-shrink-0 active:scale-95 transition-transform">${speakerIconSvg}</button>
-                        <button class="remove-learned-word-btn text-red-500 p-1 flex-shrink-0 active:scale-95 transition-transform" data-word="${word.word}">
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        </button>
-                    `;
-                    wordItem.querySelector('.voice-btn').onclick = (e) => { e.stopPropagation(); speak(word.word, e.currentTarget); };
-                    wordItem.querySelector('.remove-learned-word-btn').onclick = (e) => {
-                        const wordToRemove = e.currentTarget.dataset.word;
-                        learnedWords = learnedWords.filter(lw => lw.word !== wordToRemove);
-                        localStorage.setItem('learnedWords', JSON.stringify(learnedWords));
-                        wordLearning.displayLearnedWords(); 
-                    };
-                    wordLearning.learnedWordsListEl.appendChild(wordItem);
-                });
-            },
-            displayBookmarkedWords: () => {
-                wordLearning.cardWrapper.classList.add('hidden');
-                screens.learnedWordsListScreen.classList.add('hidden'); 
-                screens.bookmarkedWordsListScreen.classList.remove('hidden');
-                wordLearning.bookmarkedWordsListEl.innerHTML = '';
-                if (bookmarkedWords.length === 0) {
-                    wordLearning.bookmarkedWordsListEl.innerHTML = '<p class="text-slate-600 text-center font-persian">هنوز کلمه‌ای بوکمارک نکرده‌اید.</p>';
-                    return;
-                }
-                bookmarkedWords.forEach(word => {
-                    const wordItem = document.createElement('div');
-                    wordItem.className = 'bg-white/70 backdrop-blur-md rounded-lg p-3 flex items-center justify-between shadow-sm';
-                    wordItem.innerHTML = `
-                        <div>
-                            <p class="font-semibold text-lg">${word.word}</p>
-                            <p class="text-slate-700">${word.translation}</p>
-                            <p class="persian-text font-persian text-slate-500 text-sm mt-1">${word.persian}</p>
-                        </div>
-                        <button class="voice-btn text-slate-500 p-1 flex-shrink-0 active:scale-95 transition-transform">${speakerIconSvg}</button>
-                        <button class="remove-bookmarked-word-btn text-red-500 p-1 flex-shrink-0 active:scale-95 transition-transform" data-word="${word.word}">
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        </button>
-                    `;
-                    wordItem.querySelector('.voice-btn').onclick = (e) => { e.stopPropagation(); speak(word.word, e.currentTarget); };
-                    wordItem.querySelector('.remove-bookmarked-word-btn').onclick = (e) => {
-                        const wordToRemove = e.currentTarget.dataset.word;
-                        bookmarkedWords = bookmarkedWords.filter(bw => bw.word !== wordToRemove);
-                        localStorage.setItem('bookmarkedWords', JSON.stringify(bookmarkedWords));
-                        wordLearning.displayBookmarkedWords(); 
-                    };
-                    wordLearning.bookmarkedWordsListEl.appendChild(wordItem);
-                });
-            }
-        };
-
-        // Modal Module
-        const aboutModal = {
-            el: document.getElementById('about-modal'),
-            btn: document.getElementById('about-btn'),
-            closeBtn: document.getElementById('close-modal-btn'),
-            backdrop: document.getElementById('modal-backdrop'),
-            open: () => aboutModal.el.classList.remove('hidden'),
-            close: () => aboutModal.el.classList.add('hidden'),
-            init: () => {
-                aboutModal.btn.addEventListener('click', aboutModal.open);
-                aboutModal.closeBtn.addEventListener('click', aboutModal.close);
-                aboutModal.backdrop.addEventListener('click', aboutModal.close);
-            }
-        };
-        
-        // App Initialization
-        document.addEventListener('DOMContentLoaded', () => {
-            const errorContainer = document.getElementById('error-container');
-            if (typeof appData === 'undefined' || !Array.isArray(appData) || appData.length === 0) {
-                errorContainer.textContent = 'Error: Could not load quiz data from en2.js.';
-                errorContainer.classList.remove('hidden');
-                document.getElementById('home-screen').classList.add('hidden');
-                return;
-            }
-            if (typeof appWords === 'undefined' || !Array.isArray(appWords) || appWords.length === 0) {
-                errorContainer.textContent = 'Error: Could not load word data from words.js.';
-                errorContainer.classList.remove('hidden');
-                document.getElementById('home-screen').classList.add('hidden');
-                return;
-            }
-
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.onclick = () => {
-                if (btn.dataset.mode === 'quiz') {
-                    quiz.init();
-                } else if (btn.dataset.mode === 'learning') {
-                    learning.init();
-                } else if (btn.dataset.mode === 'word-learning') {
-                    wordLearning.init();
-                }
-            });
-            document.querySelectorAll('.home-btn').forEach(btn => btn.onclick = () => showScreen('home'));
+        if (!frenchVoice) {
+            console.warn("No French voice found. Speech synthesis will use the default voice.");
+        }
+    }
+    
+    function getPhoneticCorrection(text) {
+        return text.replace(/ça/g, 'sa');
+    }
+    
+    function speak(text) {
+        if (synth.speaking) {
+            synth.cancel();
+        }
+        if (text) {
+            const correctedText = getPhoneticCorrection(text);
+            const utterThis = new SpeechSynthesisUtterance(correctedText);
             
-            // Quiz event listeners
-            quiz.nextBtn.addEventListener('click', quiz.next);
-            quiz.prevBtn.addEventListener('click', quiz.prev); // New
-            quiz.revealBtn.addEventListener('click', quiz.reveal);
-            document.getElementById('start-new-quiz-btn').addEventListener('click', () => quiz.init(true));
-            quiz.learnedBtn.addEventListener('click', quiz.markAsLearned);
-            quiz.bookmarkBtn.addEventListener('click', quiz.toggleBookmark);
-            quiz.showLearnedQuizBtn.addEventListener('click', quiz.displayLearnedQuizItems);
-            quiz.showBookmarkedQuizBtn.addEventListener('click', quiz.displayBookmarkedQuizItems);
-            quiz.backToQuizFromLearnedBtn.addEventListener('click', () => quiz.init(false));
-            quiz.backToQuizFromBookmarkBtn.addEventListener('click', () => quiz.init(false));
+            if (!frenchVoice) {
+                loadVoices();
+            }
             
-            // Word Learning event listeners
-            wordLearning.nextBtn.addEventListener('click', wordLearning.next);
-            wordLearning.prevBtn.addEventListener('click', wordLearning.prev); // New
-            wordLearning.revealBtn.addEventListener('click', wordLearning.reveal);
-            wordLearning.learnedBtn.addEventListener('click', wordLearning.markAsLearned);
-            wordLearning.bookmarkBtn.addEventListener('click', wordLearning.toggleBookmark);
-            wordLearning.showLearnedWordsBtn.addEventListener('click', wordLearning.displayLearnedWords);
-            wordLearning.showBookmarkedWordsBtn.addEventListener('click', wordLearning.displayBookmarkedWords);
-            wordLearning.backToWordLearningBtn.addEventListener('click', () => wordLearning.init(false)); 
-            wordLearning.backToWordLearningFromBookmarkBtn.addEventListener('click', () => wordLearning.init(false));
+            utterThis.voice = frenchVoice;
+            utterThis.lang = 'fr-FR';
+            utterThis.pitch = 1.0;
+            utterThis.rate = 0.95;
+            
+            utterThis.onerror = function (event) {
+                console.error('SpeechSynthesisUtterance.onerror', event);
+            };
 
-            aboutModal.init();
-            showScreen('home'); 
+            synth.speak(utterThis);
+        }
+    }
+
+    function updateCounters() {
+        totalWordsCounterEl.textContent = `همه (${toPersianNumber(allWords.length)})`;
+        bookmarkedWordsCounterEl.textContent = `نشان شده (${toPersianNumber(bookmarkedWords.size)})`;
+        learnedWordsCounterEl.textContent = `یادگرفته (${toPersianNumber(learnedWords.size)})`;
+
+        totalQuestionsCounterEl.textContent = `همه (${toPersianNumber(allQuestions.length)})`;
+        bookmarkedQuestionsCounterEl.textContent = `نشان شده (${toPersianNumber(bookmarkedQuestions.size)})`;
+        learnedQuestionsCounterEl.textContent = `یادگرفته (${toPersianNumber(learnedQuestions.size)})`;
+        
+        const learnedPercentage = allWords.length > 0 ? (learnedWords.size / allWords.length) * 100 : 0;
+        progressBar.style.width = `${learnedPercentage}%`;
+    }
+
+    function renderCard(index) {
+        wordCard.classList.add('hidden');
+        questionCard.classList.add('hidden');
+        wordCard.classList.remove('flipped');
+        questionCard.classList.remove('flipped');
+
+        if (displayedContent.length === 0 || index < 0 || index >= displayedContent.length) {
+            cardContainer.classList.add('hidden');
+            noWordsMessage.classList.remove('hidden');
+            navCounterEl.textContent = `${toPersianNumber(0)} / ${toPersianNumber(0)}`;
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
+            return;
+        }
+        
+        cardContainer.classList.remove('hidden');
+        noWordsMessage.classList.add('hidden');
+
+        const currentItem = displayedContent[index];
+        
+        if (currentCategory === 'words') {
+            wordCard.classList.remove('hidden');
+            cardContainer.style.height = WORD_CARD_HEIGHT; // Set initial height for word card
+            wordEl.textContent = currentItem.word;
+            wordCardCounterEl.textContent = `${toPersianNumber(index + 1)} / ${toPersianNumber(displayedContent.length)}`;
+
+            translationEnglishEl.textContent = currentItem.translation_english;
+            persianEl.textContent = currentItem.persian;
+            pronunciationIpaEl.textContent = currentItem.pronunciation_ipa;
+            pronunciationEnglishEl.textContent = currentItem.pronunciation_english;
+            pronunciationPersianEl.textContent = currentItem.pronunciation_persian;
+            sampleSentenceEl.textContent = currentItem.sample_sentence;
+            sentenceTranslationEnglishEl.textContent = currentItem.sentence_translation_english;
+            sentencePersianEl.textContent = currentItem.sentence_persian;
+            sentencePronunciationIpaEl.textContent = currentItem.sentence_pronunciation_ipa || '';
+            sentencePronunciationEnglishEl.textContent = currentItem.sentence_pronunciation_english || '';
+            sentencePronunciationPersianEl.textContent = currentItem.sentence_pronunciation_persian || '';
+
+            updateBookmarkButton(currentItem, bookmarkWordBtn, bookmarkedWords);
+            updateLearnedButton(currentItem, learnedWordBtn, learnedWords);
+
+        } else if (currentCategory === 'questions') {
+            questionCard.classList.remove('hidden');
+            cardContainer.style.height = QUESTION_CARD_INITIAL_HEIGHT; // Set initial height for question card
+            frenchQuestionEl.textContent = currentItem.french_question;
+            questionTopicEl.textContent = currentItem.topic + (currentItem.role ? ` (${currentItem.role})` : '');
+            questionCardCounterEl.textContent = `${toPersianNumber(index + 1)} / ${toPersianNumber(displayedContent.length)}`;
+
+            questionTranslationEnglishEl.textContent = currentItem.question_translation_english;
+            questionPersianEl.textContent = currentItem.question_translation_persian;
+            questionPronunciationIpaEl.textContent = currentItem.question_pronunciation_ipa;
+            questionPronunciationEnglishEl.textContent = currentItem.question_pronunciation_english;
+            questionPronunciationPersianEl.textContent = currentItem.question_pronunciation_persian;
+
+            answerFormalFrenchEl.textContent = currentItem.french_answerformal;
+            answerFormalTranslationEnglishEl.textContent = currentItem.answerformal_translation_english;
+            answerFormalPersianEl.textContent = currentItem.answerformal_translation_persian;
+            answerFormalPronunciationIpaEl.textContent = currentItem.answerformal_pronunciation_ipa;
+            answerFormalPronunciationEnglishEl.textContent = currentItem.answerformal_pronunciation_english;
+            answerFormalPronunciationPersianEl.textContent = currentItem.answerformal_pronunciation_persian;
+
+            answerInformalFrenchEl.textContent = currentItem.french_answerinformal;
+            answerInformalTranslationEnglishEl.textContent = currentItem.answerinformal_translation_english;
+            answerInformalPersianEl.textContent = currentItem.answerinformal_translation_persian;
+            answerInformalPronunciationIpaEl.textContent = currentItem.answerinformal_pronunciation_ipa;
+            answerInformalPronunciationEnglishEl.textContent = currentItem.answerinformal_pronunciation_english;
+            answerInformalPronunciationPersianEl.textContent = currentItem.answerinformal_pronunciation_persian;
+
+            updateBookmarkButton(currentItem, bookmarkQuestionBtn, bookmarkedQuestions, 'french_question');
+            updateLearnedButton(currentItem, learnedQuestionBtn, learnedQuestions, 'french_question');
+        }
+        
+        updateNavButtons();
+        navCounterEl.textContent = `${toPersianNumber(index + 1)} / ${toPersianNumber(displayedContent.length)}`;
+    }
+    
+    function goToNextCard() {
+        if (currentIndex < displayedContent.length - 1) {
+            currentIndex++;
+            renderCard(currentIndex);
+        }
+    }
+    
+    function goToPrevCard() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            renderCard(currentIndex);
+        }
+    }
+
+    function updateBookmarkButton(item, buttonElement, set, key = 'word') {
+        const icon = buttonElement.querySelector('i');
+        const itemId = item[key];
+        if (item && set.has(itemId)) {
+            buttonElement.classList.add('text-indigo-500');
+            icon.setAttribute('fill', 'currentColor');
+        } else {
+            buttonElement.classList.remove('text-indigo-500');
+            icon.setAttribute('fill', 'none');
+        }
+    }
+
+    function updateLearnedButton(item, buttonElement, set, key = 'word') {
+        const icon = buttonElement.querySelector('i');
+        const itemId = item[key];
+        if (item && set.has(itemId)) {
+            buttonElement.classList.add('text-green-500');
+            icon.setAttribute('fill', 'currentColor');
+        } else {
+            buttonElement.classList.remove('text-green-500');
+            icon.setAttribute('fill', 'none');
+        }
+    }
+
+    function updateNavButtons() {
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex >= displayedContent.length - 1;
+    }
+    
+    function applyContentFilter() {
+        if (currentCategory === 'words') {
+            switch(currentFilter) {
+                case 'bookmarked':
+                    displayedContent = allWords.filter(w => bookmarkedWords.has(w.word));
+                    break;
+                case 'learned':
+                    displayedContent = allWords.filter(w => learnedWords.has(w.word));
+                    break;
+                default: // 'all'
+                    displayedContent = [...allWords];
+                    break;
+            }
+        } else { // currentCategory === 'questions'
+            switch(currentFilter) {
+                case 'bookmarked':
+                    displayedContent = allQuestions.filter(q => bookmarkedQuestions.has(q.french_question));
+                    break;
+                case 'learned':
+                    displayedContent = allQuestions.filter(q => learnedQuestions.has(q.french_question));
+                    break;
+                default: // 'all'
+                    displayedContent = [...allQuestions];
+                    break;
+            }
+        }
+
+        if (currentIndex >= displayedContent.length) {
+            currentIndex = Math.max(0, displayedContent.length - 1);
+        }
+        renderCard(currentIndex);
+    }
+    
+    function updateActiveNavButton() {
+        // Reset all category buttons (in footer)
+        [showWordsCategoryBtn, showQuestionsCategoryBtn].forEach(btn => {
+            btn.classList.remove('nav-btn-active', 'text-white');
+            btn.classList.add('hover:bg-gray-200', 'dark:hover:bg-gray-700');
         });
+
+        // Reset all filter buttons (in header)
+        const allFilterButtons = [
+            showAllWordsBtn, showBookmarkedWordsBtn, showLearnedWordsBtn,
+            showAllQuestionsBtn, showBookmarkedQuestionsBtn, showLearnedQuestionsBtn
+        ];
+        allFilterButtons.forEach(btn => {
+            btn.classList.remove('nav-btn-active', 'text-white');
+            btn.classList.add('hover:bg-gray-200', 'dark:hover:bg-gray-700');
+        });
+
+
+        if (currentCategory === 'words') {
+            showWordsCategoryBtn.classList.add('nav-btn-active', 'text-white');
+            showWordsCategoryBtn.classList.remove('hover:bg-gray-200', 'dark:hover:bg-gray-700');
+            
+            wordFiltersDiv.classList.remove('hidden');
+            questionFiltersDiv.classList.add('hidden');
+
+            const activeWordFilterBtn = {
+                'all': showAllWordsBtn,
+                'bookmarked': showBookmarkedWordsBtn,
+                'learned': showLearnedWordsBtn
+            }[currentFilter];
+            activeWordFilterBtn.classList.add('nav-btn-active', 'text-white');
+            activeWordFilterBtn.classList.remove('hover:bg-gray-200', 'dark:hover:bg-gray-700');
+
+        } else if (currentCategory === 'questions') {
+            showQuestionsCategoryBtn.classList.add('nav-btn-active', 'text-white');
+            showQuestionsCategoryBtn.classList.remove('hover:bg-gray-200', 'dark:hover:bg-gray-700');
+            
+            wordFiltersDiv.classList.add('hidden');
+            questionFiltersDiv.classList.remove('hidden');
+
+            const activeQuestionFilterBtn = {
+                'all': showAllQuestionsBtn,
+                'bookmarked': showBookmarkedQuestionsBtn,
+                'learned': showLearnedQuestionsBtn
+            }[currentFilter];
+            activeQuestionFilterBtn.classList.add('nav-btn-active', 'text-white');
+            activeQuestionFilterBtn.classList.remove('hover:bg-gray-200', 'dark:hover:bg-gray-700');
+        }
+    }
+    
+    function saveState() {
+        localStorage.setItem('bookmarkedWords', JSON.stringify(Array.from(bookmarkedWords)));
+        localStorage.setItem('learnedWords', JSON.stringify(Array.from(learnedWords)));
+        localStorage.setItem('bookmarkedQuestions', JSON.stringify(Array.from(bookmarkedQuestions)));
+        localStorage.setItem('learnedQuestions', JSON.stringify(Array.from(learnedQuestions)));
+    }
+
+    // --- Event Listeners ---
+    
+    // Unified reveal/unreveal logic
+    revealWordBtn.addEventListener('click', () => {
+        cardContainer.style.height = '40rem'; // Fixed height for word card reveal
+        setTimeout(() => wordCard.classList.add('flipped'), 300); // Wait for height transition
+    });
+    unrevealWordBtn.addEventListener('click', () => {
+        wordCard.classList.remove('flipped');
+        setTimeout(() => cardContainer.style.height = WORD_CARD_HEIGHT, 300); // Shrink after flip
+    });
+
+    revealQuestionBtn.addEventListener('click', () => {
+        const tempCard = questionCard.cloneNode(true);
+        tempCard.style.visibility = 'hidden';
+        tempCard.style.position = 'absolute';
+        tempCard.style.top = '0';
+        tempCard.style.left = '0';
+        tempCard.style.height = 'auto'; // Let content define height
+        tempCard.classList.remove('hidden'); // Ensure it's visible for calculation
+
+        // Temporarily put the back content into temp card's back
+        const tempBackContent = tempCard.querySelector('#question-back-content');
+        const currentBackContentHtml = questionBackContent.innerHTML; // Get current content
+        tempBackContent.innerHTML = currentBackContentHtml; // Put it in temp element
+
+        document.body.appendChild(tempCard);
+        const desiredHeight = tempCard.scrollHeight; // Get calculated height of content
+        document.body.removeChild(tempCard);
+
+        // Add padding and header/footer height approximation
+        const finalHeight = desiredHeight + PADDING_FOR_CARD_CONTENT + HEADER_HEIGHT + FOOTER_HEIGHT; // Add approximate padding and header/footer space
+
+        cardContainer.style.height = `${Math.min(window.innerHeight * 0.9, finalHeight)}px`; // Ensure it doesn't exceed 90% of viewport
+        
+        setTimeout(() => questionCard.classList.add('flipped'), 300); // Wait for height transition
+    });
+
+    unrevealQuestionBtn.addEventListener('click', () => {
+        questionCard.classList.remove('flipped');
+        setTimeout(() => cardContainer.style.height = QUESTION_CARD_INITIAL_HEIGHT, 300); // Shrink after flip
+    });
+
+
+    nextBtn.addEventListener('click', goToNextCard);
+    prevBtn.addEventListener('click', goToPrevCard);
+
+    // Word Bookmark/Learned
+    bookmarkWordBtn.addEventListener('click', () => {
+        const currentWordObject = displayedContent[currentIndex];
+        if (!currentWordObject) return;
+        const word = currentWordObject.word;
+        if (bookmarkedWords.has(word)) {
+            bookmarkedWords.delete(word);
+        } else {
+            bookmarkedWords.add(word);
+        }
+        saveState();
+        updateCounters();
+        if (currentFilter === 'bookmarked') {
+            applyContentFilter();
+        } else {
+            updateBookmarkButton(currentWordObject, bookmarkWordBtn, bookmarkedWords);
+        }
+    });
+
+    learnedWordBtn.addEventListener('click', () => {
+        const currentWordObject = displayedContent[currentIndex];
+        if (!currentWordObject) return;
+        const word = currentWordObject.word;
+        if (learnedWords.has(word)) {
+            learnedWords.delete(word);
+        } else {
+            learnedWords.add(word);
+        }
+        saveState();
+        updateCounters();
+        if (currentFilter === 'learned') {
+            applyContentFilter();
+        } else {
+            updateLearnedButton(currentWordObject, learnedWordBtn, learnedWords);
+        }
+    });
+
+    // Question Bookmark/Learned
+    bookmarkQuestionBtn.addEventListener('click', () => {
+        const currentQuestionObject = displayedContent[currentIndex];
+        if (!currentQuestionObject) return;
+        const questionText = currentQuestionObject.french_question;
+        if (bookmarkedQuestions.has(questionText)) {
+            bookmarkedQuestions.delete(questionText);
+        } else {
+            bookmarkedQuestions.add(questionText);
+        }
+        saveState();
+        updateCounters();
+        if (currentFilter === 'bookmarked') {
+            applyContentFilter();
+        } else {
+            updateBookmarkButton(currentQuestionObject, bookmarkQuestionBtn, bookmarkedQuestions, 'french_question');
+        }
+    });
+
+    learnedQuestionBtn.addEventListener('click', () => {
+        const currentQuestionObject = displayedContent[currentIndex];
+        if (!currentQuestionObject) return;
+        const questionText = currentQuestionObject.french_question;
+        if (learnedQuestions.has(questionText)) {
+            learnedQuestions.delete(questionText);
+        } else {
+            learnedQuestions.add(questionText);
+        }
+        saveState();
+        updateCounters();
+        if (currentFilter === 'learned') {
+            applyContentFilter();
+        } else {
+            updateLearnedButton(currentQuestionObject, learnedQuestionBtn, learnedQuestions, 'french_question');
+        }
+    });
+
+    // Speech for Words
+    const speakCurrentWord = () => speak(displayedContent[currentIndex]?.word);
+    speakPronunciationBtn.addEventListener('click', speakCurrentWord);
+    speakWordFrontBtn.addEventListener('click', speakCurrentWord);
+    speakSentenceBtn.addEventListener('click', () => speak(displayedContent[currentIndex]?.sample_sentence));
+    
+    // Speech for Questions and Answers
+    speakQuestionFrontBtn.addEventListener('click', () => speak(displayedContent[currentIndex]?.french_question));
+    speakQuestionBackBtn.addEventListener('click', () => speak(displayedContent[currentIndex]?.french_question));
+    speakAnswerFormalBtn.addEventListener('click', () => speak(displayedContent[currentIndex]?.french_answerformal));
+    speakAnswerInformalBtn.addEventListener('click', () => speak(displayedContent[currentIndex]?.french_answerinformal));
+
+
+    // Category Navigation (now in footer)
+    showWordsCategoryBtn.addEventListener('click', () => { 
+        currentCategory = 'words'; 
+        currentFilter = 'all'; 
+        currentIndex = 0; 
+        updateActiveNavButton(); 
+        applyContentFilter(); 
+    });
+    showQuestionsCategoryBtn.addEventListener('click', () => { 
+        currentCategory = 'questions'; 
+        currentFilter = 'all';
+        currentIndex = 0; 
+        updateActiveNavButton(); 
+        applyContentFilter(); 
+    });
+
+    // Word Filters
+    showAllWordsBtn.addEventListener('click', () => { currentFilter = 'all'; currentIndex = 0; updateActiveNavButton(); applyContentFilter(); });
+    showBookmarkedWordsBtn.addEventListener('click', () => { currentFilter = 'bookmarked'; currentIndex = 0; updateActiveNavButton(); applyContentFilter(); });
+    showLearnedWordsBtn.addEventListener('click', () => { currentFilter = 'learned'; currentIndex = 0; updateActiveNavButton(); applyContentFilter(); });
+
+    // Question Filters
+    showAllQuestionsBtn.addEventListener('click', () => { currentFilter = 'all'; currentIndex = 0; updateActiveNavButton(); applyContentFilter(); });
+    showBookmarkedQuestionsBtn.addEventListener('click', () => { currentFilter = 'bookmarked'; currentIndex = 0; updateActiveNavButton(); applyContentFilter(); });
+    showLearnedQuestionsBtn.addEventListener('click', () => { currentFilter = 'learned'; currentIndex = 0; updateActiveNavButton(); applyContentFilter(); });
+
+    darkModeToggle.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    });
+
+    const openModal = () => {
+        aboutModal.classList.remove('opacity-0', 'pointer-events-none');
+        modalContent.classList.remove('scale-95');
+    };
+    const closeModal = () => {
+        aboutModal.classList.add('opacity-0');
+        modalContent.classList.add('scale-95');
+        setTimeout(() => aboutModal.classList.add('pointer-events-none'), 250);
+    };
+
+    infoBtn.addEventListener('click', openModal);
+    closeModalBtn.addEventListener('click', closeModal);
+    aboutModal.addEventListener('click', (e) => {
+        if (e.target === aboutModal) closeModal();
+    });
+
+    // --- Initialization ---
+    function initializeApp() {
+        if (typeof words !== 'undefined' && Array.isArray(words)) {
+            allWords = words;
+        } else {
+            console.error("The 'words' variable is not defined or not an array. Please check your french.js file.");
+            wordCard.innerHTML = `<div class="persian-ui text-center text-red-500 p-4 bg-red-100 dark:bg-red-900/50 rounded-lg">خطا: بارگذاری کلمات از french.js ممکن نیست.</div>`;
+            questionCard.classList.add('hidden');
+            return;
+        }
+
+        if (typeof frenchQuestions !== 'undefined' && Array.isArray(frenchQuestions)) {
+            allQuestions = frenchQuestions;
+        } else {
+            console.warn("The 'frenchQuestions' variable is not defined or not an array. French Questions section will be empty.");
+        }
+        
+        if (synth.onvoiceschanged !== undefined) {
+            synth.onvoiceschanged = loadVoices;
+        }
+        loadVoices();
+        if (voices.length === 0) {
+            const voiceInterval = setInterval(() => {
+                loadVoices();
+                if (voices.length > 0) {
+                    clearInterval(voiceInterval);
+                }
+            }, 250);
+        }
+
+        feather.replace();
+        updateCounters();
+        currentCategory = 'words';
+        currentFilter = 'all';
+        updateActiveNavButton();
+        applyContentFilter();
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(err => console.log('ServiceWorker registration failed: ', err));
+            });
+        }
+    }
+
+    initializeApp();
+});
     </script>
 </body>
 </html>

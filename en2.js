@@ -1,5 +1,648 @@
 const appData = [
 
+  {
+    "topic": "General Greeting",
+    "role": "Colleague",
+    "q": "Good morning! How are you?",
+    "q_persien": "صبح بخیر! حالت چطوره؟",
+    "a": ["Good morning! I’m well, thanks. How about you?", "Hello, I’m doing fine, thank you for asking."],
+    "a_persien": ["صبح بخیر! خوبم، ممنون. تو چطوری؟", "سلام، خوبم، ممنون که پرسیدی."]
+  },
+  {
+    "topic": "General Greeting",
+    "role": "Colleague",
+    "q": "Did you have a good weekend?",
+    "q_persien": "آخر هفته خوبی داشتی؟",
+    "a": ["Yes, it was great. How was yours?", "Yes, thank you. I hope yours was nice as well."],
+    "a_persien": ["بله، عالی بود. مال تو چطور بود؟", "بله، ممنون. امیدوارم مال شما هم خوب بوده باشه."]
+  },
+  {
+    "topic": "General Request",
+    "role": "Manager",
+    "q": "Can you send me the report by end of day?",
+    "q_persien": "میتونی تا آخر امروز گزارش رو برام بفرستی؟",
+    "a": ["Sure, I’ll send it over soon.", "Of course, I will make sure to send it by EOD."],
+    "a_persien": ["حتماً، به زودی می‌فرستم.", "حتماً، تا پایان امروز ارسال می‌کنم."]
+  },
+  {
+    "topic": "General Request",
+    "role": "Colleague",
+    "q": "Can you help me with this task?",
+    "q_persien": "میتونی تو این کار کمکم کنی؟",
+    "a": ["Of course, let’s do it together.", "Yes, I’d be happy to help you."],
+    "a_persien": ["حتماً، با هم انجامش بدیم.", "بله، خوشحال میشم کمکت کنم."]
+  },
+  {
+    "topic": "Meeting",
+    "role": "Manager",
+    "q": "Are you available for a meeting this afternoon?",
+    "q_persien": "امروز بعدازظهر برای جلسه وقت داری؟",
+    "a": ["Yes, that works for me.", "Yes, I am available this afternoon."],
+    "a_persien": ["بله، برام اوکیه.", "بله، امروز بعدازظهر وقتم آزاده."]
+  },
+  {
+    "topic": "Meeting",
+    "role": "Colleague",
+    "q": "Can we reschedule our meeting?",
+    "q_persien": "میشه جلسه‌مون رو جابجا کنیم؟",
+    "a": ["Sure, what time works for you?", "Of course, let me know your preferred time."],
+    "a_persien": ["حتماً، چه زمانی برات مناسبه؟", "حتماً، زمان مورد نظرت رو بهم بگو."]
+  },
+  {
+    "topic": "Feedback",
+    "role": "Manager",
+    "q": "Can I give you some feedback?",
+    "q_persien": "می‌تونم کمی بازخورد بهت بدم؟",
+    "a": ["Sure, I’d appreciate it.", "Yes, I’m open to feedback."],
+    "a_persien": ["حتماً، ممنون میشم.", "بله، خوشحال میشم بازخورد بگیرم."]
+  },
+  {
+    "topic": "Feedback",
+    "role": "Colleague",
+    "q": "Do you want any feedback on your work?",
+    "q_persien": "دوست داری روی کارت بازخورد بدم؟",
+    "a": ["Yes, that would help me improve.", "Yes, please share your thoughts."],
+    "a_persien": ["بله، کمکم می‌کنه بهتر بشم.", "بله، لطفاً نظرت رو بگو."]
+  },
+  {
+    "topic": "Task Delegation",
+    "role": "Manager",
+    "q": "Can you handle this project?",
+    "q_persien": "می‌تونی این پروژه رو انجام بدی؟",
+    "a": ["Yes, I’ll take care of it.", "Yes, I can manage this project."],
+    "a_persien": ["بله، انجامش میدم.", "بله، می‌تونم این پروژه رو مدیریت کنم."]
+  },
+  {
+    "topic": "Task Delegation",
+    "role": "Colleague",
+    "q": "Do you need help with your workload?",
+    "q_persien": "برای حجم کارت کمک لازم داری؟",
+    "a": ["Yes, some help would be great.", "Yes, I could use some assistance."],
+    "a_persien": ["بله، کمی کمک خیلی خوبه.", "بله، به کمی کمک نیاز دارم."]
+  },
+  {
+    "topic": "Lunch Break",
+    "role": "Colleague",
+    "q": "Do you want to grab lunch together?",
+    "q_persien": "می‌خوای با هم بریم ناهار؟",
+    "a": ["Sure, let’s go!", "Yes, I’d like that."],
+    "a_persien": ["حتماً، بریم!", "بله، خوشحال میشم."]
+  },
+  {
+    "topic": "Lunch Break",
+    "role": "Colleague",
+    "q": "Where do you usually have lunch?",
+    "q_persien": "معمولاً کجا ناهار می‌خوری؟",
+    "a": ["Usually at the café nearby.", "I often eat at the office cafeteria."],
+    "a_persien": ["معمولاً تو کافه نزدیک شرکت.", "اغلب توی سلف شرکت غذا می‌خورم."]
+  },
+  {
+    "topic": "Coffee Break",
+    "role": "Colleague",
+    "q": "Would you like some coffee?",
+    "q_persien": "قهوه می‌خوای؟",
+    "a": ["Yes, I’d love some!", "Yes, coffee would be great, thanks."],
+    "a_persien": ["بله، خیلی دوست دارم!", "بله، قهوه خیلی خوبه، مرسی."]
+  },
+  {
+    "topic": "Coffee Break",
+    "role": "Colleague",
+    "q": "Where’s the coffee machine?",
+    "q_persien": "دستگاه قهوه کجاست؟",
+    "a": ["It’s in the kitchen.", "The coffee machine is by the kitchen area."],
+    "a_persien": ["توی آشپزخونه است.", "دستگاه قهوه کنار آشپزخونه است."]
+  },
+  {
+    "topic": "IT Support",
+    "role": "Employee",
+    "q": "My computer isn’t working, can you help?",
+    "q_persien": "کامپیوترم کار نمی‌کنه، می‌تونی کمکم کنی؟",
+    "a": ["Sure, let me take a look.", "Yes, I will check it right away."],
+    "a_persien": ["حتماً، یه نگاه بندازم.", "بله، الان بررسیش می‌کنم."]
+  },
+  {
+    "topic": "IT Support",
+    "role": "IT",
+    "q": "Have you tried restarting your device?",
+    "q_persien": "دستگاه رو ری‌استارت کردی؟",
+    "a": ["Not yet, I’ll try that now.", "No, I’ll restart and see if it helps."],
+    "a_persien": ["نه، الان امتحان می‌کنم.", "نه، ری‌استارت می‌کنم ببینم درست میشه یا نه."]
+  },
+  {
+    "topic": "Remote Work",
+    "role": "Manager",
+    "q": "Are you working from home today?",
+    "q_persien": "امروز داری دورکاری می‌کنی؟",
+    "a": ["Yes, I’m working remotely.", "Yes, I’m working from home today."],
+    "a_persien": ["بله، دارم از خونه کار می‌کنم.", "بله، امروز دورکاری می‌کنم."]
+  },
+  {
+    "topic": "Remote Work",
+    "role": "Colleague",
+    "q": "How do you find working from home?",
+    "q_persien": "دورکاری برات چطوره؟",
+    "a": ["I like it, but sometimes miss the office.", "It’s good, but I miss seeing everyone in person."],
+    "a_persien": ["دوستش دارم ولی گاهی دلم برای شرکت تنگ میشه.", "خوبه، فقط دلم برای دیدن همه تنگ میشه."]
+  },
+  {
+    "topic": "Project Status",
+    "role": "Manager",
+    "q": "What’s the status of your project?",
+    "q_persien": "وضعیت پروژه‌ات چطوره؟",
+    "a": ["It’s going well and on track.", "The project is progressing as planned."],
+    "a_persien": ["خوب پیش میره و طبق برنامه است.", "پروژه طبق برنامه داره پیش میره."]
+  },
+  {
+    "topic": "Project Status",
+    "role": "Colleague",
+    "q": "Do you need any support for your project?",
+    "q_persien": "برای پروژه‌ات کمکی لازم داری؟",
+    "a": ["Thanks, I’m okay for now.", "No, everything is under control, but thanks!"],
+    "a_persien": ["ممنون، فعلاً همه چیز خوبه.", "نه، همه چی تحت کنترله، مرسی!"]
+  },
+  {
+    "topic": "Out of Office",
+    "role": "Manager",
+    "q": "Will you be out of office tomorrow?",
+    "q_persien": "فردا سر کار نمیای؟",
+    "a": ["Yes, I have a personal day off.", "Yes, I’ll be out, but reachable by email."],
+    "a_persien": ["بله، مرخصی شخصی دارم.", "بله، سر کار نمیام ولی با ایمیل در دسترسم."]
+  },
+  {
+    "topic": "Out of Office",
+    "role": "Employee",
+    "q": "Who should I contact while you’re away?",
+    "q_persien": "وقتی نباشی باید با کی تماس بگیرم؟",
+    "a": ["Please contact Sarah if you need anything.", "You can reach out to my colleague, Sarah."],
+    "a_persien": ["اگه چیزی لازم داشتی با سارا تماس بگیر.", "می‌تونی با همکارم سارا تماس بگیری."]
+  },
+  {
+    "topic": "Pay & Benefits",
+    "role": "Employee",
+    "q": "When is the salary paid?",
+    "q_persien": "حقوق چه روزی پرداخت میشه؟",
+    "a": ["Usually on the last day of the month.", "Salaries are paid at the end of each month."],
+    "a_persien": ["معمولاً آخر ماه.", "حقوق‌ها آخر هر ماه پرداخت میشه."]
+  },
+  {
+    "topic": "Pay & Benefits",
+    "role": "HR",
+    "q": "How do I apply for health benefits?",
+    "q_persien": "چطور باید برای بیمه درمانی اقدام کنم؟",
+    "a": ["You can apply online through the HR portal.", "Fill out the form on our HR website."],
+    "a_persien": ["می‌تونی آنلاین از طریق پورتال منابع انسانی اقدام کنی.", "فرم رو تو سایت منابع انسانی پر کن."]
+  },
+  {
+    "topic": "Teamwork",
+    "role": "Colleague",
+    "q": "Would you like to work together on this?",
+    "q_persien": "دوست داری روی این با هم کار کنیم؟",
+    "a": ["Yes, teamwork makes it easier.", "Yes, I’d enjoy collaborating on this."],
+    "a_persien": ["بله، با همکاری راحت‌تره.", "بله، خوشحال میشم با هم کار کنیم."]
+  },
+  {
+    "topic": "Teamwork",
+    "role": "Colleague",
+    "q": "Can we have a brainstorming session?",
+    "q_persien": "میشه یه جلسه طوفان فکری داشته باشیم؟",
+    "a": ["Great idea, let’s set a time.", "Yes, let’s schedule a brainstorming meeting."],
+    "a_persien": ["عالیه، یک زمان مشخص کنیم.", "بله، یه جلسه برای طوفان فکری بگذاریم."]
+  },
+  {
+    "topic": "Networking",
+    "role": "Colleague",
+    "q": "Can I connect with you on LinkedIn?",
+    "q_persien": "می‌تونم تو لینکدین باهات ارتباط بگیرم؟",
+    "a": ["Of course, I’ll send you my profile.", "Yes, feel free to add me."],
+    "a_persien": ["حتماً، پروفایلم رو می‌فرستم.", "بله، خوشحال میشم اَد کنی."]
+  },
+  {
+    "topic": "Networking",
+    "role": "Colleague",
+    "q": "Do you go to any professional events?",
+    "q_persien": "تو رویدادهای تخصصی شرکت می‌کنی؟",
+    "a": ["Yes, I try to attend when I can.", "Yes, I participate in industry events."],
+    "a_persien": ["بله، سعی می‌کنم برم.", "بله، تو رویدادهای صنعت شرکت می‌کنم."]
+  },
+  {
+    "topic": "Start-up Culture",
+    "role": "Colleague",
+    "q": "What do you like about working at a start-up?",
+    "q_persien": "چی باعث میشه کار کردن تو استارت‌آپ رو دوست داشته باشی؟",
+    "a": ["I love the fast pace and innovation.", "The creative and dynamic environment is great."],
+    "a_persien": ["عاشق سرعت و نوآوری هستم.", "محیط خلاق و پویاش خیلی خوبه."]
+  },
+  {
+    "topic": "Start-up Culture",
+    "role": "Colleague",
+    "q": "Do you feel your ideas are heard here?",
+    "q_persien": "اینجا حس می‌کنی ایده‌هات شنیده میشه؟",
+    "a": ["Yes, the team values everyone’s input.", "Yes, I feel my contributions are appreciated."],
+    "a_persien": ["بله، تیم به نظرات همه اهمیت میده.", "بله، فکر می‌کنم به کارم ارزش می‌دن."]
+  },
+  {
+    "topic": "Work-Life Balance",
+    "role": "Colleague",
+    "q": "How do you manage your work-life balance?",
+    "q_persien": "چطور تعادل کار و زندگی رو حفظ می‌کنی؟",
+    "a": ["I set clear boundaries after work.", "I prioritize my time outside work."],
+    "a_persien": ["بعد کار برای خودم مرز می‌گذارم.", "زمان بیرون از کار رو اولویت می‌دم."]
+  },
+  {
+    "topic": "Work-Life Balance",
+    "role": "Colleague",
+    "q": "Do you work overtime often?",
+    "q_persien": "اغلب اضافه‌کاری می‌کنی؟",
+    "a": ["Sometimes, but I try to avoid it.", "Not often, I value my free time."],
+    "a_persien": ["گاهی، اما سعی می‌کنم پرهیز کنم.", "نه زیاد، زمان آزادم برام مهمه."]
+  },
+  {
+    "topic": "Promotion",
+    "role": "Employee",
+    "q": "How can I get promoted here?",
+    "q_persien": "چطور می‌تونم اینجا ارتقا بگیرم؟",
+    "a": ["Focus on your goals and communicate with your manager.", "Deliver quality work and ask for feedback regularly."],
+    "a_persien": ["روی هدفت تمرکز کن و با مدیرت صحبت کن.", "کار با کیفیت ارائه بده و همیشه بازخورد بگیر."]
+  },
+  {
+    "topic": "Promotion",
+    "role": "Manager",
+    "q": "Are you interested in career growth opportunities?",
+    "q_persien": "به فرصت‌های رشد شغلی علاقه داری؟",
+    "a": ["Yes, I’m always looking to grow.", "Yes, I’d like to discuss my career path."],
+    "a_persien": ["بله، همیشه دنبال رشد هستم.", "بله، دوست دارم در مورد مسیر شغلیم صحبت کنم."]
+  },
+  {
+    "topic": "Leave",
+    "role": "Employee",
+    "q": "How do I request time off?",
+    "q_persien": "چطور باید مرخصی بگیرم؟",
+    "a": ["Submit your request in the HR system.", "Send an email to HR and your manager."],
+    "a_persien": ["در سیستم منابع انسانی درخواست بده.", "یه ایمیل به منابع انسانی و مدیرت بزن."]
+  },
+  {
+    "topic": "Leave",
+    "role": "Manager",
+    "q": "Is your leave request approved?",
+    "q_persien": "درخواست مرخصی‌ات تایید شده؟",
+    "a": ["Yes, HR confirmed it.", "Yes, I have the approval from HR."],
+    "a_persien": ["بله، منابع انسانی تایید کرد.", "بله، تایید منابع انسانی رو دارم."]
+  },
+  {
+    "topic": "Conflict",
+    "role": "Colleague",
+    "q": "How do you resolve conflicts at work?",
+    "q_persien": "چطور اختلافات کاری رو حل می‌کنی؟",
+    "a": ["I try to talk openly and find a solution.", "I discuss issues directly and look for compromise."],
+    "a_persien": ["سعی می‌کنم باز حرف بزنم و راه‌حل پیدا کنم.", "مستقیم مسائل رو مطرح می‌کنم و دنبال راه‌حل می‌گردم."]
+  },
+  {
+    "topic": "Conflict",
+    "role": "Manager",
+    "q": "Do you feel comfortable bringing up concerns?",
+    "q_persien": "راحتی نگرانی‌هات رو مطرح کنی؟",
+    "a": ["Yes, I feel comfortable sharing concerns.", "Yes, I know the team is supportive."],
+    "a_persien": ["بله، راحت نگرانی‌هام رو میگم.", "بله، می‌دونم تیم حمایتم می‌کنه."]
+  },
+  {
+    "topic": "Deadlines",
+    "role": "Manager",
+    "q": "Will you meet the project deadline?",
+    "q_persien": "به ددلاین پروژه می‌رسی؟",
+    "a": ["Yes, I’m on track for the deadline.", "Yes, everything is on schedule."],
+    "a_persien": ["بله، طبق برنامه هستم.", "بله، همه چیز طبق برنامه است."]
+  },
+  {
+    "topic": "Deadlines",
+    "role": "Employee",
+    "q": "Can I get an extension on the deadline?",
+    "q_persien": "میشه ددلاین رو تمدید کنم؟",
+    "a": ["Yes, let me know your new timeline.", "Yes, just update me on your progress."],
+    "a_persien": ["بله، زمان جدیدت رو اعلام کن.", "بله، فقط از وضعیتت خبر بده."]
+  },
+  {
+    "topic": "Appreciation",
+    "role": "Manager",
+    "q": "Great job on the last project!",
+    "q_persien": "کارت تو پروژه قبلی عالی بود!",
+    "a": ["Thank you, I appreciate it!", "Thanks, glad to hear that!"],
+    "a_persien": ["ممنون، لطف داری!", "مرسی، خوشحالم شنیدم!"]
+  },
+  {
+    "topic": "Appreciation",
+    "role": "Colleague",
+    "q": "Thanks for your help!",
+    "q_persien": "ممنون بابت کمکت!",
+    "a": ["No problem, anytime!", "You’re welcome, happy to help."],
+    "a_persien": ["خواهش می‌کنم، هر وقت خواستی!", "خواهش می‌کنم، خوشحال شدم."]
+  },
+[
+  {
+    "topic": "Introduction",
+    "role": "Colleague",
+    "q": "Let me introduce myself. I’m Alex from marketing.",
+    "q_persien": "اجازه بده خودمو معرفی کنم. من الکس از بخش بازاریابی هستم.",
+    "a": ["Nice to meet you, Alex!", "Pleasure to meet you, Alex."],
+    "a_persien": ["از آشنایی باهات خوشحالم، الکس!", "باعث افتخاره که با شما آشنا شدم، الکس."]
+  },
+  {
+    "topic": "Introduction",
+    "role": "Colleague",
+    "q": "What’s your role at the company?",
+    "q_persien": "سمتت تو شرکت چیه؟",
+    "a": ["I’m a software developer.", "I work as a software engineer here."],
+    "a_persien": ["من توسعه‌دهنده نرم‌افزارم.", "من به عنوان مهندس نرم‌افزار اینجا کار می‌کنم."]
+  },
+  {
+    "topic": "Office Tour",
+    "role": "Colleague",
+    "q": "Can I give you a quick tour of the office?",
+    "q_persien": "می‌خوای یه تور کوتاه از دفتر بهت نشون بدم؟",
+    "a": ["Yes, that would be great!", "Thank you, I’d appreciate that."],
+    "a_persien": ["بله، خیلی عالی میشه!", "ممنون، قدردانم."]
+  },
+  {
+    "topic": "Onboarding",
+    "role": "HR",
+    "q": "Did you receive the onboarding materials?",
+    "q_persien": "آیا بسته راه‌اندازی رو دریافت کردی؟",
+    "a": ["Yes, I got everything. Thanks!", "Yes, I’ve received all the materials."],
+    "a_persien": ["بله، همه چیز رو گرفتم. ممنون!", "بله، همه بسته‌ها رو دریافت کردم."]
+  },
+  {
+    "topic": "Company Info",
+    "role": "Colleague",
+    "q": "How long have you been with the company?",
+    "q_persien": "چند وقته اینجا کار می‌کنی؟",
+    "a": ["About two years now.", "I have been here for two years."],
+    "a_persien": ["حدود دو ساله.", "دو ساله اینجا هستم."]
+  },
+  {
+    "topic": "Company Info",
+    "role": "Colleague",
+    "q": "What do you like most about working here?",
+    "q_persien": "بیشتر از همه چی رو در اینجا دوست داری؟",
+    "a": ["I love the team spirit.", "The supportive environment is great."],
+    "a_persien": ["روحیه تیمی رو دوست دارم.", "محیط حمایتی خیلی خوبه."]
+  },
+  {
+    "topic": "Career",
+    "role": "Manager",
+    "q": "Where do you see yourself in five years?",
+    "q_persien": "پنج سال دیگه خودتو کجا می‌بینی؟",
+    "a": ["Hopefully in a senior role.", "I hope to be in a leadership position."],
+    "a_persien": ["امیدوارم تو یه سمت بالاتر.", "امیدوارم تو جایگاه مدیریتی باشم."]
+  },
+  {
+    "topic": "Career",
+    "role": "Manager",
+    "q": "Are you interested in learning new skills?",
+    "q_persien": "علاقه‌مندی مهارت جدید یاد بگیری؟",
+    "a": ["Yes, always up for learning!", "Yes, I am open to new learning opportunities."],
+    "a_persien": ["بله، همیشه دوست دارم یاد بگیرم!", "بله، همیشه آماده یادگیری مهارت‌های جدیدم."]
+  },
+  {
+    "topic": "Training",
+    "role": "HR",
+    "q": "Did you complete the safety training?",
+    "q_persien": "آیا آموزش ایمنی رو گذروندی؟",
+    "a": ["Yes, I finished it last week.", "Yes, I have completed the training."],
+    "a_persien": ["بله، هفته پیش تمومش کردم.", "بله، آموزش رو کامل گذروندم."]
+  },
+  {
+    "topic": "Training",
+    "role": "Manager",
+    "q": "Do you want to attend a workshop?",
+    "q_persien": "دوست داری در کارگاه آموزشی شرکت کنی؟",
+    "a": ["Yes, that sounds interesting.", "Yes, I would like to participate."],
+    "a_persien": ["بله، جالبه.", "بله، دوست دارم شرکت کنم."]
+  },
+  {
+    "topic": "Relocation",
+    "role": "HR",
+    "q": "Are you open to relocating for work?",
+    "q_persien": "حاضری برای کار به شهر دیگه منتقل شی؟",
+    "a": ["Yes, I’m open to relocation.", "Yes, I can consider relocation if needed."],
+    "a_persien": ["بله، مشکلی ندارم.", "بله، اگه لازم باشه، می‌تونم."]
+  },
+  {
+    "topic": "Relocation",
+    "role": "Manager",
+    "q": "How would you feel about working in a different office?",
+    "q_persien": "نظرت درباره کار در دفتر دیگه چیه؟",
+    "a": ["I’m fine with that.", "I am comfortable with that possibility."],
+    "a_persien": ["برام مشکلی نداره.", "با این امکان مشکلی ندارم."]
+  },
+  {
+    "topic": "Salary",
+    "role": "Employee",
+    "q": "Can I discuss my salary with HR?",
+    "q_persien": "می‌تونم درباره حقوقم با منابع انسانی صحبت کنم؟",
+    "a": ["Yes, you can schedule a meeting.", "Of course, HR is available for discussions."],
+    "a_persien": ["بله، می‌تونی وقت بگیری.", "حتماً، منابع انسانی برای گفتگو آماده‌ست."]
+  },
+  {
+    "topic": "Salary",
+    "role": "Manager",
+    "q": "Are you satisfied with your compensation?",
+    "q_persien": "از دستمزدت راضی هستی؟",
+    "a": ["Yes, I am satisfied.", "Yes, I am content with my salary."],
+    "a_persien": ["بله، راضی‌ام.", "بله، از حقوقم راضی‌ام."]
+  },
+  {
+    "topic": "Workload",
+    "role": "Employee",
+    "q": "Is your workload manageable?",
+    "q_persien": "حجم کارت قابل مدیریت هست؟",
+    "a": ["Yes, I can handle it.", "Yes, my workload is manageable."],
+    "a_persien": ["بله، می‌تونم انجامش بدم.", "بله، حجم کارم مناسبه."]
+  },
+  {
+    "topic": "Workload",
+    "role": "Manager",
+    "q": "Let me know if you ever feel overwhelmed.",
+    "q_persien": "اگه حس کردی کارت زیاده، بهم بگو.",
+    "a": ["Thanks, I will!", "Thank you, I appreciate your support."],
+    "a_persien": ["ممنون، حتماً!", "ممنون، از حمایتت سپاسگزارم."]
+  },
+  {
+    "topic": "Performance Review",
+    "role": "Manager",
+    "q": "Your annual review is coming up soon.",
+    "q_persien": "ارزیابی سالانه‌ات به زودی انجام میشه.",
+    "a": ["Thanks for letting me know.", "Thank you for the heads-up."],
+    "a_persien": ["ممنون که خبر دادی.", "ممنون که اطلاع دادی."]
+  },
+  {
+    "topic": "Performance Review",
+    "role": "Employee",
+    "q": "Will I get feedback after my review?",
+    "q_persien": "بعد ارزیابی بهم بازخورد می‌دید؟",
+    "a": ["Yes, definitely.", "Yes, you’ll receive detailed feedback."],
+    "a_persien": ["بله، حتماً.", "بله، بازخورد دقیق می‌گیری."]
+  },
+  {
+    "topic": "Job Application",
+    "role": "HR",
+    "q": "Thank you for your application.",
+    "q_persien": "ممنون بابت درخواست همکاری.",
+    "a": ["Thanks for considering me!", "Thank you for the opportunity."],
+    "a_persien": ["ممنون که به من فکر کردید!", "ممنون از این فرصت."]
+  },
+  {
+    "topic": "Job Application",
+    "role": "Applicant",
+    "q": "When will I hear back about the job?",
+    "q_persien": "کی جواب درخواست کار رو می‌گیرم؟",
+    "a": ["We’ll get back to you soon.", "We will update you as soon as possible."],
+    "a_persien": ["به زودی بهت خبر می‌دیم.", "در اسرع وقت بهت اطلاع می‌دیم."]
+  },
+  {
+    "topic": "Remote Meeting",
+    "role": "Colleague",
+    "q": "Can you send me the Zoom link?",
+    "q_persien": "می‌تونی لینک زوم رو برام بفرستی؟",
+    "a": ["Sure, sending it now.", "Absolutely, I will send you the link."],
+    "a_persien": ["حتماً، الان می‌فرستم.", "حتماً، لینک رو می‌فرستم."]
+  },
+  {
+    "topic": "Remote Meeting",
+    "role": "Colleague",
+    "q": "Are you joining the call now?",
+    "q_persien": "الان به تماس ملحق می‌شی؟",
+    "a": ["Yes, I’m joining.", "Yes, I will join right now."],
+    "a_persien": ["بله، دارم وصل میشم.", "بله، همین الان ملحق میشم."]
+  },
+  {
+    "topic": "Travel",
+    "role": "Manager",
+    "q": "Do you have any travel coming up?",
+    "q_persien": "قراره سفر کاری بری؟",
+    "a": ["Not right now.", "No travel plans at the moment."],
+    "a_persien": ["فعلاً نه.", "الان برنامه سفر کاری ندارم."]
+  },
+  {
+    "topic": "Travel",
+    "role": "Colleague",
+    "q": "How was your business trip?",
+    "q_persien": "سفر کاری چطور بود؟",
+    "a": ["It went well, thanks!", "The trip was productive."],
+    "a_persien": ["خوب بود، ممنون!", "سفر مفیدی بود."]
+  },
+  {
+    "topic": "Events",
+    "role": "Colleague",
+    "q": "Are you going to the company event?",
+    "q_persien": "قراره بری رویداد شرکت؟",
+    "a": ["Yes, I’m planning to.", "Yes, I will attend the event."],
+    "a_persien": ["بله، برنامه دارم برم.", "بله، در رویداد شرکت می‌کنم."]
+  },
+  {
+    "topic": "Events",
+    "role": "Manager",
+    "q": "Will you present at the meeting?",
+    "q_persien": "تو جلسه ارائه می‌دی؟",
+    "a": ["Yes, I have a short presentation.", "Yes, I am scheduled to present."],
+    "a_persien": ["بله، یه ارائه کوتاه دارم.", "بله، برنامه ارائه دارم."]
+  },
+  {
+    "topic": "Support",
+    "role": "Colleague",
+    "q": "Let me know if you need anything.",
+    "q_persien": "اگه چیزی لازم داشتی، خبر بده.",
+    "a": ["Thank you, I will!", "Thank you, that means a lot."],
+    "a_persien": ["ممنون، حتماً!", "ممنون، لطف داری."]
+  },
+  {
+    "topic": "Support",
+    "role": "Manager",
+    "q": "Do you need resources for your project?",
+    "q_persien": "برای پروژه‌ات منابع نیاز داری؟",
+    "a": ["Yes, some extra resources would help.", "Yes, additional resources would be appreciated."],
+    "a_persien": ["بله، منابع اضافی خیلی کمک می‌کنه.", "بله، منابع بیشتر ممنون میشم."]
+  },
+  {
+    "topic": "Documentation",
+    "role": "Colleague",
+    "q": "Where can I find the project files?",
+    "q_persien": "فایل‌های پروژه کجاست؟",
+    "a": ["Check the shared drive.", "You’ll find them on the shared drive."],
+    "a_persien": ["تو درایو مشترک هست.", "رو درایو مشترک پیدا می‌کنی."]
+  },
+  {
+    "topic": "Documentation",
+    "role": "Colleague",
+    "q": "Can you update the documentation?",
+    "q_persien": "میشه مستندات رو آپدیت کنی؟",
+    "a": ["Sure, I’ll update it today.", "Yes, I will update the documentation."],
+    "a_persien": ["حتماً، امروز به‌روزش می‌کنم.", "بله، مستندات رو آپدیت می‌کنم."]
+  },
+  {
+    "topic": "Security",
+    "role": "IT",
+    "q": "Have you changed your password recently?",
+    "q_persien": "اخیراً رمز عبورت رو عوض کردی؟",
+    "a": ["Not yet, I will do that now.", "No, I will change it today."],
+    "a_persien": ["نه هنوز، الان این کار رو می‌کنم.", "نه، امروز عوض می‌کنم."]
+  },
+  {
+    "topic": "Security",
+    "role": "Colleague",
+    "q": "Did you receive the security alert?",
+    "q_persien": "هشدار امنیتی رو دریافت کردی؟",
+    "a": ["Yes, thanks for letting me know.", "Yes, I got the security notice."],
+    "a_persien": ["بله، ممنون که خبر دادی.", "بله، اطلاعیه امنیتی رو گرفتم."]
+  },
+  {
+    "topic": "Recognition",
+    "role": "Manager",
+    "q": "You’ve been nominated for employee of the month.",
+    "q_persien": "برای کارمند ماه انتخاب شدی.",
+    "a": ["Wow, thanks a lot!", "Thank you, it’s an honor."],
+    "a_persien": ["وای، خیلی ممنون!", "ممنونم، باعث افتخاره."]
+  },
+  {
+    "topic": "Recognition",
+    "role": "Colleague",
+    "q": "Congrats on your promotion!",
+    "q_persien": "ارتقا رو تبریک می‌گم!",
+    "a": ["Thank you so much!", "Thank you, I appreciate it."],
+    "a_persien": ["خیلی ممنون!", "ممنون، لطف داری."]
+  },
+  {
+    "topic": "Conflict Resolution",
+    "role": "Manager",
+    "q": "Let’s resolve this issue together.",
+    "q_persien": "بیایید این مشکل رو با هم حل کنیم.",
+    "a": ["Sounds good to me.", "Yes, I agree, let’s work together."],
+    "a_persien": ["به نظرم خوبه.", "بله، موافقم، با هم حلش کنیم."]
+  },
+  {
+    "topic": "Conflict Resolution",
+    "role": "Colleague",
+    "q": "Can we talk privately?",
+    "q_persien": "می‌تونیم خصوصی صحبت کنیم؟",
+    "a": ["Of course, let’s find a quiet spot.", "Yes, we can have a private discussion."],
+    "a_persien": ["حتماً، یه جای خلوت پیدا کنیم.", "بله، می‌تونیم خصوصی صحبت کنیم."]
+  },
+  {
+    "topic": "Goodbye",
+    "role": "Colleague",
+    "q": "See you tomorrow!",
+    "q_persien": "فردا می‌بینمت!",
+    "a": ["See you!", "See you tomorrow."],
+    "a_persien": ["می‌بینمت!", "تا فردا."]
+  },
+  {
+    "topic": "Goodbye",
+    "role": "Colleague",
+    "q": "Have a great evening!",
+    "q_persien": "عصر خوبی داشته باشی!",
+    "a": ["You too, take care!", "Thank you, have a good evening."],
+    "a_persien": ["تو هم همینطور، مراقب باش!", "ممنون، عصر خوبی داشته باشید."]
+  }
+,
+
 
   {
     "topic": "Food",
