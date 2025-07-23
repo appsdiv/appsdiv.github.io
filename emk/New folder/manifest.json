@@ -1,0 +1,22 @@
+{
+  "name": "Elka Mehr Kimiya Order Form",
+  "short_name": "Order Form",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "description": "Online order form for Elka Mehr Kimiya products.",
+  "lang": "fa",
+  "icons": [
+    {
+      "src": "https://elkamehr.com/en/wp-content/uploads/2024/03/emk-logo-en.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://elkamehr.com/en/wp-content/uploads/2024/03/emk-logo-en.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

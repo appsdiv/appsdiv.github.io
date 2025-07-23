@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <title data-translate="header-title">ثبت سفارش شرکت الکامهر کیمیا</title>
+
+    
+
+    <meta name="description" data-translate="seo-description">
+
+    <meta name="keywords" data-translate="seo-keywords">
+
+    
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="apple-touch-icon" href="https://elkamehr.com/en/wp-content/uploads/2024/03/emk-logo-en.png">
+
+    
+
+    <link rel="manifest" href="manifest.json">
+
+
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+
+        body {
+
+            font-family: 'Vazirmatn', sans-serif;
+
+            background-color: #f3f4f6;
+
+            margin: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+
+            padding-top: 5rem; /* Add padding for the fixed navbar */
+
+        }
+
+        .rtl {
+
+            direction: rtl;
+
+            text-align: right;
+
+        }
+
+        .ltr {
+
+            direction: ltr;
+
+            text-align: left;
+
+        }
+
+        .hidden {
+
+            display: none;
+
+        }
+
+        .max-w-xl {
+
+            max-width: 500px;
+
+        }
+
+        /* Progress Bar Styles */
+
+        .progress-container {
+
+            width: 100%;
+
+            height: 8px;
+
+            background-color: #d1d5db;
+
+            border-radius: 9999px;
+
+            overflow: hidden;
+
+            margin-bottom: 2rem;
+
+        }
+
+        .progress-bar {
+
+            height: 100%;
+
+            background-color: #3b82f6;
+
+            transition: width 0.3s ease-in-out;
+
+        }
+
+        /* Product Card Styles */
+
+        .product-card {
+
+            cursor: pointer;
+
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+            border: 1px solid #d1d5db;
+
+            background-color: white;
+
+            padding: 16px;
+
+            text-align: center;
+
+            border-radius: 8px;
+
+            position: relative;
+
+        }
+
+        .product-card:hover {
+
+            transform: translateY(-5px);
+
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+
+        }
+
+        .selected-card {
+
+            border: 2px solid #3b82f6;
+
+            background-color: #e0f2fe;
+
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+
+        }
+
+        .selected-card::after {
+
+            content: '\f00c';
+
+            font-family: 'Font Awesome 5 Free';
+
+            font-weight: 900;
+
+            position: absolute;
+
+            top: 10px;
+
+            right: 10px;
+
+            background-color: #3b82f6;
+
+            color: white;
+
+            border-radius: 50%;
+
+            width: 24px;
+
+            height: 24px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 14px;
+
+        }
+
+        /* Form Styles */
+
+        .form-container {
+
+            background-color: #ffffff;
+
+            padding: 2rem;
+
+            border-radius: 8px;
+
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+
+        }
+
+        h1 {
+
+            font-size: 1.5rem;
+
+            font-weight: 700;
+
+            text-align: center;
+
+            margin-bottom: 0.5rem;
+
+        }
+
+        h2 {
+
+            font-size: 1.25rem;
+
+            font-weight: 700;
+
+            color: #1f2937;
+
+        }
+
+        label {
+
+            font-size: 0.875rem;
+
+            font-weight: 500;
+
+            color: #4b5563;
+
+        }
+
+        input, textarea, select {
+
+            border: 1px solid #d1d5db;
+
+            transition: all 0.2s ease-in-out;
+
+        }
+
+        input:focus, textarea:focus, select:focus {
+
+            border-color: #3b82f6;
+
+            box-shadow: 0 0 0 1px #3b82f6;
+
+        }
+
+        select {
+
+            appearance: none;
+
+            background-color: #fff;
+
+            background-position: right 10px center;
+
+            background-repeat: no-repeat;
+
+            background-size: 10px;
+
+        }
+
+        .rtl select {
+
+            background-image: url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/svgs/solid/chevron-down.svg");
+
+        }
+
+        .ltr select {
+
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3e%3cpath fill='%239CA3AF' d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+
+            background-position: left 10px center;
+
+        }
+
+
+
+        /* iOS-like Button Styles */
+
+        button {
+
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+            -webkit-user-select: none;
+
+            -moz-user-select: none;
+
+            user-select: none;
+
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+
+            font-weight: 600;
+
+            border: none;
+
+            border-radius: 10px;
+
+            padding: 12px 24px;
+
+            box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.1);
+
+        }
+
+        button:active {
+
+            transform: translateY(2px);
+
+            box-shadow: none;
+
+        }
+
+        .bg-blue-500 { background-color: #007aff; }
+
+        .hover\:bg-blue-600:hover { background-color: #0056b3; }
+
+        .bg-gray-500 { background-color: #8e8e93; }
+
+        .hover\:bg-gray-600:hover { background-color: #6a6a6e; }
+
+        /* Fixed Navbar Styles */
+
+        .fixed-navbar {
+
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+            z-index: 10;
+
+        }
+
+    </style>
+
+</head>
+
+<body class="bg-gray-100 rtl">
+
+
+
+<nav class="fixed-navbar fixed top-0 left-0 right-0 bg-white p-4 flex items-center justify-between">
+
+    <button id="nav-back-button" onclick="goToStep(currentStep - 1)" class="text-blue-500 flex items-center hidden" aria-label="Back">
+
+        <i class="fas fa-chevron-left mr-2"></i> <span data-translate="nav-back">بازگشت</span>
+
+    </button>
+
+    <div class="flex-grow text-center">
+
+        <p id="nav-title" class="font-bold text-lg" data-translate="header-title">ثبت سفارش شرکت الکامهر کیمیا</p>
+
+    </div>
+
+</nav>
+
+
+
+<div class="max-w-xl mx-auto mt-10 px-4">
+
+    <div class="flex flex-col items-center mb-6">
+
+        <img src="https://elkamehr.com/en/wp-content/uploads/2024/03/emk-logo-en.png" alt="Elka Mehr Kimiya Logo" class="h-24 mb-2">
+
+        <p data-translate="header-subtitle">تولیدکننده آلومینیوم خالص و آلیاژی</p>
+
+    </div>
+
+    
+
+    <div class="progress-container">
+
+        <div class="progress-bar" style="width: 0%;"></div>
+
+    </div>
+
+    <div class="form-container">
+
+        <form id="multi-step-form" action="/submit-order" method="POST">
+
+
+
+            <div class="form-step" id="step-0">
+
+                <h2 class="mb-6 flex items-center"><i class="fas fa-language ml-2 text-blue-500"></i> <span data-translate="choose-language-text">زبان خود را انتخاب کنید</span></h2>
+
+                <div class="grid grid-cols-2 gap-4">
+
+                    <div class="flex flex-col items-center justify-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:border-blue-500" data-lang="fa">
+
+                        <img src="https://flagcdn.com/w160/ir.png" alt="Persian Flag" class="h-10 w-10 rounded-full mb-2">
+
+                        <p class="mt-2 text-center text-sm">فارسی</p>
+
+                    </div>
+
+                    <div class="flex flex-col items-center justify-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:border-blue-500" data-lang="en">
+
+                        <img src="https://flagcdn.com/w160/us.png" alt="USA Flag" class="h-10 w-10 rounded-full mb-2">
+
+                        <p class="mt-2 text-center text-sm">English</p>
+
+                    </div>
+
+                    <div class="flex flex-col items-center justify-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:border-blue-500" data-lang="tr">
+
+                        <img src="https://flagcdn.com/w160/tr.png" alt="Turkey Flag" class="h-10 w-10 rounded-full mb-2">
+
+                        <p class="mt-2 text-center text-sm">Türkçe</p>
+
+                    </div>
+
+                    <div class="flex flex-col items-center justify-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:border-blue-500" data-lang="ar">
+
+                        <img src="https://flagcdn.com/w160/sa.png" alt="Saudi Arabia Flag" class="h-10 w-10 rounded-full mb-2">
+
+                        <p class="mt-2 text-center text-sm">العربية</p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="form-step hidden" id="step-1">
+
+                <h2 class="mb-6 flex items-center"><i class="fas fa-file-alt ml-2 text-blue-500"></i> <span data-translate="order-info-heading">اطلاعات سفارش</span></h2>
+
+                
+
+                <label for="order-type" class="block mb-2" data-translate="order-type-label">نوع سفارش</label>
+
+                <select id="order-type" name="order-type" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="internal" data-translate="option-internal">سفارش داخلی</option>
+
+                    <option value="customer" data-translate="option-customer" selected>سفارش مشتری</option>
+
+                </select>
+
+                
+
+                <label for="customer_name" class="block mb-2" data-translate="company-person-name-label">نام شرکت / شخص</label>
+
+                <input type="text" id="customer_name" name="customer_name" data-translate-placeholder="company_person_name_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+
+
+                <label for="contact_number" class="block mb-2" data-translate="contact-number-label">شماره تماس</label>
+
+                <input type="tel" id="contact_number" name="contact_number" data-translate-placeholder="contact_number_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                
+
+                <label for="delivery-date" class="block mb-2" data-translate="delivery-date-label">تاریخ تحویل به مشتری</label>
+
+                <div class="relative mb-4 icon-input">
+
+                    <input type="text" id="delivery-date" name="delivery_date" data-translate-placeholder="delivery_date_placeholder" class="w-full p-2 rounded-md focus:ring-2 focus:ring-blue-500">
+
+                </div>
+
+                <label for="description" class="block mb-2" data-translate="description-label">توضیح</label>
+
+                <textarea id="description" name="description" rows="4" data-translate-placeholder="description_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500"></textarea>
+
+                
+
+                <label for="note" class="block mb-2" data-translate="note-label">یادداشت</label>
+
+                <textarea id="note" name="note" rows="2" data-translate-placeholder="note_placeholder" class="w-full p-2 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+
+                
+
+                <button type="button" class="bg-blue-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center w-full next-button" onclick="goToStep(2)">
+
+                    <span data-translate="next-step-1">مرحله بعد</span> <i class="fas fa-arrow-left ml-2"></i>
+
+                </button>
+
+            </div>
+
+
+
+            <div class="form-step hidden" id="step-2">
+
+                <h2 class="mb-6 flex items-center"><i class="fas fa-box ml-2 text-blue-500"></i> <span data-translate="product-type-heading">نوع محصول</span></h2>
+
+                <div id="product-options" class="grid grid-cols-2 gap-4">
+
+                    <div data-value="alloy_ingot" class="product-card p-4 bg-white border border-gray-300 rounded-lg shadow-sm text-center">
+
+                        <img src="https://elkamehr.com/en/wp-content/uploads/2024/10/resized_image_3.png" alt="شمش آلیاژی" class="mx-auto mb-2">
+
+                        <p data-translate="product-alloy-ingot">شمش آلیاژی</p>
+
+                    </div>
+
+                    <div data-value="granule" class="product-card p-4 bg-white border border-gray-300 rounded-lg shadow-sm text-center">
+
+                        <img src="https://elkamehr.com/en/wp-content/uploads/2024/10/resized_image_4.png" alt="گرانول" class="mx-auto mb-2">
+
+                        <p data-translate="product-granule">گرانول</p>
+
+                    </div>
+
+                    <div data-value="wire" class="product-card p-4 bg-white border border-gray-300 rounded-lg shadow-sm text-center">
+
+                        <img src="https://elkamehr.com/en/wp-content/uploads/2024/10/resized_image_5.png" alt="مفتول" class="mx-auto mb-2">
+
+                        <p data-translate="product-wire">مفتول</p>
+
+                    </div>
+
+                    <div data-value="aac_conductor" class="product-card p-4 bg-white border border-gray-300 rounded-lg shadow-sm text-center">
+
+                        <img src="https://elkamehr.com/en/wp-content/uploads/2024/10/resized_image_0.png" alt="هادی AAC" class="mx-auto mb-2">
+
+                        <p data-translate="product-aac-conductor">هادی AAC</p>
+
+                    </div>
+
+                    <div data-value="aaac_conductor" class="product-card p-4 bg-white border border-gray-300 rounded-lg shadow-sm text-center">
+
+                        <img src="https://elkamehr.com/en/wp-content/uploads/2024/10/resized_image_6.png" alt="هادی AAAC" class="mx-auto mb-2">
+
+                        <p data-translate="product-aaac-conductor">هادی AAAC</p>
+
+                    </div>
+
+                    <div data-value="abc_conductor" class="product-card p-4 bg-white border border-gray-300 rounded-lg shadow-sm text-center">
+
+                        <img src="https://elkamehr.com/en/wp-content/uploads/2024/10/resized_image_7.png" alt="هادی ABC" class="mx-auto mb-2">
+
+                        <p data-translate="product-abc-conductor">هادی ABC</p>
+
+                    </div>
+
+                    <div data-value="acsr_conductor" class="product-card p-4 bg-white border border-gray-300 rounded-lg shadow-sm text-center">
+
+                        <img src="https://elkamehr.com/en/wp-content/uploads/2024/10/resized_image_1.png" alt="هادی ACSR" class="mx-auto mb-2">
+
+                        <p data-translate="product-acsr-conductor">هادی ACSR</p>
+
+                    </div>
+
+                    <div data-value="rod" class="product-card p-4 bg-white border border-gray-300 rounded-lg shadow-sm text-center">
+
+                        <img src="https://elkamehr.com/en/wp-content/uploads/2024/10/resized_image_2.png" alt="راد" class="mx-auto mb-2">
+
+                        <p data-translate="product-rod">راد</p>
+
+                    </div>
+
+                    <div data-value="aluminum_tray" class="product-card p-4 bg-white border border-gray-300 rounded-lg shadow-sm text-center">
+
+                        <img src="https://elkamehr.com/en/wp-content/uploads/2025/05/Some-aluminium-foil-trays-for-food-on-transparnt-background-PNG-150x150.png" alt="ظروف آلومینیوم" class="mx-auto mb-2">
+
+                        <p data-translate="product-Aluminium-tray">ظروف آلومینیوم</p>
+
+                    </div>
+
+                </div>
+
+                <input type="hidden" id="product-type" name="product_type" value="">
+
+                
+
+                <div class="flex justify-between mt-6">
+
+                    <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center prev-button" onclick="goToStep(1)">
+
+                        <i class="fas fa-arrow-right ml-2"></i> <span data-translate="prev-step-2">مرحله قبل</span>
+
+                    </button>
+
+                    <button type="button" class="bg-blue-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center next-button" onclick="goToStep(3)">
+
+                        <span data-translate="next-step-2">مرحله بعد</span> <i class="fas fa-arrow-left ml-2"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="form-step hidden" id="step-3-alloy">
+
+                <h2 class="mb-6 flex items-center"><i class="fas fa-cubes ml-2 text-blue-500"></i> <span data-translate="alloy-ingot-heading">جزئیات شمش آلیاژی</span></h2>
+
+                <label for="alloy-type" class="block mb-2" data-translate="alloy-type-label">نوع آلیاژ</label>
+
+                <select id="alloy-type" name="alloy_type" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-option-default-alloy">انتخاب کنید</option>
+
+                    <option value="pure" data-translate="option-pure">خالص</option>
+
+                    <option value="alloyed" data-translate="option-alloyed">آلیاژی</option>
+
+                </select>
+
+                <label for="packaging" class="block mb-2" data-translate="packaging-label-alloy">بسته بندی</label>
+
+                <select id="packaging" name="packaging" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-packaging-default-alloy">انتخاب کنید</option>
+
+                    <option value="bulk" data-translate="option-bulk-alloy">فله</option>
+
+                    <option value="pallet" data-translate="option-pallet-alloy">پالت 1000 کیلوگرمی</option>
+
+                </select>
+
+                <label for="weight" class="block mb-2" data-translate="weight-label-alloy">وزن درخواستی (کیلوگرم)</label>
+
+                <input type="number" id="weight" name="weight" data-translate-placeholder="weight_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                <label for="standard" class="block mb-2" data-translate="standard-label">استاندارد</label>
+
+                <input type="text" id="standard" name="standard" data-translate-placeholder="standard_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                <label for="chemical-analysis" class="block mb-2" data-translate="chemical-analysis-label">اهم آنالیز شیمیایی</label>
+
+                <textarea id="chemical-analysis" name="chemical_analysis" rows="2" data-translate-placeholder="chemical_analysis_placeholder" class="w-full p-2 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+
+                <label for="note-alloy" class="block mb-2" data-translate="note-label-alloy">یادداشت</label>
+
+                <textarea id="note-alloy" name="note_alloy" rows="2" data-translate-placeholder="note_placeholder_alloy" class="w-full p-2 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+
+                <div class="flex justify-between mt-6">
+
+                    <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center prev-button" onclick="goToStep(2)">
+
+                        <i class="fas fa-arrow-right ml-2"></i> <span data-translate="prev-step-2">مرحله قبل</span>
+
+                    </button>
+
+                    <button type="button" class="bg-blue-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center next-button" onclick="goToStep(4)">
+
+                        <span data-translate="submit-alloy">تایید و نمایش خلاصه</span> <i class="fas fa-arrow-left ml-2"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="form-step hidden" id="step-3-aac">
+
+                <h2 class="mb-6 flex items-center"><i class="fas fa-cubes ml-2 text-blue-500"></i> <span data-translate="aac-heading">جزئیات هادی AAC</span></h2>
+
+                <label for="aac-packaging" class="block mb-2" data-translate="aac-packaging-label">بسته بندی</label>
+
+                <select id="aac-packaging" name="aac_packaging" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-aac-packaging-default">انتخاب کنید</option>
+
+                    <option value="metal-reel" data-translate="option-aac-metal-reel">قرقره فلزی</option>
+
+                    <option value="wood-reel" data-translate="option-aac-wood-reel">روی قرقره چوبی</option>
+
+                </select>
+
+                <label for="aac-cross_section" class="block mb-2" data-translate="aac-cross-section-label">سطح مقطع نامی (میلی‌متر مربع)</label>
+
+                <select id="aac-cross_section" name="aac_cross_section" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-aac-cross-section-default">انتخاب کنید</option>
+
+                    <option value="16">16</option>
+
+                    <option value="25">25</option>
+
+                    <option value="35">35</option>
+
+                    <option value="50">50</option>
+
+                    <option value="70">70</option>
+
+                    <option value="95">95</option>
+
+                    <option value="120">120</option>
+
+                    <option value="185">185</option>
+
+                </select>
+
+                <label class="block mb-2" data-translate="order-by-label-aac">سفارش بر اساس</label>
+
+                <div class="flex space-x-4 mb-4" dir="rtl">
+
+                    <label>
+
+                        <input type="radio" name="aac_order_by" value="weight" id="aac-order-by-weight" class="ml-2"> <span data-translate="aac-order-by-weight-text">وزن (کیلوگرم)</span>
+
+                    </label>
+
+                    <label>
+
+                        <input type="radio" name="aac_order_by" value="tiraj" id="aac-order-by-tiraj" class="ml-2"> <span data-translate="aac-order-by-tiraj-text">متراژ (متر)</span>
+
+                    </label>
+
+                </div>
+
+                <div id="aac-weight-input" class="hidden">
+
+                    <label for="aac-weight" class="block mb-2" data-translate="aac-weight-input-label">وزن درخواستی (کیلوگرم)</label>
+
+                    <input type="number" id="aac-weight" name="aac_weight" data-translate-placeholder="aac_weight_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <label for="aac-calculated-tiraj" class="block mb-2" data-translate="aac-calculated-tiraj-label">متراژ محاسبه‌شده (متر)</label>
+
+                    <input type="text" id="aac-calculated-tiraj" name="aac_calculated_tiraj" readonly class="w-full p-2 rounded-md mb-4 bg-gray-100">
+
+                </div>
+
+                <div id="aac-tiraj-input" class="hidden">
+
+                    <label for="aac-tiraj" class="block mb-2" data-translate="aac-tiraj-input-label">متراژ درخواستی (متر)</label>
+
+                    <input type="number" id="aac-tiraj" name="aac_tiraj" data-translate-placeholder="aac_tiraj_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <label for="aac-calculated-weight" class="block mb-2" data-translate="aac-calculated-weight-label">وزن محاسبه‌شده (کیلوگرم)</label>
+
+                    <input type="text" id="aac-calculated-weight" name="aac_calculated_weight" readonly class="w-full p-2 rounded-md mb-4 bg-gray-100">
+
+                </div>
+
+                <label for="aac-brand-name" class="block mb-2" data-translate="aac-brand-name-label">اسم تجاری محصول</label>
+
+                <input type="text" id="aac-brand-name" name="aac_brand_name" data-translate-placeholder="aac_brand_name_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                <label for="aac-direction" class="block mb-2" data-translate="aac-direction-label">نوع</label>
+
+                <select id="aac-direction" name="aac_direction" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-aac-direction-default">انتخاب کنید</option>
+
+                    <option value="right" data-translate="option-aac-right">راستگرد</option>
+
+                    <option value="left" data-translate="option-aac-left">چپگرد</option>
+
+                </select>
+
+                <label for="note-aac" class="block mb-2" data-translate="note-label-aac">یادداشت</label>
+
+                <textarea id="note-aac" name="note_aac" rows="2" data-translate-placeholder="note_placeholder_aac" class="w-full p-2 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+
+                <div class="flex justify-between mt-6">
+
+                    <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center prev-button" onclick="goToStep(2)">
+
+                        <i class="fas fa-arrow-right ml-2"></i> <span data-translate="prev-step-2">مرحله قبل</span>
+
+                    </button>
+
+                    <button type="button" class="bg-blue-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center next-button" onclick="goToStep(4)">
+
+                        <span data-translate="submit-aac">تایید و نمایش خلاصه</span> <i class="fas fa-arrow-left ml-2"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="form-step hidden" id="step-3-aaac">
+
+                <h2 class="mb-6 flex items-center"><i class="fas fa-cubes ml-2 text-blue-500"></i> <span data-translate="aaac-heading">جزئیات هادی AAAC</span></h2>
+
+                <label for="aaac-packaging" class="block mb-2" data-translate="aaac-packaging-label">بسته بندی</label>
+
+                <select id="aaac-packaging" name="aaac_packaging" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-aaac-packaging-default">انتخاب کنید</option>
+
+                    <option value="metal-reel" data-translate="option-aaac-metal-reel">قرقره فلزی</option>
+
+                    <option value="wood-reel" data-translate="option-aaac-wood-reel">روی قرقره چوبی</option>
+
+                </select>
+
+                <label for="aaac-cross_section" class="block mb-2" data-translate="aaac-cross-section-label">سطح مقطع نامی (میلی‌متر مربع)</label>
+
+                <select id="aaac-cross_section" name="aaac_cross_section" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-aaac-cross-section-default">انتخاب کنید</option>
+
+                    <option value="16">16</option>
+
+                    <option value="25">25</option>
+
+                    <option value="35">35</option>
+
+                    <option value="50">50</option>
+
+                    <option value="70">70</option>
+
+                    <option value="95">95</option>
+
+                    <option value="120">120</option>
+
+                    <option value="185">185</option>
+
+                </select>
+
+                <label class="block mb-2" data-translate="order-by-label-aaac">سفارش بر اساس</label>
+
+                <div class="flex space-x-4 mb-4" dir="rtl">
+
+                    <label>
+
+                        <input type="radio" name="aaac_order_by" value="weight" id="aaac-order-by-weight" class="ml-2"> <span data-translate="aaac-order-by-weight-text">وزن (کیلوگرم)</span>
+
+                    </label>
+
+                    <label>
+
+                        <input type="radio" name="aaac_order_by" value="tiraj" id="aaac-order-by-tiraj" class="ml-2"> <span data-translate="aaac-order-by-tiraj-text">متراژ (متر)</span>
+
+                    </label>
+
+                </div>
+
+                <div id="aaac-weight-input" class="hidden">
+
+                    <label for="aaac-weight" class="block mb-2" data-translate="aaac-weight-input-label">وزن درخواستی (کیلوگرم)</label>
+
+                    <input type="number" id="aaac-weight" name="aaac_weight" data-translate-placeholder="aaac_weight_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <label for="aaac-calculated-tiraj" class="block mb-2" data-translate="aaac-calculated-tiraj-label">متراژ محاسبه‌شده (متر)</label>
+
+                    <input type="text" id="aaac-calculated-tiraj" name="aaac_calculated_tiraj" readonly class="w-full p-2 rounded-md mb-4 bg-gray-100">
+
+                </div>
+
+                <div id="aaac-tiraj-input" class="hidden">
+
+                    <label for="aaac-tiraj" class="block mb-2" data-translate="aaac-tiraj-input-label">متراژ درخواستی (متر)</label>
+
+                    <input type="number" id="aaac-tiraj" name="aaac_tiraj" data-translate-placeholder="aaac_tiraj_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <label for="aaac-calculated-weight" class="block mb-2" data-translate="aaac-calculated-weight-label">وزن محاسبه‌شده (کیلوگرم)</label>
+
+                    <input type="text" id="aaac-calculated-weight" name="aaac_calculated_weight" readonly class="w-full p-2 rounded-md mb-4 bg-gray-100">
+
+                </div>
+
+                <label for="aaac-brand-name" class="block mb-2" data-translate="aaac-brand-name-label">اسم تجاری محصول</label>
+
+                <input type="text" id="aaac-brand-name" name="aaac_brand_name" data-translate-placeholder="aaac_brand_name_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                <label for="aaac-direction" class="block mb-2" data-translate="aaac-direction-label">نوع</label>
+
+                <select id="aaac-direction" name="aaac_direction" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-aaac-direction-default">انتخاب کنید</option>
+
+                    <option value="right" data-translate="option-aaac-right">راستگرد</option>
+
+                    <option value="left" data-translate="option-aaac-left">چپگرد</option>
+
+                </select>
+
+                <label for="note-aaac" class="block mb-2" data-translate="note-label-aaac">یادداشت</label>
+
+                <textarea id="note-aaac" name="note_aaac" rows="2" data-translate-placeholder="note_placeholder_aaac" class="w-full p-2 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+
+                <div class="flex justify-between mt-6">
+
+                    <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center prev-button" onclick="goToStep(2)">
+
+                        <i class="fas fa-arrow-right ml-2"></i> <span data-translate="prev-step-2">مرحله قبل</span>
+
+                    </button>
+
+                    <button type="button" class="bg-blue-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center next-button" onclick="goToStep(4)">
+
+                        <span data-translate="submit-aaac">تایید و نمایش خلاصه</span> <i class="fas fa-arrow-left ml-2"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="form-step hidden" id="step-3-abc">
+
+                <h2 class="mb-6 flex items-center"><i class="fas fa-cubes ml-2 text-blue-500"></i> <span data-translate="abc-heading">جزئیات هادی ABC</span></h2>
+
+                <label for="abc-packaging" class="block mb-2" data-translate="abc-packaging-label">بسته بندی</label>
+
+                <select id="abc-packaging" name="abc_packaging" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-abc-packaging-default">انتخاب کنید</option>
+
+                    <option value="metal-reel" data-translate="option-abc-metal-reel">قرقره فلزی</option>
+
+                    <option value="wood-reel" data-translate="option-abc-wood-reel">روی قرقره چوبی</option>
+
+                </select>
+
+                <label for="abc-cross_section" class="block mb-2" data-translate="abc-cross-section-label">سطح مقطع نامی (میلی‌متر مربع)</label>
+
+                <select id="abc-cross_section" name="abc_cross_section" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-abc-cross-section-default">انتخاب کنید</option>
+
+                    <option value="16">16</option>
+
+                    <option value="25">25</option>
+
+                    <option value="35">35</option>
+
+                    <option value="50">50</option>
+
+                    <option value="70">70</option>
+
+                    <option value="95">95</option>
+
+                    <option value="120">120</option>
+
+                </select>
+
+                <label class="block mb-2" data-translate="order-by-label-abc">سفارش بر اساس</label>
+
+                <div class="flex space-x-4 mb-4" dir="rtl">
+
+                    <label>
+
+                        <input type="radio" name="abc_order_by" value="weight" id="abc-order-by-weight" class="ml-2"> <span data-translate="abc-order-by-weight-text">وزن (کیلوگرم)</span>
+
+                    </label>
+
+                    <label>
+
+                        <input type="radio" name="abc_order_by" value="tiraj" id="abc-order-by-tiraj" class="ml-2"> <span data-translate="abc-order-by-tiraj-text">متراژ (متر)</span>
+
+                    </label>
+
+                </div>
+
+                <div id="abc-weight-input" class="hidden">
+
+                    <label for="abc-weight" class="block mb-2" data-translate="abc-weight-input-label">وزن درخواستی (کیلوگرم)</label>
+
+                    <input type="number" id="abc-weight" name="abc_weight" data-translate-placeholder="abc_weight_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <label for="abc-calculated-tiraj" class="block mb-2" data-translate="abc-calculated-tiraj-label">متراژ محاسبه‌شده (متر)</label>
+
+                    <input type="text" id="abc-calculated-tiraj" name="abc_calculated_tiraj" readonly class="w-full p-2 rounded-md mb-4 bg-gray-100">
+
+                </div>
+
+                <div id="abc-tiraj-input" class="hidden">
+
+                    <label for="abc-tiraj" class="block mb-2" data-translate="abc-tiraj-input-label">متراژ درخواستی (متر)</label>
+
+                    <input type="number" id="abc-tiraj" name="abc_tiraj" data-translate-placeholder="abc_tiraj_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <label for="abc-calculated-weight-no-cover" class="block mb-2" data-translate="abc-calculated-weight-no-cover-label">وزن بدون روکش (کیلوگرم)</label>
+
+                    <input type="text" id="abc-calculated-weight-no-cover" name="abc_calculated_weight_no_cover" readonly class="w-full p-2 rounded-md mb-4 bg-gray-100">
+
+                    <label for="abc-calculated-weight-with-cover" class="block mb-2" data-translate="abc-calculated-weight-with-cover-label">وزن با روکش (کیلوگرم)</label>
+
+                    <input type="text" id="abc-calculated-weight-with-cover" name="abc_calculated_weight_with_cover" readonly class="w-full p-2 rounded-md mb-4 bg-gray-100">
+
+                    <label for="abc-calculated-total-weight" class="block mb-2" data-translate="abc-calculated-total-weight-label">وزن کل (کیلوگرم)</label>
+
+                    <input type="text" id="abc-calculated-total-weight" name="abc_calculated_total_weight" readonly class="w-full p-2 rounded-md mb-4 bg-gray-100">
+
+                </div>
+
+                <label for="abc-brand-name" class="block mb-2" data-translate="abc-brand-name-label">اسم تجاری محصول</label>
+
+                <input type="text" id="abc-brand-name" name="abc_brand_name" data-translate-placeholder="abc_brand_name_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                <label for="abc-direction" class="block mb-2" data-translate="abc-direction-label">نوع</label>
+
+                <select id="abc-direction" name="abc_direction" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-abc-direction-default">انتخاب کنید</option>
+
+                    <option value="right" data-translate="option-abc-right">راستگرد</option>
+
+                    <option value="left" data-translate="option-abc-left">چپگرد</option>
+
+                </select>
+
+                <label for="note-abc" class="block mb-2" data-translate="note-label-abc">یادداشت</label>
+
+                <textarea id="note-abc" name="note_abc" rows="2" data-translate-placeholder="note_placeholder_abc" class="w-full p-2 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+
+                <div class="flex justify-between mt-6">
+
+                    <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center prev-button" onclick="goToStep(2)">
+
+                        <i class="fas fa-arrow-right ml-2"></i> <span data-translate="prev-step-2">مرحله قبل</span>
+
+                    </button>
+
+                    <button type="button" class="bg-blue-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center next-button" onclick="goToStep(4)">
+
+                        <span data-translate="submit-abc">تایید و نمایش خلاصه</span> <i class="fas fa-arrow-left ml-2"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="form-step hidden" id="step-3-acsr">
+
+                <h2 class="mb-6 flex items-center"><i class="fas fa-cubes ml-2 text-blue-500"></i> <span data-translate="acsr-heading">جزئیات هادی ACSR</span></h2>
+
+                <label for="acsr-packaging" class="block mb-2" data-translate="acsr-packaging-label">بسته بندی</label>
+
+                <select id="acsr-packaging" name="acsr_packaging" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-acsr-packaging-default">انتخاب کنید</option>
+
+                    <option value="metal-reel" data-translate="option-acsr-metal-reel">قرقره فلزی</option>
+
+                    <option value="wood-reel" data-translate="option-acsr-wood-reel">روی قرقره چوبی</option>
+
+                </select>
+
+                <label for="acsr-cross_section" class="block mb-2" data-translate="acsr-cross-section-label">سطح مقطع نامی (میلی‌متر مربع)</label>
+
+                <select id="acsr-cross_section" name="acsr_cross_section" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-acsr-cross-section-default">انتخاب کنید</option>
+
+                    <option value="16">16</option>
+
+                    <option value="25">25</option>
+
+                    <option value="35">35</option>
+
+                    <option value="50">50</option>
+
+                    <option value="70">70</option>
+
+                    <option value="95">95</option>
+
+                    <option value="120">120</option>
+
+                    <option value="185">185</option>
+
+                </select>
+
+                <label class="block mb-2" data-translate="order-by-label-acsr">سفارش بر اساس</label>
+
+                <div class="flex space-x-4 mb-4" dir="rtl">
+
+                    <label>
+
+                        <input type="radio" name="acsr_order_by" value="weight" id="acsr-order-by-weight" class="ml-2"> <span data-translate="acsr-order-by-weight-text">وزن (کیلوگرم)</span>
+
+                    </label>
+
+                    <label>
+
+                        <input type="radio" name="acsr_order_by" value="tiraj" id="acsr-order-by-tiraj" class="ml-2"> <span data-translate="acsr-order-by-tiraj-text">متراژ (متر)</span>
+
+                    </label>
+
+                </div>
+
+                <div id="acsr-weight-input" class="hidden">
+
+                    <label for="acsr-weight" class="block mb-2" data-translate="acsr-weight-input-label">وزن درخواستی (کیلوگرم)</label>
+
+                    <input type="number" id="acsr-weight" name="acsr_weight" data-translate-placeholder="acsr_weight_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <label for="acsr-calculated-tiraj" class="block mb-2" data-translate="acsr-calculated-tiraj-label">متراژ محاسبه‌شده (متر)</label>
+
+                    <input type="text" id="acsr-calculated-tiraj" name="acsr_calculated_tiraj" readonly class="w-full p-2 rounded-md mb-4 bg-gray-100">
+
+                </div>
+
+                <div id="acsr-tiraj-input" class="hidden">
+
+                    <label for="acsr-tiraj" class="block mb-2" data-translate="acsr-tiraj-input-label">متراژ درخواستی (متر)</label>
+
+                    <input type="number" id="acsr-tiraj" name="acsr_tiraj" data-translate-placeholder="acsr_tiraj_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <label for="acsr-calculated-weight" class="block mb-2" data-translate="acsr-calculated-weight-label">وزن محاسبه‌شده (کیلوگرم)</label>
+
+                    <input type="text" id="acsr-calculated-weight" name="acsr_calculated_weight" readonly class="w-full p-2 rounded-md mb-4 bg-gray-100">
+
+                </div>
+
+                <label for="acsr-brand-name" class="block mb-2" data-translate="acsr-brand-name-label">اسم تجاری محصول</label>
+
+                <input type="text" id="acsr-brand-name" name="acsr_brand_name" data-translate-placeholder="acsr_brand_name_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                <label for="acsr-direction" class="block mb-2" data-translate="acsr-direction-label">نوع</label>
+
+                <select id="acsr-direction" name="acsr_direction" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-acsr-direction-default">انتخاب کنید</option>
+
+                    <option value="right" data-translate="option-acsr-right">راستگرد</option>
+
+                    <option value="left" data-translate="option-acsr-left">چپگرد</option>
+
+                </select>
+
+                <label for="note-acsr" class="block mb-2" data-translate="note-label-acsr">یادداشت</label>
+
+                <textarea id="note-acsr" name="note_acsr" rows="2" data-translate-placeholder="note_placeholder_acsr" class="w-full p-2 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+
+                <div class="flex justify-between mt-6">
+
+                    <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center prev-button" onclick="goToStep(2)">
+
+                        <i class="fas fa-arrow-right ml-2"></i> <span data-translate="prev-step-2">مرحله قبل</span>
+
+                    </button>
+
+                    <button type="button" class="bg-blue-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center next-button" onclick="goToStep(4)">
+
+                        <span data-translate="submit-acsr">تایید و نمایش خلاصه</span> <i class="fas fa-arrow-left ml-2"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="form-step hidden" id="step-3-granule">
+
+                <h2 class="mb-6 flex items-center"><i class="fas fa-cubes ml-2 text-blue-500"></i> <span data-translate="granule-heading">جزئیات گرانول</span></h2>
+
+                <label for="granule-alloy-type" class="block mb-2" data-translate="granule-alloy-type-label">نوع آلیاژ</label>
+
+                <select id="granule-alloy-type" name="granule_alloy_type" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-granule-alloy-default">انتخاب کنید</option>
+
+                    <option value="pure" data-translate="option-granule-pure">خالص</option>
+
+                    <option value="alloyed" data-translate="option-granule-alloyed">آلیاژی</option>
+
+                </select>
+
+                <label for="granule-packaging" class="block mb-2" data-translate="granule-packaging-label">بسته بندی</label>
+
+                <select id="granule-packaging" name="granule_packaging" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-granule-packaging-default">انتخاب کنید</option>
+
+                    <option value="jumbo" data-translate="option-jumbo">جامبو</option>
+
+                    <option value="bulk" data-translate="option-bulk-granule">فله</option>
+
+                </select>
+
+                <label for="granule-weight" class="block mb-2" data-translate="granule-weight-label">وزن درخواستی (کیلوگرم)</label>
+
+                <input type="number" id="granule-weight" name="granule_weight" data-translate-placeholder="granule_weight_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                <label for="granule-note" class="block mb-2" data-translate="granule-note-label">یادداشت</label>
+
+                <textarea id="granule-note" name="granule_note" rows="2" data-translate-placeholder="granule_note_placeholder" class="w-full p-2 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+
+                <div class="flex justify-between mt-6">
+
+                    <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center prev-button" onclick="goToStep(2)">
+
+                        <i class="fas fa-arrow-right ml-2"></i> <span data-translate="prev-step-2">مرحله قبل</span>
+
+                    </button>
+
+                    <button type="button" class="bg-blue-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center next-button" onclick="goToStep(4)">
+
+                        <span data-translate="submit-granule">تایید و نمایش خلاصه</span> <i class="fas fa-arrow-left ml-2"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            
+
+            <div class="form-step hidden" id="step-3-wire">
+
+                <h2 class="mb-6 flex items-center"><i class="fas fa-cubes ml-2 text-blue-500"></i> <span data-translate="wire-heading">جزئیات مفتول</span></h2>
+
+                <label for="wire-alloy-type" class="block mb-2" data-translate="wire-alloy-type-label">نوع آلیاژ</label>
+
+                <select id="wire-alloy-type" name="wire_alloy_type" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-wire-alloy-default">انتخاب کنید</option>
+
+                    <option value="pure" data-translate="option-wire-pure">خالص</option>
+
+                    <option value="alloyed" data-translate="option-wire-alloyed">آلیاژی</option>
+
+                </select>
+
+                <label for="anneal" class="block mb-2" data-translate="anneal-label">آنیل</label>
+
+                <select id="anneal" name="anneal" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-anneal-default">انتخاب کنید</option>
+
+                    <option value="yes" data-translate="option-anneal-yes">بشود</option>
+
+                    <option value="no" data-translate="option-anneal-no">نشود</option>
+
+                </select>
+
+                <label for="aging" class="block mb-2" data-translate="aging-label">ایجینگ</label>
+
+                <select id="aging" name="aging" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-aging-default">انتخاب کنید</option>
+
+                    <option value="yes" data-translate="option-aging-yes">بشود</option>
+
+                    <option value="no" data-translate="option-aging-no">نشود</option>
+
+                </select>
+
+                <label for="wire-packaging" class="block mb-2" data-translate="wire-packaging-label">بسته بندی</label>
+
+                <select id="wire-packaging" name="wire_packaging" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-wire-packaging-default">انتخاب کنید</option>
+
+                    <option value="reel-630" data-translate="option-reel-630">قرقره 630</option>
+
+                    <option value="plastic-reel" data-translate="option-plastic-reel">قرقره پلاستیکی</option>
+
+                    <option value="wood-reel" data-translate="option-wood-reel">قرقره چوبی</option>
+
+                    <option value="coil" data-translate="option-coil">کویل</option>
+
+                </select>
+
+                <label for="wire-cross_section" class="block mb-2" data-translate="wire-cross-section-label">قطر (میلی‌متر)</label>
+
+                <input type="number" id="wire-cross_section" name="cross_section" data-translate-placeholder="wire_cross_section_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                <label class="block mb-2" data-translate="order-by-label-wire">سفارش بر اساس</label>
+
+                <div class="flex space-x-4 mb-4" dir="rtl">
+
+                    <label>
+
+                        <input type="radio" name="wire_order_by" value="weight" id="wire-order-by-weight" class="ml-2"> <span data-translate="wire-order-by-weight-text">وزن (کیلوگرم)</span>
+
+                    </label>
+
+                    <label>
+
+                        <input type="radio" name="wire_order_by" value="tiraj" id="wire-order-by-tiraj" class="ml-2"> <span data-translate="wire-order-by-tiraj-text">متراژ (متر)</span>
+
+                    </label>
+
+                </div>
+
+                <div id="wire-weight-input" class="hidden">
+
+                    <label for="wire-weight" class="block mb-2" data-translate="wire-weight-input-label">وزن درخواستی (کیلوگرم)</label>
+
+                    <input type="number" id="wire-weight" name="wire_weight" data-translate-placeholder="wire_weight_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <label for="wire-calculated-tiraj" class="block mb-2" data-translate="wire-calculated-tiraj-label">متراژ محاسبه‌شده (متر)</label>
+
+                    <input type="text" id="wire-calculated-tiraj" name="wire_calculated_tiraj" readonly class="w-full p-2 rounded-md mb-4 bg-gray-100">
+
+                </div>
+
+                <div id="wire-tiraj-input" class="hidden">
+
+                    <label for="wire-tiraj" class="block mb-2" data-translate="wire-tiraj-input-label">متراژ درخواستی (متر)</label>
+
+                    <input type="number" id="wire-tiraj" name="wire_tiraj" data-translate-placeholder="wire_tiraj_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <label for="wire-calculated-weight" class="block mb-2" data-translate="wire-calculated-weight-label">وزن محاسبه‌شده (کیلوگرم)</label>
+
+                    <input type="text" id="wire-calculated-weight" name="wire_calculated_weight" readonly class="w-full p-2 rounded-md mb-4 bg-gray-100">
+
+                </div>
+
+                <label for="note-wire" class="block mb-2" data-translate="note-label-wire">یادداشت</label>
+
+                <textarea id="note-wire" name="note_wire" rows="2" data-translate-placeholder="note_placeholder_wire" class="w-full p-2 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+
+                <div class="flex justify-between mt-6">
+
+                    <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center prev-button" onclick="goToStep(2)">
+
+                        <i class="fas fa-arrow-right ml-2"></i> <span data-translate="prev-step-2">مرحله قبل</span>
+
+                    </button>
+
+                    <button type="button" class="bg-blue-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center next-button" onclick="goToStep(4)">
+
+                        <span data-translate="submit-wire">تایید و نمایش خلاصه</span> <i class="fas fa-arrow-left ml-2"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="form-step hidden" id="step-3-rod">
+
+                <h2 class="mb-6 flex items-center"><i class="fas fa-cubes ml-2 text-blue-500"></i> <span data-translate="rod-heading">جزئیات Rod</span></h2>
+
+                <label for="rod-alloy-type" class="block mb-2" data-translate="rod-alloy-type-label">نوع آلیاژ</label>
+
+                <select id="rod-alloy-type" name="rod_alloy_type" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-rod-alloy-default">انتخاب کنید</option>
+
+                    <option value="pure" data-translate="option-rod-pure">خالص</option>
+
+                    <option value="alloyed" data-translate="option-rod-alloyed">آلیاژی</option>
+
+                </select>
+
+                <label for="rod-annealing" class="block mb-2" data-translate="rod-annealing-label">آنیل</label>
+
+                <select id="rod-annealing" name="rod_annealing" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-rod-annealing-default">انتخاب کنید</option>
+
+                    <option value="yes" data-translate="option-rod-annealing-yes">بشود</option>
+
+                    <option value="no" data-translate="option-rod-annealing-no">نشود</option>
+
+                </select>
+
+                <label for="rod-aging" class="block mb-2" data-translate="rod-aging-label">ایجینگ</label>
+
+                <select id="rod-aging" name="rod_aging" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-rod-aging-default">انتخاب کنید</option>
+
+                    <option value="yes" data-translate="option-rod-aging-yes">بشود</option>
+
+                    <option value="no" data-translate="option-rod-aging-no">نشود</option>
+
+                </select>
+
+                <label for="rod-packaging" class="block mb-2" data-translate="rod-packaging-label">بسته بندی</label>
+
+                <select id="rod-packaging" name="rod_packaging" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-rod-packaging-default">انتخاب کنید</option>
+
+                    <option value="bundle" data-translate="option-bundle">کلاف</option>
+
+                    <option value="coil" data-translate="option-coil-rod">کویل</option>
+
+                </select>
+
+                <label for="rod-diameter" class="block mb-2" data-translate="rod-diameter-label">قطر (میلی‌متر مربع)</label>
+
+                <select id="rod-diameter" name="rod_diameter" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-rod-diameter-default">انتخاب کنید</option>
+
+                    <option value="9">9 میلی‌متر</option>
+
+                    <option value="12">12 میلی‌متر</option>
+
+                </select>
+
+                <label for="rod-temper" class="block mb-2" data-translate="rod-temper-label">تمپر</label>
+
+                <select id="rod-temper" name="rod_temper" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-rod-temper-default">انتخاب کنید</option>
+
+                    <option value="H11">H11</option>
+
+                    <option value="H12">H12</option>
+
+                    <option value="H13">H13</option>
+
+                    <option value="H14">H14</option>
+
+                </select>
+
+                <label class="block mb-2" data-translate="order-by-label-rod">سفارش بر اساس</label>
+
+                <div class="flex space-x-4 mb-4" dir="rtl">
+
+                    <label>
+
+                        <input type="radio" name="rod_order_by" value="weight" id="rod-order-by-weight" class="ml-2"> <span data-translate="rod-order-by-weight-text">وزن (کیلوگرم)</span>
+
+                    </label>
+
+                    <label>
+
+                        <input type="radio" name="rod_order_by" value="length" id="rod-order-by-length" class="ml-2"> <span data-translate="rod-order-by-length-text">متراژ (متر)</span>
+
+                    </label>
+
+                </div>
+
+                <div id="rod-weight-input" class="hidden">
+
+                    <label for="rod-weight" class="block mb-2" data-translate="rod-weight-input-label">وزن درخواستی (کیلوگرم)</label>
+
+                    <input type="number" id="rod-weight" name="rod_weight" data-translate-placeholder="rod_weight_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                </div>
+
+                <div id="rod-length-input" class="hidden">
+
+                    <label for="rod-length" class="block mb-2" data-translate="rod-length-input-label">متراژ درخواستی (متر)</label>
+
+                    <input type="number" id="rod-length" name="rod_length" data-translate-placeholder="rod_length_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                </div>
+
+                <label for="note-rod" class="block mb-2" data-translate="note-label-rod">یادداشت</label>
+
+                <textarea id="note-rod" name="note_rod" rows="2" data-translate-placeholder="note_placeholder_rod" class="w-full p-2 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+
+                <div class="flex justify-between mt-6">
+
+                    <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center prev-button" onclick="goToStep(2)">
+
+                        <i class="fas fa-arrow-right ml-2"></i> <span data-translate="prev-step-2">مرحله قبل</span>
+
+                    </button>
+
+                    <button type="button" class="bg-blue-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center next-button" onclick="goToStep(4)">
+
+                        <span data-translate="submit-rod">تایید و نمایش خلاصه</span> <i class="fas fa-arrow-left ml-2"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="form-step hidden" id="step-3-aluminum-tray">
+
+                <h2 class="mb-6 flex items-center"><i class="fas fa-box ml-2 text-blue-500"></i> <span data-translate="Aluminium-tray-heading">جزئیات ظروف آلومینیوم</span></h2>
+
+                <label for="tray-capacity" class="block mb-2" data-translate="tray-capacity-label">حجم</label>
+
+                <select id="tray-capacity" name="tray_capacity" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                    <option value="" disabled selected data-translate="select-tray-capacity-default">انتخاب کنید</option>
+
+                    <option value="500">500 ml</option>
+
+                    <option value="800">800 ml</option>
+
+                    <option value="1000">1000 ml</option>
+
+                    <option value="1300">1300 ml</option>
+
+                    <option value="1500">1500 ml</option>
+
+                    <option value="2000">2000 ml</option>
+
+                    <option value="2500">2500 ml</option>
+
+                    <option value="4000">4000 ml</option>
+
+                </select>
+
+                <label for="tray-dimensions" class="block mb-2" data-translate="tray-dimensions-label">ابعاد</label>
+
+                <select id="tray-dimensions" name="tray_dimensions" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500" disabled>
+
+                    <option value="" disabled selected data-translate="select-tray-dimensions-default">ابتدا حجم را انتخاب کنید</option>
+
+                </select>
+
+                <label for="tray-quantity" class="block mb-2" data-translate="tray-quantity-label">تعداد</label>
+
+                <input type="number" id="tray-quantity" name="tray_quantity" data-translate-placeholder="tray_quantity_placeholder" class="w-full p-2 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+
+                <label for="tray-note" class="block mb-2" data-translate="note-label-tray">یادداشت</label>
+
+                <textarea id="tray-note" name="tray_note" rows="2" data-translate-placeholder="note_placeholder_tray" class="w-full p-2 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+
+                <div class="flex justify-between mt-6">
+
+                    <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center prev-button" onclick="goToStep(2)">
+
+                        <i class="fas fa-arrow-right ml-2"></i> <span data-translate="prev-step-2">مرحله قبل</span>
+
+                    </button>
+
+                    <button type="button" class="bg-blue-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center next-button" onclick="goToStep(4)">
+
+                        <span data-translate="submit-tray">تایید و نمایش خلاصه</span> <i class="fas fa-arrow-left ml-2"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="form-step hidden" id="step-4">
+
+                <h2 class="mb-6 flex items-center"><i class="fas fa-check-circle ml-2 text-blue-500"></i> <span data-translate="summary-heading">خلاصه و تایید سفارش</span></h2>
+
+                <div class="bg-white p-6 rounded-lg shadow-md">
+
+                    <div id="summary-content" class="mb-6">
+
+                        </div>
+
+                    <div class="flex justify-between mt-6">
+
+                        <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center prev-button" onclick="goToStep(3)">
+
+                            <i class="fas fa-arrow-right ml-2"></i> <span data-translate="prev-step-2">مرحله قبل</span>
+
+                        </button>
+
+                        <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center submit-button">
+
+                            <span data-translate="summary-submit">ثبت نهایی سفارش</span> <i class="fas fa-check ml-2"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/persian-date/dist/persian-date.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fa.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/tr.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+
+</html>

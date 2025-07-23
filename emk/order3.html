@@ -1,0 +1,1809 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elkamehr Kimia Order Registration</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Elkamehr Kimia order registration form for pure and alloyed aluminum products including ingots, granules, wires, conductors (AAC, AAAC, ABC, ACSR), rods, and aluminum trays.">
+    <meta name="keywords" content="Elkamehr Kimia, aluminum, order form, alloy ingot, granule, wire, AAC conductor, AAAC conductor, ABC conductor, ACSR conductor, rod, aluminum tray, pure aluminum, alloyed aluminum, industrial aluminum, metal order, Iran aluminum">
+    <link rel="canonical" href="YOUR_CANONICAL_URL_HERE"> <!-- Replace with your actual canonical URL -->
+
+    <!-- Open Graph / Social Media Meta Tags (optional but recommended) -->
+    <meta property="og:title" content="Elkamehr Kimia Order Registration">
+    <meta property="og:description" content="Order pure and alloyed aluminum products from Elkamehr Kimia.">
+    <meta property="og:image" content="https://elkamehr.com/en/wp-content/uploads/2024/03/emk-logo-en.png">
+    <meta property="og:url" content="YOUR_PAGE_URL_HERE"> <!-- Replace with your actual page URL -->
+    <meta property="og:type" content="website">
+
+    <!-- PWA Meta Tags for iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://elkamehr.com/en/wp-content/uploads/2024/03/emk-logo-en.png">
+    
+    <!-- Internal Web App Manifest -->
+    <script type="application/manifest+json">
+    {
+        "name": "Elkamehr Kimia Order Form",
+        "short_name": "EMK Order",
+        "description": "Order registration form for Elkamehr Kimia products.",
+        "start_url": "./index.html",
+        "display": "standalone",
+        "background_color": "#f3f4f6",
+        "theme_color": "#3b82f6",
+        "icons": [
+            {
+                "src": "https://elkamehr.com/en/wp-content/uploads/2024/03/emk-logo-en.png",
+                "sizes": "192x192",
+                "type": "image/png"
+            },
+            {
+                "src": "https://elkamehr.com/en/wp-content/uploads/2024/03/emk-logo-en.png",
+                "sizes": "512x512",
+                "type": "image/png"
+            }
+        ]
+    }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Custom iOS Date Picker Styles & General UI Enhancements -->
+    <style>
+        /* General Styles */
+        :root {
+            --bg-color: #f0f2f5;
+            --input-bg: #ffffff;
+            --modal-bg: #ffffff;
+            --selector-bg: #f9f9f9;
+            --highlight-bg: rgba(200, 200, 200, 0.2);
+            --primary-blue: #007aff;
+            --primary-gray: #e5e5ea;
+            --text-color: #1c1c1e;
+            --text-light: #8e8e93;
+        }
+        body {
+            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top to prevent vertical centering on small screens */
+            min-height: 100vh;
+            padding-bottom: 80px; /* Space for the fixed footer */
+        }
+        .hidden {
+            display: none;
+        }
+        .max-w-xl {
+            max-width: 500px;
+        }
+        /* Progress Bar Styles */
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e5e7eb;
+            border-radius: 9999px; /* Full rounded corners */
+            height: 8px; /* Thinner progress bar */
+            margin-bottom: 1.5rem;
+            overflow: hidden; /* Ensure inner bar stays within bounds */
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #3b82f6;
+            border-radius: 9999px; /* Full rounded corners */
+            transition: width 0.3s ease-in-out;
+        }
+
+        /* Product Card Styles */
+        .product-card {
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            border: 1px solid #d1d5db;
+            background-color: white;
+            padding: 16px;
+            text-align: center;
+            border-radius: 12px; /* Slightly more rounded */
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+        .selected-card {
+            border: 2px solid #3b82f6;
+            background-color: #e0f2fe;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+        .selected-card::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        /* Form Container & Elements */
+        .form-container {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 12px; /* More rounded corners for the main container */
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+            width: 100%; /* Full width on small screens */
+            box-sizing: border-box; /* Include padding in width */
+        }
+        @media (min-width: 640px) { /* Tailwind's 'sm' breakpoint */
+            .form-container {
+                padding: 2.5rem;
+            }
+        }
+        button {
+            transition: all 0.2s ease-in-out;
+            border-radius: 0.5rem; /* Slightly more rounded buttons */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Button shadow */
+        }
+        button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        h1, h2 {
+            font-size: 1.6rem; /* Slightly larger heading */
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1.2rem; /* More space below headings */
+        }
+        p {
+            font-size: 1rem; /* Slightly larger paragraph text */
+            color: #6b7280;
+        }
+        label {
+            font-size: 0.9rem; /* Slightly larger label text */
+            font-weight: 500;
+            color: #4b5563;
+            margin-bottom: 0.6rem; /* More space below labels */
+        }
+        input, textarea, select {
+            border: 1px solid #d1d5db;
+            transition: all 0.2s ease-in-out;
+            padding: 0.85rem; /* Increased padding for touch targets */
+            border-radius: 0.5rem; /* More rounded inputs */
+            width: 100%;
+            box-sizing: border-box;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); /* Larger, softer focus ring */
+            outline: none;
+        }
+        select {
+            appearance: none;
+            background-color: #fff;
+            background-image: url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/svgs/solid/chevron-down.svg");
+            background-position: right 12px center; /* Adjusted icon position */
+            background-repeat: no-repeat;
+            background-size: 1.1rem; /* Slightly smaller icon */
+        }
+        html[dir="rtl"] select {
+            background-position: left 12px center; /* Adjusted for RTL */
+        }
+        .flex-row-reverse {
+            flex-direction: row-reverse;
+        }
+        .ml-2 {
+            margin-left: 0.5rem;
+        }
+        html[dir="rtl"] .ml-2 {
+            margin-left: 0;
+            margin-right: 0.5rem;
+        }
+        .mr-2 {
+            margin-right: 0.5rem;
+        }
+        html[dir="rtl"] .mr-2 {
+            margin-right: 0;
+            margin-left: 0.5rem;
+        }
+
+        /* Fixed Footer for Buttons */
+        .fixed-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #ffffff;
+            padding: 1rem;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+            z-index: 50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem; /* Space between buttons */
+        }
+        .fixed-footer button {
+            flex: 1; /* Make buttons take equal width */
+            padding: 0.75rem 1.5rem; /* Adjust padding for fixed buttons */
+            font-size: 1rem;
+        }
+
+        /* Language Buttons specific styles */
+        .language-buttons-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .language-button {
+            background-color: #f0f0f0;
+            border: 1px solid #d1d5db;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-width: 120px; /* Ensure a minimum width */
+        }
+        .language-button:hover {
+            background-color: #e5e7eb;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .language-button.selected {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* iOS-style Selector Styles (from previous version, ensuring compatibility) */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 1000;
+        }
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: var(--modal-bg);
+            border-radius: 16px 16px 0 0;
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.1);
+            transform: translateY(100%);
+            transition: transform 0.3s ease-out;
+        }
+        .modal-overlay.visible .modal-content {
+            transform: translateY(0);
+        }
+        .modal-header {
+            padding: 12px 20px;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .selectors-container {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            padding: 20px;
+            direction: ltr;
+        }
+        .selector-column {
+            flex: 1;
+            height: 220px;
+            overflow: hidden;
+            position: relative;
+        }
+        .selector-list {
+            position: absolute;
+            width: 100%;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .selector-item {
+            font-size: 1.25rem;
+            line-height: 44px;
+            height: 44px;
+            color: var(--text-light);
+            user-select: none;
+            transition: color 0.3s, font-weight 0.3s;
+        }
+        .selector-item.selected {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        .selector-highlight {
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            right: 10px;
+            height: 44px;
+            transform: translateY(-50%);
+            background-color: var(--highlight-bg);
+            border-radius: 8px;
+            pointer-events: none;
+        }
+        .btn-confirm {
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+        .btn-close {
+            color: #8e8e93;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 sm:p-6">
+
+<div class="max-w-xl mx-auto w-full">
+    <div class="form-container">
+        <!-- Progress Bar -->
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <!-- Header & Language Picker (Moved to Step 0) -->
+        <div class="form-step" id="step-0-language">
+            <header class="flex flex-col items-center justify-center text-center mb-8">
+                <img src="https://elkamehr.com/en/wp-content/uploads/2024/03/emk-logo-en.png" alt="Company Logo" class="h-24 w-auto mb-4">
+                <h1 class="text-2xl font-bold mb-2" data-translate="header-title"></h1>
+                <p class="text-base text-gray-500 mb-6" data-translate="header-subtitle"></p>
+                
+                <div class="language-buttons-container">
+                    <button type="button" class="language-button" data-lang="fa">
+                        <span role="img" aria-label="Farsi flag">🇮🇷</span> فارسی
+                    </button>
+                    <button type="button" class="language-button" data-lang="en">
+                        <span role="img" aria-label="English flag">🇬🇧</span> English
+                    </button>
+                    <button type="button" class="language-button" data-lang="tr">
+                        <span role="img" aria-label="Turkish flag">🇹🇷</span> Türkçe
+                    </button>
+                    <button type="button" class="language-button" data-lang="ar">
+                        <span role="img" aria-label="Arabic flag">🇸🇦</span> العربية
+                    </button>
+                </div>
+            </header>
+            <!-- Button for Step 0 is now in the fixed footer -->
+        </div>
+
+        <form id="multi-step-form" action="/submit-order" method="POST">
+            <div class="form-step hidden" id="step-1-info">
+                <h2 class="mb-6 flex items-center" data-translate="order-info-heading"><i class="fas fa-file-alt ml-2 text-blue-500"></i></h2>
+
+                <label for="order-type" class="block mb-2" data-translate="order-type-label"><i class="fas fa-box ml-2 text-blue-500"></i></label>
+                <select id="order-type" name="order-type" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="internal" data-translate="option-internal"></option>
+                    <option value="customer" data-translate="option-customer" selected></option>
+                </select>
+
+                <label for="company_person_name" class="block mb-2" data-translate="company-person-name-label"><i class="fas fa-user ml-2 text-blue-500"></i></label>
+                <input type="text" id="company_person_name" name="company_person_name" data-translate-placeholder="company_person_name_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500" required>
+
+                <label for="contact_number" class="block mb-2" data-translate="contact-number-label"><i class="fas fa-phone ml-2 text-blue-500"></i></label>
+                <input type="text" id="contact_number" name="contact_number" data-translate-placeholder="contact_number_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500" required>
+
+                <label for="deliveryDate" class="block mb-2" data-translate="delivery-date-label"><i class="fas fa-calendar-alt ml-2 text-blue-500"></i></label>
+                <div class="relative mb-4 icon-input">
+                    <input type="text" id="deliveryDate" name="delivery_date" data-translate-placeholder="delivery_date_placeholder" class="w-full p-3 rounded-md focus:ring-2 focus:ring-blue-500" readonly>
+                </div>
+
+                <label for="description" class="block mb-2" data-translate="description-label"><i class="fas fa-info-circle ml-2 text-blue-500"></i></label>
+                <textarea id="description" name="description" rows="4" data-translate-placeholder="description_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500"></textarea>
+
+                <label for="note" class="block mb-2" data-translate="note-label"><i class="fas fa-sticky-note ml-2 text-blue-500"></i></label>
+                <textarea id="note" name="note" rows="2" data-translate-placeholder="note_placeholder" class="w-full p-3 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+
+                <!-- Buttons for Step 1 are now in the fixed footer -->
+            </div>
+
+            <div class="form-step hidden" id="step-2-product-type">
+                <h2 class="mb-6 flex items-center" data-translate="product-type-heading"><i class="fas fa-box ml-2 text-blue-500"></i></h2>
+
+                <div id="product-options" class="grid grid-cols-2 gap-4 py-4"> <!-- Added py-4 for whitespace -->
+                    <div data-value="alloy_ingot" class="product-card p-4 bg-white border border-gray-300 rounded-lg shadow-sm text-center">
+                        <img src="https://elkamehr.com/en/wp-content/uploads/2024/10/resized_image_3.png" alt="Alloy Ingot" class="mx-auto mb-2 w-20 h-20 object-contain">
+                        <p data-translate="product-alloy-ingot"></p>
+                    </div>
+                    <div data-value="granule" class="product-card p-4 bg-white border border-gray-300 rounded-lg shadow-sm text-center">
+                        <img src="https://elkamehr.com/en/wp-content/uploads/2024/10/resized_image_4.png" alt="Granule" class="mx-auto mb-2 w-20 h-20 object-contain">
+                        <p data-translate="product-granule"></p>
+                    </div>
+                    <div data-value="wire" class="product-card p-4 bg-white border border-gray-300 rounded-lg shadow-sm text-center">
+                        <img src="https://elkamehr.com/en/wp-content/uploads/2024/10/resized_image_5.png" alt="Wire" class="mx-auto mb-2 w-20 h-20 object-contain">
+                        <p data-translate="product-wire"></p>
+                    </div>
+                    <div data-value="aac" class="product-card p-4 bg-white border border-gray-300 rounded-lg shadow-sm text-center">
+                        <img src="https://elkamehr.com/en/wp-content/uploads/2024/10/resized_image_0.png" alt="AAC Conductor" class="mx-auto mb-2 w-20 h-20 object-contain">
+                        <p data-translate="product-aac-conductor"></p>
+                    </div>
+                    <div data-value="aaac" class="product-card p-4 bg-white border border-gray-300 rounded-lg shadow-sm text-center">
+                        <img src="https://elkamehr.com/en/wp-content/uploads/2024/10/resized_image_6.png" alt="AAAC Conductor" class="mx-auto mb-2 w-20 h-20 object-contain">
+                        <p data-translate="product-aaac-conductor"></p>
+                    </div>
+                    <div data-value="abc" class="product-card p-4 bg-white border border-gray-300 rounded-lg shadow-sm text-center">
+                        <img src="https://elkamehr.com/en/wp-content/uploads/2024/10/resized_image_7.png" alt="ABC Conductor" class="mx-auto mb-2 w-20 h-20 object-contain">
+                        <p data-translate="product-abc-conductor"></p>
+                    </div>
+                    <div data-value="acsr" class="product-card p-4 bg-white border border-gray-300 rounded-lg shadow-sm text-center">
+                        <img src="https://elkamehr.com/en/wp-content/uploads/2024/10/resized_image_1.png" alt="ACSR Conductor" class="mx-auto mb-2 w-20 h-20 object-contain">
+                        <p data-translate="product-acsr-conductor"></p>
+                    </div>
+                    <div data-value="rod" class="product-card p-4 bg-white border border-gray-300 rounded-lg shadow-sm text-center">
+                        <img src="https://elkamehr.com/en/wp-content/uploads/2024/10/resized_image_2.png" alt="Rod" class="mx-auto mb-2 w-20 h-20 object-contain">
+                        <p data-translate="product-rod"></p>
+                    </div>
+                    <div data-value="aluminum_tray" class="product-card p-4 bg-white border border-gray-300 rounded-lg shadow-sm text-center">
+                        <img src="https://elkamehr.com/en/wp-content/uploads/2025/05/Some-aluminium-foil-trays-for-food-on-transparnt-background-PNG-150x150.png" alt="Aluminum Tray" class="mx-auto mb-2 w-20 h-20 object-contain">
+                        <p data-translate="product-aluminum-tray"></p>
+                    </div>
+                </div>
+
+                <input type="hidden" id="product-type" name="product_type" value="">
+
+                <!-- Buttons for Step 2 are now in the fixed footer -->
+            </div>
+
+            <!-- ALL PRODUCT DETAIL STEPS ARE HERE -->
+            
+            <div class="form-step hidden" id="step-3-alloy">
+                <h2 class="mb-6 flex items-center" data-translate="alloy-ingot-heading"><i class="fas fa-cubes ml-2 text-blue-500"></i></h2>
+                <label for="alloy-type" class="block mb-2" data-translate="alloy-type-label"></label>
+                <select id="alloy-type" name="alloy_type" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-option-default-alloy"></option>
+                    <option value="pure" data-translate="option-pure"></option>
+                    <option value="alloyed" data-translate="option-alloyed"></option>
+                </select>
+                <label for="packaging" class="block mb-2" data-translate="packaging-label-alloy"></label>
+                <select id="packaging" name="packaging" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-packaging-default-alloy"></option>
+                    <option value="bulk" data-translate="option-bulk-alloy"></option>
+                    <option value="pallet" data-translate="option-pallet-alloy"></option>
+                </select>
+                <label for="weight" class="block mb-2" data-translate="weight-label-alloy"></label>
+                <input type="number" id="weight" name="weight" data-translate-placeholder="weight_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                <label for="standard" class="block mb-2" data-translate="standard-label"></label>
+                <input type="text" id="standard" name="standard" data-translate-placeholder="standard_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                <label for="chemical-analysis" class="block mb-2" data-translate="chemical-analysis-label"></label>
+                <textarea id="chemical-analysis" name="chemical_analysis" rows="2" data-translate-placeholder="chemical_analysis_placeholder" class="w-full p-3 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+                <label for="note-alloy" class="block mb-2" data-translate="note-label-alloy"></label>
+                <textarea id="note-alloy" name="note_alloy" rows="2" data-translate-placeholder="note_placeholder_alloy" class="w-full p-3 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+                <!-- Buttons for Step 3 are now in the fixed footer -->
+            </div>
+
+            <div class="form-step hidden" id="step-3-granule">
+                <h2 class="mb-6 flex items-center" data-translate="granule-heading"><i class="fas fa-cubes ml-2 text-blue-500"></i></h2>
+                <label for="granule-alloy-type" class="block mb-2" data-translate="granule-alloy-type-label"></label>
+                <select id="granule-alloy-type" name="granule_alloy_type" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-granule-alloy-default"></option>
+                    <option value="pure" data-translate="option-granule-pure"></option>
+                    <option value="alloyed" data-translate="option-granule-alloyed"></option>
+                </select>
+                <label for="granule-packaging" class="block mb-2" data-translate="granule-packaging-label"></label>
+                <select id="granule-packaging" name="granule_packaging" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-granule-packaging-default"></option>
+                    <option value="jumbo" data-translate="option-jumbo"></option>
+                    <option value="bulk" data-translate="option-bulk-granule"></option>
+                </select>
+                <label for="granule-weight" class="block mb-2" data-translate="granule-weight-label"></label>
+                <input type="number" id="granule-weight" name="granule_weight" data-translate-placeholder="granule_weight_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                <label for="granule-note" class="block mb-2" data-translate="granule-note-label"></label>
+                <textarea id="granule-note" name="granule_note" rows="2" data-translate-placeholder="granule_note_placeholder" class="w-full p-3 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+                <!-- Buttons for Step 3 are now in the fixed footer -->
+            </div>
+
+            <div class="form-step hidden" id="step-3-wire">
+                <h2 class="mb-6 flex items-center" data-translate="wire-heading"><i class="fas fa-cubes ml-2 text-blue-500"></i></h2>
+                <label for="wire-alloy-type" class="block mb-2" data-translate="wire-alloy-type-label"></label>
+                <select id="wire-alloy-type" name="wire_alloy_type" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-wire-alloy-default"></option>
+                    <option value="pure" data-translate="option-wire-pure"></option>
+                    <option value="alloyed" data-translate="option-wire-alloyed"></option>
+                </select>
+                <label for="anneal" class="block mb-2" data-translate="anneal-label"></label>
+                <select id="anneal" name="anneal" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-anneal-default"></option>
+                    <option value="yes" data-translate="option-anneal-yes"></option>
+                    <option value="no" data-translate="option-anneal-no"></option>
+                </select>
+                <label for="aging" class="block mb-2" data-translate="aging-label"></label>
+                <select id="aging" name="aging" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-aging-default"></option>
+                    <option value="yes" data-translate="option-aging-yes"></option>
+                    <option value="no" data-translate="option-aging-no"></option>
+                </select>
+                <label for="wire-packaging" class="block mb-2" data-translate="wire-packaging-label"></label>
+                <select id="wire-packaging" name="wire_packaging" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-wire-packaging-default"></option>
+                    <option value="reel-630" data-translate="option-reel-630"></option>
+                    <option value="plastic-reel" data-translate="option-plastic-reel"></option>
+                    <option value="wood-reel" data-translate="option-wood-reel"></option>
+                    <option value="coil" data-translate="option-coil"></option>
+                </select>
+                <label for="wire-cross_section" class="block mb-2" data-translate="wire-cross-section-label"></label>
+                <input type="number" id="wire-cross_section" name="cross_section" data-translate-placeholder="wire_cross_section_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                <label class="block mb-2" data-translate="order-by-label-wire"></label>
+                <div class="flex space-x-4 mb-4">
+                    <label>
+                        <input type="radio" name="wire_order_by" value="weight" id="wire-order-by-weight" class="mr-2"><span data-translate="wire-order-by-weight-text"></span>
+                    </label>
+                    <label>
+                        <input type="radio" name="wire_order_by" value="tiraj" id="wire-order-by-tiraj" class="mr-2"><span data-translate="wire-order-by-tiraj-text"></span>
+                    </label>
+                </div>
+                <div id="wire-weight-input" class="hidden">
+                    <label for="wire-weight" class="block mb-2" data-translate="wire-weight-input-label"></label>
+                    <input type="number" id="wire-weight" name="wire_weight" data-translate-placeholder="wire_weight_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <label for="wire-calculated-tiraj" class="block mb-2" data-translate="wire-calculated-tiraj-label"></label>
+                    <input type="text" id="wire-calculated-tiraj" name="wire_calculated_tiraj" readonly class="w-full p-3 rounded-md mb-4 bg-gray-100">
+                </div>
+                <div id="wire-tiraj-input" class="hidden">
+                    <label for="wire-tiraj" class="block mb-2" data-translate="wire-tiraj-input-label"></label>
+                    <input type="number" id="wire-tiraj" name="wire_tiraj" data-translate-placeholder="wire_tiraj_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <label for="wire-calculated-weight" class="block mb-2" data-translate="wire-calculated-weight-label"></label>
+                    <input type="text" id="wire-calculated-weight" name="wire_calculated_weight" readonly class="w-full p-3 rounded-md mb-4 bg-gray-100">
+                </div>
+                <label for="note-wire" class="block mb-2" data-translate="note-label-wire"></label>
+                <textarea id="note-wire" name="note_wire" rows="2" data-translate-placeholder="note_placeholder_wire" class="w-full p-3 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+                <!-- Buttons for Step 3 are now in the fixed footer -->
+            </div>
+
+            <div class="form-step hidden" id="step-3-aac">
+                <h2 class="mb-6 flex items-center" data-translate="aac-heading"><i class="fas fa-cubes ml-2 text-blue-500"></i></h2>
+                <label for="aac-packaging" class="block mb-2" data-translate="aac-packaging-label"></label>
+                <select id="aac-packaging" name="aac_packaging" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-aac-packaging-default"></option>
+                    <option value="metal-reel" data-translate="option-aac-metal-reel"></option>
+                    <option value="wood-reel" data-translate="option-aac-wood-reel"></option>
+                </select>
+                <label for="aac-cross_section" class="block mb-2" data-translate="aac-cross-section-label"></label>
+                <select id="aac-cross_section" name="aac_cross_section" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-aac-cross-section-default"></option>
+                    <option value="16">16</option>
+                    <option value="25">25</option>
+                    <option value="35">35</option>
+                    <option value="50">50</option>
+                    <option value="70">70</option>
+                    <option value="95">95</option>
+                    <option value="120">120</option>
+                    <option value="185">185</option>
+                </select>
+                <label class="block mb-2" data-translate="order-by-label-aac"></label>
+                <div class="flex space-x-4 mb-4">
+                    <label>
+                        <input type="radio" name="aac_order_by" value="weight" id="aac-order-by-weight" class="mr-2"><span data-translate="aac-order-by-weight-text"></span>
+                    </label>
+                    <label>
+                        <input type="radio" name="aac_order_by" value="tiraj" id="aac-order-by-tiraj" class="mr-2"><span data-translate="aac-order-by-tiraj-text"></span>
+                    </label>
+                </div>
+                <div id="aac-weight-input" class="hidden">
+                    <label for="aac-weight" class="block mb-2" data-translate="aac-weight-input-label"></label>
+                    <input type="number" id="aac-weight" name="aac_weight" data-translate-placeholder="aac_weight_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <label for="aac-calculated-tiraj" class="block mb-2" data-translate="aac-calculated-tiraj-label"></label>
+                    <input type="text" id="aac-calculated-tiraj" name="aac_calculated_tiraj" readonly class="w-full p-3 rounded-md mb-4 bg-gray-100">
+                </div>
+                <div id="aac-tiraj-input" class="hidden">
+                    <label for="aac-tiraj" class="block mb-2" data-translate="aac-tiraj-input-label"></label>
+                    <input type="number" id="aac-tiraj" name="aac_tiraj" data-translate-placeholder="aac_tiraj_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <label for="aac-calculated-weight" class="block mb-2" data-translate="aac-calculated-weight-label"></label>
+                    <input type="text" id="aac-calculated-weight" name="aac_calculated_weight" readonly class="w-full p-3 rounded-md mb-4 bg-gray-100">
+                </div>
+                <label for="aac-brand-name" class="block mb-2" data-translate="aac-brand-name-label"></label>
+                <input type="text" id="aac-brand-name" name="aac_brand_name" data-translate-placeholder="aac_brand_name_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                <label for="aac-direction" class="block mb-2" data-translate="aac-direction-label"></label>
+                <select id="aac-direction" name="aac_direction" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-aac-direction-default"></option>
+                    <option value="right" data-translate="option-aac-right"></option>
+                    <option value="left" data-translate="option-aac-left"></option>
+                </select>
+                <label for="note-aac" class="block mb-2" data-translate="note-label-aac"></label>
+                <textarea id="note-aac" name="note_aac" rows="2" data-translate-placeholder="note_placeholder_aac" class="w-full p-3 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+                <!-- Buttons for Step 3 are now in the fixed footer -->
+            </div>
+
+            <div class="form-step hidden" id="step-3-aaac">
+                <h2 class="mb-6 flex items-center" data-translate="aaac-heading"><i class="fas fa-cubes ml-2 text-blue-500"></i></h2>
+                <label for="aaac-packaging" class="block mb-2" data-translate="aaac-packaging-label"></label>
+                <select id="aaac-packaging" name="aaac_packaging" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-aaac-packaging-default"></option>
+                    <option value="metal-reel" data-translate="option-aaac-metal-reel"></option>
+                    <option value="wood-reel" data-translate="option-aaac-wood-reel"></option>
+                </select>
+                <label for="aaac-cross_section" class="block mb-2" data-translate="aaac-cross-section-label"></label>
+                <select id="aaac-cross_section" name="aaac_cross_section" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-aaac-cross-section-default"></option>
+                    <option value="16">16</option>
+                    <option value="25">25</option>
+                    <option value="35">35</option>
+                    <option value="50">50</option>
+                    <option value="70">70</option>
+                    <option value="95">95</option>
+                    <option value="120">120</option>
+                    <option value="185">185</option>
+                </select>
+                <label class="block mb-2" data-translate="order-by-label-aaac"></label>
+                <div class="flex space-x-4 mb-4">
+                    <label>
+                        <input type="radio" name="aaac_order_by" value="weight" id="aaac-order-by-weight" class="mr-2"><span data-translate="aaac-order-by-weight-text"></span>
+                    </label>
+                    <label>
+                        <input type="radio" name="aaac_order_by" value="tiraj" id="aaac-order-by-tiraj" class="mr-2"><span data-translate="aaac-order-by-tiraj-text"></span>
+                    </label>
+                </div>
+                <div id="aaac-weight-input" class="hidden">
+                    <label for="aaac-weight" class="block mb-2" data-translate="aaac-weight-input-label"></label>
+                    <input type="number" id="aaac-weight" name="aaac_weight" data-translate-placeholder="aaac_weight_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <label for="aaac-calculated-tiraj" class="block mb-2" data-translate="aaac-calculated-tiraj-label"></label>
+                    <input type="text" id="aaac-calculated-tiraj" name="aaac_calculated_tiraj" readonly class="w-full p-3 rounded-md mb-4 bg-gray-100">
+                </div>
+                <div id="aaac-tiraj-input" class="hidden">
+                    <label for="aaac-tiraj" class="block mb-2" data-translate="aaac-tiraj-input-label"></label>
+                    <input type="number" id="aaac-tiraj" name="aaac_tiraj" data-translate-placeholder="aaac_tiraj_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <label for="aaac-calculated-weight" class="block mb-2" data-translate="aaac-calculated-weight-label"></label>
+                    <input type="text" id="aaac-calculated-weight" name="aaac_calculated_weight" readonly class="w-full p-3 rounded-md mb-4 bg-gray-100">
+                </div>
+                <label for="aaac-brand-name" class="block mb-2" data-translate="aaac-brand-name-label"></label>
+                <input type="text" id="aaac-brand-name" name="aaac_brand_name" data-translate-placeholder="aaac_brand_name_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                <label for="aaac-direction" class="block mb-2" data-translate="aaac-direction-label"></label>
+                <select id="aaac-direction" name="aaac_direction" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-aaac-direction-default"></option>
+                    <option value="right" data-translate="option-aaac-right"></option>
+                    <option value="left" data-translate="option-aaac-left"></option>
+                </select>
+                <label for="note-aaac" class="block mb-2" data-translate="note-label-aaac"></label>
+                <textarea id="note-aaac" name="note_aaac" rows="2" data-translate-placeholder="note_placeholder_aaac" class="w-full p-3 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+                <!-- Buttons for Step 3 are now in the fixed footer -->
+            </div>
+
+            <div class="form-step hidden" id="step-3-acsr">
+                <h2 class="mb-6 flex items-center" data-translate="acsr-heading"><i class="fas fa-cubes ml-2 text-blue-500"></i></h2>
+                <label for="acsr-packaging" class="block mb-2" data-translate="acsr-packaging-label"></label>
+                <select id="acsr-packaging" name="acsr_packaging" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-acsr-packaging-default"></option>
+                    <option value="metal-reel" data-translate="option-acsr-metal-reel"></option>
+                    <option value="wood-reel" data-translate="option-acsr-wood-reel"></option>
+                </select>
+                <label for="acsr-cross_section" class="block mb-2" data-translate="acsr-cross-section-label"></label>
+                <select id="acsr-cross_section" name="acsr_cross_section" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-acsr-cross-section-default"></option>
+                    <option value="16">16</option>
+                    <option value="25">25</option>
+                    <option value="35">35</option>
+                    <option value="50">50</option>
+                    <option value="70">70</option>
+                    <option value="95">95</option>
+                    <option value="120">120</option>
+                    <option value="185">185</option>
+                </select>
+                <label class="block mb-2" data-translate="order-by-label-acsr"></label>
+                <div class="flex space-x-4 mb-4">
+                    <label>
+                        <input type="radio" name="acsr_order_by" value="weight" id="acsr-order-by-weight" class="mr-2"><span data-translate="acsr-order-by-weight-text"></span>
+                    </label>
+                    <label>
+                        <input type="radio" name="acsr_order_by" value="tiraj" id="acsr-order-by-tiraj" class="mr-2"><span data-translate="acsr-order-by-tiraj-text"></span>
+                    </label>
+                </div>
+                <div id="acsr-weight-input" class="hidden">
+                    <label for="acsr-weight" class="block mb-2" data-translate="acsr-weight-input-label"></label>
+                    <input type="number" id="acsr-weight" name="acsr_weight" data-translate-placeholder="acsr_weight_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <label for="acsr-calculated-tiraj" class="block mb-2" data-translate="acsr-calculated-tiraj-label"></label>
+                    <input type="text" id="acsr-calculated-tiraj" name="acsr_calculated_tiraj" readonly class="w-full p-3 rounded-md mb-4 bg-gray-100">
+                </div>
+                <div id="acsr-tiraj-input" class="hidden">
+                    <label for="acsr-tiraj" class="block mb-2" data-translate="acsr-tiraj-input-label"></label>
+                    <input type="number" id="acsr-tiraj" name="acsr_tiraj" data-translate-placeholder="acsr_tiraj_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <label for="acsr-calculated-weight" class="block mb-2" data-translate="acsr-calculated-weight-label"></label>
+                    <input type="text" id="acsr-calculated-weight" name="acsr_calculated_weight" readonly class="w-full p-3 rounded-md mb-4 bg-gray-100">
+                </div>
+                <label for="acsr-brand-name" class="block mb-2" data-translate="acsr-brand-name-label"></label>
+                <input type="text" id="acsr-brand-name" name="acsr_brand_name" data-translate-placeholder="acsr_brand_name_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                <label for="acsr-direction" class="block mb-2" data-translate="acsr-direction-label"></label>
+                <select id="acsr-direction" name="acsr_direction" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-acsr-direction-default"></option>
+                    <option value="right" data-translate="option-acsr-right"></option>
+                    <option value="left" data-translate="option-acsr-left"></option>
+                </select>
+                <label for="note-acsr" class="block mb-2" data-translate="note-label-acsr"></label>
+                <textarea id="note-acsr" name="note_acsr" rows="2" data-translate-placeholder="note_placeholder_acsr" class="w-full p-3 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+                <!-- Buttons for Step 3 are now in the fixed footer -->
+            </div>
+
+            <div class="form-step hidden" id="step-3-abc">
+                <h2 class="mb-6 flex items-center" data-translate="abc-heading"><i class="fas fa-cubes ml-2 text-blue-500"></i></h2>
+                <label for="abc-packaging" class="block mb-2" data-translate="abc-packaging-label"></label>
+                <select id="abc-packaging" name="abc_packaging" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-abc-packaging-default"></option>
+                    <option value="metal-reel" data-translate="option-abc-metal-reel"></option>
+                    <option value="wood-reel" data-translate="option-abc-wood-reel"></option>
+                </select>
+                <label for="abc-cross_section" class="block mb-2" data-translate="abc-cross-section-label"></label>
+                <select id="abc-cross_section" name="abc_cross_section" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-abc-cross-section-default"></option>
+                    <option value="16">16</option>
+                    <option value="25">25</option>
+                    <option value="35">35</option>
+                    <option value="50">50</option>
+                    <option value="70">70</option>
+                    <option value="95">95</option>
+                    <option value="120">120</option>
+                </select>
+                <label class="block mb-2" data-translate="order-by-label-abc"></label>
+                <div class="flex space-x-4 mb-4">
+                    <label>
+                        <input type="radio" name="abc_order_by" value="weight" id="abc-order-by-weight" class="mr-2"><span data-translate="abc-order-by-weight-text"></span>
+                    </label>
+                    <label>
+                        <input type="radio" name="abc_order_by" value="tiraj" id="abc-order-by-tiraj" class="mr-2"><span data-translate="abc-order-by-tiraj-text"></span>
+                    </label>
+                </div>
+                <div id="abc-weight-input" class="hidden">
+                    <label for="abc-weight" class="block mb-2" data-translate="abc-weight-input-label"></label>
+                    <input type="number" id="abc-weight" name="abc_weight" data-translate-placeholder="abc_weight_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <label for="abc-calculated-tiraj" class="block mb-2" data-translate="abc-calculated-tiraj-label"></label>
+                    <input type="text" id="abc-calculated-tiraj" name="abc_calculated_tiraj" readonly class="w-full p-3 rounded-md mb-4 bg-gray-100">
+                </div>
+                <div id="abc-tiraj-input" class="hidden">
+                    <label for="abc-tiraj" class="block mb-2" data-translate="abc-tiraj-input-label"></label>
+                    <input type="number" id="abc-tiraj" name="abc_tiraj" data-translate-placeholder="abc_tiraj_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <label for="abc-calculated-weight-no-cover" class="block mb-2" data-translate="abc-calculated-weight-no-cover-label"></label>
+                    <input type="text" id="abc-calculated-weight-no-cover" name="abc_calculated_weight_no_cover" readonly class="w-full p-3 rounded-md mb-4 bg-gray-100">
+
+                    <label for="abc-calculated-weight-with-cover" class="block mb-2" data-translate="abc-calculated-weight-with-cover-label"></label>
+                    <input type="text" id="abc-calculated-weight-with-cover" name="abc_calculated_weight_with_cover" readonly class="w-full p-3 rounded-md mb-4 bg-gray-100">
+
+                    <label for="abc-calculated-total-weight" class="block mb-2" data-translate="abc-calculated-total-weight-label"></label>
+                    <input type="text" id="abc-calculated-total-weight" name="abc_calculated_total_weight" readonly class="w-full p-3 rounded-md mb-4 bg-gray-100">
+                </div>
+                <label for="abc-brand-name" class="block mb-2" data-translate="abc-brand-name-label"></label>
+                <input type="text" id="abc-brand-name" name="abc_brand_name" data-translate-placeholder="abc_brand_name_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                <label for="abc-direction" class="block mb-2" data-translate="abc-direction-label"></label>
+                <select id="abc-direction" name="abc_direction" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-abc-direction-default"></option>
+                    <option value="right" data-translate="option-abc-right"></option>
+                    <option value="left" data-translate="option-abc-left"></option>
+                </select>
+                <label for="note-abc" class="block mb-2" data-translate="note-label-abc"></label>
+                <textarea id="note-abc" name="note_abc" rows="2" data-translate-placeholder="note_placeholder_abc" class="w-full p-3 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+                <!-- Buttons for Step 3 are now in the fixed footer -->
+            </div>
+
+            <div class="form-step hidden" id="step-3-rod">
+                <h2 class="mb-6 flex items-center" data-translate="rod-heading"><i class="fas fa-cubes ml-2 text-blue-500"></i></h2>
+                <label for="rod-alloy-type" class="block mb-2" data-translate="rod-alloy-type-label"></label>
+                <select id="rod-alloy-type" name="rod_alloy_type" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-rod-alloy-default"></option>
+                    <option value="pure" data-translate="option-rod-pure"></option>
+                    <option value="alloyed" data-translate="option-rod-alloyed"></option>
+                </select>
+                <label for="rod-annealing" class="block mb-2" data-translate="rod-annealing-label"></label>
+                <select id="rod-annealing" name="rod_annealing" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-rod-annealing-default"></option>
+                    <option value="yes" data-translate="option-rod-annealing-yes"></option>
+                    <option value="no" data-translate="option-rod-annealing-no"></option>
+                </select>
+                <label for="rod-aging" class="block mb-2" data-translate="rod-aging-label"></label>
+                <select id="rod-aging" name="rod_aging" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-rod-aging-default"></option>
+                    <option value="yes" data-translate="option-rod-aging-yes"></option>
+                    <option value="no" data-translate="option-rod-aging-no"></option>
+                </select>
+                <label for="rod-packaging" class="block mb-2" data-translate="rod-packaging-label"></label>
+                <select id="rod-packaging" name="rod_packaging" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-rod-packaging-default"></option>
+                    <option value="bundle" data-translate="option-bundle"></option>
+                    <option value="coil" data-translate="option-coil-rod"></option>
+                </select>
+                <label for="rod-diameter" class="block mb-2" data-translate="rod-diameter-label"></label>
+                <select id="rod-diameter" name="rod_diameter" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-rod-diameter-default"></option>
+                    <option value="9">9 mm</option>
+                    <option value="12">12 mm</option>
+                </select>
+                <label for="rod-temper" class="block mb-2" data-translate="rod-temper-label"></label>
+                <select id="rod-temper" name="rod_temper" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-rod-temper-default"></option>
+                    <option value="H11">H11</option>
+                    <option value="H12">H12</option>
+                    <option value="H13">H13</option>
+                    <option value="H14">H14</option>
+                </select>
+                <label class="block mb-2" data-translate="rod-order-by-weight-text"></label>
+                <div class="flex space-x-4 mb-4">
+                    <label>
+                        <input type="radio" name="rod_order_by" value="weight" id="rod-order-by-weight" class="mr-2"><span data-translate="rod-order-by-weight-text"></span>
+                    </label>
+                    <label>
+                        <input type="radio" name="rod_order_by" value="length" id="rod-order-by-length" class="mr-2"><span data-translate="rod-order-by-length-text"></span>
+                    </label>
+                </div>
+                <div id="rod-weight-input" class="hidden">
+                    <label for="rod-weight" class="block mb-2" data-translate="rod-weight-input-label"></label>
+                    <input type="number" id="rod-weight" name="rod_weight" data-translate-placeholder="rod_weight_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div id="rod-length-input" class="hidden">
+                    <label for="rod-length" class="block mb-2" data-translate="rod-length-input-label"></label>
+                    <input type="number" id="rod-length" name="rod_length" data-translate-placeholder="rod_length_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                </div>
+                <label for="note-rod" class="block mb-2" data-translate="note-label-rod"></label>
+                <textarea id="note-rod" name="note_rod" rows="2" data-translate-placeholder="note_placeholder_rod" class="w-full p-3 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+                <!-- Buttons for Step 3 are now in the fixed footer -->
+            </div>
+
+            <div class="form-step hidden" id="step-3-aluminum-tray">
+                <h2 class="mb-6 flex items-center" data-translate="aluminum-tray-heading"><i class="fas fa-box ml-2 text-blue-500"></i></h2>
+                <label for="tray-capacity" class="block mb-2" data-translate="tray-capacity-label"></label>
+                <select id="tray-capacity" name="tray_capacity" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected data-translate="select-tray-capacity-default"></option>
+                    <option value="500">500 ml</option>
+                    <option value="800">800 ml</option>
+                    <option value="1000">1000 ml</option>
+                    <option value="1300">1300 ml</option>
+                    <option value="1500">1500 ml</option>
+                    <option value="2000">2000 ml</option>
+                    <option value="2500">2500 ml</option>
+                    <option value="4000">4000 ml</option>
+                </select>
+                <label for="tray-dimensions" class="block mb-2" data-translate="tray-dimensions-label"></label>
+                <select id="tray-dimensions" name="tray_dimensions" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-blue-500" disabled>
+                    <option value="" disabled selected data-translate="select-tray-dimensions-default"></option>
+                </select>
+                <label for="tray-quantity" class="block mb-2" data-translate="tray-quantity-label"></label>
+                <input type="number" id="tray-quantity" name="tray_quantity" data-translate-placeholder="tray_quantity_placeholder" class="w-full p-3 rounded-md mb-4 focus:ring-2 focus:ring-2 focus:ring-blue-500">
+                <label for="tray-note" class="block mb-2" data-translate="note-label-tray"></label>
+                <textarea id="tray-note" name="note_tray" rows="2" data-translate-placeholder="note_placeholder_tray" class="w-full p-3 rounded-md mb-6 focus:ring-2 focus:ring-blue-500"></textarea>
+                <!-- Buttons for Step 3 are now in the fixed footer -->
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Fixed Footer for Navigation Buttons -->
+<div class="fixed-footer" id="fixedFooter">
+    <!-- Buttons will be dynamically inserted here by JavaScript -->
+</div>
+
+<!-- Date Picker Modal HTML -->
+<div id="datePickerModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button id="closeModal" class="btn btn-close" data-translate="date-picker-cancel"></button>
+            <button id="confirmDate" class="btn btn-confirm" data-translate="date-picker-confirm"></button>
+        </div>
+        <div class="selectors-container">
+            <div id="pdp-year" class="selector-column"></div>
+            <div id="pdp-month" class="selector-column"></div>
+            <div id="pdp-day" class="selector-column"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="translations.js"></script>
+<script>
+    // Global variable to hold the current language and step
+    let currentLang = 'fa';
+    let currentStep = 0; // 0 for language selection, 1 for order info, 2 for product type, 3 for product details
+
+    // Total number of main steps (0, 1, 2, 3)
+    const totalMainSteps = 4;
+
+    // Function to translate all elements on the page
+    function translatePage(lang) {
+        currentLang = lang;
+        document.documentElement.lang = lang;
+        document.documentElement.dir = (lang === 'fa' || lang === 'ar') ? 'rtl' : 'ltr';
+
+        // Update Font Awesome icon direction for RTL/LTR
+        const updateIconDirection = () => {
+            document.querySelectorAll('button[data-translate]').forEach(button => {
+                const icon = button.querySelector('i.fas');
+                if (icon) {
+                    if (currentLang === 'fa' || currentLang === 'ar') {
+                        // For RTL, if it's a 'next' button, arrow should point left, 'prev' should point right
+                        if (button.getAttribute('data-translate') === 'next-step-1' || button.getAttribute('data-translate') === 'next-step-2') {
+                            icon.classList.remove('ml-2');
+                            icon.classList.add('mr-2');
+                            button.classList.add('flex-row-reverse');
+                        } else if (button.getAttribute('data-translate') === 'prev-step-2') {
+                            icon.classList.remove('mr-2');
+                            icon.classList.add('ml-2');
+                            button.classList.add('flex-row-reverse');
+                        } else if (button.getAttribute('data-translate').startsWith('submit-')) {
+                            icon.classList.remove('ml-2');
+                            icon.classList.add('mr-2');
+                            button.classList.add('flex-row-reverse');
+                        }
+                    } else {
+                        // For LTR
+                        if (button.getAttribute('data-translate') === 'next-step-1' || button.getAttribute('data-translate') === 'next-step-2') {
+                            icon.classList.remove('mr-2');
+                            icon.classList.add('ml-2');
+                            button.classList.remove('flex-row-reverse');
+                        } else if (button.getAttribute('data-translate') === 'prev-step-2') {
+                            icon.classList.remove('ml-2');
+                            icon.classList.add('mr-2');
+                            button.classList.remove('flex-row-reverse');
+                        } else if (button.getAttribute('data-translate').startsWith('submit-')) {
+                            icon.classList.remove('mr-2');
+                            icon.classList.add('ml-2');
+                            button.classList.remove('flex-row-reverse');
+                        }
+                    }
+                }
+            });
+        };
+
+        document.querySelectorAll('[data-translate]').forEach(element => {
+            const key = element.getAttribute('data-translate');
+            if (translations[lang] && translations[lang][key]) {
+                if (element.tagName === 'SELECT') {
+                    element.querySelectorAll('option[data-translate]').forEach(option => {
+                        const optionKey = option.getAttribute('data-translate');
+                        if (translations[lang][optionKey]) {
+                            option.textContent = translations[lang][optionKey];
+                        }
+                    });
+                    // Also update the default selected option if it has a data-translate
+                    const selectedOption = element.querySelector('option[selected]');
+                    if (selectedOption && selectedOption.hasAttribute('data-translate')) {
+                        const defaultKey = selectedOption.getAttribute('data-translate');
+                        if (translations[lang][defaultKey]) {
+                            selectedOption.textContent = translations[lang][defaultKey];
+                        }
+                    }
+                } else {
+                    element.textContent = translations[lang][key];
+                }
+            }
+        });
+
+        document.querySelectorAll('[data-translate-placeholder]').forEach(element => {
+            const key = element.getAttribute('data-translate-placeholder');
+            if (translations[lang] && translations[lang][key]) {
+                element.placeholder = translations[lang][key];
+            }
+        });
+
+        // Update specific elements that might not have data-translate
+        const trayDimensionsDropdown = document.getElementById('tray-dimensions');
+        if (trayDimensionsDropdown && trayDimensionsDropdown.disabled) {
+            const defaultOption = trayDimensionsDropdown.querySelector('option[disabled][selected]');
+            if (defaultOption) {
+                defaultOption.textContent = translations[currentLang]['select-tray-dimensions-default'];
+            }
+        }
+
+        // Update radio button labels
+        document.getElementById('wire-order-by-weight').nextElementSibling.textContent = translations[currentLang]['wire-order-by-weight-text'];
+        document.getElementById('wire-order-by-tiraj').nextElementSibling.textContent = translations[currentLang]['wire-order-by-tiraj-text'];
+        document.getElementById('aaac-order-by-weight').nextElementSibling.textContent = translations[currentLang]['aaac-order-by-weight-text'];
+        document.getElementById('aaac-order-by-tiraj').nextElementSibling.textContent = translations[currentLang]['aaac-order-by-tiraj-text'];
+        document.getElementById('aac-order-by-weight').nextElementSibling.textContent = translations[currentLang]['aac-order-by-weight-text'];
+        document.getElementById('aac-order-by-tiraj').nextElementSibling.textContent = translations[currentLang]['aac-order-by-tiraj-text'];
+        document.getElementById('acsr-order-by-weight').nextElementSibling.textContent = translations[currentLang]['acsr-order-by-weight-text'];
+        document.getElementById('acsr-order-by-tiraj').nextElementSibling.textContent = translations[currentLang]['acsr-order-by-tiraj-text'];
+        document.getElementById('abc-order-by-weight').nextElementSibling.textContent = translations[currentLang]['abc-order-by-weight-text'];
+        document.getElementById('abc-order-by-tiraj').nextElementSibling.textContent = translations[currentLang]['abc-order-by-tiraj-text'];
+        document.getElementById('rod-order-by-weight').nextElementSibling.textContent = translations[currentLang]['rod-order-by-weight-text'];
+        document.getElementById('rod-order-by-length').nextElementSibling.textContent = translations[currentLang]['rod-order-by-length-text'];
+
+        updateIconDirection(); // Call to update icon directions after translation
+    }
+
+    // Function to update the progress bar
+    function updateProgressBar() {
+        const progressBar = document.getElementById('progressBar');
+        // Calculate progress based on main steps (0 to totalMainSteps-1)
+        const progress = (currentStep / (totalMainSteps - 1)) * 100;
+        progressBar.style.width = `${progress}%`;
+    }
+
+    // Function to handle step navigation and button rendering
+    function goToStep(step) {
+        // Validation for step 1 (Order Info)
+        if (currentStep === 1 && step === 2) {
+            const companyName = document.getElementById('company_person_name').value.trim();
+            const contactNumber = document.getElementById('contact_number').value.trim();
+            if (!companyName || !contactNumber) {
+                Toastify({
+                    text: translations[currentLang]['toast-error-required-fields'],
+                    duration: 3000,
+                    gravity: "top",
+                    position: (currentLang === 'fa' || currentLang === 'ar') ? "left" : "right",
+                    backgroundColor: "#ff4b4b",
+                    stopOnFocus: true,
+                }).showToast();
+                return; // Stop navigation if validation fails
+            }
+        }
+
+        // Validation for step 2 (Product Type)
+        if (currentStep === 2 && step === 3) {
+            const selectedProduct = document.getElementById('product-type').value;
+            if (!selectedProduct) {
+                Toastify({
+                    text: translations[currentLang]['toast-error-product-selection'],
+                    duration: 3000,
+                    gravity: "top",
+                    position: (currentLang === 'fa' || currentLang === 'ar') ? "left" : "right",
+                    backgroundColor: "#ff4b4b",
+                    stopOnFocus: true,
+                }).showToast();
+                return; // Stop navigation if validation fails
+            }
+        }
+
+        // Hide all steps first
+        document.querySelectorAll('.form-step').forEach(stepDiv => {
+            stepDiv.classList.add('hidden');
+        });
+
+        currentStep = step;
+        updateProgressBar(); // Update progress bar on step change
+        renderFixedFooterButtons(); // Render buttons based on the new step
+
+        if (step === 0) {
+            document.getElementById('step-0-language').classList.remove('hidden');
+        } else if (step === 1) {
+            document.getElementById('step-1-info').classList.remove('hidden');
+        } else if (step === 2) {
+            document.getElementById('step-2-product-type').classList.remove('hidden');
+        } else if (step === 3) {
+            const selectedProduct = document.getElementById('product-type').value;
+            // Console log to debug selected product value
+            console.log("Selected Product for Step 3:", selectedProduct); 
+            const stepElement = document.getElementById('step-3-' + selectedProduct); // Removed .replace(/_/g, '-')
+            if (stepElement) {
+                stepElement.classList.remove('hidden');
+            } else {
+                console.error('Product specific step element not found for:', selectedProduct);
+                Toastify({
+                    text: translations[currentLang]['toast-error-product-selection'], // Use existing translation for error
+                    duration: 3000,
+                    gravity: "top",
+                    position: (currentLang === 'fa' || currentLang === 'ar') ? "left" : "right",
+                    backgroundColor: "#ff4b4b",
+                    stopOnFocus: true,
+                }).showToast();
+                goToStep(2); // Fallback to product selection if element not found
+            }
+        }
+        // Re-apply translations after showing the new step, in case new elements become visible
+        translatePage(currentLang);
+    }
+
+    // Function to render buttons in the fixed footer based on the current step
+    function renderFixedFooterButtons() {
+        const footer = document.getElementById('fixedFooter');
+        footer.innerHTML = ''; // Clear existing buttons
+
+        let buttonsHtml = '';
+
+        if (currentStep === 0) {
+            buttonsHtml = `
+                <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-md focus:outline-none flex items-center justify-center w-full text-lg" data-translate="next-step-1" onclick="goToStep(1)">
+                    <span class="mr-2"></span><i class="fas fa-arrow-left ml-2"></i>
+                </button>
+            `;
+        } else if (currentStep === 1) {
+            buttonsHtml = `
+                <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center" data-translate="prev-step-2" onclick="goToStep(0)">
+                    <i class="fas fa-arrow-right mr-2"></i>
+                </button>
+                <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center" data-translate="next-step-1" onclick="goToStep(2)">
+                    <i class="fas fa-arrow-left ml-2"></i>
+                </button>
+            `;
+        } else if (currentStep === 2) {
+            buttonsHtml = `
+                <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center" data-translate="prev-step-2" onclick="goToStep(1)">
+                    <i class="fas fa-arrow-right mr-2"></i>
+                </button>
+                <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center" data-translate="next-step-2" onclick="goToStep(3)">
+                    <i class="fas fa-arrow-left ml-2"></i>
+                </button>
+            `;
+        } else if (currentStep === 3) {
+            // Determine the correct submit button text based on the selected product
+            const selectedProduct = document.getElementById('product-type').value;
+            let submitKey = 'submit-alloy'; // Default
+            if (selectedProduct) {
+                // Assuming translation keys are like 'submit-alloy', 'submit-granule', etc.
+                submitKey = 'submit-' + selectedProduct; // Use selectedProduct directly
+            }
+
+            buttonsHtml = `
+                <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center" data-translate="prev-step-2" onclick="goToStep(2)">
+                    <i class="fas fa-arrow-right mr-2"></i>
+                </button>
+                <button type="submit" form="multi-step-form" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md focus:outline-none flex items-center justify-center" data-translate="${submitKey}">
+                    <i class="fas fa-check ml-2"></i>
+                </button>
+            `;
+        }
+        footer.innerHTML = buttonsHtml;
+        translatePage(currentLang); // Re-translate newly added buttons
+    }
+
+    // Date Picker Logic (Gregorian to Jalali conversion)
+    function toJalali(gy, gm, gd) {
+        const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+        const gy2 = (gm > 2) ? (gy + 1) : gy;
+        let days = 355666 + (365 * gy) + Math.floor((gy2 + 3) / 4) - Math.floor((gy2 + 99) / 100) + Math.floor((gy2 + 399) / 400) + gd + g_d_m[gm - 1];
+        let jy = -1595 + (33 * Math.floor(days / 12053));
+        days %= 12053;
+        jy += 4 * Math.floor(days / 1461);
+        days %= 1461;
+        if (days > 365) {
+            jy += Math.floor((days - 1) / 365);
+            days = (days - 1) % 365;
+        }
+        const jm = (days < 186) ? 1 + Math.floor(days / 31) : 7 + Math.floor((days - 186) / 30);
+        const jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
+        return { jy, jm, jd };
+    }
+
+    function getJalaliMonthLength(year, month) {
+        if (month <= 6) return 31;
+        if (month <= 11) return 30;
+        const isLeap = ((((year - 474) % 2820) + 512) * 682) % 2816 < 682;
+        return isLeap ? 30 : 29;
+    }
+
+    // Gregorian to Hijri conversion (simplified for this context)
+    // For full accuracy, a dedicated library is highly recommended.
+    function toHijri(gy, gm, gd) {
+        let jd = Math.floor((1461 * (gy + 4800 + Math.floor((gm - 14) / 12))) / 4) +
+                 Math.floor((367 * (gm - 2 - 12 * Math.floor((gm - 14) / 12))) / 12) -
+                 Math.floor((3 * Math.floor((gy + 4900 + Math.floor((gm - 14) / 12)) / 100)) / 4) +
+                 gd - 32075;
+
+        let l = jd - 1948440 + 10632;
+        let n = Math.floor((l - 1) / 10631);
+        let j = l - 10631 * n + 3;
+        let h = Math.floor((j * 1000) / 306941);
+        let a = Math.floor((8 * h + 2) / 245);
+        let hd = j - Math.floor((306 * a) / 10) - 1;
+        let hm = a - 1;
+        let hy = 15 * n + h - 15;
+
+        if (hm > 11) {
+            hm += 1;
+            hy += 1;
+        }
+        if (hm === 0) {
+            hm = 12;
+        }
+
+        return { hy: hy, hm: hm, hd: hd };
+    }
+
+    // Simplified Hijri month length (approximate)
+    function getHijriMonthLength(year, month) {
+        // This is a simplified approximation. For exact values, use a lookup table or a robust library.
+        if (month % 2 === 1) { // Odd months are usually 30 days
+            return 30;
+        } else { // Even months are usually 29 days
+            return 29;
+        }
+    }
+
+    // Month names for different calendars and languages
+    const jalaliMonthNames = {
+        fa: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+        en: ["Farvardin", "Ordibehesht", "Khordad", "Tir", "Mordad", "Shahrivar", "Mehr", "Aban", "Azar", "Dey", "Bahman", "Esfand"], // English transliteration for Jalali
+        tr: ["Ferverdin", "Ordibeheşt", "Hordad", "Tir", "Mordad", "Şehriver", "Mehr", "Aban", "Azar", "Dey", "Behmen", "Esfend"], // Turkish transliteration for Jalali
+        ar: ["فروردين", "أرديبهشت", "خرداد", "تير", "مرداد", "شهريور", "مهر", "آبان", "آذر", "دي", "بهمن", "اسفند"] // Arabic transliteration for Jalali
+    };
+
+    const gregorianMonthNames = {
+        en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+        tr: ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"],
+        fa: ["ژانویه", "فوریه", "مارس", "آوریل", "مه", "ژوئن", "ژوئیه", "اوت", "سپتامبر", "اکتبر", "نوامبر", "دسامبر"], // Farsi Gregorian
+        ar: ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"] // Arabic Gregorian
+    };
+
+    const hijriMonthNames = {
+        ar: ["محرم", "صفر", "ربيع الأول", "ربيع الآخر", "جمادى الأولى", "جمادى الآخرة", "رجب", "شعبان", "رمضان", "شوال", "ذو القعدة", "ذو الحجة"],
+        en: ["Muharram", "Safar", "Rabi' al-Awwal", "Rabi' al-Thani", "Jumada al-Awwal", "Jumada al-Thani", "Rajab", "Sha'ban", "Ramadan", "Shawwal", "Dhu al-Qi'dah", "Dhu al-Hijjah"],
+        fa: ["محرم", "صفر", "ربيع‌الاول", "ربيع‌الثاني", "جمادی‌الاول", "جمادی‌الثاني", "رجب", "شعبان", "رمضان", "شوال", "ذی‌القعده", "ذی‌الحجه"],
+        tr: ["Muharrem", "Safer", "Rebiülevvel", "Rebiülahir", "Cemaziyelevvel", "Cemaziyelahir", "Recep", "Şaban", "Ramazan", "Şevval", "Zilkade", "Zilhicce"]
+    };
+
+    // Simplified Gregorian leap year check
+    function isGregorianLeap(year) {
+        return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+    }
+
+    // Get days in Gregorian month
+    function getGregorianMonthLength(year, month) {
+        const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        if (isGregorianLeap(year)) {
+            daysInMonth[1] = 29; // February in a leap year
+        }
+        return daysInMonth[month - 1];
+    }
+
+    function getMonthsSource(calendarType, lang) {
+        if (calendarType === 'jalali') {
+            return Array.from({ length: 12 }, (_, i) => ({ value: i + 1, text: jalaliMonthNames[lang][i] || jalaliMonthNames['fa'][i] }));
+        } else if (calendarType === 'gregorian') {
+            return Array.from({ length: 12 }, (_, i) => ({ value: i + 1, text: gregorianMonthNames[lang][i] || gregorianMonthNames['en'][i] }));
+        } else if (calendarType === 'hijri') {
+            return Array.from({ length: 12 }, (_, i) => ({ value: i + 1, text: hijriMonthNames[lang][i] || hijriMonthNames['ar'][i] }));
+        }
+    }
+
+    // Global selectors
+    let yearSelector, monthSelector, daySelector;
+
+    // Function to update selectors based on calendar type
+    function updateDatePickerSelectors(calendarType, initialDate) {
+        let yearSource, monthSource, daySource;
+        let initialYearValue, initialMonthValue, initialDayValue;
+
+        if (calendarType === 'jalali') {
+            yearSource = getRange(1350, 1450); // Jalali years
+            monthSource = getMonthsSource('jalali', currentLang);
+            initialYearValue = initialDate.jy;
+            initialMonthValue = initialDate.jm;
+            initialDayValue = initialDate.jd;
+            daySource = getRange(1, getJalaliMonthLength(initialYearValue, initialMonthValue));
+        } else if (calendarType === 'gregorian') {
+            yearSource = getRange(1950, 2050); // Gregorian years
+            monthSource = getMonthsSource('gregorian', currentLang);
+            initialYearValue = initialDate.gy;
+            initialMonthValue = initialDate.gm;
+            initialDayValue = initialDate.gd;
+            daySource = getRange(1, getGregorianMonthLength(initialYearValue, initialMonthValue));
+        } else if (calendarType === 'hijri') {
+            yearSource = getRange(1400, 1500); // Hijri years (adjust range as needed)
+            monthSource = getMonthsSource('hijri', currentLang);
+            initialYearValue = initialDate.hy;
+            initialMonthValue = initialDate.hm;
+            initialDayValue = initialDate.hd;
+            daySource = getRange(1, getHijriMonthLength(initialYearValue, initialMonthValue));
+        }
+
+        // Calculate initial indices
+        const initialYearIndex = yearSource.findIndex(item => item.value === initialYearValue);
+        const initialMonthIndex = monthSource.findIndex(item => item.value === initialMonthValue);
+        const initialDayIndex = daySource.findIndex(item => item.value === initialDayValue);
+
+        const safeYearIndex = Math.max(0, Math.min(initialYearIndex !== -1 ? initialYearIndex : 0, yearSource.length - 1));
+        const safeMonthIndex = Math.max(0, Math.min(initialMonthIndex !== -1 ? initialMonthIndex : 0, monthSource.length - 1));
+        const safeDayIndex = Math.max(0, Math.min(initialDayIndex !== -1 ? initialDayIndex : 0, daySource.length - 1));
+
+        // Re-initialize selectors
+        yearSelector = new IosSelector({
+            el: "#pdp-year",
+            source: yearSource,
+            selectedIndex: safeYearIndex,
+            onChange: () => updateDaySelector(calendarType)
+        });
+        monthSelector = new IosSelector({
+            el: "#pdp-month",
+            source: monthSource,
+            selectedIndex: safeMonthIndex,
+            onChange: () => updateDaySelector(calendarType)
+        });
+        daySelector = new IosSelector({
+            el: "#pdp-day",
+            source: daySource,
+            selectedIndex: safeDayIndex,
+        });
+    }
+
+    function updateDaySelector(calendarType) {
+        const yearValue = parseInt(yearSelector.getValue());
+        const monthValue = parseInt(monthSelector.getValue());
+        let daysInMonth;
+
+        if (calendarType === 'jalali') {
+            daysInMonth = getRange(1, getJalaliMonthLength(yearValue, monthValue));
+        } else if (calendarType === 'gregorian') {
+            daysInMonth = getRange(1, getGregorianMonthLength(yearValue, monthValue));
+        } else if (calendarType === 'hijri') {
+            daysInMonth = getRange(1, getHijriMonthLength(yearValue, monthValue));
+        }
+        daySelector.updateSource(daysInMonth);
+    }
+
+    function initializeDatePicker(inputId) {
+        const today = new Date();
+        let initialDateData;
+        let calendarType;
+
+        if (currentLang === 'fa') {
+            // For Farsi, use Jalali calendar and convert today's Gregorian date to Jalali
+            initialDateData = toJalali(today.getFullYear(), today.getMonth() + 1, today.getDate());
+            calendarType = 'jalali';
+        } else if (currentLang === 'ar') {
+            // For Arabic, use Hijri calendar and convert today's Gregorian date to Hijri
+            initialDateData = toHijri(today.getFullYear(), today.getMonth() + 1, today.getDate());
+            calendarType = 'hijri';
+        } else {
+            // For English and Turkish, use Gregorian calendar directly
+            initialDateData = {
+                gy: today.getFullYear(),
+                gm: today.getMonth() + 1,
+                gd: today.getDate()
+            };
+            calendarType = 'gregorian';
+        }
+
+        updateDatePickerSelectors(calendarType, initialDateData);
+
+        const modal = document.getElementById("datePickerModal");
+        const openModal = () => modal.classList.add("visible");
+        const closeModal = () => modal.classList.remove("visible");
+
+        document.getElementById(inputId).onclick = openModal;
+        document.getElementById("closeModal").onclick = closeModal;
+        modal.onclick = (event) => {
+            if (event.target === modal) closeModal();
+        };
+
+        document.getElementById("confirmDate").onclick = () => {
+            const selectedYear = parseInt(yearSelector.getValue());
+            const selectedMonth = parseInt(monthSelector.getValue());
+            const selectedDay = parseInt(daySelector.getValue());
+            const format = (d) => (d < 10 ? `0${d}` : d);
+            document.getElementById(inputId).value = `${selectedYear}/${format(selectedMonth)}/${format(selectedDay)}`;
+            closeModal();
+        };
+    }
+
+    class IosSelector {
+        constructor(options) {
+            this.el = document.querySelector(options.el);
+            this.source = options.source;
+            this.itemHeight = 44;
+            this.middleIndex = 2; // Math.floor(5 / 2) for 5 visible items
+            this.onChange = options.onChange || function() {};
+            this._init(options.selectedIndex || 0);
+        }
+
+        _init(selectedIndex) {
+            this.el.innerHTML = `<ul class="selector-list">${this.source
+                .map(item => `<li class="selector-item">${item.text}</li>`)
+                .join("")}</ul><div class="selector-highlight"></div>`;
+            this.list = this.el.querySelector("ul");
+            this.items = this.el.querySelectorAll("li");
+            this.select(selectedIndex, false);
+            this._attachEvents();
+        }
+
+        _attachEvents() {
+            let startY = 0, scrollStart = 0, isDragging = false;
+            const onStart = (e) => {
+                e.stopPropagation();
+                startY = e.touches ? e.touches[0].clientY : e.clientY;
+                scrollStart = parseFloat(this.list.style.transform.replace("translateY(", "")) || 0;
+                this.list.style.transition = "none";
+                this.list.style.willChange = "transform"; // Performance optimization
+                isDragging = true;
+            };
+            const onMove = (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                let moveY = (e.touches ? e.touches[0].clientY : e.clientY) - startY;
+                this.list.style.transform = `translateY(${scrollStart + moveY}px)`;
+            };
+            const onEnd = () => { 
+                if (isDragging) { 
+                    isDragging = false; 
+                    this.list.style.willChange = "auto"; // Reset will-change
+                    this._snap(); 
+                } 
+            };
+            const onWheel = (e) => {
+                e.preventDefault();
+                let currentScroll = parseFloat(this.list.style.transform.replace("translateY(", "")) || 0;
+                this.list.style.transition = "none";
+                this.list.style.transform = `translateY(${currentScroll - e.deltaY}px)`;
+                clearTimeout(this.wheelTimeout);
+                this.wheelTimeout = setTimeout(() => this._snap(), 150);
+            };
+
+            this.el.addEventListener("mousedown", onStart);
+            document.addEventListener("mousemove", onMove);
+            document.addEventListener("mouseup", onEnd);
+            this.el.addEventListener("wheel", onWheel);
+            this.el.addEventListener("touchstart", onStart, { passive: false });
+            this.el.addEventListener("touchmove", onMove, { passive: false });
+            this.el.addEventListener("touchend", onEnd);
+        }
+
+        _snap() {
+            let finalScroll = parseFloat(this.list.style.transform.replace("translateY(", "")) || 0;
+            let targetIndex = Math.round((finalScroll - this.middleIndex * this.itemHeight) / -this.itemHeight);
+            this.select(targetIndex);
+        }
+        
+        select(index, triggerChange = true) {
+            index = Math.max(0, Math.min(index, this.source.length - 1));
+            const hasChanged = this.selectedIndex !== index;
+
+            this.selectedIndex = index;
+
+            this.list.style.transition = "transform 0.2s ease-out";
+            this.list.style.transform = `translateY(${(this.middleIndex - this.selectedIndex) * this.itemHeight}px)`;
+            this.items.forEach((item, i) => item.classList.toggle("selected", i === this.selectedIndex));
+            
+            if (hasChanged && triggerChange) {
+                this.onChange();
+            }
+        }
+
+        updateSource(newSource) {
+            this.source = newSource;
+            this.list.innerHTML = this.source
+                .map(item => `<li class="selector-item">${item.text}</li>`)
+                .join("");
+            this.items = this.el.querySelectorAll("li");
+            const newSelectedIndex = Math.min(this.selectedIndex, this.source.length - 1);
+            this.select(newSelectedIndex, false);
+        }
+
+        getValue() { return this.source[this.selectedIndex].value; }
+    }
+
+    const getRange = (start, end) => Array.from({ length: end - start + 1 }, (_, i) => ({ value: start + i, text: start + i }));
+    const getDays = (year, month) => getRange(1, getJalaliMonthLength(year, month));
+    // getMonthsSource is defined above
+
+    $(document).ready(function () {
+        // Set initial language and show the first step (language selection)
+        const initialLang = localStorage.getItem('selectedLanguage') || 'fa';
+        // Select the correct language button and apply selected class
+        document.querySelectorAll('.language-button').forEach(button => {
+            if (button.getAttribute('data-lang') === initialLang) {
+                button.classList.add('selected');
+            }
+        });
+        translatePage(initialLang);
+        goToStep(0); // Start at the language selection step
+
+        // Language button click event
+        document.querySelectorAll('.language-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const newLang = this.getAttribute('data-lang');
+                localStorage.setItem('selectedLanguage', newLang); // Save preference
+                
+                // Update selected class for buttons
+                document.querySelectorAll('.language-button').forEach(btn => btn.classList.remove('selected'));
+                this.classList.add('selected');
+
+                translatePage(newLang);
+                initializeDatePicker("deliveryDate"); // Re-initialize date picker to update calendar system and month names
+            });
+        });
+
+        // Initialize iOS-style Datepicker
+        initializeDatePicker("deliveryDate");
+
+        // Handle product card selection
+        const productInput = document.getElementById('product-type');
+        const productCards = document.querySelectorAll('.product-card');
+
+        if (productCards && productInput) {
+            productCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    productCards.forEach(c => c.classList.remove('selected-card'));
+                    this.classList.add('selected-card');
+                    productInput.value = this.getAttribute('data-value');
+                });
+            });
+        }
+
+        // --- Wire Calculations ---
+        $('input[name="wire_order_by"]').on('change', function () {
+            if (this.value === 'weight') {
+                $('#wire-weight-input').removeClass('hidden');
+                $('#wire-tiraj-input').addClass('hidden');
+                $('#wire-calculated-tiraj').val('');
+            } else if (this.value === 'tiraj') {
+                $('#wire-tiraj-input').removeClass('hidden');
+                $('#wire-weight-input').addClass('hidden');
+                $('#wire-calculated-weight').val('');
+            }
+        });
+
+        $('#wire-weight').on('input', function () {
+            var weight = parseFloat($(this).val());
+            var crossSection = parseFloat($('#wire-cross_section').val());
+            if (!isNaN(weight) && !isNaN(crossSection) && crossSection > 0) {
+                var tiraj = (weight * 1000) / (Math.pow(crossSection / 2, 2) * Math.PI * 1000 * 2705 / 1000000);
+                $('#wire-calculated-tiraj').val(tiraj.toFixed(2));
+            } else {
+                $('#wire-calculated-tiraj').val('');
+            }
+        });
+
+        $('#wire-tiraj').on('input', function () {
+            var tiraj = parseFloat($(this).val());
+            var crossSection = parseFloat($('#wire-cross_section').val());
+            if (!isNaN(tiraj) && !isNaN(crossSection) && crossSection > 0) {
+                var weight = tiraj * (Math.pow(crossSection / 2, 2) * Math.PI * 1000 * 2705 / 1000000) / 1000;
+                $('#wire-calculated-weight').val(weight.toFixed(2));
+            } else {
+                $('#wire-calculated-weight').val('');
+            }
+        });
+
+        // --- AAAC Calculations ---
+        const aaacWeightsPerMeter = {
+            '16': 0.042, '25': 0.067, '35': 0.093, '50': 0.126, '70': 0.182, '95': 0.251, '120': 0.316, '185': 0.496
+        };
+        $('input[name="aaac_order_by"]').on('change', function () {
+            if (this.value === 'weight') {
+                $('#aaac-weight-input').removeClass('hidden');
+                $('#aaac-tiraj-input').addClass('hidden');
+                $('#aaac-calculated-tiraj').val('');
+            } else if (this.value === 'tiraj') {
+                $('#aaac-tiraj-input').removeClass('hidden');
+                $('#aaac-weight-input').addClass('hidden');
+                $('#aaac-calculated-weight').val('');
+            }
+        });
+        $('#aaac-weight').on('input', function () {
+            var weight = parseFloat($(this).val());
+            var crossSection = $('#aaac-cross_section').val();
+            if (!isNaN(weight) && aaacWeightsPerMeter[crossSection]) {
+                var tiraj = weight / aaacWeightsPerMeter[crossSection];
+                $('#aaac-calculated-tiraj').val(tiraj.toFixed(2));
+            } else {
+                $('#aaac-calculated-tiraj').val('');
+            }
+        });
+        $('#aaac-tiraj').on('input', function () {
+            var tiraj = parseFloat($(this).val());
+            var crossSection = $('#aaac-cross_section').val();
+            if (!isNaN(tiraj) && aaacWeightsPerMeter[crossSection]) {
+                var weight = tiraj * aaacWeightsPerMeter[crossSection];
+                $('#aaac-calculated-weight').val(weight.toFixed(2));
+            } else {
+                $('#aaac-calculated-weight').val('');
+            }
+        });
+
+        // --- AAC Calculations ---
+        const aacWeightsPerMeter = {
+            '16': 0.040, '25': 0.063, '35': 0.088, '50': 0.118, '70': 0.165, '95': 0.230, '120': 0.289, '185': 0.456
+        };
+        $('input[name="aac_order_by"]').on('change', function () {
+            if (this.value === 'weight') {
+                $('#aac-weight-input').removeClass('hidden');
+                $('#aac-tiraj-input').addClass('hidden');
+                $('#aac-calculated-tiraj').val('');
+            } else if (this.value === 'tiraj') {
+                $('#aac-tiraj-input').removeClass('hidden');
+                $('#aac-weight-input').addClass('hidden');
+                $('#aac-calculated-weight').val('');
+            }
+        });
+        $('#aac-weight').on('input', function () {
+            var weight = parseFloat($(this).val());
+            var crossSection = $('#aac-cross_section').val();
+            if (!isNaN(weight) && aacWeightsPerMeter[crossSection]) {
+                var tiraj = weight / aacWeightsPerMeter[crossSection];
+                $('#aac-calculated-tiraj').val(tiraj.toFixed(2));
+            } else {
+                $('#aac-calculated-tiraj').val('');
+            }
+        });
+        $('#aac-tiraj').on('input', function () {
+            var tiraj = parseFloat($(this).val());
+            var crossSection = $('#aac-cross_section').val();
+            if (!isNaN(tiraj) && aacWeightsPerMeter[crossSection]) {
+                var weight = tiraj * aacWeightsPerMeter[crossSection];
+                $('#aac-calculated-weight').val(weight.toFixed(2));
+            } else {
+                $('#aac-calculated-weight').val('');
+            }
+        });
+
+        // --- ACSR Calculations ---
+        const acsrWeightsPerMeter = {
+            '16': 0.045, '25': 0.070, '35': 0.095, '50': 0.130, '70': 0.180, '95': 0.250, '120': 0.320, '185': 0.500
+        };
+        $('input[name="acsr_order_by"]').on('change', function () {
+            if (this.value === 'weight') {
+                $('#acsr-weight-input').removeClass('hidden');
+                $('#acsr-tiraj-input').addClass('hidden');
+                $('#acsr-calculated-tiraj').val('');
+            } else if (this.value === 'tiraj') {
+                $('#acsr-tiraj-input').removeClass('hidden');
+                $('#acsr-weight-input').addClass('hidden');
+                $('#acsr-calculated-weight').val('');
+            }
+        });
+        $('#acsr-weight').on('input', function () {
+            var weight = parseFloat($(this).val());
+            var crossSection = $('#acsr-cross_section').val();
+            if (!isNaN(weight) && acsrWeightsPerMeter[crossSection]) {
+                var tiraj = weight / acsrWeightsPerMeter[crossSection];
+                $('#acsr-calculated-tiraj').val(tiraj.toFixed(2));
+            } else {
+                $('#acsr-calculated-tiraj').val('');
+            }
+        });
+        $('#acsr-tiraj').on('input', function () {
+            var tiraj = parseFloat($(this).val());
+            var crossSection = $('#acsr-cross_section').val();
+            if (!isNaN(tiraj) && acsrWeightsPerMeter[crossSection]) {
+                var weight = tiraj * acsrWeightsPerMeter[crossSection];
+                $('#acsr-calculated-weight').val(weight.toFixed(2));
+            } else {
+                $('#acsr-calculated-weight').val('');
+            }
+        });
+
+        // --- ABC Calculations ---
+        const abcWeightsPerMeter = {
+            '16': { noCover: 0.042, withCover: 0.023, total: 0.065 },
+            '25': { noCover: 0.067, withCover: 0.033, total: 0.100 },
+            '35': { noCover: 0.093, withCover: 0.043, total: 0.136 },
+            '50': { noCover: 0.126, withCover: 0.049, total: 0.175 },
+            '70': { noCover: 0.182, withCover: 0.066, total: 0.248 },
+            '95': { noCover: 0.251, withCover: 0.077, total: 0.328 },
+            '120': { noCover: 0.316, withCover: 0.082, total: 0.398 }
+        };
+        $('input[name="abc_order_by"]').on('change', function () {
+            if (this.value === 'weight') {
+                $('#abc-weight-input').removeClass('hidden');
+                $('#abc-tiraj-input').addClass('hidden');
+                $('#abc-calculated-tiraj').val('');
+            } else if (this.value === 'tiraj') {
+                $('#abc-tiraj-input').removeClass('hidden');
+                $('#abc-weight-input').addClass('hidden');
+                $('#abc-calculated-weight-no-cover').val('');
+                $('#abc-calculated-weight-with-cover').val('');
+                $('#abc-calculated-total-weight').val('');
+            }
+        });
+        $('#abc-weight').on('input', function () {
+            var weight = parseFloat($(this).val());
+            var crossSection = $('#abc-cross_section').val();
+            if (!isNaN(weight) && abcWeightsPerMeter[crossSection]) {
+                var tiraj = weight / abcWeightsPerMeter[crossSection].total;
+                $('#abc-calculated-tiraj').val(tiraj.toFixed(2));
+            } else {
+                $('#abc-calculated-tiraj').val('');
+            }
+        });
+        $('#abc-tiraj').on('input', function () {
+            var tiraj = parseFloat($(this).val());
+            var crossSection = $('#abc-cross_section').val();
+            if (!isNaN(tiraj) && abcWeightsPerMeter[crossSection]) {
+                var weightNoCover = tiraj * abcWeightsPerMeter[crossSection].noCover;
+                var weightWithCover = tiraj * abcWeightsPerMeter[crossSection].withCover;
+                var totalWeight = tiraj * abcWeightsPerMeter[crossSection].total;
+                $('#abc-calculated-weight-no-cover').val(weightNoCover.toFixed(2));
+                $('#abc-calculated-weight-with-cover').val(weightWithCover.toFixed(2));
+                $('#abc-calculated-total-weight').val(totalWeight.toFixed(2));
+            } else {
+                $('#abc-calculated-weight-no-cover').val('');
+                $('#abc-calculated-weight-with-cover').val('');
+                $('#abc-calculated-total-weight').val('');
+            }
+        });
+
+        // --- Rod Calculations ---
+        $('input[name="rod_order_by"]').on('change', function () {
+            if (this.value === 'weight') {
+                $('#rod-weight-input').removeClass('hidden');
+                $('#rod-length-input').addClass('hidden');
+            } else if (this.value === 'length') {
+                $('#rod-length-input').removeClass('hidden');
+                $('#rod-weight-input').addClass('hidden');
+            }
+        });
+
+        // --- Aluminum Tray Logic ---
+        const trayDimensionsData = {
+            '500': [{ text: '200 × 115 mm (Code 30)', value: '200x115_30' }, { text: '202 × 112 mm (Code 30/1)', value: '202x112_30-1' }, { text: '215 × 149 mm (Code 105)', value: '215x149_105' }],
+            '800': [{ text: '210 × 144 mm (Code 711)', value: '210x144_711' }],
+            '1000': [{ text: '220 × 155 mm (Code 109)', value: '220x155_109' }],
+            '1300': [{ text: '218 × 155 mm (Code 106)', value: '218x155_106' }],
+            '1500': [{ text: '225 × 163 mm (Code 107)', value: '225x163_107' }, { text: '230 × 182 mm (Code 222)', value: '230x182_222' }, { text: '235 × 180 mm (Code 320)', value: '235x180_320' }, { text: '250 × 166 mm (Code 114)', value: '250x166_114' }],
+            '2000': [{ text: '312 × 164 mm (Code 240)', value: '312x164_240' }],
+            '2500': [{ text: '325 × 177 mm (Code 250)', value: '325x177_250' }],
+            '4000': [{ text: '361 × 210 mm (Code 118)', value: '361x210_118' }]
+        };
+        $('#tray-capacity').on('change', function() {
+            const selectedCapacity = $(this).val();
+            const dimensionsDropdown = $('#tray-dimensions');
+            dimensionsDropdown.empty();
+            dimensionsDropdown.append('<option value="" disabled selected>' + translations[currentLang]['select-tray-dimensions-default'] + '</option>');
+            if (selectedCapacity && trayDimensionsData[selectedCapacity]) {
+                trayDimensionsData[selectedCapacity].forEach(dim => {
+                    dimensionsDropdown.append(new Option(dim.text, dim.value));
+                });
+                dimensionsDropdown.prop('disabled', false);
+            } else {
+                dimensionsDropdown.prop('disabled', true);
+            }
+        });
+
+        // Handle form submission via AJAX
+        $('#multi-step-form').on('submit', function (e) {
+            e.preventDefault();
+            Swal.fire({
+                title: translations[currentLang]['swal-confirm-title'],
+                text: translations[currentLang]['swal-confirm-text'],
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: translations[currentLang]['swal-confirm-btn'],
+                cancelButtonText: translations[currentLang]['swal-cancel-btn']
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = $(this).serialize();
+                    $.ajax({
+                        type: 'POST',
+                        url: $(this).attr('action'),
+                        data: formData,
+                        success: function (response) {
+                            Toastify({
+                                text: translations[currentLang]['toast-success'],
+                                duration: 3000,
+                                gravity: "top",
+                                position: (currentLang === 'fa' || currentLang === 'ar') ? "left" : "right",
+                                backgroundColor: "#4CAF50",
+                                stopOnFocus: true,
+                            }).showToast();
+                            $('#multi-step-form')[0].reset();
+                            $('.product-card').removeClass('selected-card');
+                            goToStep(0); // Go back to the very first step (language selection)
+                        },
+                        error: function (xhr, status, error) {
+                            Swal.fire({
+                                title: translations[currentLang]['swal-error-title'],
+                                text: translations[currentLang]['swal-error-text'],
+                                icon: 'error',
+                                confirmButtonText: translations[currentLang]['swal-error-btn']
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
