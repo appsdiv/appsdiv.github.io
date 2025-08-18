@@ -1,0 +1,308 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#030712" />
+  <title>قیمت روز آلومینیوم | الکامهر کیمیا</title>
+
+  <link rel="icon" href="https://em-content.zobj.net/thumbs/120/apple/354/crystal-ball_1f52e.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="https://i.postimg.cc/HxSyfWxR/App-Icon-2x.jpg" />
+  <link rel="shortcut icon" href="https://i.postimg.cc/HxSyfWxR/App-Icon-2x.jpg" />
+
+  <!-- Performance: preconnect + font-display swap -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+  <style>
+    :root{
+      --bg:#030712;--c-bg:rgba(17,24,39,.58);--card:rgba(31,41,55,.52);
+      --bdr:rgba(255,255,255,.08);--t:#f9fafb;--t2:#9ca3af;--sh:rgba(0,0,0,.3);
+      --gold:#f59e0b;--green:#10b981;--blue:#3b82f6;--red:#ef4444;
+      --g1:#030712;--g2:#101826;--g3:#1c2633;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Vazirmatn',sans-serif;text-rendering:optimizeLegibility}
+    html,body{height:100%}
+    body{
+      background:linear-gradient(125deg,var(--g1),var(--g2),var(--g1),var(--g3));
+      background-size:300% 300%;
+      min-height:100vh;color:var(--t);
+      display:flex;flex-direction:column;gap:clamp(.6rem,1.5vw,.9rem);
+      align-items:center;justify-content:flex-start;
+      padding:clamp(.8rem,2.5vw,1.25rem);
+      -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale
+    }
+    @media (prefers-reduced-motion:no-preference){
+      body{animation:bg-pan 16s ease-in-out infinite}
+      @keyframes bg-pan{0%{background-position:0 50%}50%{background-position:100% 50%}100%{background-position:0 50%}}
+    }
+
+    .wrap{
+      width:100%;max-width:980px;background:var(--c-bg);border:1px solid var(--bdr);
+      border-radius:18px;
+      padding:clamp(1rem,2.5vw,1.5rem) clamp(.8rem,2.2vw,1.25rem);
+      box-shadow:0 16px 34px -14px var(--sh);backdrop-filter:blur(12px)
+    }
+
+    /* --- Header --- */
+    .header{display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:.4rem}
+    .header h1{
+      font-size:clamp(1.35rem,3.5vw,1.9rem);letter-spacing:.02em;
+      background:linear-gradient(90deg,var(--gold),var(--blue));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent
+    }
+    .refresh{
+      position:absolute;left:.25rem;top:50%;transform:translateY(-50%);
+      cursor:pointer;font-size:clamp(1.2rem,3.5vw,1.35rem);
+      color:var(--t2);transition:.2s;padding:.45rem;border-radius:10px
+    }
+    .refresh:active{transform:translateY(-50%) scale(.95)}
+    .refresh:hover{color:var(--blue)}
+    #ts{color:var(--t2);text-align:center;font-size:clamp(.84rem,2.5vw,.92rem);margin-top:.35rem}
+
+    /* --- Layout --- */
+    .grid-spot{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:clamp(.7rem,2.5vw,1rem);margin-top:.8rem}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(.7rem,2.5vw,1rem);margin-top:.8rem}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+
+    /* --- Cards --- */
+    .card{
+      background:var(--card);border:1px solid transparent;border-radius:14px;
+      padding:clamp(.8rem,2vw,1rem) clamp(.7rem,2vw,.95rem);
+      transition:border-color .25s,transform .25s;
+      display:flex;flex-direction:column;gap:.5rem;position:relative;overflow:hidden;
+      content-visibility:auto;contain-intrinsic-size:auto 220px;
+    }
+    .card:hover{border-color:rgba(255,255,255,.12);transform:translateY(-2px)}
+    .lme{--accent:var(--blue)} .gold{--accent:var(--gold)} .usd{--accent:var(--green)} .china{--accent:var(--red)}
+
+    .hd{display:flex;align-items:center;gap:.55rem;margin-bottom:.15rem}
+    .icon{font-size:clamp(1.3rem,3.2vw,1.5rem)}
+    .ttl{font-size:clamp(1rem,3vw,1.1rem);font-weight:800}
+
+    .main-price{
+      font-size:clamp(1.6rem,5.5vw,2.1rem);
+      font-weight:900;text-align:center;direction:ltr;line-height:1.1
+    }
+    .unit{font-size:clamp(.85rem,2.5vw,.95rem);color:var(--t2);margin:0 .35rem}
+    .rows{display:flex;flex-direction:column;margin-top:.15rem}
+    .row{display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px dashed rgba(255,255,255,.07)}
+    .row:last-child{border-bottom:none}
+    .label{color:var(--t2);font-size:clamp(.9rem,2.5vw,.95rem)}
+    .value{direction:ltr;font-weight:700;font-size:clamp(.95rem,2.8vw,1.05rem)}
+
+    .foot{margin-top:.45rem;padding-top:.55rem;border-top:1px solid var(--bdr);text-align:center;color:var(--t2);font-size:clamp(.8rem,2.4vw,.9rem)}
+
+    /* --- Badge --- */
+    .badge{
+      position:absolute;top:.55rem;left:.55rem;background:rgba(59,130,246,.18);color:#cfe1ff;border:1px solid rgba(59,130,246,.35);
+      padding:.18rem .5rem;border-radius:999px;font-size:.72rem
+    }
+
+    /* --- Skeleton --- */
+    .skeleton{position:relative;overflow:hidden;background:rgba(255,255,255,.06);border-radius:8px}
+    .skeleton::after{
+      content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent);
+      transform:translateX(-100%);animation:shimmer 1.35s infinite
+    }
+    @keyframes shimmer{100%{transform:translateX(100%)}}
+    .sk-line{height:16px;margin:.35rem 0}
+    .sk-num{height:34px;margin:.55rem 0}
+
+    /* --- Footer --- */
+    .footbar{
+      display:flex;gap:1rem;justify-content:center;align-items:center;
+      background:transparent;border:0;box-shadow:none;text-align:center;color:var(--t2);
+      padding:.4rem;margin-top:.5rem
+    }
+    .footbar a{
+      color:var(--t2);text-decoration:none;font-size:clamp(1.35rem,4vw,1.6rem);
+      padding:.6rem .7rem;border-radius:12px;transition:transform .15s, color .15s, background .15s
+    }
+    .footbar a:active{transform:scale(.96)}
+    .footbar a:hover{color:var(--blue);background:rgba(255,255,255,.05)}
+
+    /* Hit area boost for small screens */
+    @media (max-width:520px){
+      .footbar a{padding:.7rem .9rem}
+      .badge{font-size:.68rem}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="header">
+      <i id="btn-refresh" class="fas fa-sync-alt refresh" title="بروزرسانی"></i>
+      <h1>قیمت لحظه ای آلومینیوم</h1>
+    </header>
+    <div id="ts">در حال آماده‌سازی داده‌ها…</div>
+
+    <!-- Skeleton layout renders instantly -->
+    <section class="grid-spot" id="spot-cards">
+      <div class="card gold">
+        <div class="hd"><span class="icon">🪙</span><div class="ttl">قیمت طلا (گرم)</div></div>
+        <div class="main-price skeleton sk-num"></div>
+        <div class="foot skeleton sk-line" style="height:14px;"></div>
+      </div>
+      <div class="card usd">
+        <div class="hd"><span class="icon">💵</span><div class="ttl">نرخ دلار</div></div>
+        <div class="main-price skeleton sk-num"></div>
+        <div class="foot skeleton sk-line" style="height:14px;"></div>
+      </div>
+    </section>
+
+    <section class="grid" id="market-cards">
+      <div class="card lme">
+        <span class="badge">Live, No Delay</span>
+        <div class="hd"><span class="icon">📈</span><div class="ttl">بورس فلزات لندن (LME) — لحظه‌ای</div></div>
+        <div class="rows">
+          <div class="row"><span class="label">Al Spot Ask</span><span class="value skeleton sk-line" style="width:120px;"></span></div>
+          <div class="row"><span class="label">Cu Spot Ask</span><span class="value skeleton sk-line" style="width:120px;"></span></div>
+          <div class="row"><span class="label">Zn Spot Ask</span><span class="value skeleton sk-line" style="width:120px;"></span></div>
+        </div>
+        <div class="foot skeleton sk-line" style="height:14px;"></div>
+      </div>
+
+      <div class="card china">
+        <div class="hd"><span class="icon">🇨🇳</span><div class="ttl">بازار آلومینیوم چین (شانگهای)</div></div>
+        <div class="rows">
+          <div class="row"><span class="label">قیمت در چین</span><span class="value skeleton sk-line" style="width:120px;"></span></div>
+          <div class="row"><span class="label">USD/CNY</span><span class="value skeleton sk-line" style="width:90px;"></span></div>
+          <div class="row"><span class="label">USD (با مالیات)</span><span class="value skeleton sk-line" style="width:120px;"></span></div>
+          <div class="row"><span class="label">USD (بدون مالیات)</span><span class="value skeleton sk-line" style="width:120px;"></span></div>
+        </div>
+        <div class="foot skeleton sk-line" style="height:14px;"></div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="footbar">
+    <a href="https://elkamehr.com" target="_blank" rel="noopener noreferrer" title="Elkamehr.com">
+      <i class="fas fa-globe"></i>
+    </a>
+    <a href="https://t.me/lme_live_elkamehr" target="_blank" rel="noopener noreferrer" title="کانال تلگرام LME Live">
+      <i class="fab fa-telegram-plane"></i>
+    </a>
+  </footer>
+
+  <script>
+    const API_URL = 'https://gold.chbk.app/api/all-prices'; // returns lme_aluminium with new fields
+    const tsEl = document.getElementById('ts');
+    const btnRefresh = document.getElementById('btn-refresh');
+
+    // ---- Helpers ----
+    const nfEN = new Intl.NumberFormat('en-US');
+    function toFarsiDigits(s){return String(s).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[+d])}
+    function fmt(n){ if(n===null || n===undefined || n==='') return '—'; const x=String(n).replace(/,/g,''); return toFarsiDigits(nfEN.format(Number(x))) }
+
+    // localStorage keys
+    const LS_KEY = 'elk_prices_cache_v3';
+    function saveCache(obj){ try{ localStorage.setItem(LS_KEY, JSON.stringify({t:Date.now(), data:obj})) }catch{} }
+    function readCache(){ try{ const v = JSON.parse(localStorage.getItem(LS_KEY)||'null'); return v&&v.data ? v : null }catch{ return null } }
+
+    // Render functions
+    function render(data){
+      // Header timestamp: prefer LME jalali as "truth"
+      const ts = (data?.lme_aluminium?.jalali) || new Date().toLocaleString('fa-IR',{hour:'2-digit',minute:'2-digit',hour12:false});
+      tsEl.textContent = `آخرین بروزرسانی: ${toFarsiDigits(ts)}`;
+
+      // GOLD
+      const goldHTML = `
+        <div class="card gold">
+          <div class="hd"><span class="icon">🪙</span><div class="ttl">قیمت طلا (گرم)</div></div>
+          <div class="main-price" style="color:var(--gold);">
+            <span class="unit">ریال</span>${fmt(data?.gold?.current_price)}
+          </div>
+          <div class="foot">به‌روزرسانی: ${toFarsiDigits(data?.gold?.time || '—')}</div>
+        </div>`;
+      // USD
+      const usdHTML = `
+        <div class="card usd">
+          <div class="hd"><span class="icon">💵</span><div class="ttl">نرخ دلار</div></div>
+          <div class="main-price" style="color:var(--green);">
+            <span class="unit">ریال</span>${fmt(data?.usd?.usd_price)}
+          </div>
+          <div class="foot">${toFarsiDigits(data?.usd?.usd_date || '—')}</div>
+        </div>`;
+
+      document.getElementById('spot-cards').innerHTML = goldHTML + usdHTML;
+
+      // LME (live / no delay) — use new fields
+      const lme = data?.lme_aluminium || {};
+      const lmeHTML = `
+        <div class="card lme">
+          <span class="badge">Live, No Delay</span>
+          <div class="hd"><span class="icon">📈</span><div class="ttl">بورس فلزات لندن (LME) — لحظه‌ای</div></div>
+          <div class="rows">
+            <div class="row"><span class="label">Al Spot Ask</span><span class="value" style="color:var(--blue)">${fmt(lme.al_spot_ask)} <span class="unit">$</span></span></div>
+            <div class="row"><span class="label">Cu Spot Ask</span><span class="value">${fmt(lme.cu_spot_ask)} <span class="unit">$</span></span></div>
+            <div class="row"><span class="label">Zn Spot Ask</span><span class="value">${fmt(lme.zn_spot_ask)} <span class="unit">$</span></span></div>
+          </div>
+          <div class="foot">تهران: ${toFarsiDigits(lme.tehran_iso || '—')} — UTC: ${toFarsiDigits(lme.utc_iso || '—')}</div>
+        </div>`;
+
+      // China
+      const ch = data?.china_aluminium || {};
+      const chHTML = `
+        <div class="card china">
+          <div class="hd"><span class="icon">🇨🇳</span><div class="ttl">بازار آلومینیوم چین (شانگهای)</div></div>
+          <div class="rows">
+            <div class="row"><span class="label">قیمت در چین</span><span class="value" style="color:var(--red)">${fmt(ch.china_al_price_cny)} <span class="unit">¥</span></span></div>
+            <div class="row"><span class="label">USD/CNY</span><span class="value">${toFarsiDigits(ch.china_al_exchange_rate ?? '—')}</span></div>
+            <div class="row"><span class="label">USD (با مالیات)</span><span class="value">${fmt(ch.china_al_price_usd_with_vat)} <span class="unit">$</span></span></div>
+            <div class="row"><span class="label">USD (بدون مالیات)</span><span class="value">${fmt(ch.china_al_price_usd_no_vat)} <span class="unit">$</span></span></div>
+          </div>
+          <div class="foot">تاریخ: ${toFarsiDigits(ch.china_al_date || '—')}</div>
+        </div>`;
+
+      document.getElementById('market-cards').innerHTML = lmeHTML + chHTML;
+    }
+
+    // Fetch with timeout + retry
+    async function fetchWithTimeout(url, {timeout=7000}={}){
+      const ctrl = new AbortController();
+      const t = setTimeout(()=>ctrl.abort(), timeout);
+      try{
+        const res = await fetch(url, {signal: ctrl.signal, cache:'no-store'});
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        return await res.json();
+      } finally { clearTimeout(t) }
+    }
+
+    async function loadData(){
+      // 1) Warm start from cache (if exists)
+      const cache = readCache();
+      if(cache){ render(cache.data) }
+
+      // 2) Fetch fresh data
+      try{
+        const data = await fetchWithTimeout(API_URL,{timeout:7000});
+        render(data);
+        saveCache(data);
+        tsEl.textContent = `آخرین بروزرسانی: ${toFarsiDigits(data?.lme_aluminium?.jalali || '')} • هم‌اکنون`;
+      } catch(err){
+        console.warn('Fetch failed, using cache if available:', err);
+        if(!cache){
+          tsEl.textContent = 'خطا در دریافت اطلاعات. لطفاً بعداً تلاش کنید.';
+        } else {
+          tsEl.textContent = `${tsEl.textContent} • (نمایش داده‌های ذخیره‌شده)`;
+        }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      loadData();
+      // Light auto-refresh
+      const intervalMin = 3; // every 3 minutes
+      setInterval(loadData, intervalMin*60*1000);
+      btnRefresh.addEventListener('click', ()=>{
+        btnRefresh.classList.add('fa-spin');
+        loadData().finally(()=>btnRefresh.classList.remove('fa-spin'))
+      })
+    });
+  </script>
+</body>
+</html>
