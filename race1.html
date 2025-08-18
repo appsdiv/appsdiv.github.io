@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Racer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        /*
+         * GLOBAL STYLES
+         * Setting up the basic page layout and typography.
+         */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+        body {
+            background-color: #f0f4f8;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            flex-direction: column;
+            color: #2c3e50;
+        }
+
+        /*
+         * GAME CONTAINER
+         * Main wrapper for the game elements.
+         */
+        .game-container {
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            background-color: #ffffff;
+            width: 90%;
+            max-width: 500px;
+            height: 90vh;
+            max-height: 800px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 1s ease-out;
+        }
+
+        /*
+         * GAME CANVAS
+         * The main drawing surface for the game.
+         */
+        canvas {
+            display: block;
+            background-color: #f8fafc;
+        }
+
+        /*
+         * GAME UI OVERLAYS
+         * Styles for the score, high score, game over screen, and buttons.
+         */
+        #game-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #34495e;
+            pointer-events: none;
+            z-index: 10;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        #game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(44, 62, 80, 0.85);
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: opacity 0.5s ease-in-out;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 20;
+            border-radius: 16px;
+        }
+
+        #game-over-screen.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #game-over-screen h2 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        #game-over-screen p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .button {
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            background-color: #3498db;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+        }
+
+        .button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(52, 152, 219, 0.3);
+        }
+
+        #sound-toggle-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #34495e;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+        
+        #sound-toggle-button:hover {
+            opacity: 1;
+        }
+
+        #loading-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            color: #2c3e50;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            z-index: 30;
+            border-radius: 16px;
+            cursor: pointer;
+        }
+        
+        #loading-screen.hidden {
+            display: none;
+        }
+
+        /*
+         * KEYFRAMES FOR ANIMATIONS
+         * Creating smooth visual effects.
+         */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* High score message box */
+        .message-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #2ecc71;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out;
+            z-index: 30;
+        }
+        
+        .message-box.show {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <!-- Loading screen to ensure Tone.js is ready -->
+        <div id="loading-screen">
+            <p>Click to Play</p>
+        </div>
+        
+        <!-- The canvas is where the game will be drawn -->
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- The score and high score display -->
+        <div id="game-info" class="hidden">
+            <div style="display: flex; flex-direction: column; text-align: left;">
+                <span id="score-text">Score: <span id="score">0</span></span>
+                <span id="ammo-text">Ammo: <span id="bullet-count">100</span></span>
+                <span id="speed-text">Speed: <span id="speed-meter">0</span></span>
+                <span id="high-score-text" style="font-size: 0.8em; opacity: 0.7; margin-top: 5px;">High Score: <span id="high-score-display">0</span></span>
+            </div>
+        </div>
+        
+        <!-- Sound toggle button -->
+        <button id="sound-toggle-button" class="hidden">🔊</button>
+
+        <!-- The game over screen, initially hidden -->
+        <div id="game-over-screen">
+            <h2>Game Over</h2>
+            <p>Your Score: <span id="final-score">0</span></p>
+            <p style="font-size: 1rem; opacity: 0.8; margin-top: 5px;">Press SPACE to Restart</p>
+            <button id="restart-button" class="button">Restart</button>
+        </div>
+        
+        <!-- High score message box -->
+        <div id="message-box" class="message-box">New High Score!</div>
+    </div>
+
+    <script>
+        /*
+         * JAVASCRIPT GAME LOGIC
+         * All the magic happens here.
+         */
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const finalScoreElement = document.getElementById('final-score');
+        const highScoreDisplayElement = document.getElementById('high-score-display');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const restartButton = document.getElementById('restart-button');
+        const soundToggleButton = document.getElementById('sound-toggle-button');
+        const messageBox = document.getElementById('message-box');
+        const loadingScreen = document.getElementById('loading-screen');
+        const gameInfo = document.getElementById('game-info');
+        const bulletCountElement = document.getElementById('bullet-count');
+        const speedMeterElement = document.getElementById('speed-meter');
+
+        // Game state variables
+        let animationFrameId;
+        let isGameOver = false;
+        let score = 0;
+        let highScore = 0;
+        let player, entities, bullets, particles;
+        let lastUpdateTime = 0;
+        let lastSpawnTime = 0;
+        let gameSpeed = 1;
+        let isMuted = false;
+        let bulletCount = 100;
+        let lastBulletRechargeTime = 0;
+        const BULLET_RECHARGE_INTERVAL = 10000;
+        let cameraShakeX = 0;
+        let cameraShakeY = 0;
+        
+        // Power-up state
+        let shieldActive = false;
+        let shieldTimer = 0;
+        const SHIELD_DURATION = 5000;
+        const PASS_BONUS = 500;
+        const SPEED_BURST = 1.2;
+        const ACCELERATION_RATE = 0.05;
+        const BRAKE_RATE = 0.08;
+        const MIN_SPEED = 1;
+        const MAX_SPEED = 10;
+        const BASE_SPEED = 2;
+
+        // Player and Lane configuration
+        const playerConfig = {
+            width: 30,
+            height: 40,
+            color: '#3498db',
+            shieldColor: '#2ecc71',
+        };
+        const LANE_COUNT = 4;
+        const laneXPositions = [];
+        const lanePatterns = [
+            [0, 1, 2], [1, 2, 3], [0, 2, 3], [0, 3], [1, 2]
+        ];
+
+        // Entity configurations
+        const entityConfig = {
+            obstacleColor: '#e74c3c',
+            rivalColor: '#f1c40f',
+            powerUpColor: '#2ecc71',
+            bulletColor: '#3498db',
+            minSpeed: 2,
+            maxSpeed: 5,
+        };
+        
+        // --- SOUND EFFECTS ---
+        const backgroundMusic = new Tone.PolySynth().toDestination();
+        const collisionSynth = new Tone.NoiseSynth({
+            noise: { type: 'pink' },
+            envelope: { attack: 0.001, decay: 0.2, sustain: 0, release: 0.1 }
+        }).toDestination();
+        const scoreSynth = new Tone.Synth({
+            oscillator: { type: 'sine' },
+            envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.1 }
+        }).toDestination();
+        const powerUpSynth = new Tone.Synth({
+            oscillator: { type: 'sawtooth' },
+            envelope: { attack: 0.001, decay: 0.2, sustain: 0, release: 0.2 }
+        }).toDestination();
+        const passSynth = new Tone.Synth({
+            oscillator: { type: 'triangle' },
+            envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 }
+        }).toDestination();
+        const shootSynth = new Tone.MetalSynth({
+            frequency: 200, envelope: { attack: 0.001, decay: 0.1, release: 0.1 },
+            harmonicity: 3.1, modulationIndex: 10, resonance: 4000,
+            octaves: 1.5
+        }).toDestination();
+
+        function playSound(type) {
+            if (isMuted || Tone.context.state !== 'running') return;
+            try {
+                switch(type) {
+                    case 'background':
+                        backgroundMusic.triggerAttackRelease(['C4', 'E4', 'G4'], '8n');
+                        break;
+                    case 'collision':
+                        collisionSynth.triggerAttackRelease('8n');
+                        break;
+                    case 'score':
+                        scoreSynth.triggerAttackRelease('C5', '8n');
+                        break;
+                    case 'powerUp':
+                        powerUpSynth.triggerAttackRelease('G5', '8n');
+                        break;
+                    case 'pass':
+                        passSynth.triggerAttackRelease('E5', '8n');
+                        break;
+                    case 'shoot':
+                        shootSynth.triggerAttackRelease('8n');
+                        break;
+                }
+            } catch(e) {
+                console.error("Audio playback failed:", e);
+            }
+        }
+        
+        soundToggleButton.addEventListener('click', async () => {
+            isMuted = !isMuted;
+            if (isMuted) {
+                soundToggleButton.textContent = '🔇';
+                Tone.Destination.mute = true;
+            } else {
+                soundToggleButton.textContent = '🔊';
+                Tone.Destination.mute = false;
+            }
+        });
+
+        /**
+         * The Player class.
+         * Handles the player's position and drawing.
+         */
+        class Player {
+            constructor() {
+                this.width = playerConfig.width;
+                this.height = playerConfig.height;
+                this.lane = 2;
+                this.x = laneXPositions[this.lane] - this.width / 2;
+                this.y = canvas.height - this.height - 50;
+                this.targetX = this.x;
+            }
+
+            draw() {
+                if (shieldActive) {
+                    ctx.fillStyle = playerConfig.shieldColor;
+                    ctx.globalAlpha = 0.3;
+                    ctx.beginPath();
+                    ctx.arc(this.x + this.width / 2, this.y + this.height / 2, Math.max(this.width, this.height) * 0.8, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+                }
+                
+                ctx.fillStyle = playerConfig.color;
+                ctx.beginPath();
+                ctx.moveTo(this.x + this.width / 2, this.y);
+                ctx.lineTo(this.x + this.width, this.y + this.height);
+                ctx.lineTo(this.x + this.width / 2, this.y + this.height * 0.75);
+                ctx.lineTo(this.x, this.y + this.height);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            update() {
+                this.targetX = laneXPositions[this.lane] - this.width / 2;
+                const dx = this.targetX - this.x;
+                this.x += dx * 0.2;
+            }
+        }
+        
+        /**
+         * The Bullet class.
+         */
+        class Bullet {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.width = 5;
+                this.height = 15;
+                this.speed = 15;
+                this.color = entityConfig.bulletColor;
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+            }
+
+            update() {
+                this.y -= this.speed;
+            }
+        }
+
+        /**
+         * The Particle class for explosions and smoke.
+         */
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 5 + 1;
+                this.color = color;
+                this.speedX = Math.random() * 3 - 1.5;
+                this.speedY = Math.random() * 3 - 1.5;
+                this.alpha = 1;
+            }
+            
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.size *= 0.95;
+                this.alpha -= 0.02;
+            }
+            
+            draw() {
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        /**
+         * The Entity class (for Obstacles, Rivals, PowerUps).
+         * Handles position, movement, and drawing.
+         */
+        class Entity {
+            constructor(lane, y, width, height, speed, type) {
+                this.lane = lane;
+                this.x = laneXPositions[this.lane] - width / 2;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+                this.speed = speed;
+                this.type = type;
+                this.passed = false;
+                this.obstacleShape = Math.floor(Math.random() * 3);
+            }
+            
+            draw() {
+                let color;
+                switch (this.type) {
+                    case 'obstacle':
+                        color = entityConfig.obstacleColor;
+                        ctx.fillStyle = color;
+                        this.drawShape();
+                        break;
+                    case 'rival':
+                        color = entityConfig.rivalColor;
+                        ctx.fillStyle = color;
+                        this.drawRivalShape();
+                        break;
+                    case 'powerUp':
+                        color = entityConfig.powerUpColor;
+                        ctx.fillStyle = color;
+                        this.drawPowerUpShape();
+                        break;
+                }
+            }
+            
+            drawShape() {
+                // Use a different shape based on obstacleShape property
+                switch(this.obstacleShape) {
+                    case 0: // Gate
+                        const gateWidth = 10;
+                        ctx.fillRect(this.x - this.width / 2, this.y, gateWidth, this.height);
+                        ctx.fillRect(this.x + this.width / 2 - gateWidth, this.y, gateWidth, this.height);
+                        break;
+                    case 1: // Diamond
+                        ctx.beginPath();
+                        ctx.moveTo(this.x + this.width / 2, this.y);
+                        ctx.lineTo(this.x + this.width, this.y + this.height / 2);
+                        ctx.lineTo(this.x + this.width / 2, this.y + this.height);
+                        ctx.lineTo(this.x, this.y + this.height / 2);
+                        ctx.closePath();
+                        ctx.fill();
+                        break;
+                    case 2: // Cross
+                        const barThickness = 8;
+                        ctx.fillRect(this.x + this.width/2 - barThickness/2, this.y, barThickness, this.height);
+                        ctx.fillRect(this.x, this.y + this.height/2 - barThickness/2, this.width, barThickness);
+                        break;
+                }
+            }
+
+            drawRivalShape() {
+                ctx.beginPath();
+                ctx.moveTo(this.x + this.width / 2, this.y);
+                ctx.lineTo(this.x + this.width, this.y + this.height);
+                ctx.lineTo(this.x + this.width / 2, this.y + this.height * 0.75);
+                ctx.lineTo(this.x, this.y + this.height);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            drawPowerUpShape() {
+                ctx.beginPath();
+                ctx.rect(this.x, this.y, this.width, this.height);
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.fillStyle = this.color;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.font = 'bold ' + (this.width / 2) + 'px Arial';
+                ctx.fillText('⚡', this.x + this.width / 2, this.y + this.height / 2);
+            }
+
+            update() {
+                this.y += this.speed * gameSpeed;
+            }
+        }
+
+        /**
+         * Checks for collision between the player and an entity.
+         */
+        function checkCollision(player, entity) {
+            const isSameLane = player.lane === entity.lane;
+            if (isSameLane) {
+                return (
+                    player.y < entity.y + entity.height &&
+                    player.y + player.height > entity.y &&
+                    player.x < entity.x + entity.width &&
+                    player.x + player.width > entity.x
+                );
+            }
+            return false;
+        }
+        
+        /**
+         * Displays a temporary message box.
+         */
+        function showMessage(text) {
+            messageBox.textContent = text;
+            messageBox.classList.add('show');
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 1500);
+        }
+
+        /**
+         * Initializes or resets the game state.
+         */
+        function init() {
+            isGameOver = false;
+            score = 0;
+            gameSpeed = BASE_SPEED;
+            lastSpawnTime = 0;
+            shieldActive = false;
+            shieldTimer = 0;
+            bulletCount = 100;
+            bulletCountElement.textContent = `100`;
+            lastBulletRechargeTime = Date.now();
+            
+            const storedHighScore = localStorage.getItem('airplaneHighScore');
+            highScore = storedHighScore ? parseInt(storedHighScore, 10) : 0;
+            highScoreDisplayElement.textContent = highScore;
+
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            const laneWidth = canvas.width / LANE_COUNT;
+            for (let i = 0; i < LANE_COUNT; i++) {
+                laneXPositions[i] = (i * laneWidth) + (laneWidth / 2);
+            }
+
+            player = new Player();
+            entities = [];
+            bullets = [];
+            particles = [];
+            
+            // Spawn initial rivals for the race
+            for (let i = 0; i < LANE_COUNT; i++) {
+                if (i !== player.lane) {
+                    entities.push(new Entity(i, -100, playerConfig.width, playerConfig.height, entityConfig.minSpeed, 'rival'));
+                }
+            }
+            
+            gameOverScreen.classList.remove('active');
+            
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            gameLoop();
+        }
+        
+        // Function to create an explosion effect
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 20; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+        
+        // Function to create camera shake
+        function createCameraShake(amount) {
+            cameraShakeX = (Math.random() - 0.5) * amount;
+            cameraShakeY = (Math.random() - 0.5) * amount;
+        }
+
+        /**
+         * The main game loop.
+         */
+        function gameLoop(timestamp = 0) {
+            if (isGameOver) {
+                return;
+            }
+
+            const deltaTime = timestamp - lastUpdateTime;
+            lastUpdateTime = timestamp;
+            const now = Date.now();
+
+            score += deltaTime / 100;
+            scoreElement.textContent = Math.floor(score);
+            speedMeterElement.textContent = `${gameSpeed.toFixed(1)}`;
+            
+            // Bullet recharge logic
+            if (bulletCount < 100 && (now - lastBulletRechargeTime) > BULLET_RECHARGE_INTERVAL) {
+                bulletCount = 100;
+                bulletCountElement.textContent = `100`;
+                lastBulletRechargeTime = now;
+                showMessage("Ammo Recharged!");
+            }
+
+            // Handle power-up timer
+            if (shieldActive) {
+                shieldTimer -= deltaTime;
+                if (shieldTimer <= 0) {
+                    shieldActive = false;
+                }
+            }
+
+            player.update();
+            
+            lastSpawnTime += deltaTime;
+            const spawnInterval = Math.max(500, 1000 - gameSpeed * 50);
+            if (lastSpawnTime > spawnInterval) {
+                // Implement smarter spawning patterns
+                const type = Math.random() < 0.1 ? 'powerUp' : (Math.random() < 0.7 ? 'obstacle' : 'rival');
+                const lane = Math.floor(Math.random() * LANE_COUNT);
+                const width = 30;
+                const height = 40;
+                const y = -height;
+                const speed = Math.random() * (entityConfig.maxSpeed - entityConfig.minSpeed) + entityConfig.minSpeed;
+                
+                if (type === 'obstacle') {
+                    // Spawn a random pattern of obstacles
+                    const patternIndex = Math.floor(Math.random() * lanePatterns.length);
+                    const selectedPattern = lanePatterns[patternIndex];
+                    
+                    selectedPattern.forEach(patternLane => {
+                        entities.push(new Entity(patternLane, y, width, height, speed, 'obstacle'));
+                    });
+                } else {
+                    entities.push(new Entity(lane, y, width, height, speed, type));
+                }
+                lastSpawnTime = 0;
+            }
+
+            // Update and draw bullets, and check for collisions with obstacles
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                const bullet = bullets[i];
+                bullet.update();
+
+                for (let j = entities.length - 1; j >= 0; j--) {
+                    const entity = entities[j];
+                    if (entity.type === 'obstacle' && bullet.x < entity.x + entity.width && bullet.x + bullet.width > entity.x && bullet.y < entity.y + entity.height && bullet.y + bullet.height > entity.y) {
+                        createExplosion(entity.x + entity.width / 2, entity.y + entity.height / 2, entity.color);
+                        entities.splice(j, 1);
+                        bullets.splice(i, 1);
+                        playSound('collision');
+                        score += 100;
+                        break;
+                    }
+                }
+                
+                if (bullet.y < 0) {
+                    bullets.splice(i, 1);
+                }
+            }
+
+            // Update and draw entities, check for player collisions
+            for (let i = entities.length - 1; i >= 0; i--) {
+                const entity = entities[i];
+                entity.update();
+
+                if (checkCollision(player, entity)) {
+                    if (entity.type === 'powerUp') {
+                        playSound('powerUp');
+                        shieldActive = true;
+                        shieldTimer = SHIELD_DURATION;
+                        entities.splice(i, 1);
+                    } else if (shieldActive) {
+                        playSound('powerUp');
+                        entities.splice(i, 1);
+                    } else {
+                        playSound('collision');
+                        createExplosion(player.x + player.width / 2, player.y + player.height / 2, playerConfig.color);
+                        isGameOver = true;
+                        const finalScore = Math.floor(score);
+                        finalScoreElement.textContent = finalScore;
+                        gameOverScreen.classList.add('active');
+                        
+                        if (finalScore > highScore) {
+                            localStorage.setItem('airplaneHighScore', finalScore);
+                            highScoreDisplayElement.textContent = finalScore;
+                            showMessage("New High Score!");
+                        }
+                        
+                        return;
+                    }
+                }
+
+                if (entity.y > canvas.height) {
+                    if (entity.type === 'rival' && !entity.passed) {
+                        score += PASS_BONUS;
+                        showMessage(`+${PASS_BONUS} points!`);
+                        playSound('pass');
+                        gameSpeed *= SPEED_BURST;
+                        entity.passed = true;
+                    }
+                    if (entity.type !== 'powerUp') {
+                        playSound('score');
+                    }
+                    entities.splice(i, 1);
+                }
+            }
+            
+            // Update particles
+            for(let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                if(particles[i].alpha <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Apply camera shake
+            ctx.save();
+            ctx.translate(cameraShakeX, cameraShakeY);
+            cameraShakeX *= 0.9;
+            cameraShakeY *= 0.9;
+
+            // Draw animated speed lines
+            ctx.strokeStyle = '#d9e2ee';
+            ctx.lineWidth = 2 + (gameSpeed * 0.5);
+            ctx.globalAlpha = Math.min(1, 0.5 + (gameSpeed * 0.1));
+            const lineSpacing = 150 - (gameSpeed * 10);
+            for(let i = 0; i < LANE_COUNT; i++) {
+                ctx.beginPath();
+                ctx.moveTo(laneXPositions[i], 0);
+                ctx.lineTo(laneXPositions[i], canvas.height);
+                ctx.stroke();
+            }
+            ctx.globalAlpha = 1;
+
+            // Draw tire smoke when braking
+            if (isBraking) {
+                 for(let i=0; i < 5; i++) {
+                    particles.push(new Particle(player.x + player.width / 2, player.y + player.height, '#b0c4de'));
+                }
+            }
+            
+            player.draw();
+            entities.forEach(ent => ent.draw());
+            bullets.forEach(bullet => bullet.draw());
+            particles.forEach(p => p.draw());
+
+            ctx.restore();
+
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+        
+        let isBraking = false;
+        
+        // --- Event Listeners for Player Control ---
+        document.addEventListener('keydown', (event) => {
+            if (isGameOver && event.code === 'Space') {
+                init();
+                return;
+            }
+
+            if (event.key === 'ArrowLeft' && player.lane > 0) {
+                player.lane--;
+            } else if (event.key === 'ArrowRight' && player.lane < LANE_COUNT - 1) {
+                player.lane++;
+            } else if (event.key === 'ArrowUp') {
+                gameSpeed = Math.min(MAX_SPEED, gameSpeed + ACCELERATION_RATE);
+                createCameraShake(10);
+            } else if (event.key === 'ArrowDown') {
+                isBraking = true;
+                gameSpeed = Math.max(MIN_SPEED, gameSpeed - BRAKE_RATE);
+                createCameraShake(10);
+            } else if (event.key === 'w' && bulletCount > 0) {
+                bullets.push(new Bullet(player.x + player.width / 2 - 5, player.y));
+                bullets.push(new Bullet(player.x + player.width / 2 + 5, player.y));
+                bulletCount--;
+                bulletCountElement.textContent = `${bulletCount}`;
+                playSound('shoot');
+            }
+        });
+        
+        document.addEventListener('keyup', (event) => {
+            if (event.key === 'ArrowDown') {
+                isBraking = false;
+            }
+        });
+
+        canvas.addEventListener('mousemove', (event) => {
+            if (isGameOver) return;
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = event.clientX - rect.left;
+            const laneWidth = canvas.width / LANE_COUNT;
+            player.lane = Math.floor(mouseX / laneWidth);
+            player.lane = Math.max(0, Math.min(LANE_COUNT - 1, player.lane));
+        });
+
+        canvas.addEventListener('touchmove', (event) => {
+            if (isGameOver) return;
+            event.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const touchX = event.touches[0].clientX - rect.left;
+            const laneWidth = canvas.width / LANE_COUNT;
+            player.lane = Math.floor(touchX / laneWidth);
+            player.lane = Math.max(0, Math.min(LANE_COUNT - 1, player.lane));
+        });
+        
+        // The loading screen is now the entry point for the game.
+        loadingScreen.addEventListener('click', async () => {
+            loadingScreen.classList.add('hidden');
+            gameInfo.classList.remove('hidden');
+            soundToggleButton.classList.remove('hidden');
+            gameOverScreen.classList.remove('active');
+            
+            await Tone.start();
+            init();
+        });
+
+        // Restart button also initializes the game
+        restartButton.addEventListener('click', () => {
+            init();
+        });
+
+        window.addEventListener('resize', () => {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            const laneWidth = canvas.width / LANE_COUNT;
+            for (let i = 0; i < LANE_COUNT; i++) {
+                laneXPositions[i] = (i * laneWidth) + (laneWidth / 2);
+            }
+            player.y = canvas.height - player.height - 50;
+        });
+
+    </script>
+
+</body>
+</html>
