@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <link rel="apple-touch-icon" href="https://i.postimg.cc/D0r9rVjn/App-Icon-2x.png">
+<link rel="manifest" href="manifest.json">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 <style>
 :root{
@@ -416,7 +417,9 @@ const HAZ = {
         if (aabb(e, player)) damage(e.dmg);
     }
   }, dr: (e) => { ctx.fillStyle = e.col; ctx.beginPath(); ctx.arc(e.x+e.w/2, e.y+e.h/2, e.radius, 0, TAU); ctx.fill(); }
-  }
+  },
+  // Train
+  train:{dmg:34, col:'#444', w:40,h:140, dr:(e)=>{ ctx.fillStyle=e.col; ctx.fillRect(e.x,e.y,e.w,e.h); }}
 };
 const HAZ_KEYS=Object.keys(HAZ);
 let fogT=0, windX=0, slipT=0;
@@ -477,6 +480,10 @@ function drawPickup(e){
 function laneX(l){ return lanesX[l]; }
 function pushHaz(key,l,y){
   const h=HAZ[key], w=h.w, hh=h.h;
+  if (!h) {
+    console.error(`Attempted to spawn unknown hazard type: ${key}`);
+    return;
+  }
   const e={kind:TYPE.HZ, hz:key, lane:l, x:laneX(l)-w/2, y, w, h:hh, sp:1.6+R()*1.2+speed*.08, col:h.col, hp:h.hp||0};
   ents.push(e);
 }
@@ -838,7 +845,7 @@ function update(dtRaw){
     // Radar detection
     const distY = e.y - player.y;
     if (e.kind === TYPE.HZ && distY > 0 && distY < radarRange && e.lane === player.lane) {
-      radarTarget = HAZ[e.hz].col;
+      radarTarget = HAZ[e.hz]?.col;
       radarDistance = distY;
     }
 
@@ -964,7 +971,7 @@ function render(){
   for(const e of ents){
     if(e.kind===TYPE.RIVAL) drawRival(e);
     else if(e.kind===TYPE.ACE) drawAce(e);
-    else if(e.kind===TYPE.HZ){ HAZ[e.hz]?.dr(e); }
+    else if(e.kind===TYPE.HZ){ if(HAZ[e.hz]?.dr) HAZ[e.hz].dr(e); }
     else if(e.kind===TYPE.PICK){ drawPickup(e); }
   }
   drawPlayer(); drawBullets(); ctx.restore();
