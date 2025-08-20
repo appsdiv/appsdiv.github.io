@@ -446,11 +446,23 @@ const PICKS = {
   score:{col:'#ffd43b', apply:()=>{ const add=200*mult; score+=add; toast(`Score +${add}`); sScore(); }},
   focus:{col:'#66d9e8', apply:()=>{ focusEnergy=Math.min(1, focusEnergy+.35); toast('Focus +'); sFocus(); }},
   emp:  {col:'#ffa94d', apply:()=>{ empEnergy=Math.min(1, empEnergy+.5); toast('EMP +'); sEMP(); }},
-  dualgun:{col:'#ff00c8', apply:()=>{ dualGun=true; toast('Dual Guns Activated!'); dualGunExpiry = performance.now() + 8000; }}
+  dualgun:{col:'#ff00c8', apply:()=>{ dualGun=true; toast('Dual Guns Activated!'); dualGunExpiry = performance.now() + 8000; }},
+  cosmic_crate: {col: '#ff00ff', apply: () => {
+    const bonuses = ['score', 'ammo', 'hp', 'dualgun', 'emp'];
+    const bonus = pick(bonuses);
+    if(bonus === 'score') {
+      const add = 2000 * mult;
+      score += add;
+      toast(`Cosmic Crate! Massive Score +${add}`);
+    } else {
+      PICKS[bonus].apply();
+      toast(`Cosmic Crate! Found a bonus: ${bonus}`);
+    }
+  }}
 };
 function spawnPickupAt(x,y){
   const pickups = Object.keys(PICKS);
-  const probabilities = {hp: 0.25, ammo: 0.2, score: 0.15, focus: 0.15, emp: 0.15, dualgun: 0.1};
+  const probabilities = {hp: 0.25, ammo: 0.2, score: 0.15, focus: 0.15, emp: 0.15, dualgun: 0.1, cosmic_crate: 0.05};
   let rand = R();
   let key;
   for (const p of pickups) {
@@ -487,6 +499,16 @@ function drawPickup(e){
     ctx.beginPath(); ctx.moveTo(cx-4,cy-6); ctx.lineTo(cx+1,cy-2); ctx.lineTo(cx-2,cy-2); ctx.lineTo(cx+4,cy+6); ctx.lineTo(cx-1,cy+2); ctx.lineTo(cx+2,cy+2); ctx.closePath(); ctx.fill();
   } else if(e.pk==='dualgun'){ // twin bullets
     ctx.fillRect(cx-6, cy, 3, 10); ctx.fillRect(cx+3, cy, 3, 10);
+  } else if(e.pk==='cosmic_crate'){ // box
+    ctx.fillStyle = '#ff00ff';
+    ctx.strokeStyle = '#fff';
+    ctx.fillRect(cx - 10, cy - 10, 20, 20);
+    ctx.beginPath();
+    ctx.moveTo(cx - 5, cy);
+    ctx.lineTo(cx + 5, cy);
+    ctx.moveTo(cx, cy - 5);
+    ctx.lineTo(cx, cy + 5);
+    ctx.stroke();
   }
   ctx.restore();
 }
@@ -508,7 +530,7 @@ function spawnHazard(l,y){
   if(k==='volt'){ const x = laneX(l); ents.push({kind:TYPE.HZ,hz:'volt',lane:l,x:x-3,y:y,w:6,h:110,sp:3+speed*.35,col:HAZ.volt.col}); return; }
   pushHaz(k,l,y);
 }
-function spawnRival(l,y){ const w=38,h=46; ents.push({kind:TYPE.RIVAL,lane:l,x:laneX(l)-w/2,y,w,h,sp:2+R()*2+speed*.15,color:pick(['#ff3b3b','#ff9f1a','#4ca3ff','#19c997','#c56cf0']), shot:800+R()*900, passed:false, targetLane: (player ? player.lane : l)}); }
+function spawnRival(l,y){ const w=38,h=46; ents.push({kind:TYPE.RIVAL,lane:l,x:laneX(l)-w/2,y,w,h,sp:2+R()*2+speed*.15,color:pick(['#ff3b3b','#ff9f1a','#4ca3ff','#19c997','#c56cf0']), shot:800+R()*900, passed:false, targetLane: l }); }
 function spawnAce(){ const l=(R()*LANES)|0, y=-120, w=52,h=58; ents.push({kind:TYPE.ACE,lane:l,x:laneX(l)-w/2,y,w,h,sp:2+R()*1.5+speed*.12,hp:5,color:'#ffd166', shot:500, phase:0}); }
 
 const director={mode:'free', t:0, dur:0, wave:0};
@@ -521,48 +543,51 @@ function patternSpawn(dt){
   // More deliberate, sequenced patterns
   if(director.mode === 'free') {
       const difficulty = score / 10000;
-      if (patternAcc > (8000 + R()*4000) * (1 - Math.min(0.5, difficulty))) {
+      if (patternAcc > (4000 + R()*2000) * (1 - Math.min(0.5, difficulty))) {
         patternAcc = 0;
         const patterns = ['zigzag', 'orb', 'vortex_trap', 'train_line', 'ion_pulse'];
-        setPattern(pick(patterns), 4000 + R() * 3000);
+        setPattern(pick(patterns), 2000 + R() * 2000);
       }
   }
 
   if(director.mode==='convoy'){
-    if((director.t|0)%500<18){ const l=(R()*LANES)|0; for(let k=0;k<3;k++) spawnRival(l,-120-k*70); }
+    if((director.t|0)%300<18){ const l=(R()*LANES)|0; for(let k=0;k<3;k++) spawnRival(l,-120-k*70); }
   } else if(director.mode==='zigzag'){
-    if((director.t|0)%420<18){ const start=(R()*4)|0; for(let i=0;i<4;i++){ const l=(start+i)%4; pushHaz('energy_barrier',l,-120-i*55); } }
+    if((director.t|0)%220<18){ const start=(R()*4)|0; for(let i=0;i<4;i++){ const l=(start+i)%4; pushHaz('energy_barrier',l,-120-i*55); } }
   } else if(director.mode==='orb'){
-    if((director.t|0)%480<18){ for(let l=0;l<LANES;l++) pushHaz('orb',l,-100 - l*40); }
+    if((director.t|0)%280<18){ for(let l=0;l<LANES;l++) pushHaz('orb',l,-100 - l*40); }
   } else if(director.mode==='train_line'){
-    if((director.t|0)%1000<18) {
+    if((director.t|0)%500<18) {
       const l = (R()*LANES)|0;
       pushHaz('train', l, -200);
       pushHaz('train', l, -350);
     }
   } else if(director.mode === 'ion_pulse') {
-    if((director.t | 0) % 600 < 18) {
+    if((director.t | 0) % 300 < 18) {
       const l = (R() * LANES)|0;
       pushHaz('ion_pulse', l, -100);
     }
   } else if(director.mode==='safe'){
-    if((director.t|0)%520<18){ const safe=(R()*4)|0; for(let l=0;l<LANES;l++){ if(l!==safe) pushHaz(pick(HAZ_KEYS),l,-110); } }
+    if((director.t|0)%260<18){ const safe=(R()*4)|0; for(let l=0;l<LANES;l++){ if(l!==safe) pushHaz(pick(HAZ_KEYS),l,-110); } }
   }
 }
 function spawnStep(dt){
   spawnAcc+=dt; aceAcc+=dt; patternAcc+=dt;
-  const base=(set.zen?1150:900) - speed*40 - score*0.08;
-  if(spawnAcc>Math.max(240,base) && director.mode === 'free'){
+  const base=(set.zen?650:400) - speed*20 - score*0.04;
+  if(spawnAcc>Math.max(120,base) && director.mode === 'free'){
     spawnAcc=0;
-    const lanes=[0,1,2,3]; const count=(set.zen?2:2+(R()<Math.min(1,score/2200)?1:0));
+    const lanes=[0,1,2,3]; 
+    const count = 2 + (R() < Math.min(1, score / 1000) ? 1 : 0); // Increase count with score
     for(let k=0;k<count;k++){
       const l=lanes.splice((R()*lanes.length)|0,1)[0]; const y=-80-k*60;
       const r=R();
-      if(r<.30) spawnRival(l,y); else pushHaz(pick(HAZ_KEYS),l,y);
+      // Increase rival spawn chance with speed and score
+      const rivalChance = 0.3 + Math.min(0.7, speed / 100) + Math.min(0.4, score / 5000);
+      if(r < rivalChance) spawnRival(l,y); else pushHaz(pick(HAZ_KEYS),l,y);
     }
   }
   
-  if(!set.zen && aceAcc>(45000 - Math.min(30000, score*5))){ aceAcc=0; spawnAce(); }
+  if(!set.zen && aceAcc>(25000 - Math.min(20000, score*5))){ aceAcc=0; spawnAce(); }
 
   clouds.forEach((c,i)=>{ c.y+=(c.v + speed*.1); c.x+=Math.sin((performance.now()+i*900)/2600)*.12; if(c.y>H+40){ c.y-=H+80; c.x=(c.x+W)%W; } });
 }
@@ -866,13 +891,12 @@ function update(dtRaw){
     const e=ents[i];
     
     // Rival AI: Smartly target player's lane
-    if (e.kind === TYPE.RIVAL && player && e.targetLane !== player.lane && e.y < player.y - 100) {
-      if (R() < 0.005) { // A small chance to change lanes
-          e.targetLane = player.lane;
-          e.lane = player.lane;
+    if (e.kind === TYPE.RIVAL && player && e.y < player.y - 100) {
+      if(e.lane !== player.lane && R() < 0.01 + speed/2000) { // Higher chance to switch lanes at higher speeds
+        e.targetLane = player.lane;
+        e.lane = player.lane; // Instantly move to player's lane for challenge
       }
     }
-
 
     // Radar detection
     const distY = e.y - (player ? player.y : H);
@@ -901,12 +925,7 @@ function update(dtRaw){
 
     if(player && aabb(e,player)){
       if(e.kind===TYPE.HZ){
-        if(e.hz === 'ion_pulse'){
-            damage(HAZ[e.hz]?.dmg);
-            explode(e);
-            ents.splice(i, 1);
-            toast("Ion Pulse Activated!");
-        } else if(e.hz==='splitter' && !e.split){
+        if(e.hz==='splitter' && !e.split){
           e.split = true;
           explode(e);
           ents.push({ ...e, y: e.y + 20, sp: e.sp + 0.5, x: e.x - 15, w: 15, h: 15, dmg: 10, dead: false });
@@ -915,8 +934,8 @@ function update(dtRaw){
         } else {
           damage(HAZ[e.hz]?.dmg||20);
           toast(`Notified: Affected by ${e.hz.replace(/_/g, ' ')}`);
-          if(e.hz!=='train' && e.hz!=='laserH' && e.hz!=='rumble') explode(e);
-          if(e.hz!=='train' && e.hz!=='laserH' && e.hz!=='splitter') ents.splice(i,1);
+          if(e.hz!=='train' && e.hz!=='laserH' && e.hz!=='rumble' && e.hz!=='ion_pulse') explode(e);
+          if(e.hz!=='train' && e.hz!=='laserH' && e.hz!=='splitter' && e.hz!=='ion_pulse') ents.splice(i,1);
         }
       } else if(e.kind===TYPE.RIVAL||e.kind===TYPE.ACE){
         damage(e.kind===TYPE.ACE?30:22); explode(e); if(e.kind!==TYPE.ACE) ents.splice(i,1);
@@ -1118,7 +1137,7 @@ touchZone.addEventListener('touchstart', (ev) => {
     moved = false;
     
     // Increased touch zone for fire
-    if (t0.clientY > H * 0.7) { 
+    if (t0.clientY > H * 0.7 && t0.clientX < W * 0.3) { 
         firing = true;
         fire();
     }
@@ -1178,7 +1197,7 @@ btn.closeDrawer.addEventListener('click', closeDrawer);
 el.scrim.addEventListener('click', closeDrawer);
 
 /* Help + Mute */
-btn.help.addEventListener('click', ()=>{ toast('Created by pymn.'); });
+btn.help.addEventListener('click', ()=>{ toast('Created by pymnn.'); });
 btn.mute.addEventListener('click', ()=>{ Tone.Destination.mute=!Tone.Destination.mute; btn.mute.textContent=Tone.Destination.mute?'🔈':'🔊'; });
 
 /* Codes */
