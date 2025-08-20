@@ -690,6 +690,7 @@ function drawAce(e){ const x=e.x,y=e.y,w=e.w,h=e.h; ctx.fillStyle='#ffd166'; ctx
 /* Player & FX (airplane drawing unchanged) */
 function heat(){ const cx=player.x+player.w/2, cy=player.y+player.h*0.9; ctx.save(); ctx.globalAlpha=.18; const n=set.low?4:6; for(let i=0;i<n;i++){ const off=i*8; ctx.beginPath(); ctx.ellipse(cx + Math.sin((performance.now()+off)/140)*(3+speed*.8), cy+off, 14,6,0,0,TAU); ctx.fillStyle="rgba(255,255,255,.55)"; ctx.fill(); } ctx.restore(); }
 function drawPlayer(){
+  if (!player) return; // Defensive check
   const tilt=(player.tx-player.x)*.04; player.bank+=(tilt-player.bank)*.18;
   ctx.save();
   const cx=player.x+player.w/2, cy=player.y+player.h/2;
@@ -845,7 +846,12 @@ function update(dtRaw){
   if(t-lastHit>REGEN_DELAY && hp<HP_MAX){ hp=Math.min(HP_MAX, hp+REGEN_PER_S*dt/1000); el.hp.style.transform=`scaleX(${hp/HP_MAX})`; }
 
   const steering = (laneLockExpiry > 0) ? 0 : (slipT>0 ? .14 : .22);
-  player.tx=lanesX[player.lane]-player.w/2 + windX*40; player.x+=(player.tx-player.x)*steering; player.y=H-PLAYER_H-56;
+  if (player) {
+    player.tx=lanesX[player.lane]-player.w/2 + windX*40; 
+    player.x+=(player.tx-player.x)*steering; 
+    player.y=H-PLAYER_H-56;
+  }
+  
 
   spawnStep(dt); patternSpawn(dt);
 
@@ -856,15 +862,15 @@ function update(dtRaw){
     const e=ents[i];
     
     // Radar detection
-    const distY = e.y - player.y;
-    if (e.kind === TYPE.HZ && distY > 0 && distY < radarRange && e.lane === player.lane) {
+    const distY = e.y - (player ? player.y : H);
+    if (player && e.kind === TYPE.HZ && distY > 0 && distY < radarRange && e.lane === player.lane) {
       radarTarget = HAZ[e.hz]?.col;
       radarDistance = distY;
     }
 
     if(e.kind===TYPE.PICK){
       e.t+=dt; e.y+=e.vy; e.x+=Math.sin(e.t*0.004)*0.6; e.a=Math.max(0.25, 1 - e.t/9000);
-      if(aabb(e,player)){ PICKS[e.pk].apply(); ents.splice(i,1); continue; }
+      if(player && aabb(e,player)){ PICKS[e.pk].apply(); ents.splice(i,1); continue; }
       if(e.y>H+30 || e.a<=0.26){ ents.splice(i,1); continue; }
       continue;
     }
@@ -876,11 +882,11 @@ function update(dtRaw){
 
     if(e.kind===TYPE.HZ && HAZ[e.hz]?.up) HAZ[e.hz].up(e,dt);
 
-    if((e.kind===TYPE.RIVAL||e.kind===TYPE.ACE) && e.y+e.h - player.y > 60 && e.y+e.h - player.y < 140 && e.lane===player.lane){
+    if(player && (e.kind===TYPE.RIVAL||e.kind===TYPE.ACE) && e.y+e.h - player.y > 60 && e.y+e.h - player.y < 140 && e.lane===player.lane){
       speed=Math.min(MAX_SPEED, speed + 0.003*dt); draftT=500; if(R()<0.02) sPass(); missionHit('draft6',1);
     }
 
-    if(aabb(e,player)){
+    if(player && aabb(e,player)){
       if(e.kind===TYPE.HZ){
         if(e.hz === 'gravity_well') {
             damage(HAZ[e.hz]?.dmg); // No damage but still a trap
@@ -933,7 +939,7 @@ function update(dtRaw){
     }
     if(hit || b.y<-20) bullets.splice(i,1);
   }
-  for(let i=eBullets.length-1;i>=0;i--){ const b=eBullets[i]; b.y+=b.sp; if(aabb(b,player)){ damage(18); eBullets.splice(i,1); continue; } if(b.y>H+20) eBullets.splice(i,1); }
+  for(let i=eBullets.length-1;i>=0;i--){ const b=eBullets[i]; b.y+=b.sp; if(player && aabb(b,player)){ damage(18); eBullets.splice(i,1); continue; } if(b.y>H+20) eBullets.splice(i,1); }
 
   if(parts.length > 800) parts.splice(0, parts.length - 800);
 
@@ -1055,7 +1061,8 @@ function loop(t){
 document.addEventListener('keydown', e=>{
   if(e.repeat) return;
   if(!running && e.code==='Space'){ start(); return; }
-  if (laneLockExpiry <= 0) {
+  // FIX: Use `performance.now()` to check if the lock has expired
+  if (performance.now() > laneLockExpiry) {
       if(e.key==='ArrowLeft' && player.lane>0){ player.lane--; lastSwap=performance.now(); }
       if(e.key==='ArrowRight' && player.lane<LANES-1){ player.lane++; lastSwap=performance.now(); }
   }
@@ -1072,7 +1079,15 @@ document.addEventListener('keyup', e=>{ if(e.key==='ArrowUp') accel=false; if(e.
 let t0=null, moved=false;
 function ts(ev){ ev.preventDefault(); const t=ev.changedTouches?ev.changedTouches[0]:ev; t0={x:t.clientX,y:t.clientY}; moved=false; }
 function tm(ev){ if(!t0) return; ev.preventDefault(); const t=ev.changedTouches[0]; const dx=t.clientX-t0.x, dy=t.clientY-t0.y; const ax=Math.abs(dx), ay=Math.abs(dy);
-  if(!moved && (ax>24 || ay>24)){ moved=true; if (laneLockExpiry <= 0) { if(ax>ay){ if(dx<0&&player.lane>0){player.lane--; lastSwap=performance.now();} if(dx>0&&player.lane<LANES-1){player.lane++; lastSwap=performance.now();} } } else { if(dy<-12){accel=true;brake=false;} if(dy>12){brake=true;accel=false;} } } }
+  if(!moved && (ax>24 || ay>24)){ moved=true; 
+    // FIX: Use `performance.now()` to check if the lock has expired
+    if (performance.now() > laneLockExpiry) { 
+        if(ax>ay){ if(dx<0&&player.lane>0){player.lane--; lastSwap=performance.now();} if(dx>0&&player.lane<LANES-1){player.lane++; lastSwap=performance.now();} } 
+    } else { 
+        if(dy<-12){accel=true;brake=false;} if(dy>12){brake=true;accel=false;} 
+    }
+  }
+}
 function te(ev){ ev.preventDefault(); accel=false;brake=false;t0=null; }
 cv.addEventListener('touchstart', ts, {passive:false});
 cv.addEventListener('touchmove', tm, {passive:false});
