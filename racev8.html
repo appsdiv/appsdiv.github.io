@@ -243,7 +243,7 @@ function lcg(seed){let s=seed|0;return ()=>((s=(s*1664525+1013904223)|0)>>>0)/42
 function daySeed(){return +new Date().toISOString().slice(0,10).replace(/-/g,'');}
 let mode={daily:true, code:null};
 let R=Math.random;
-function applySeed(){ if(mode.code){ const s=parseInt(mode.code.slice(0,6),36)||daySeed(); R=lcg(s);} else if(mode.daily){ R=lcg(daySeed()); } else R=Math.random; }
+function applySeed(){ if(mode.code){ const s=parseInt(mode.code.slice(0,6),36)||daySeed(); R=lcg(s); } else if(mode.daily){ R=lcg(daySeed()); } else R=Math.random; }
 function encodeCode(){ const s=(daySeed() ^ ((sw.rival.checked?1:0)<<1) ^ ((sw.lightning.checked?1:0)<<2) ^ ((sw.zen.checked?1:0)<<3))>>>0; return (s>>>0).toString(36).slice(0,6).toUpperCase(); }
 
 /* ---------- Persisted Settings ---------- */
@@ -360,6 +360,7 @@ let weave=0, lastSwap=-1e9, comboT=-1e9, mult=1;
 let timer=180000;
 let dtCarry=0;
 let dualGun = false;
+let laneLockExpiry = 0;
 
 const TYPE={RIVAL:'rival', ACE:'ace', HZ:'haz', WEATHER:'weather', LIGHT:'light', PICK:'pick'};
 const ents=[], bullets=[], eBullets=[], parts=[], clouds=[], lines=[];
@@ -415,7 +416,18 @@ const HAZ = {
   }, dr: (e) => { ctx.fillStyle = e.col; ctx.beginPath(); ctx.arc(e.x+e.w/2, e.y+e.h/2, e.radius, 0, TAU); ctx.fill(); }
   },
   // Train
-  train:{dmg:34, col:'#444', w:40,h:140, dr:(e)=>{ ctx.fillStyle=e.col; ctx.fillRect(e.x,e.y,e.w,e.h); }}
+  train:{dmg:34, col:'#444', w:40,h:140, dr:(e)=>{ ctx.fillStyle=e.col; ctx.fillRect(e.x,e.y,e.w,e.h); }},
+  // Gravity Well - New Hazard
+  gravity_well: { dmg: 0, col: '#6a0dad', w: 50, h: 50, dr: (e) => {
+    const cx = e.x + e.w/2, cy = e.y + e.h/2;
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, e.w/2);
+    grad.addColorStop(0, e.col);
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, e.w/2, 0, TAU);
+    ctx.fill();
+  }}
 };
 const HAZ_KEYS=Object.keys(HAZ);
 let fogT=0, windX=0, slipT=0;
@@ -504,7 +516,7 @@ function patternSpawn(dt){
       const difficulty = score / 10000;
       if (patternAcc > (8000 + R()*4000) * (1 - Math.min(0.5, difficulty))) {
         patternAcc = 0;
-        const patterns = ['zigzag', 'orb', 'vortex_trap', 'train_line'];
+        const patterns = ['zigzag', 'orb', 'vortex_trap', 'train_line', 'gravity_well_trap'];
         setPattern(pick(patterns), 4000 + R() * 3000);
       }
   }
@@ -521,13 +533,11 @@ function patternSpawn(dt){
       pushHaz('train', l, -200);
       pushHaz('train', l, -350);
     }
-  } else if(director.mode==='vortex_trap'){
-    if((director.t|0)%700<18){
-      const l1 = (R()*LANES)|0;
-      const l2 = (l1 + 1 + R()*2)%LANES;
-      pushHaz('vortex', l1, -120);
-      pushHaz('vortex', l2, -180);
-    }
+  } else if (director.mode === 'gravity_well_trap') {
+      if ((director.t | 0) % 800 < 18) {
+        const l = (R() * LANES) | 0;
+        pushHaz('gravity_well', l, -100);
+      }
   } else if(director.mode==='safe'){
     if((director.t|0)%520<18){ const safe=(R()*4)|0; for(let l=0;l<LANES;l++){ if(l!==safe) pushHaz(pick(HAZ_KEYS),l,-110); } }
   }
@@ -724,13 +734,15 @@ function drawPlayer(){
 }
 function drawBullets(){
   bullets.forEach(b=>{
-    if(b.trail>0){
-      const grad=ctx.createLinearGradient(b.x+3,b.y,b.x+3,b.y+b.trail*3);
-      grad.addColorStop(0,'#ffffff');
-      grad.addColorStop(1,'rgba(255,255,255,0)');
-      ctx.fillStyle=grad;
-      ctx.fillRect(b.x+1,b.y,5,b.trail*3);
-    }
+    // Bug fix for non-finite values causing freeze
+    if (!isFinite(b.x) || !isFinite(b.y) || !isFinite(b.trail) || b.trail <= 0) return;
+    
+    const grad=ctx.createLinearGradient(b.x+3,b.y,b.x+3,b.y+b.trail*3);
+    grad.addColorStop(0,'#ffffff');
+    grad.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=grad;
+    ctx.fillRect(b.x+1,b.y,5,b.trail*3);
+
     ctx.save();
     ctx.shadowColor="#fff";
     ctx.shadowBlur=16;
@@ -805,6 +817,13 @@ function update(dtRaw){
       toast('Dual Guns Expired');
   }
   
+  if (laneLockExpiry > 0) {
+      laneLockExpiry -= dtRaw;
+      if (laneLockExpiry <= 0) {
+          toast("Lane control restored!");
+      }
+  }
+
   if(set.low){ dtCarry+=dtRaw; if(dtCarry<22) return; dtRaw=dtCarry; dtCarry=0; }
   const dt = focusOn ? dtRaw*0.75 : dtRaw;
 
@@ -825,7 +844,7 @@ function update(dtRaw){
   if(ammo<AMMO_MAX && t-lastAmmo>RECHARGE_MS){ ammo=AMMO_MAX; el.ammo.textContent=ammo; lastAmmo=t; toast('Ammo Recharged'); }
   if(t-lastHit>REGEN_DELAY && hp<HP_MAX){ hp=Math.min(HP_MAX, hp+REGEN_PER_S*dt/1000); el.hp.style.transform=`scaleX(${hp/HP_MAX})`; }
 
-  const steering = slipT>0 ? .14 : .22;
+  const steering = (laneLockExpiry > 0) ? 0 : (slipT>0 ? .14 : .22);
   player.tx=lanesX[player.lane]-player.w/2 + windX*40; player.x+=(player.tx-player.x)*steering; player.y=H-PLAYER_H-56;
 
   spawnStep(dt); patternSpawn(dt);
@@ -863,7 +882,12 @@ function update(dtRaw){
 
     if(aabb(e,player)){
       if(e.kind===TYPE.HZ){
-        if(e.hz==='splitter' && !e.split){
+        if(e.hz === 'gravity_well') {
+            damage(HAZ[e.hz]?.dmg); // No damage but still a trap
+            laneLockExpiry = performance.now() + 2000; // Lock lanes for 2 seconds
+            toast("Lane controls locked!");
+            ents.splice(i, 1);
+        } else if(e.hz==='splitter' && !e.split){
           e.split = true;
           explode(e);
           ents.push({ ...e, y: e.y + 20, sp: e.sp + 0.5, x: e.x - 15, w: 15, h: 15, dmg: 10, dead: false });
@@ -889,7 +913,6 @@ function update(dtRaw){
 
   for(let i=bullets.length-1;i>=0;i--){
     const b=bullets[i];
-    // PREVENTATIVE FIX: Remove bullets with invalid properties
     if (isNaN(b.x) || isNaN(b.y) || isNaN(b.sp) || isNaN(b.trail)) {
         bullets.splice(i, 1);
         continue;
@@ -960,7 +983,12 @@ function render(){
     else if(e.kind===TYPE.HZ){ if(HAZ[e.hz]?.dr) HAZ[e.hz].dr(e); }
     else if(e.kind===TYPE.PICK){ drawPickup(e); }
   }
-  drawPlayer(); drawBullets(); ctx.restore();
+  
+  if (player) {
+    drawPlayer();
+  }
+  
+  drawBullets(); ctx.restore();
 
   for(let i=lines.length-1;i>=0;i--){ const s=lines[i]; s.y+=s.sp; ctx.globalAlpha=s.a; ctx.fillStyle="#fff"; ctx.fillRect(s.x,s.y,2,s.len); if(s.y>H+40) lines.splice(i,1); } ctx.globalAlpha=1;
   drawParts();
@@ -1027,8 +1055,10 @@ function loop(t){
 document.addEventListener('keydown', e=>{
   if(e.repeat) return;
   if(!running && e.code==='Space'){ start(); return; }
-  if(e.key==='ArrowLeft' && player.lane>0){ player.lane--; lastSwap=performance.now(); }
-  if(e.key==='ArrowRight' && player.lane<LANES-1){ player.lane++; lastSwap=performance.now(); }
+  if (laneLockExpiry <= 0) {
+      if(e.key==='ArrowLeft' && player.lane>0){ player.lane--; lastSwap=performance.now(); }
+      if(e.key==='ArrowRight' && player.lane<LANES-1){ player.lane++; lastSwap=performance.now(); }
+  }
   if(e.key==='ArrowUp') accel=true;
   if(e.key==='ArrowDown') brake=true;
   if(e.code==='Space'){ firing=true; fire(); }
@@ -1042,7 +1072,7 @@ document.addEventListener('keyup', e=>{ if(e.key==='ArrowUp') accel=false; if(e.
 let t0=null, moved=false;
 function ts(ev){ ev.preventDefault(); const t=ev.changedTouches?ev.changedTouches[0]:ev; t0={x:t.clientX,y:t.clientY}; moved=false; }
 function tm(ev){ if(!t0) return; ev.preventDefault(); const t=ev.changedTouches[0]; const dx=t.clientX-t0.x, dy=t.clientY-t0.y; const ax=Math.abs(dx), ay=Math.abs(dy);
-  if(!moved && (ax>24 || ay>24)){ moved=true; if(ax>ay){ if(dx<0&&player.lane>0){player.lane--; lastSwap=performance.now();} if(dx>0&&player.lane<LANES-1){player.lane++; lastSwap=performance.now();} } else { if(dy<-12){accel=true;brake=false;} if(dy>12){brake=true;accel=false;} } } }
+  if(!moved && (ax>24 || ay>24)){ moved=true; if (laneLockExpiry <= 0) { if(ax>ay){ if(dx<0&&player.lane>0){player.lane--; lastSwap=performance.now();} if(dx>0&&player.lane<LANES-1){player.lane++; lastSwap=performance.now();} } } else { if(dy<-12){accel=true;brake=false;} if(dy>12){brake=true;accel=false;} } } }
 function te(ev){ ev.preventDefault(); accel=false;brake=false;t0=null; }
 cv.addEventListener('touchstart', ts, {passive:false});
 cv.addEventListener('touchmove', tm, {passive:false});
