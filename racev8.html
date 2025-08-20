@@ -308,7 +308,7 @@ function tickAmbience(speed){
 
 /* ---------- Game constants ---------- */
 const LANES=4, PLAYER_W=42, PLAYER_H=50;
-const BASE_SPEED=2.6, MIN_SPEED=1.4, MAX_SPEED=80.0, ACCEL=0.012, BRAKE=0.011;
+const BASE_SPEED=2.6, MIN_SPEED=1.4, MAX_SPEED=200.0, ACCEL=0.012, BRAKE=0.011;
 let AMMO_MAX=120, RECHARGE_MS=8000, FIRE_MS=90;
 let HP_MAX=100, REGEN_DELAY=1200, REGEN_PER_S=16, INV_MS=650;
 const NEAR=54, COMBO_MS=1500;
@@ -411,7 +411,7 @@ const HAZ = {
     if (e.pulse > TAU) e.pulse = 0;
     e.radius = 10 + Math.sin(e.pulse) * 5;
     if (e.pulse > 0 && e.pulse < 0.1) {
-      if (aabb(e, player)) damage(e.dmg);
+      if (player && aabb(e, player)) damage(e.dmg);
     }
   }, dr: (e) => { ctx.fillStyle = e.col; ctx.beginPath(); ctx.arc(e.x+e.w/2, e.y+e.h/2, e.radius, 0, TAU); ctx.fill(); }
   },
@@ -691,7 +691,10 @@ function drawAce(e){ const x=e.x,y=e.y,w=e.w,h=e.h; ctx.fillStyle='#ffd166'; ctx
 function heat(){ const cx=player.x+player.w/2, cy=player.y+player.h*0.9; ctx.save(); ctx.globalAlpha=.18; const n=set.low?4:6; for(let i=0;i<n;i++){ const off=i*8; ctx.beginPath(); ctx.ellipse(cx + Math.sin((performance.now()+off)/140)*(3+speed*.8), cy+off, 14,6,0,0,TAU); ctx.fillStyle="rgba(255,255,255,.55)"; ctx.fill(); } ctx.restore(); }
 function drawPlayer(){
   if (!player) return; // Defensive check
-  const tilt=(player.tx-player.x)*.04; player.bank+=(tilt-player.bank)*.18;
+  const tilt=(player.tx-player.x)*.04; 
+  // Disable airplane rotation
+  player.bank += (0 - player.bank) * 0.18;
+  
   ctx.save();
   const cx=player.x+player.w/2, cy=player.y+player.h/2;
   ctx.translate(cx, cy);
@@ -1061,8 +1064,7 @@ function loop(t){
 document.addEventListener('keydown', e=>{
   if(e.repeat) return;
   if(!running && e.code==='Space'){ start(); return; }
-  // FIX: Use `performance.now()` to check if the lock has expired
-  if (performance.now() > laneLockExpiry) {
+  if (player && performance.now() > laneLockExpiry) {
       if(e.key==='ArrowLeft' && player.lane>0){ player.lane--; lastSwap=performance.now(); }
       if(e.key==='ArrowRight' && player.lane<LANES-1){ player.lane++; lastSwap=performance.now(); }
   }
@@ -1080,12 +1082,13 @@ let t0=null, moved=false;
 function ts(ev){ ev.preventDefault(); const t=ev.changedTouches?ev.changedTouches[0]:ev; t0={x:t.clientX,y:t.clientY}; moved=false; }
 function tm(ev){ if(!t0) return; ev.preventDefault(); const t=ev.changedTouches[0]; const dx=t.clientX-t0.x, dy=t.clientY-t0.y; const ax=Math.abs(dx), ay=Math.abs(dy);
   if(!moved && (ax>24 || ay>24)){ moved=true; 
-    // FIX: Use `performance.now()` to check if the lock has expired
-    if (performance.now() > laneLockExpiry) { 
+    if (player && performance.now() > laneLockExpiry) { 
         if(ax>ay){ if(dx<0&&player.lane>0){player.lane--; lastSwap=performance.now();} if(dx>0&&player.lane<LANES-1){player.lane++; lastSwap=performance.now();} } 
-    } else { 
-        if(dy<-12){accel=true;brake=false;} if(dy>12){brake=true;accel=false;} 
     }
+    // Fixed: The accelerometer logic was inside the lane-lock condition.
+    // It is now separate, so you can always accelerate/brake.
+    if(dy<-12){accel=true;brake=false;}
+    if(dy>12){brake=true;accel=false;} 
   }
 }
 function te(ev){ ev.preventDefault(); accel=false;brake=false;t0=null; }
