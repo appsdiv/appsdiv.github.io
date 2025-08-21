@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover,user-scalable=no"/>
     <title>Velocity — Polished Minimal Edition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700&family=Inter:wght@400;600&display=swap"
+          rel="stylesheet">
     <link rel="apple-touch-icon" href="https://i.postimg.cc/D0r9rVjn/App-Icon-2x.png">
     <link rel="manifest" href="manifest.json">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
@@ -232,7 +233,7 @@
             right: -360px;
             top: 0;
             height: 100%;
-            width: 360px;
+            width: min(90vw, 360px);
             background: var(--panel);
             color: #eef3ff;
             z-index: 999;
@@ -240,7 +241,8 @@
             transition: right .25s ease;
             border-left: 1px solid rgba(255, 255, 255, .08);
             display: flex;
-            flex-direction: column
+            flex-direction: column;
+            overflow-y: auto;
         }
 
         .drawer.open {
@@ -556,8 +558,9 @@
             </div>
             <div class="sec">
                 <div style="font:700 13px 'Inter';margin:4px 0">Pilot Perks</div>
-                <div style="font:600 12px 'Inter';opacity:.85;margin-bottom:6px">XP: <span id="xp">0</span> • Points: <span
-                        id="pt">0</span></div>
+                <div style="font:600 12px 'Inter';opacity:.85;margin-bottom:6px">XP: <span id="xp">0</span> • Points:
+                    <span
+                            id="pt">0</span></div>
                 <label>+10 Ammo Cap <input type="checkbox" class="switch" id="perkAmmo"></label>
                 <label>Faster Regen (+30%) <input type="checkbox" class="switch" id="perkRegen"></label>
                 <label>Longer Boost (+40%) <input type="checkbox" class="switch" id="perkBoost"></label>
@@ -1979,7 +1982,7 @@
 
         function drawBullets() {
             bullets.forEach(b => {
-                if (!isFinite(b.x) || !isFinite(b.y) || !isFinite(b.trail) || b.trail <= 0) return;
+                if (!isFinite(b.x) || !isFinite(b.y) || !isFinite(b.sp) || !isFinite(b.trail) || b.trail <= 0) return;
                 // Glowing red fire bullet effect
                 const grad = ctx.createLinearGradient(b.x + 3, b.y, b.x + 3, b.y + b.trail * 3);
                 grad.addColorStop(0, b.color);
@@ -2536,10 +2539,87 @@
             if (e.key === 'ArrowDown') brake = false;
             if (e.code === 'Space') firing = false;
         });
-        // touch (swipe LR to change lanes; swipe up/down = accel/brake; hold 🔫 to fire)
-        let t0 = null, moved = false;
-        const touchZone = document.body;
-        // Fix for pointer events on mobile
+
+        // Touch controls with better swipe detection
+        const touchState = {
+            startX: 0,
+            startY: 0,
+            moved: false,
+            isSwiping: false,
+            isButton: false,
+        };
+
+        cv.addEventListener('touchstart', (e) => {
+            if (!running) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchState.startX = touch.clientX;
+            touchState.startY = touch.clientY;
+            touchState.moved = false;
+            touchState.isSwiping = false;
+            touchState.isButton = false;
+        }, { passive: false });
+
+        cv.addEventListener('touchmove', (e) => {
+            if (!running || touchState.isButton) return;
+            const touch = e.touches[0];
+            const dx = touch.clientX - touchState.startX;
+            const dy = touch.clientY - touchState.startY;
+            const absX = Math.abs(dx);
+            const absY = Math.abs(dy);
+
+            // Determine if a swipe is happening
+            if (!touchState.isSwiping && (absX > 15 || absY > 15)) {
+                touchState.isSwiping = true;
+            }
+
+            if (touchState.isSwiping) {
+                if (absY > absX && absY > 20) { // Vertical swipe
+                    if (dy < 0) {
+                        accel = true;
+                        brake = false;
+                    } else if (dy > 0) {
+                        brake = true;
+                        accel = false;
+                    }
+                    touchState.startX = touch.clientX;
+                    touchState.startY = touch.clientY;
+                } else if (absX > absY && absX > 20) { // Horizontal swipe
+                    if (player) {
+                        if (dx < 0 && player.lane > 0) {
+                            player.lane--;
+                            lastSwap = performance.now();
+                        } else if (dx > 0 && player.lane < LANES - 1) {
+                            player.lane++;
+                            lastSwap = performance.now();
+                        }
+                    }
+                    touchState.startX = touch.clientX;
+                    touchState.startY = touch.clientY;
+                }
+            }
+            e.preventDefault();
+        }, { passive: false });
+
+        cv.addEventListener('touchend', () => {
+            accel = false;
+            brake = false;
+            touchState.isSwiping = false;
+            touchState.moved = true;
+        });
+
+        // Fire button logic
+        btn.fire.addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+            touchState.isButton = true;
+            firing = true;
+            fire();
+        });
+        btn.fire.addEventListener('touchend', (e) => {
+            e.stopPropagation();
+            touchState.isButton = false;
+            firing = false;
+        });
         btn.fire.addEventListener('pointerdown', (e) => {
             e.preventDefault();
             firing = true;
@@ -2549,71 +2629,8 @@
             e.preventDefault();
             firing = false;
         });
-        const handleTouch = (e) => {
-            if (!running) return;
-            e.preventDefault();
-            const rect = game.getBoundingClientRect();
-            const clientX = e.clientX || e.changedTouches[0].clientX;
-            const clientY = e.clientY || e.changedTouches[0].clientY;
-            const normalizedX = (clientX - rect.left) / rect.width;
-            const normalizedY = (clientY - rect.top) / rect.height;
-            if (normalizedY > 0.8 && (normalizedX < 0.2 || normalizedX > 0.8)) {
-                return; // Ignore corner taps to prevent conflicts with buttons
-            }
-            if (normalizedX < 0.5) {
-                if (player && player.lane > 0) {
-                    player.lane--;
-                    lastSwap = performance.now();
-                }
-            } else {
-                if (player && player.lane < LANES - 1) {
-                    player.lane++;
-                    lastSwap = performance.now();
-                }
-            }
-        };
-        const handleVerticalSwipe = (e) => {
-            if (!running) return;
-            const t = e.changedTouches[0];
-            const dy = t.clientY - (e.touches[0].initialY || t.clientY);
-            if (dy < -20) {
-                accel = true;
-                brake = false;
-            } else if (dy > 20) {
-                brake = true;
-                accel = false;
-            } else {
-                accel = false;
-                brake = false;
-            }
-        };
-        // Use pointer events for cross-platform compatibility
-        game.addEventListener('pointerdown', (e) => {
-            if (!running || e.target !== cv) return;
-            if (e.pointerType === 'touch') {
-                e.initialY = e.clientY;
-            }
-            if (e.pointerType === 'touch' || e.button === 0) {
-                if (e.clientX < W/2) {
-                    if (player.lane > 0) player.lane--;
-                } else {
-                    if (player.lane < LANES-1) player.lane++;
-                }
-            }
-            e.preventDefault();
-        });
-        game.addEventListener('pointerup', (e) => {
-            accel = false;
-            brake = false;
-        });
-        game.addEventListener('pointermove', (e) => {
-             if (e.pointerType === 'touch' && e.initialY !== undefined) {
-                 const dy = e.clientY - e.initialY;
-                 if (dy < -20) { accel = true; brake = false; }
-                 else if (dy > 20) { brake = true; accel = false; }
-                 else { accel = false; brake = false; }
-             }
-        });
+
+
         // Drawer open/close — PAUSE
         function openDrawer() {
             el.drawer.classList.add('open');

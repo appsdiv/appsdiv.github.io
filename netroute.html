@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>NetRoute Visualizer · Traceroute & Leak Check (Client‑Only)</title>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">
+  <style>
+    :root{
+      --bg:#0c0f13; --card:#12161c; --muted:#8ea0b4; --text:#e9eef3; --accent:#3ddc97; --accent2:#89ddff; --warn:#ffcc00; --bad:#ff5d5d;
+      --ok:#3ddc97; --border:#1c232d; --chip:#1a2230; --chip2:#192028;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    }
+    header{
+      position:sticky; top:0; z-index:5; backdrop-filter:saturate(130%) blur(10px);
+      background:linear-gradient(180deg, rgba(12,15,19,.9), rgba(12,15,19,.6), rgba(12,15,19,0));
+      border-bottom:1px solid var(--border);
+    }
+    .wrap{max-width:1100px;margin:0 auto;padding:20px}
+    .row{display:grid; gap:14px}
+    .g-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    @media (max-width:960px){.g-2,.g-3{grid-template-columns:1fr}}
+
+    .brand{display:flex; align-items:center; gap:12px; padding:14px 20px}
+    .brand .logo{width:28px;height:28px;border-radius:8px;background:var(--chip);display:grid;place-items:center}
+    .brand .logo::after{content:"";width:14px;height:14px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;display:block;transform:rotate(45deg)}
+    .brand h1{font-size:16px;margin:0}
+    .brand small{color:var(--muted)}
+
+    .card{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:14px; box-shadow:0 6px 24px rgba(0,0,0,.25)}
+    .card h2{margin:0 0 8px 0; font-size:15px; font-weight:600}
+    .card .sub{color:var(--muted); font-size:12px; margin-top:-2px}
+    .controls{display:flex; gap:8px; flex-wrap:wrap; margin:10px 0}
+    .controls input[type=text]{flex:1 1 260px; background:#0e141b; color:var(--text); border:1px solid var(--border); border-radius:12px; padding:10px 12px; outline:none}
+    .btn{appearance:none; border:1px solid var(--border); background:linear-gradient(180deg,#1a2330,#131a23); color:var(--text); padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:600}
+    .btn:hover{filter:brightness(1.08)}
+    .btn:disabled{opacity:.6; cursor:not-allowed}
+    .btn.accent{background:linear-gradient(180deg,#1b2e2a,#11221e); border-color:#234; color:#c2ffeb}
+    .pill{padding:6px 10px; background:var(--chip); border:1px solid var(--border); border-radius:10px; font-size:12px}
+    .pill.good{background:rgba(61,220,151,.12); border-color:rgba(61,220,151,.4)}
+    .pill.warn{background:rgba(255,204,0,.12); border-color:rgba(255,204,0,.4)}
+    .pill.bad{background:rgba(255,93,93,.12); border-color:rgba(255,93,93,.4)}
+
+    .kv{display:grid; grid-template-columns:180px 1fr; gap:8px; align-items:center; padding:8px 0; border-bottom:1px dashed var(--border)}
+    .kv:last-child{border-bottom:0}
+    .kv b{font-size:12px; color:var(--muted)}
+    .kv .v{font-family:ui-monospace, Menlo, Consolas, monospace}
+
+    .chips{display:flex; flex-wrap:wrap; gap:8px}
+    .chip{background:var(--chip2); border:1px solid var(--border); border-radius:999px; padding:6px 10px; font-size:12px}
+
+    #map{height:420px; border-radius:14px; overflow:hidden; background:#0a0f14; border:1px solid var(--border)}
+    .legend{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .legend span{display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted)}
+    .legend i{width:10px; height:10px; border-radius:50%}
+    .leg-you{background:#7ee3ff}
+    .leg-hop{background:#ffcf6e}
+    .leg-dst{background:#85ffa7}
+
+    .footer{color:var(--muted); font-size:12px; padding:12px 0 24px}
+    .code{white-space:pre-wrap; word-break:break-word; background:#0b1117; border:1px solid var(--border); border-radius:12px; padding:10px; font-family:ui-monospace, Menlo, Consolas, monospace; font-size:12px}
+
+    .inline-badge{display:inline-block;margin-left:8px;padding:2px 6px;border-radius:6px;background:#0f141a;border:1px solid var(--border);font-size:11px;color:var(--muted)}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:800px){.grid-2{grid-template-columns:1fr}}
+
+    .notice{font-size:12px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap brand">
+      <div class="logo" aria-hidden="true"></div>
+      <div>
+        <h1>NetRoute Visualizer</h1>
+        <small>Client‑only tools to inspect your route, IPs, and potential leaks</small>
+      </div>
+      <div style="margin-left:auto" class="chips">
+        <span class="chip">No backend</span>
+        <span class="chip">Privacy‑friendly</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="row g-2">
+      <section class="card">
+        <h2>1) Quick Check: Your IP & Environment</h2>
+        <div class="sub">Fetches your public IP (HTTP), WebRTC candidates, ASN/ISP, basic VPN/Proxy/Tor flags, and Cloudflare trace.</div>
+        <div class="controls">
+          <button id="btnCheck" class="btn accent">Run all checks</button>
+          <button id="btnExport" class="btn" disabled>Export JSON</button>
+        </div>
+        <div id="ipSummary" class="chips" aria-live="polite"></div>
+        <div id="envGrid" class="grid-2" style="margin-top:10px">
+          <div class="card" style="padding:10px">
+            <div class="kv"><b>Public IP (HTTP)</b><div class="v" id="vHttpIp">—</div></div>
+            <div class="kv"><b>Public IP (IPv6)</b><div class="v" id="vIp6">—</div></div>
+            <div class="kv"><b>WebRTC srflx IPs</b><div class="v" id="vSrflx">—</div></div>
+            <div class="kv"><b>Local/Host candidates</b><div class="v" id="vHost">—</div></div>
+            <div class="kv"><b>mDNS masking</b><div class="v" id="vMdns">—</div></div>
+          </div>
+          <div class="card" style="padding:10px">
+            <div class="kv"><b>ASN / ISP</b><div class="v" id="vAsn">—</div></div>
+            <div class="kv"><b>Org / Domain</b><div class="v" id="vOrg">—</div></div>
+            <div class="kv"><b>Country / City</b><div class="v" id="vGeo">—</div></div>
+            <div class="kv"><b>Security flags</b><div class="v" id="vSec">—</div></div>
+            <div class="kv"><b>Cloudflare trace</b><div class="v" id="vCf">—</div></div>
+          </div>
+        </div>
+        <div class="notice" style="margin-top:8px">Note: Browser apps cannot run true ICMP traceroute or see your OS DNS resolver directly. This app uses safe client‑side methods (HTTP, WebRTC STUN, public JSON APIs) and will gracefully degrade where browsers or CORS block something.</div>
+      </section>
+
+      <section class="card">
+        <h2>2) Visual Route (Traceroute‑like)</h2>
+        <div class="sub">Attempts a hop list via public API; falls back to origin → destination path if blocked. Plots on the map below.</div>
+        <div class="controls">
+          <input id="target" type="text" placeholder="Target domain or IP (e.g. cloudflare.com)" value="cloudflare.com" />
+          <label class="pill"><input type="checkbox" id="useApi" checked style="accent-color:#3ddc97"> Use community traceroute API</label>
+          <button id="btnTrace" class="btn">Trace</button>
+        </div>
+        <div class="chips" id="hopChips"></div>
+        <div id="map" style="margin-top:12px"></div>
+        <div class="legend" style="margin-top:10px">
+          <span><i class="leg-you"></i> You</span>
+          <span><i class="leg-hop"></i> Hop</span>
+          <span><i class="leg-dst"></i> Destination</span>
+        </div>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:14px">
+      <h2>3) DNS & Leak Notes</h2>
+      <div class="sub">Quick, client‑only heuristics. For a thorough DNS leak test, use a dedicated service (requires server‑side capture).</div>
+      <div class="grid-2" style="margin-top:8px">
+        <div>
+          <div class="kv"><b>DNS over HTTPS (DoH) reachable</b><div class="v" id="vDoh">—</div></div>
+          <div class="kv"><b>Likely DNS leak?</b><div class="v" id="vDnsLeak">—</div></div>
+          <div class="kv"><b>Notes</b><div class="v" id="vDnsNotes">—</div></div>
+        </div>
+        <div>
+          <div class="controls">
+            <a class="btn" href="https://www.dnsleaktest.com/" target="_blank" rel="noopener">Open full DNS leak test ↗</a>
+            <a class="btn" href="https://ipleak.net/" target="_blank" rel="noopener">Open IP leak test ↗</a>
+          </div>
+          <div class="notice">Those external sites run server‑side beacons to see which DNS resolver actually queried their unique hostnames. That is not possible purely on the client without a server.</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">Map © OpenStreetMap contributors · Tiles © OpenStreetMap. Built with Leaflet.
+      <span class="inline-badge">This tool never stores your data.</span>
+    </div>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+  <script>
+  // ---------- Utilities ----------
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  async function fetchJSON(url, opt={}){
+    const res = await fetch(url, {...opt, mode:'cors'});
+    if(!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+    return res.json();
+  }
+  async function fetchText(url, opt={}){
+    const res = await fetch(url, {...opt, mode:'cors'});
+    if(!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+    return res.text();
+  }
+  function set(el, v){ document.getElementById(el).textContent = v; }
+  function chip(text, cls=""){ const s=document.createElement('span'); s.className=`chip ${cls}`; s.textContent=text; return s; }
+  function fmt(obj){ return JSON.stringify(obj, null, 2); }
+
+  // ---------- Global state ----------
+  const S = {
+    httpIp:null, httpIp6:null, webrtc:{srflx:[], host:[] , mdnsMasked:null},
+    ipInfo:null, cfTrace:null, hops:[], dstInfo:null, dohReachable:null, dnsLeakLikely:null,
+  };
+
+  // ---------- IP & Environment ----------
+  async function getPublicIPs(){
+    try { S.httpIp = (await fetchJSON('https://api.ipify.org?format=json')).ip; } catch(e){ S.httpIp = null; }
+    try { S.httpIp6 = (await fetchJSON('https://api64.ipify.org?format=json')).ip; } catch(e){ S.httpIp6 = null; }
+  }
+
+  async function getIpInfo(ip){
+    // ipwho.is tends to allow CORS and includes security & connection info
+    try{
+      const info = await fetchJSON(`https://ipwho.is/${ip? ip: ''}?security=1`);
+      return info && info.success !== false ? info : null;
+    }catch(e){ return null; }
+  }
+
+  async function getCloudflareTrace(){
+    try{
+      const t = await fetchText('https://www.cloudflare.com/cdn-cgi/trace');
+      // key=value lines
+      const kv = Object.fromEntries(t.trim().split('\n').map(l=>l.split('=')));
+      return kv; // contains ip, loc, tls, warp, gateway, usw
+    }catch(e){ return null; }
+  }
+
+  async function getWebRTCIps(){
+    const srflx = new Set();
+    const host = new Set();
+    let mdnsMasked = false;
+    try{
+      const pc = new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'}]});
+      pc.createDataChannel('x');
+      pc.onicecandidate = e => {
+        if(!e.candidate) return;
+        const c = e.candidate.candidate;
+        // Typical: candidate:foundation 1 udp 2122260223 203.0.113.1 54321 typ srflx raddr 0.0.0.0 rport 0
+        const ipMatch = c.match(/ (\d+\.\d+\.\d+\.\d+|[a-f0-9:]+) /i);
+        const typMatch = c.match(/ typ ([a-z]+)/i);
+        if(ipMatch && typMatch){
+          const ip = ipMatch[1];
+          const typ = typMatch[1];
+          if(typ === 'srflx') srflx.add(ip);
+          if(typ === 'host') host.add(ip);
+          if(/\.local$/.test(ip)) mdnsMasked = true; // mDNS hostname instead of raw LAN IP
+        }
+      };
+      const offer = await pc.createOffer({offerToReceiveAudio:false, offerToReceiveVideo:false});
+      await pc.setLocalDescription(offer);
+      // wait a bit for candidates
+      await sleep(1200);
+      pc.close();
+    }catch(e){ /* ignore */ }
+    S.webrtc = { srflx:[...srflx], host:[...host], mdnsMasked };
+  }
+
+  async function runEnvCheck(){
+    document.getElementById('btnCheck').disabled = true;
+    document.getElementById('btnExport').disabled = true;
+    document.getElementById('ipSummary').innerHTML = '';
+
+    await Promise.all([ getPublicIPs(), getWebRTCIps() ]);
+    S.ipInfo = await getIpInfo(S.httpIp || '');
+    S.cfTrace = await getCloudflareTrace();
+
+    // Fill UI
+    set('vHttpIp', S.httpIp || '—');
+    set('vIp6', S.httpIp6 || '—');
+    set('vSrflx', S.webrtc.srflx.length? S.webrtc.srflx.join(', ') : '—');
+    set('vHost', S.webrtc.host.length? S.webrtc.host.join(', ') : (S.webrtc.mdnsMasked? 'Masked via mDNS ✔' : '—'));
+    set('vMdns', S.webrtc.mdnsMasked? 'Yes (good)' : (S.webrtc.host.length? 'No (browser exposed LAN IP)' : 'Unknown'));
+
+    if(S.ipInfo){
+      const asn = S.ipInfo.connection?.asn || '—';
+      const isp = S.ipInfo.connection?.isp || '—';
+      const org = S.ipInfo.connection?.org || '—';
+      const dom = S.ipInfo.connection?.domain || '—';
+      const cc = S.ipInfo.country_code || '—';
+      const city = S.ipInfo.city || '—';
+      set('vAsn', `${asn} / ${isp}`);
+      set('vOrg', `${org} / ${dom}`);
+      set('vGeo', `${cc} · ${city}`);
+      const sec = S.ipInfo.security || {};
+      const flags = [];
+      if(sec.vpn) flags.push('VPN');
+      if(sec.proxy) flags.push('Proxy');
+      if(sec.tor) flags.push('Tor');
+      if(sec.relay) flags.push('Relay');
+      if(sec.crawler) flags.push('Crawler');
+      set('vSec', flags.length? flags.join(', ') : 'None detected');
+
+      const sum = document.getElementById('ipSummary');
+      sum.append(
+        chip(`IP ${S.httpIp||'?'}`),
+        chip(`ASN ${asn}`),
+        chip(`${isp}`),
+      );
+      if(flags.length) sum.append(chip(flags.join(' · '), 'bad'));
+      if(S.httpIp6) sum.append(chip('IPv6 ✓','good'));
+      if(S.webrtc.srflx.length && S.webrtc.srflx[0] !== S.httpIp) sum.append(chip('HTTP vs WebRTC IP mismatch', 'warn'));
+      if(S.webrtc.mdnsMasked) sum.append(chip('LAN IP masked (mDNS)','good'));
+    }
+
+    // Export ready
+    document.getElementById('btnExport').disabled = false;
+    document.getElementById('btnCheck').disabled = false;
+
+    // Cloudflare trace
+    if(S.cfTrace){
+      const min = {ip:S.cfTrace.ip, warp:S.cfTrace.warp, loc:S.cfTrace.loc, tls:S.cfTrace.tls};
+      set('vCf', Object.entries(min).map(([k,v])=>`${k}:${v}`).join('  '));
+    } else set('vCf','—');
+
+    // DoH reachability (Cloudflare JSON API)
+    try{
+      const doh = await fetchJSON('https://cloudflare-dns.com/dns-query?name=example.com&type=A', {headers:{'accept':'application/dns-json'}});
+      S.dohReachable = !!doh?.Answer;
+      set('vDoh', S.dohReachable? 'Yes' : 'No');
+    }catch(e){ set('vDoh','No'); S.dohReachable = false; }
+
+    // Very rough DNS leak heuristic
+    // If HTTP IP != WebRTC srflx IP, you might be behind a proxy/VPN. DNS leak is different and cannot be verified client-only.
+    const mismatch = S.webrtc.srflx.length && S.httpIp && (S.webrtc.srflx[0] !== S.httpIp);
+    S.dnsLeakLikely = null; // Unknown via client-only
+    set('vDnsLeak', mismatch? 'Unknown (VPN/proxy suspected; cannot verify leak client-only)' : 'Unknown (needs server)');
+    set('vDnsNotes', 'True DNS leak tests require a server to observe which resolver queries unique hostnames. Use the links at right for a full test.');
+  }
+
+  // ---------- Traceroute (best-effort) ----------
+  function parseHackertargetMTR(txt){
+    // Example lines contain hop number, host (ip), and latency samples
+    const lines = txt.split('\n').map(l=>l.trim()).filter(Boolean);
+    const hops = [];
+    const hopRe = /^(\s*\d+)\.\s+([^\s]+)\s+\(([^)]+)\)\s+/; // " 1. example.com (93.184.216.34)  ..."
+    const hopRe2 = /^(\s*\d+)\.\s+([\d\.\-]+)\s+/; // fallback if no parentheses
+    for(const l of lines){
+      let m = l.match(hopRe);
+      if(m){
+        hops.push({ hop: parseInt(m[1]), ip: m[3], host: m[2] });
+        continue;
+      }
+      m = l.match(hopRe2);
+      if(m){
+        const ip = m[2];
+        hops.push({ hop: parseInt(m[1]), ip, host: ip });
+      }
+    }
+    // Dedup by consecutive same IP
+    return hops.filter((h,i,a)=> i===0 || h.ip !== a[i-1].ip);
+  }
+
+  async function tracerouteViaApi(target){
+    try{
+      // mtr gives richer output (often). Fallback to traceroute API if needed.
+      const txt = await fetchText(`https://api.hackertarget.com/mtr/?q=${encodeURIComponent(target)}`);
+      let hops = parseHackertargetMTR(txt);
+      if(!hops.length){
+        const tr = await fetchText(`https://api.hackertarget.com/traceroute/?q=${encodeURIComponent(target)}`);
+        // lines like: 1 10.0.0.1  1.123 ms ...  2 203.0.113.1 ...
+        const lines = tr.split('\n');
+        hops = lines.map(l=>{
+          const m = l.trim().match(/^(\d+)\s+([^\s]+)/);
+          if(!m) return null; return { hop: parseInt(m[1]), ip: m[2], host:m[2] };
+        }).filter(Boolean);
+      }
+      return hops;
+    }catch(e){
+      console.warn('Traceroute API blocked/failed', e);
+      return null;
+    }
+  }
+
+  async function geocodeIPs(ips){
+    const out = {};
+    for(const ip of ips){
+      await sleep(160); // be gentle to the free API
+      try{
+        const info = await fetchJSON(`https://ipwho.is/${ip}`);
+        if(info && info.success !== false){
+          out[ip] = {
+            lat: info.latitude, lon: info.longitude, city: info.city, cc: info.country_code,
+            asn: info.connection?.asn, isp: info.connection?.isp
+          };
+        }
+      }catch(e){ /* ignore */ }
+    }
+    return out;
+  }
+
+  // ---------- Map ----------
+  let map, youMarker, dstMarker, hopMarkers=[], poly;
+  function initMap(){
+    if(map) return;
+    map = L.map('map', { zoomControl:true, attributionControl:true });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
+    map.setView([20,0], 2);
+  }
+
+  function clearMap(){
+    hopMarkers.forEach(m=>m.remove()); hopMarkers=[];
+    if(youMarker) youMarker.remove(); if(dstMarker) dstMarker.remove(); if(poly) poly.remove();
+  }
+
+  function drawRoute(coords){
+    clearMap();
+    if(!coords.length) return;
+    const you = coords[0];
+    const dst = coords[coords.length-1];
+    youMarker = L.circleMarker([you.lat,you.lon],{radius:7,color:'#7ee3ff',fillOpacity:0.9}).addTo(map).bindPopup('You');
+    dstMarker = L.circleMarker([dst.lat,dst.lon],{radius:7,color:'#85ffa7',fillOpacity:0.9}).addTo(map).bindPopup('Destination');
+    coords.slice(1,-1).forEach((c,i)=>{
+      const m = L.circleMarker([c.lat,c.lon],{radius:6,color:'#ffcf6e',fillOpacity:0.85})
+        .addTo(map).bindPopup(c.label||`Hop ${i+1}`);
+      hopMarkers.push(m);
+    });
+    poly = L.polyline(coords.map(c=>[c.lat,c.lon]), {weight:3, opacity:0.8}).addTo(map);
+    map.fitBounds(poly.getBounds(), {padding:[30,30]});
+  }
+
+  function renderHopChips(hops, geo){
+    const box = document.getElementById('hopChips');
+    box.innerHTML='';
+    if(!hops?.length){ box.append(chip('No hops available','warn')); return; }
+    for(const h of hops){
+      const g = geo?.[h.ip];
+      const text = `${h.hop}. ${h.host} (${h.ip})${g? ` · ${g.cc||''} ${g.city||''}`:''}`;
+      box.append(chip(text));
+    }
+  }
+
+  async function runTrace(){
+    initMap();
+    const target = document.getElementById('target').value.trim();
+    const useApi = document.getElementById('useApi').checked;
+    document.getElementById('btnTrace').disabled = true;
+    document.getElementById('hopChips').innerHTML = '';
+
+    let hops = null;
+    if(useApi){
+      hops = await tracerouteViaApi(target);
+    }
+    // Fallback: just you -> destination
+    // Resolve destination IP info to plot
+    const dst = await getIpInfo(target).catch(()=>null); // ipwho.is supports domain lookup
+
+    // Geocode points
+    const ips = new Set();
+    if(S.httpIp) ips.add(S.httpIp);
+    if(hops) hops.forEach(h=> ips.add(h.ip));
+    else if(dst?.ip) ips.add(dst.ip);
+
+    const geo = await geocodeIPs([...ips]);
+    const coords = [];
+    if(S.httpIp && geo[S.httpIp]) coords.push({lat:geo[S.httpIp].lat, lon:geo[S.httpIp].lon, label:'You'});
+
+    if(hops && hops.length){
+      renderHopChips(hops, geo);
+      for(const h of hops){
+        const g = geo[h.ip];
+        if(g) coords.push({lat:g.lat, lon:g.lon, label:`Hop ${h.hop}\n${h.ip}\n${g.asn||''} ${g.isp||''}`});
+      }
+    } else if(dst){
+      renderHopChips([{hop:1, ip: dst.ip || target, host: target}], {[dst.ip]: geo[dst.ip]});
+      const g = geo[dst.ip];
+      if(g) coords.push({lat:g.lat, lon:g.lon, label:`Destination\n${dst.ip}\n${g.asn||''} ${g.isp||''}`});
+    }
+
+    drawRoute(coords);
+    document.getElementById('btnTrace').disabled = false;
+  }
+
+  // ---------- Export ----------
+  function exportJSON(){
+    const data = {
+      when: new Date().toISOString(),
+      httpIp: S.httpIp, httpIp6: S.httpIp6,
+      webrtc: S.webrtc,
+      ipInfo: S.ipInfo,
+      cfTrace: S.cfTrace,
+      hops: S.hops,
+      dstInfo: S.dstInfo,
+      dohReachable: S.dohReachable,
+      dnsLeakLikely: S.dnsLeakLikely
+    };
+    const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download='netroute_report.json'; a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  }
+
+  // ---------- Wire up ----------
+  document.getElementById('btnCheck').addEventListener('click', runEnvCheck);
+  document.getElementById('btnTrace').addEventListener('click', runTrace);
+  document.getElementById('btnExport').addEventListener('click', exportJSON);
+
+  // Auto‑run quick check on first load
+  runEnvCheck();
+  setTimeout(()=>{ initMap(); runTrace(); }, 400);
+  </script>
+</body>
+</html>
