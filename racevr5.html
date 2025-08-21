@@ -2503,13 +2503,15 @@
         }
 
         /* ---------- Controls ---------- */
+        let keyStates = {};
+        let lastLaneChange = 0;
+        const LANE_CHANGE_DEBOUNCE = 200; // ms between lane changes
+
         document.addEventListener('keydown', e => {
-            if (e.repeat) return;
-            if (!running && e.code === 'Space') {
-                start();
-                return;
-            }
-            if (player) {
+            keyStates[e.key] = true;
+
+            // Handle non-repeating actions
+            if (!e.repeat) {
                 if (e.key === 'ArrowLeft' && player.lane > 0) {
                     player.lane--;
                     lastSwap = performance.now();
@@ -2518,26 +2520,26 @@
                     player.lane++;
                     lastSwap = performance.now();
                 }
-            }
-            if (e.key === 'ArrowUp') accel = true;
-            if (e.key === 'ArrowDown') brake = true;
-            if (e.code === 'Space') {
-                firing = true;
-                fire();
-            }
-            if (e.key === 'q' || e.key === 'Q') useFocus();
-            if (e.key === 'e' || e.key === 'E') useEMP();
-            if (e.key === 'Escape') {
-                if (el.drawer.classList.contains('open')) closeDrawer();
-                else if (running) {
-                    openDrawer();
+                if (e.key === 'q' || e.key === 'Q') useFocus();
+                if (e.key === 'e' || e.key === 'E') useEMP();
+                if (e.key === 'Escape') {
+                    if (el.drawer.classList.contains('open')) closeDrawer();
+                    else if (running) {
+                        openDrawer();
+                    }
+                }
+                if (e.code === 'Space') {
+                    firing = true;
+                    fire();
                 }
             }
         });
+
         document.addEventListener('keyup', e => {
-            if (e.key === 'ArrowUp') accel = false;
-            if (e.key === 'ArrowDown') brake = false;
-            if (e.code === 'Space') firing = false;
+            keyStates[e.key] = false;
+            if (e.code === 'Space') {
+                firing = false;
+            }
         });
 
         // Touch controls with better swipe detection
