@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت هزینه سفر</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css">
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            direction: rtl;
+            text-align: right;
+            margin: 0;
+            padding: 20px 10px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 25px;
+            font-size: 2rem;
+        }
+        h2 {
+            color: #007bff;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-top: 0;
+            font-size: 1.5rem;
+        }
+        /* Tabs */
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ccc;
+        }
+        .tab-button {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 15px 0;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #555;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-button.active {
+            color: #007bff;
+            border-bottom: 3px solid #007bff;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        /* Forms and Inputs */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        input, select, button, textarea {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: 'Vazirmatn', sans-serif;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        /* Lists */
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        li {
+            background: #fafafa;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .action-buttons button {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            margin-left: 5px;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        .edit-btn {
+            background-color: #ffc107;
+            color: #333;
+        }
+        .edit-btn:hover {
+            background-color: #e0a800;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: #f9f9f9;
+        }
+        .member-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .expense-item, .summary-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+        }
+        .summary-info {
+            background-color: #e9f5ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        .member-type-selection {
+            display: flex;
+            justify-content: flex-start;
+            gap: 20px;
+            align-self: flex-start;
+        }
+        .family-member-fields {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .family-member-list li {
+            font-size: 0.9em;
+            color: #555;
+            background: #f1f1f1;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        .summary-details {
+            font-size: 0.9em;
+            color: #555;
+            margin-top: 10px;
+            padding-right: 20px;
+            border-right: 2px solid #eee;
+        }
+        .expense-cost-per-person {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+            border-top: 1px solid #eee;
+            padding-top: 5px;
+        }
+        /* Summary Table */
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            direction: rtl;
+            text-align: right;
+        }
+        .summary-table th, .summary-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .summary-table th {
+            background-color: #007bff;
+            color: white;
+            cursor: default;
+        }
+        .summary-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .summary-table .debtor {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .summary-table .creditor {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .summary-table .paid {
+            color: #28a745;
+        }
+        .summary-table .unpaid {
+            color: #dc3545;
+        }
+        .pay-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .pay-btn:hover {
+            background-color: #218838;
+        }
+        .initial-balance-item {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .go-next-btn {
+            background-color: #28a745;
+            margin-top: 20px;
+            padding: 15px;
+            font-size: 1.1rem;
+        }
+        .go-next-btn:hover {
+            background-color: #218838;
+        }
+        .report-details {
+            font-size: 0.9rem;
+            margin-top: 10px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>مدیریت دنگ و دونگ سفر</h1>
+        
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab('trips')">مسافرت‌ها</button>
+            <button class="tab-button" onclick="openTab('members')">اعضا</button>
+            <button class="tab-button" onclick="openTab('initial-balance')">موجودی اولیه</button>
+            <button class="tab-button" onclick="openTab('expenses')">هزینه‌ها</button>
+            <button class="tab-button" onclick="openTab('summary')">گزارش</button>
+        </div>
+
+        <div id="trips" class="tab-content active">
+            <h2>مدیریت مسافرت‌ها</h2>
+            <form id="add-trip-form">
+                <input type="text" id="trip-name" placeholder="نام مسافرت" required>
+                <button type="submit">ایجاد مسافرت جدید</button>
+            </form>
+            <ul id="trips-list"></ul>
+        </div>
+
+        <div id="members" class="tab-content">
+            <h2>اعضای <span id="current-trip-name"></span></h2>
+            <p id="no-trip-selected-member">لطفا ابتدا یک مسافرت انتخاب کنید.</p>
+            <div id="member-content">
+                <form id="add-member-form">
+                    <label>نوع عضویت:</label>
+                    <div class="member-type-selection">
+                        <label>
+                            <input type="radio" name="member-type" value="انفرادی" checked> انفرادی
+                        </label>
+                        <label>
+                            <input type="radio" name="member-type" value="خانوادگی"> خانوادگی
+                        </label>
+                    </div>
+                    
+                    <input type="text" id="member-name" placeholder="نام" required>
+                    <div id="family-member-fields" style="display: none;">
+                        <input type="text" id="family-members-input" placeholder="اعضای خانواده (با ویرگول جدا کنید)" >
+                    </div>
+                    <button type="submit">اضافه کردن عضو</button>
+                </form>
+                <ul id="members-list"></ul>
+            </div>
+        </div>
+
+        <div id="initial-balance" class="tab-content">
+            <h2>موجودی اولیه <span id="current-trip-name-initial"></span></h2>
+            <p id="no-trip-selected-initial">لطفا ابتدا یک مسافرت انتخاب کنید.</p>
+            <div id="initial-balance-content">
+                <ul id="initial-balance-list"></ul>
+                <button class="go-next-btn" onclick="openTab('expenses')">رفتن به بخش هزینه ها</button>
+            </div>
+        </div>
+
+        <div id="expenses" class="tab-content">
+            <h2>هزینه‌های <span id="current-trip-name-expense"></span></h2>
+            <p id="no-trip-selected-expense">لطفا ابتدا یک مسافرت انتخاب کنید.</p>
+            <div id="expense-content">
+                <form id="add-expense-form">
+                    <input type="text" id="expense-description" placeholder="توضیحات هزینه" required>
+                    <input type="number" id="expense-amount" placeholder="مبلغ" required>
+                    <textarea id="expense-note" placeholder="یادداشت (اختیاری)"></textarea>
+                    <label>هزینه‌کننده:</label>
+                    <select id="payer" required></select>
+                    <label>ذینفعان:</label>
+                    <div id="beneficiaries-list" class="checkbox-group"></div>
+                    <button type="submit">ثبت هزینه</button>
+                </form>
+                <ul id="expenses-log"></ul>
+            </div>
+        </div>
+
+        <div id="summary" class="tab-content">
+            <h2>گزارش <span id="current-trip-name-summary"></span></h2>
+            <p id="no-trip-selected-summary">لطفا ابتدا یک مسافرت انتخاب کنید.</p>
+            <div id="summary-content">
+                <div id="summary-info"></div>
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>نام</th>
+                            <th>بدهی</th>
+                            <th>طلب</th>
+                            <th>وضعیت</th>
+                            <th>اقدامات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summary-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="footer">
+        <p>توسعه دهنده: پیمان</p>
+    </footer>
+
+    <script>
+        const tabs = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        const addTripForm = document.getElementById('add-trip-form');
+        const tripNameInput = document.getElementById('trip-name');
+        const tripsList = document.getElementById('trips-list');
+        const currentTripName = document.getElementById('current-trip-name');
+        const currentTripNameExpense = document.getElementById('current-trip-name-expense');
+        const currentTripNameSummary = document.getElementById('current-trip-name-summary');
+        const currentTripNameInitial = document.getElementById('current-trip-name-initial');
+        const noTripSelectedMember = document.getElementById('no-trip-selected-member');
+        const noTripSelectedExpense = document.getElementById('no-trip-selected-expense');
+        const noTripSelectedSummary = document.getElementById('no-trip-selected-summary');
+        const noTripSelectedInitial = document.getElementById('no-trip-selected-initial');
+        const memberContent = document.getElementById('member-content');
+        const expenseContent = document.getElementById('expense-content');
+        const summaryContent = document.getElementById('summary-content');
+        const initialBalanceContent = document.getElementById('initial-balance-content');
+
+        const addMemberForm = document.getElementById('add-member-form');
+        const memberTypeRadios = document.querySelectorAll('input[name="member-type"]');
+        const memberNameInput = document.getElementById('member-name');
+        const membersList = document.getElementById('members-list');
+        const familyMemberFields = document.getElementById('family-member-fields');
+        const familyMembersInput = document.getElementById('family-members-input');
+
+        const initialBalanceList = document.getElementById('initial-balance-list');
+        const addExpenseForm = document.getElementById('add-expense-form');
+        const expenseDescriptionInput = document.getElementById('expense-description');
+        const expenseAmountInput = document.getElementById('expense-amount');
+        const expenseNoteInput = document.getElementById('expense-note');
+        const payerSelect = document.getElementById('payer');
+        const beneficiariesList = document.getElementById('beneficiaries-list');
+        const expensesLog = document.getElementById('expenses-log');
+
+        const summaryInfo = document.getElementById('summary-info');
+        const summaryTableBody = document.getElementById('summary-table-body');
+
+        let trips = JSON.parse(localStorage.getItem('trips')) || [];
+        let currentTripId = localStorage.getItem('currentTripId') || null;
+
+        function toJalali(date) {
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            return new Intl.DateTimeFormat('fa-IR', options).format(date);
+        }
+
+        function toJalaliTime(date) {
+            const options = { hour: '2-digit', minute: '2-digit' };
+            return new Intl.DateTimeFormat('fa-IR', options).format(date);
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('trips', JSON.stringify(trips));
+            localStorage.setItem('currentTripId', currentTripId);
+        }
+
+        function openTab(tabId) {
+            tabContents.forEach(tab => tab.classList.remove('active'));
+            tabs.forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`.tab-button[onclick="openTab('${tabId}')"]`).classList.add('active');
+            
+            const currentTrip = trips.find(trip => trip.id === currentTripId);
+            const isTripSelected = !!currentTrip;
+
+            if (isTripSelected) {
+                currentTripName.textContent = currentTrip.name;
+                currentTripNameExpense.textContent = currentTrip.name;
+                currentTripNameSummary.textContent = currentTrip.name;
+                currentTripNameInitial.textContent = currentTrip.name;
+            }
+
+            if (tabId !== 'trips' && !isTripSelected) {
+                memberContent.style.display = 'none';
+                noTripSelectedMember.style.display = 'block';
+                expenseContent.style.display = 'none';
+                noTripSelectedExpense.style.display = 'block';
+                summaryContent.style.display = 'none';
+                noTripSelectedSummary.style.display = 'block';
+                initialBalanceContent.style.display = 'none';
+                noTripSelectedInitial.style.display = 'block';
+            } else {
+                memberContent.style.display = 'block';
+                noTripSelectedMember.style.display = 'none';
+                expenseContent.style.display = 'block';
+                noTripSelectedExpense.style.display = 'none';
+                summaryContent.style.display = 'block';
+                noTripSelectedSummary.style.display = 'none';
+                initialBalanceContent.style.display = 'block';
+                noTripSelectedInitial.style.display = 'none';
+
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            renderTrips();
+            if (currentTripId) {
+                const currentTrip = trips.find(trip => trip.id === currentTripId);
+                if (!currentTrip) {
+                    currentTripId = null;
+                    saveToLocalStorage();
+                    updateUI();
+                    return;
+                }
+                
+                renderMembers(currentTrip);
+                renderInitialBalances(currentTrip);
+                renderExpenses(currentTrip);
+                calculateSummary(currentTrip);
+            }
+        }
+        
+        addTripForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = tripNameInput.value.trim();
+            if (name) {
+                const newTrip = {
+                    id: Date.now().toString(),
+                    name: name,
+                    members: [],
+                    expenses: [],
+                    initialBalances: []
+                };
+                trips.push(newTrip);
+                currentTripId = newTrip.id;
+                saveToLocalStorage();
+                updateUI();
+                tripNameInput.value = '';
+                openTab('members');
+            }
+        });
+
+        function renderTrips() {
+            tripsList.innerHTML = '';
+            trips.forEach(trip => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>${trip.name}</span>
+                    <div class="action-buttons">
+                        <button class="select-btn" data-id="${trip.id}">انتخاب</button>
+                        <button class="delete-btn" data-id="${trip.id}">حذف</button>
+                    </div>
+                `;
+                tripsList.appendChild(li);
+            });
+        }
+
+        tripsList.addEventListener('click', (e) => {
+            const id = e.target.dataset.id;
+            if (e.target.classList.contains('select-btn')) {
+                currentTripId = id;
+                saveToLocalStorage();
+                updateUI();
+                openTab('members');
+            } else if (e.target.classList.contains('delete-btn')) {
+                if (confirm('آیا مطمئنید می‌خواهید این مسافرت را حذف کنید؟')) {
+                    trips = trips.filter(trip => trip.id !== id);
+                    if (currentTripId === id) {
+                        currentTripId = null;
+                    }
+                    saveToLocalStorage();
+                    updateUI();
+                }
+            }
+        });
+
+        memberTypeRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                if (radio.value === 'خانوادگی') {
+                    familyMemberFields.style.display = 'flex';
+                    memberNameInput.placeholder = 'نام سرپرست خانواده';
+                } else {
+                    familyMemberFields.style.display = 'none';
+                    memberNameInput.placeholder = 'نام عضو';
+                }
+            });
+        });
+
+        addMemberForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const currentTrip = trips.find(trip => trip.id === currentTripId);
+            if (!currentTrip) return;
+
+            const name = memberNameInput.value.trim();
+            const type = document.querySelector('input[name="member-type"]:checked').value;
+            const familyMembers = type === 'خانوادگی' ? familyMembersInput.value.split(/[,،\s]+/).map(m => m.trim()).filter(m => m) : [];
+
+            if (name && !currentTrip.members.find(m => m.name === name)) {
+                const newMember = { name, type, familyMembers, hasPaid: false };
+                currentTrip.members.push(newMember);
+                saveToLocalStorage();
+                updateUI();
+                addMemberForm.reset();
+            } else {
+                alert('لطفا نام معتبر وارد کنید یا نام تکراری نباشد.');
+            }
+        });
+
+        function renderMembers(currentTrip) {
+            membersList.innerHTML = '';
+            payerSelect.innerHTML = '';
+            beneficiariesList.innerHTML = '';
+
+            currentTrip.members.forEach(member => {
+                const li = document.createElement('li');
+                let memberInfo = `<span>${member.name} (${member.type})</span>`;
+                if (member.type === 'خانوادگی' && member.familyMembers && member.familyMembers.length > 0) {
+                    memberInfo += `<ul class="family-member-list"><li>اعضای خانواده: ${member.familyMembers.join(', ')}</li></ul>`;
+                }
+                li.innerHTML = `
+                    ${memberInfo}
+                    <div class="action-buttons">
+                        <button class="delete-btn" data-name="${member.name}">حذف</button>
+                    </div>
+                `;
+                membersList.appendChild(li);
+                
+                if (member.type === 'انفرادی' || member.type === 'خانوادگی') {
+                    const option = document.createElement('option');
+                    option.value = member.name;
+                    option.textContent = member.name;
+                    payerSelect.appendChild(option);
+                }
+            });
+
+            const allBeneficiaries = currentTrip.members.map(member => {
+                if (member.type === 'خانوادگی') {
+                    const familyMembers = [member.name, ...member.familyMembers];
+                    return {
+                        name: `خانواده ${member.name}`,
+                        members: familyMembers
+                    };
+                } else {
+                    return {
+                        name: member.name,
+                        members: [member.name]
+                    };
+                }
+            });
+
+            allBeneficiaries.forEach(beneficiary => {
+                const checkboxDiv = document.createElement('div');
+                checkboxDiv.className = 'member-item';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `beneficiary-${beneficiary.name}`;
+                checkbox.value = JSON.stringify(beneficiary);
+                checkbox.checked = true;
+                const label = document.createElement('label');
+                label.htmlFor = `beneficiary-${beneficiary.name}`;
+                let labelText = beneficiary.name;
+                if (beneficiary.members.length > 1) {
+                    labelText += ` (${beneficiary.members.join(', ')})`;
+                }
+                label.textContent = labelText;
+                checkboxDiv.appendChild(checkbox);
+                checkboxDiv.appendChild(label);
+                beneficiariesList.appendChild(checkboxDiv);
+            });
+        }
+        
+        function renderInitialBalances(currentTrip) {
+            initialBalanceList.innerHTML = '';
+            const allMembers = currentTrip.members.filter(m => m.type === 'انفرادی' || m.type === 'خانوادگی');
+            
+            currentTrip.members.forEach(member => {
+                const memberName = member.type === 'خانوادگی' ? `خانواده ${member.name}` : member.name;
+                const initialBalance = currentTrip.initialBalances.find(ib => ib.name === member.name) || { amount: 0, paidTo: '' };
+                const li = document.createElement('li');
+
+                const payerOptions = allMembers.map(m => `<option value="${m.name}" ${m.name === initialBalance.paidTo ? 'selected' : ''}>${m.name}</option>`).join('');
+
+                li.innerHTML = `
+                    <div class="initial-balance-item">
+                        <span>${memberName}:</span>
+                        <input type="number" class="initial-amount-input" data-name="${member.name}" value="${initialBalance.amount}" placeholder="مبلغ">
+                        <span>پرداخت شده به:</span>
+                        <select class="initial-payer-select" data-name="${member.name}">
+                            <option value="">انتخاب کنید</option>
+                            ${payerOptions}
+                        </select>
+                    </div>
+                `;
+                initialBalanceList.appendChild(li);
+            });
+
+            initialBalanceList.addEventListener('change', (e) => {
+                const target = e.target;
+                const name = target.dataset.name;
+                const existingBalance = currentTrip.initialBalances.find(ib => ib.name === name);
+                
+                if (target.classList.contains('initial-amount-input')) {
+                    if (existingBalance) {
+                        existingBalance.amount = parseFloat(target.value) || 0;
+                    } else {
+                        currentTrip.initialBalances.push({ name: name, amount: parseFloat(target.value) || 0, paidTo: '' });
+                    }
+                } else if (target.classList.contains('initial-payer-select')) {
+                    if (existingBalance) {
+                        existingBalance.paidTo = target.value;
+                    } else {
+                        const amountInput = target.closest('.initial-balance-item').querySelector('.initial-amount-input');
+                        currentTrip.initialBalances.push({ name: name, amount: parseFloat(amountInput.value) || 0, paidTo: target.value });
+                    }
+                }
+                saveToLocalStorage();
+                calculateSummary(currentTrip);
+            });
+        }
+        
+        membersList.addEventListener('click', (e) => {
+            const currentTrip = trips.find(trip => trip.id === currentTripId);
+            if (!currentTrip) return;
+
+            if (e.target.classList.contains('delete-btn')) {
+                const name = e.target.dataset.name;
+                if (confirm(`آیا از حذف ${name} مطمئن هستید؟ تمام هزینه‌های مرتبط با او نیز حذف خواهد شد.`)) {
+                    currentTrip.members = currentTrip.members.filter(m => m.name !== name);
+                    currentTrip.initialBalances = currentTrip.initialBalances.filter(ib => ib.name !== name && ib.paidTo !== name);
+                    currentTrip.expenses = currentTrip.expenses.filter(exp => exp.payer !== name && !exp.beneficiaries.some(b => JSON.parse(b).name.includes(name)));
+                    saveToLocalStorage();
+                    updateUI();
+                }
+            }
+        });
+
+        const addExpenseHandler = (e) => {
+            e.preventDefault();
+            const currentTrip = trips.find(trip => trip.id === currentTripId);
+            if (!currentTrip) return;
+
+            const description = expenseDescriptionInput.value.trim();
+            const amount = parseFloat(expenseAmountInput.value);
+            const note = expenseNoteInput.value.trim();
+            const payer = payerSelect.value;
+            const beneficiaries = Array.from(beneficiariesList.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+            
+            if (description && !isNaN(amount) && amount > 0 && payer && beneficiaries.length > 0) {
+                const timestamp = new Date();
+                currentTrip.expenses.push({ 
+                    id: Date.now().toString(), 
+                    description, 
+                    amount, 
+                    note,
+                    payer, 
+                    beneficiaries,
+                    date: toJalali(timestamp),
+                    time: toJalaliTime(timestamp)
+                });
+                saveToLocalStorage();
+                updateUI();
+                addExpenseForm.reset();
+            } else {
+                alert('لطفا تمام فیلدها را به درستی پر کنید و حداقل یک ذینفع انتخاب کنید.');
+            }
+        };
+
+        addExpenseForm.addEventListener('submit', addExpenseHandler);
+
+        function renderExpenses(currentTrip) {
+            expensesLog.innerHTML = '';
+            currentTrip.expenses.forEach(expense => {
+                const li = document.createElement('li');
+                const beneficiariesParsed = expense.beneficiaries.map(b => JSON.parse(b));
+                
+                const beneficiariesStr = beneficiariesParsed.map(benef => {
+                    let familyMembersStr = '';
+                    if (benef.members.length > 1) {
+                        familyMembersStr = ` (${benef.members.join(', ')})`;
+                    }
+                    return `${benef.name}${familyMembersStr}`;
+                }).join(', ');
+                
+                let totalBeneficiaryCount = 0;
+                beneficiariesParsed.forEach(benef => {
+                    totalBeneficiaryCount += benef.members.length;
+                });
+                const costPerPerson = expense.amount / totalBeneficiaryCount;
+                
+                let benefSharesHtml = `
+                    <p class="expense-cost-per-person">سهم هر نفر: ${costPerPerson.toLocaleString(undefined, { maximumFractionDigits: 0 })} تومان</p>
+                    <ul class="expense-shares">
+                        ${beneficiariesParsed.map(benef => {
+                            const shareAmount = benef.members.length * costPerPerson;
+                            return `<li>سهم ${benef.name}: ${shareAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })} تومان</li>`;
+                        }).join('')}
+                    </ul>
+                `;
+
+                li.innerHTML = `
+                    <div>
+                        <strong>${expense.description}</strong><br>
+                        <span>مبلغ: ${expense.amount.toLocaleString()} تومان</span><br>
+                        <span>هزینه‌کننده: ${expense.payer}</span><br>
+                        <span>ذینفعان: ${beneficiariesStr}</span><br>
+                        <span>تاریخ: ${expense.date} - ساعت: ${expense.time}</span>
+                        ${expense.note ? `<span>یادداشت: ${expense.note}</span>` : ''}
+                        ${benefSharesHtml}
+                    </div>
+                    <div class="action-buttons">
+                        <button class="edit-btn" data-id="${expense.id}">ویرایش</button>
+                        <button class="delete-btn" data-id="${expense.id}">حذف</button>
+                    </div>
+                `;
+                expensesLog.appendChild(li);
+            });
+        }
+
+        expensesLog.addEventListener('click', (e) => {
+            const currentTrip = trips.find(trip => trip.id === currentTripId);
+            if (!currentTrip) return;
+
+            const id = e.target.dataset.id;
+            if (e.target.classList.contains('delete-btn')) {
+                if (confirm('آیا از حذف این هزینه مطمئن هستید؟')) {
+                    currentTrip.expenses = currentTrip.expenses.filter(exp => exp.id !== id);
+                    saveToLocalStorage();
+                    updateUI();
+                }
+            } else if (e.target.classList.contains('edit-btn')) {
+                const expense = currentTrip.expenses.find(exp => exp.id === id);
+                if (expense) {
+                    expenseDescriptionInput.value = expense.description;
+                    expenseAmountInput.value = expense.amount;
+                    expenseNoteInput.value = expense.note || '';
+                    payerSelect.value = expense.payer;
+                    
+                    document.querySelectorAll('#beneficiaries-list input[type="checkbox"]').forEach(cb => {
+                        cb.checked = expense.beneficiaries.includes(cb.value);
+                    });
+
+                    addExpenseForm.querySelector('button[type="submit"]').textContent = "به‌روزرسانی هزینه";
+                    addExpenseForm.onsubmit = (event) => {
+                        event.preventDefault();
+                        const newDescription = expenseDescriptionInput.value.trim();
+                        const newAmount = parseFloat(expenseAmountInput.value);
+                        const newNote = expenseNoteInput.value.trim();
+                        const newPayer = payerSelect.value;
+                        const newBeneficiaries = Array.from(beneficiariesList.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+
+                        if (newDescription && !isNaN(newAmount) && newAmount > 0 && newPayer && newBeneficiaries.length > 0) {
+                            expense.description = newDescription;
+                            expense.amount = newAmount;
+                            expense.note = newNote;
+                            expense.payer = newPayer;
+                            expense.beneficiaries = newBeneficiaries;
+                            saveToLocalStorage();
+                            updateUI();
+                            
+                            addExpenseForm.reset();
+                            addExpenseForm.querySelector('button[type="submit"]').textContent = "ثبت هزینه";
+                            addExpenseForm.onsubmit = addExpenseHandler;
+                        } else {
+                            alert('لطفا تمام فیلدها را به درستی پر کنید و حداقل یک ذینفع انتخاب کنید.');
+                        }
+                    };
+                }
+            }
+        });
+
+        function calculateSummary(currentTrip) {
+            const balances = {};
+            let totalMembersCount = 0;
+            let totalExpense = 0;
+            
+            const allMembersMap = {};
+            currentTrip.members.forEach(member => {
+                allMembersMap[member.name] = member;
+                if (member.type === 'خانوادگی') {
+                    member.familyMembers.forEach(fmem => {
+                        allMembersMap[fmem] = member; // Map family member to their head
+                    });
+                }
+            });
+
+            currentTrip.members.forEach(member => {
+                balances[member.name] = 0;
+                totalMembersCount += 1;
+                if (member.type === 'خانوادگی' && member.familyMembers) {
+                    totalMembersCount += member.familyMembers.length;
+                }
+            });
+            
+            currentTrip.initialBalances.forEach(ib => {
+                balances[ib.name] = (balances[ib.name] || 0) + ib.amount;
+                if(ib.paidTo) {
+                    balances[ib.paidTo] = (balances[ib.paidTo] || 0) - ib.amount;
+                }
+            });
+
+            const transactionDetails = {};
+            currentTrip.members.forEach(member => {
+                transactionDetails[member.name] = { owes: [], gets: [] };
+            });
+
+            currentTrip.expenses.forEach(expense => {
+                totalExpense += expense.amount;
+                
+                const payerMember = currentTrip.members.find(m => m.name === expense.payer);
+                if (payerMember) {
+                    balances[payerMember.name] -= expense.amount;
+                }
+
+                let totalBeneficiaryCount = 0;
+                const beneficiariesParsed = expense.beneficiaries.map(b => JSON.parse(b));
+                beneficiariesParsed.forEach(benef => {
+                    totalBeneficiaryCount += benef.members.length;
+                });
+                const costPerPerson = expense.amount / totalBeneficiaryCount;
+
+                beneficiariesParsed.forEach(benef => {
+                    const beneficiaryHead = allMembersMap[benef.members[0]];
+                    if (beneficiaryHead) {
+                        const familyShare = costPerPerson * benef.members.length;
+                        balances[beneficiaryHead.name] = (balances[beneficiaryHead.name] || 0) + familyShare;
+                        
+                        // Record transaction for report
+                        transactionDetails[beneficiaryHead.name].owes.push({
+                            description: expense.description,
+                            amount: familyShare,
+                            to: expense.payer
+                        });
+                        transactionDetails[expense.payer].gets.push({
+                            description: expense.description,
+                            amount: familyShare,
+                            from: benef.name
+                        });
+                    }
+                });
+            });
+
+            const finalBalances = {};
+            currentTrip.members.forEach(member => {
+                finalBalances[member.name] = balances[member.name];
+            });
+            
+            summaryInfo.innerHTML = `
+                <div class="summary-info">
+                    <strong>هزینه کلی سفر:</strong> ${totalExpense.toLocaleString()} تومان<br>
+                    <strong>تعداد کل اعضا:</strong> ${totalMembersCount} نفر
+                </div>
+            `;
+            
+            summaryTableBody.innerHTML = '';
+            for (const name in finalBalances) {
+                const member = currentTrip.members.find(m => m.name === name);
+                const balance = finalBalances[name];
+                const tr = document.createElement('tr');
+                tr.setAttribute('data-name', name);
+
+                let debtHtml = '';
+                let creditHtml = '';
+                let statusHtml = '';
+                let actionsHtml = '';
+
+                if (balance < 0) {
+                    debtHtml = `<span class="debtor">${Math.abs(balance).toLocaleString()}</span>`;
+                    statusHtml = `<span class="${member.hasPaid ? 'paid' : 'unpaid'}">${member.hasPaid ? 'پرداخت شده' : 'پرداخت نشده'}</span>`;
+                    if (!member.hasPaid) {
+                        actionsHtml = `<button class="pay-btn" data-name="${name}">پرداخت شد</button>`;
+                    }
+                } else if (balance > 0) {
+                    creditHtml = `<span class="creditor">${balance.toLocaleString()}</span>`;
+                    statusHtml = '---';
+                    actionsHtml = '---';
+                } else {
+                    statusHtml = 'حساب صاف';
+                    actionsHtml = '---';
+                }
+
+                tr.innerHTML = `
+                    <td>${name}</td>
+                    <td>${debtHtml}</td>
+                    <td>${creditHtml}</td>
+                    <td>${statusHtml}</td>
+                    <td>${actionsHtml}</td>
+                `;
+                summaryTableBody.appendChild(tr);
+
+                // Adding transaction details row (initially hidden)
+                const detailsTr = document.createElement('tr');
+                detailsTr.classList.add('details-row');
+                detailsTr.style.display = 'none';
+                
+                let detailsHtml = '';
+                if (transactionDetails[name].owes.length > 0) {
+                    detailsHtml += `<strong>بدهی‌ها:</strong><ul>`;
+                    transactionDetails[name].owes.forEach(item => {
+                        detailsHtml += `<li> ${item.description} (${item.amount.toLocaleString(undefined, { maximumFractionDigits: 0 })} تومان به ${item.to})</li>`;
+                    });
+                    detailsHtml += `</ul>`;
+                }
+                if (transactionDetails[name].gets.length > 0) {
+                    detailsHtml += `<strong>طلب‌ها:</strong><ul>`;
+                    transactionDetails[name].gets.forEach(item => {
+                        detailsHtml += `<li> ${item.description} (${item.amount.toLocaleString(undefined, { maximumFractionDigits: 0 })} تومان از ${item.from})</li>`;
+                    });
+                    detailsHtml += `</ul>`;
+                }
+
+                if (detailsHtml) {
+                    detailsTr.innerHTML = `<td colspan="5"><div class="report-details">${detailsHtml}</div></td>`;
+                    summaryTableBody.appendChild(detailsTr);
+                }
+            }
+        }
+        
+        summaryTableBody.addEventListener('click', (e) => {
+            const row = e.target.closest('tr');
+            if (row && !e.target.classList.contains('pay-btn')) {
+                const nextRow = row.nextElementSibling;
+                if (nextRow && nextRow.classList.contains('details-row')) {
+                    const isHidden = nextRow.style.display === 'none';
+                    nextRow.style.display = isHidden ? '' : 'none';
+                }
+            }
+
+            if (e.target.classList.contains('pay-btn')) {
+                const name = e.target.dataset.name;
+                const currentTrip = trips.find(trip => trip.id === currentTripId);
+                const member = currentTrip.members.find(m => m.name === name);
+                if (member) {
+                    member.hasPaid = true;
+                    saveToLocalStorage();
+                    updateUI();
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUI();
+            openTab('trips');
+        });
+    </script>
+</body>
+</html>
