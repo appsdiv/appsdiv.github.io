@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>فاکتور/پیش‌فاکتور ساز | موبایل + جلالی + JPG</title>
+  <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.min.css" rel="stylesheet" />
+  <style>
+    :root{
+      --bg:#f7f7fb; --card:#fff; --muted:#6b7280; --primary:#0f172a; --border:#e5e7eb;
+      --accent:#2563eb; --danger:#ef4444; --ok:#16a34a; --radius:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--primary);font-family:Vazirmatn,Tahoma,system-ui}
+    .container{max-width:880px;margin:0 auto;padding:12px}
+    .header{position:sticky;top:0;z-index:20;background:rgba(247,247,251,.85);backdrop-filter:blur(6px);border-bottom:1px solid var(--border);padding:10px 12px}
+    .header h1{font-size:16px;margin:0}
+    .section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin:12px 0}
+    .section h3{margin:0 0 10px;font-size:15px}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    input[type="text"],input[type="tel"],input[type="number"],textarea,select{
+      width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;background:#fff;font-size:14px
+    }
+    textarea{min-height:76px;resize:vertical}
+    .grid{display:grid;gap:10px;grid-template-columns:1fr 1fr}
+    @media(max-width:640px){.grid{grid-template-columns:1fr}}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .muted{color:var(--muted);font-size:12px}
+
+    /* کارت‌های آیتم برای موبایل */
+    .item-card{border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff;display:grid;gap:6px}
+    .item-top{display:flex;justify-content:space-between;align-items:center}
+    .badge{background:#eef2ff;border:1px solid #e5e7eb;border-radius:20px;padding:4px 10px;font-size:12px}
+    .item-actions{display:flex;gap:8px}
+    .btn{border:1px solid var(--border);background:#fff;border-radius:12px;padding:10px 14px;font-size:14px;cursor:pointer}
+    .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .btn.danger{background:var(--danger);color:#fff;border-color:var(--danger)}
+    .btn.ghost{background:#fff}
+    .btn.full{width:100%}
+    .fabbar{position:sticky;bottom:0;z-index:25;background:#fff;border-top:1px solid var(--border);padding:10px}
+    .fabbar .row{justify-content:space-between}
+    .fabbar .btn{flex:1}
+    .fabbar .btn + .btn{margin-inline-start:6px}
+
+    /* پیش‌نمایش قالب فرم‌افزار در تب جدید؛ نسخهٔ داخل همین صفحه هم داریم برای خروجی JPG */
+    #FactorDefault{border:1px solid #000;padding:5px;max-width:1000px;margin:10px auto;background:#fff;font-size:12px}
+    #FactorDefault .FCHead{background:#fff;width:100%}
+    #FactorDefault .FCcompanyName{font-weight:bold;font-size:18px;text-align:center;line-height:45px}
+    #FactorDefault .FCtitle{font-weight:normal;text-align:center;line-height:30px;font-size:18px}
+    #FactorDefault .FCcustdetail{font-size:10pt;width:100%;line-height:28px}
+    #FactorDefault table{width:100%;border-collapse:collapse;border-spacing:0}
+    #FactorDefault th,#FactorDefault td{border:1px solid #787878;padding:10px 6px;font-size:10pt;text-align:center}
+    #FactorDefault th{background:#eee}
+    #FactorDefault .TrDetail td{border-color:#888;padding:5px}
+    #FactorDefault .FCcompanyAddress{background:#fff;font-size:8pt;width:100%;border-top:1px solid #000;padding-top:5px;text-align:right}
+    .logo-slot{position:absolute;top:6px;right:6px}
+    .logo-slot img{height:48px;width:auto;object-fit:contain}
+
+    /* مدال ساده */
+    .modal{position:fixed;inset:0;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.35);z-index:40}
+    .modal.show{display:flex}
+    .modal .sheet{background:#fff;width:100%;max-width:680px;border-top-left-radius:18px;border-top-right-radius:18px;padding:12px 12px 16px;border:1px solid var(--border)}
+    .modal .title{font-size:15px;margin:0 0 8px}
+    .modal .actions{display:flex;gap:8px;margin-top:10px}
+    .modal .actions .btn{flex:1}
+
+    /* چاپ */
+    @media print{.header,.fabbar,.modal,.section:not(.printable){display:none!important} body{background:#fff}}
+
+    /* form */
+    @font-face {
+    font-family: 'IRANSansWeb';
+    src: url('/Themes/resources/fonts/IRANSansWeb_Medium.eot');
+    src: url('/Themes/resources/fonts/IRANSansWeb_Medium.eot?#iefix') format('eot'), /* IE6–8 */
+    url('/Themes/resources/fonts/IRANSansWeb_Medium.woff') format('woff'), /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+    url('/Themes/resources/fonts/IRANSansWeb_Medium.ttf') format('ttf');
+    font-display: fallback;
+}
+
+
+@font-face {
+    font-family: 'IRANSansWebFaNum';
+    src: url('/Themes/resources/fonts/IRANSansWeb(FaNum)_Medium.eot');
+    src: url('/Themes/resources/fonts/IRANSansWeb(FaNum)_Medium.eot?#iefix') format('eot'), /* IE6–8 */
+    url('/Themes/resources/fonts/IRANSansWeb(FaNum)_Medium.woff') format('woff'), /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+    url('/Themes/resources/fonts/IRANSansWeb(FaNum)_Medium.ttf') format('ttf');
+    font-display: fallback;
+}
+
+@font-face {
+    font-family: 'IRANSansWebEnNum';
+    src: url('/Themes/resources/fonts/IRANSansWeb(EnNum)_Medium.eot');
+    src: url('/Themes/resources/fonts/IRANSansWeb(EnNum)_Medium.eot?#iefix') format('eot'), /* IE6–8 */
+    url('/Themes/resources/fonts/IRANSansWeb(EnNum)_Medium.woff') format('woff'), /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+    url('/Themes/resources/fonts/IRANSansWeb(EnNum)_Medium.ttf') format('ttf');
+    font-display: fallback;
+}
+
+@font-face {
+    font-family: 'BTitrBold';
+    src: url('/Themes/resources/fonts/BTitrBold.eot?#') format('eot'), url('/Themes/resources/fonts/BTitrBold.woff') format('woff'), url('/Themes/resources/fonts/BTitrBold.ttf') format('truetype');
+    font-display: fallback;
+}
+
+@font-face {
+    font-family: 'BKoodakBold';
+    src: url('/Themes/resources/fonts/BKoodakBold.eot?#') format('eot'), url('/Themes/resources/fonts/BKoodakBold.woff') format('woff'), url('/Themes/resources/fonts/BKoodakBold.ttf') format('truetype');
+    font-display: fallback;
+}
+
+@font-face {
+    font-family: 'BHoma';
+    src: url('/Themes/resources/fonts/BHoma.eot?#') format('eot'), url('/Themes/resources/fonts/BHoma.woff') format('woff'), url('/Themes/resources/fonts/BHoma.ttf') format('truetype');
+    font-display: fallback;
+}
+
+@font-face {
+    font-family: 'BYekan';
+    src: url('/Themes/resources/fonts/BYekan.woff') format('woff'), url('/Themes/resources/fonts/BHoma.ttf') format('truetype');
+    font-display: fallback;
+}
+
+[dir=rtl].ravesh-dropdown-menu,
+[dir=rtl].ravesh-form-builder,
+[dir=rtl].ravesh-form-builder input,
+[dir=rtl].ravesh-form-builder button,
+[dir=rtl].ravesh-form-builder textarea,
+[dir=rtl].ravesh-form-builder select {
+    font-family: 'IRANSansWeb',Tahoma;
+}
+
+[dir=ltr].ravesh-dropdown-menu,
+[dir=ltr].ravesh-form-builder,
+[dir=ltr].ravesh-form-builder input,
+[dir=ltr].ravesh-form-builder button,
+[dir=ltr].ravesh-form-builder textarea,
+[dir=ltr].ravesh-form-builder select {
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+}
+
+[dir=rtl].ravesh-dropdown-menu,
+[dir=rtl].ravesh-form-builder {
+    direction: rtl;
+    text-align: right;
+}
+
+    [dir=rtl].ravesh-dropdown-menu .float-left,
+    [dir=rtl].ravesh-form-builder .float-left {
+        float: left;
+    }
+
+    [dir=rtl].ravesh-dropdown-menu .float-right,
+    [dir=rtl].ravesh-form-builder .float-right {
+        float: right;
+    }
+
+
+[dir=ltr].ravesh-dropdown-menu [dir=ltr].ravesh-form-builder {
+    direction: ltr;
+    text-align: left;
+}
+
+[dir=ltr].ravesh-dropdown-menu .float-left,
+[dir=ltr].ravesh-form-builder .float-left {
+    float: right;
+}
+
+[dir=ltr].ravesh-dropdown-menu .float-right,
+[dir=ltr].ravesh-form-builder .float-right {
+    float: left;
+}
+
+
+.ravesh-form-builder .ravesh-button {
+    text-align: center;
+    border-radius: 2px;
+    padding: 7px 10px;
+    cursor: pointer;
+    font-size: 12px !important;
+    border: none;
+    color: gray;
+    background-color: #eee;
+    /*outline: none;*/
+    line-height: 20px;
+    margin: 0 5px;
+    user-select: none;
+    min-width: auto;
+    font-weight: normal;
+    height: auto;
+    text-shadow: none;
+    position: relative;
+    opacity: 0.9;
+}
+
+    .ravesh-form-builder .ravesh-button.not-show {
+        display: none !important;
+    }
+
+    .ravesh-form-builder .ravesh-button:hover {
+        background-color: #e5e5e5;
+        color: #444;
+        opacity: 1;
+    }
+
+    .ravesh-form-builder .ravesh-button.submit {
+        background-color: #42a2eb;
+        color: white;
+    }
+
+        .ravesh-form-builder .ravesh-button.submit:hover {
+            background-color: #439bde;
+            color: white;
+        }
+
+    .ravesh-form-builder .ravesh-button.dark {
+        background: #607D8B;
+        color: white;
+    }
+
+        .ravesh-form-builder .ravesh-button.dark:hover {
+            background-color: #546E7A;
+            color: white;
+        }
+
+        .ravesh-form-builder .ravesh-button:disabled{
+            opacity:0.5;
+            cursor:default;
+        }
+
+.ravesh-form-builder .ravesh-form-loading-bar {
+    transition: all 0.3s ease-in-out;
+    height: 4px;
+    background-color: #4CAF50;
+    width: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+
+
+
+
+/*form design --> page*/
+.form-design-page {
+}
+
+.form-design-page-content {
+    min-height: 80px;
+    padding: 10px;
+}
+
+.form-design-page-footer {
+    display: inline-block;
+}
+
+    .form-design-page-footer .ravesh-button {
+        min-width: 60px;
+        margin-right: 5px;
+        margin-left: 5px;
+        display: inline-block;
+    }
+
+/*form design --> section*/
+
+.form-design-section {
+    margin-bottom: 10px;
+}
+
+    .form-design-section:last-of-type {
+        margin-bottom: 1px;
+    }
+
+    .form-design-section .add-new,
+    .form-design-section .delete-field {
+        padding: 4px 2px 5px 2px;
+        font-size: 10px;
+        display: inline-block;
+        margin-bottom: 5px;
+    }
+    .form-design-section .add-new-section.no-active,
+    .form-design-section .delete-section.no-active {
+        background-color: #9E9E9E;
+        cursor: default;
+    }
+
+    .form-design-section .add-new-section,
+    .form-design-section .delete-section {
+        background: #4caf50;
+        color: #fff;
+        margin: 0px 10px 5px;
+        padding: 5px 7px;
+        border-radius: 4px;
+        display: inline-block;
+        text-decoration: none;
+        font-size: 11px;
+    }
+      
+
+        .form-design-section .add-new-section:hover,
+        .form-design-section .delete-section:hover {
+            opacity: 0.9;
+        }
+
+        .form-design-section .add-new-section.style-border,
+        .form-design-section .delete-section.style-border {
+            margin: 7.5px 0 15px;
+        }
+
+    .form-design-section .delete-section {
+        background: #f44336;
+    }
+
+.form-design-section-wrapper {
+    position: relative;
+}
+
+    .form-design-section-wrapper.style-border {
+        border: solid 1px #eee;
+    }
+
+        .form-design-section-wrapper.style-border .form-design-section-head {
+            border-bottom: solid 1px #eee;
+        }
+
+    .form-design-section-wrapper.selected.style-border .form-design-section-head {
+        border-bottom: solid 1px #ebc762;
+    }
+
+.insert-mode .form-design-section-wrapper.style-border .form-design-section-head {
+    background: #f9f9f9;
+}
+
+
+.form-design-section-head {
+    height: 35px;
+    line-height: 35px;
+    font-size: 12px;
+    padding: 0 10px;
+    transition: background 300ms,border 300ms;
+    border-bottom: solid 1px white;
+}
+
+    .form-design-section-head .title {
+        display: inline-block;
+        background: none !important;
+    }
+
+.insert-mode .form-design-section-content {
+    min-height: 65px;
+    padding: 10px 5px 0;
+}
+
+.form-design-section-wrapper .col-full {
+    width: 100%;
+}
+
+.form-design-section-wrapper .col-2-3 {
+    width: 66.66%;
+}
+
+.form-design-section-wrapper .col-1-3 {
+    width: 33.33%;
+}
+
+.form-design-section-wrapper .col-1-2 {
+    width: 50%;
+}
+
+.form-design-section-wrapper .col-1-4 {
+    width: 25%;
+}
+
+.form-design-section-wrapper .col-3-4 {
+    width: 75%;
+}
+
+.form-design-section-wrapper .col-1-5 {
+    width: 20%;
+}
+
+.form-design-section-wrapper .col-2-5 {
+    width: 40%;
+}
+
+.form-design-section-wrapper .col-3-5 {
+    width: 60%;
+}
+
+.form-design-section-wrapper .col-4-5 {
+    width: 80%;
+}
+
+.form-design-section-wrapper .col-1-6 {
+    width: 16.65%;
+}
+
+.form-design-section-wrapper .col-5-6 {
+    width: 82%;
+}
+
+
+.ravesh-form-size-medium .form-design-section-wrapper .col-2-3,
+.ravesh-form-size-medium .form-design-section-wrapper .col-1-3,
+.ravesh-form-size-medium .form-design-section-wrapper .col-1-2,
+.ravesh-form-size-medium .form-design-section-wrapper .col-1-4,
+.ravesh-form-size-medium .form-design-section-wrapper .col-3-4,
+.ravesh-form-size-medium .form-design-section-wrapper .col-1-5,
+.ravesh-form-size-medium .form-design-section-wrapper .col-2-5,
+.ravesh-form-size-medium .form-design-section-wrapper .col-3-5,
+.ravesh-form-size-medium .form-design-section-wrapper .col-4-5,
+.ravesh-form-size-medium .form-design-section-wrapper .col-1-6,
+.ravesh-form-size-medium .form-design-section-wrapper .col-5-6 {
+    width: 50%;
+}
+
+.ravesh-form-size-small .form-design-section-wrapper .col-2-3,
+.ravesh-form-size-small .form-design-section-wrapper .col-1-3,
+.ravesh-form-size-small .form-design-section-wrapper .col-1-2,
+.ravesh-form-size-small .form-design-section-wrapper .col-1-4,
+.ravesh-form-size-small .form-design-section-wrapper .col-3-4,
+.ravesh-form-size-small .form-design-section-wrapper .col-1-5,
+.ravesh-form-size-small .form-design-section-wrapper .col-2-5,
+.ravesh-form-size-small .form-design-section-wrapper .col-3-5,
+.ravesh-form-size-small .form-design-section-wrapper .col-4-5,
+.ravesh-form-size-small .form-design-section-wrapper .col-1-6,
+.ravesh-form-size-small .form-design-section-wrapper .col-5-6 {
+    width: 100%;
+}
+
+/*form design --> fields*/
+.form-design-field {
+    margin-bottom: 15px;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.insert-mode .form-design-field.hidden {
+    display: none !important
+}
+
+.insert-mode .form-design-field .content {
+    padding: 10px 5px 0;
+    min-height: 30px;
+    font-size: 12px;
+    color: #444444;
+}
+
+.form-design-field .wrapper {
+    transition: opacity 300ms;
+}
+
+.form-design-field .title {
+    font-weight: bold;
+    font-size: 11px;
+    font-weight: bold;
+    font-size: 11px;
+    margin: 0 !important;
+    background: none !important;
+    display: flex;
+}
+
+    .form-design-field .title .title-str {
+        display: inline-block;
+        line-height: 1.5;
+        flex: 1;
+    }
+
+    .form-design-field .title .help-icon {
+        background: url(/pages/FormBuilder/images/question-mark.svg);
+        background-size: 18px 18px;
+        width: 18px;
+        height: 18px;
+        display: inline-block;
+        margin: -5px 5px 0;
+        position: relative;
+        top: 7px;
+        cursor: help;
+    }
+
+.form-design-field .detail {
+    font-size: 10px;
+    color: #999;
+    font-style: italic;
+    padding: 5px 2px;
+}
+
+.form-design-field.hidden-title .title {
+    display: none;
+}
+
+.form-design-field.hidden-title .wrapper {
+    width: 100% !important;
+}
+
+.form-design-field .required {
+    color: red;
+    display: none;
+}
+
+[dir=rtl] .form-design-field .title .required {
+    margin-left: 10px;
+}
+
+[dir=ltr] .form-design-field .title .required {
+    margin-right: 10px;
+}
+
+.form-design-field.required .required {
+    display: initial;
+}
+
+.titles-top .form-design-field .title .title-str {
+    margin-bottom: 5px;
+}
+
+[dir=rtl].titles-top .form-design-field .btns {
+    left: 0;
+}
+
+[dir=ltr].titles-top .form-design-field .btns {
+    right: 0;
+}
+
+[dir=rtl].titles-left .form-design-field .title .title-str,
+[dir=rtl].titles-right .form-design-field .title .title-str {
+    margin-left: 10px;
+    margin-top: 5px;
+}
+
+[dir=rtl].titles-left .form-design-field .title,
+[dir=rtl].titles-right .form-design-field .title {
+    float: right;
+    width: 25%;
+}
+
+[dir=rtl].titles-left .form-design-field .wrapper,
+[dir=rtl].titles-right .form-design-field .wrapper {
+    float: left;
+    width: 75%;
+    overflow: hidden;
+}
+
+[dir=rtl].titles-left .form-design-field .title {
+    text-align: left;
+}
+
+
+[dir=ltr].titles-left .form-design-field .title .title-str,
+[dir=ltr].titles-right .form-design-field .title .title-str {
+    margin-right: 10px;
+    margin-top: 5px;
+}
+
+[dir=ltr].titles-left .form-design-field .title,
+[dir=ltr].titles-right .form-design-field .title {
+    float: left;
+    width: 25%;
+}
+
+[dir=ltr].titles-left .form-design-field .wrapper,
+[dir=ltr].titles-right .form-design-field .wrapper {
+    float: right;
+    width: 75%;
+    overflow: hidden;
+}
+
+[dir=ltr].titles-right .form-design-field .title {
+    text-align: right;
+}
+
+
+/*form wizard*/
+.ravesh-form-builder.frm-header {
+    text-align: center;
+    direction: ltr;
+    border-bottom: solid 1px #c4c4c4;
+    box-shadow: 0px 2px 2px rgba(0,0,0,0.1);
+    z-index: 1;
+    position: relative;
+    padding-top: 15px;
+    width: 100%;
+    display: flex;
+    overflow-y: auto;
+}
+
+.form-design-page-step.allow-click.style-1 {
+    cursor: pointer;
+}
+
+.form-design-page-step.style-1 {
+    display: inline-block;
+    text-align: center;
+    min-width: 180px;
+    opacity: 0.3;
+    transition: opacity 0.3s;
+    cursor: default;
+    flex: 1;
+}
+
+    .form-design-page-step.style-1 .box-wizard {
+        height: 4px;
+        background: #03A9F4;
+    }
+
+    .form-design-page-step.style-1 .number-wizard {
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        background: #03A9F4;
+        border-radius: 50%;
+        font-size: 15px;
+        margin: auto;
+        margin-bottom: -15px;
+        color: #fff;
+    }
+
+    .form-design-page-step.style-1 .title-wizard {
+        margin: 25px 10px 10px;
+        font-size: 12px;
+        color: #000;
+        background: none;
+    }
+
+    .form-design-page-step.style-1.active {
+        cursor: default;
+        opacity: 1;
+    }
+
+.form-design-page-step.allow-click.style-1:hover {
+    opacity: 1;
+}
+
+
+
+/*FORM INPUTS-----------------------------------------*/
+.form-design-field .form-input {
+    background: #fff;
+    border: 1px solid #e1e1e1;
+    padding: 7px 5px;
+    font-size: 11px;
+    box-sizing: border-box;
+    max-width: 100% !important;
+    height: 35px;
+    outline: none;
+}
+
+    .form-design-field .form-input:disabled {
+        background: #f1f1f1 !important;
+        border: solid 1px #ccc;
+    }
+
+    .form-design-field .form-input:focus {
+        border: solid 1px #03A9F4;
+    }
+
+    .form-design-field .form-input:-webkit-autofill,
+    .form-design-field .form-input:-webkit-autofill:hover,
+    .form-design-field .form-input:-webkit-autofill:focus,
+    .form-design-field .form-input:-webkit-autofill:active {
+        -webkit-box-shadow: 0 0 0 30px #ffffff inset !important;
+    }
+
+
+    .form-design-field .form-input::-webkit-outer-spin-button,
+    .form-design-field .form-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+
+    .form-design-field .form-input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+.ravesh-form-control {
+    margin: 0;
+    max-width: 100%;
+}
+
+    .ravesh-form-control .cover {
+        display: inline-block;
+        position: relative;
+        margin: 4px 0 4px 0;
+        font-size: 11px;
+        line-height: 20px;
+        min-height: 20px;
+        min-width: 20px;
+    }
+
+    .ravesh-form-control.no-text {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+[dir=rtl] .ravesh-form-control .cover {
+    padding: 0 25px 0 15px;
+}
+
+[dir=ltr] .ravesh-form-control .cover {
+    padding: 0 15px 0 25px;
+}
+
+.ravesh-form-control input {
+    position: absolute;
+    z-index: -1;
+    opacity: 0;
+}
+
+.ravesh-form-control-indicator {
+    position: absolute;
+    top: 0;
+    height: 18px;
+    width: 18px;
+    background: #ffffff;
+    cursor: pointer;
+    border: solid 1px #767676;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+
+[dir=rtl] .ravesh-form-control-indicator {
+    right: 0;
+    left: auto;
+}
+
+[dir=ltr] .ravesh-form-control-indicator {
+    left: 0;
+    right: auto;
+}
+
+.ravesh-form-control span {
+    cursor: pointer;
+}
+
+.ravesh-form-control-radio .ravesh-form-control-indicator {
+    border-radius: 50%;
+}
+
+.ravesh-form-control:hover input ~ .cover .ravesh-form-control-indicator,
+.ravesh-form-control input:focus ~ .cover .ravesh-form-control-indicator {
+    background: #ccc;
+}
+
+.ravesh-form-control input:checked ~ .cover .ravesh-form-control-indicator {
+    background: #03a9f4;
+    border: none;
+}
+
+.ravesh-form-control:hover input:not([disabled]):checked ~ .cover .ravesh-form-control-indicator,
+.ravesh-form-control input:checked:focus ~ .cover .ravesh-form-control-indicator {
+    background: #0277bd;
+}
+
+.ravesh-form-control input:disabled ~ .cover .ravesh-form-control-indicator {
+    background: #e6e6e6;
+    opacity: 0.6;
+    pointer-events: none;
+    cursor: default;
+}
+
+.ravesh-form-control input:disabled ~ .cover span {
+    color: gray;
+    cursor: default;
+}
+
+.ravesh-form-control-indicator:after {
+    content: '';
+    position: absolute;
+    display: none;
+}
+
+.ravesh-form-control input:checked ~ .cover .ravesh-form-control-indicator:after {
+    display: block;
+}
+
+.ravesh-form-control-checkbox .ravesh-form-control-indicator:after {
+    left: 7px;
+    top: 3px;
+    width: 3px;
+    height: 8px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    box-sizing: content-box;
+}
+
+.ravesh-form-control-checkbox input:disabled ~ .cover .ravesh-form-control-indicator:after {
+    border-color: #7b7b7b;
+}
+
+.ravesh-form-control-radio .ravesh-form-control-indicator:after {
+    left: 6px;
+    top: 6px;
+    height: 6px;
+    width: 6px;
+    border-radius: 50%;
+    background: #fff;
+}
+
+.ravesh-form-control-radio input:disabled ~ .cover .ravesh-form-control-indicator:after {
+    background: #7b7b7b;
+}
+
+.ravesh-form-control.type-line .cover {
+    border: solid 1px #ddd;
+    width: 100%;
+    max-width: 100%;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-sizing: border-box;
+}
+
+    .ravesh-form-control.type-line .cover:hover {
+        background: #f1f1f1;
+    }
+
+.ravesh-form-control.type-line .ravesh-form-control-indicator {
+    top: 10px;
+    right: 10px;
+}
+
+[dir=rtl] .ravesh-form-control.type-line .cover {
+    padding: 10px 35px 10px 15px;
+}
+
+[dir=ltr] .ravesh-form-control.type-line .cover {
+    padding: 10px 15px 10px 35px;
+}
+
+.ravesh-form-control.type-line input:checked ~ .cover {
+    -webkit-animation: blink2 0.15s linear 2 normal forwards;
+    animation: blink2 0.15s linear 2 normal forwards;
+}
+
+@keyframes blink2 {
+    0% {
+        background-color: transparent;
+        border-color: #a9b3c6;
+    }
+
+    100% {
+        border-color: #5badfe;
+        background-color: #d7ebff;
+    }
+}
+
+/* VALIDATION -----------------------------------------*/
+.ravesh-error-tip {
+    position: absolute;
+    display: inline-block;
+    background: #dd4b39;
+    color: white;
+    border-radius: 3px;
+    box-sizing: border-box;
+    padding: 0 7px;
+    min-width: 150px;
+    height: 25px;
+    line-height: 26px;
+    font-size: 10px;
+    z-index: 1;
+    margin-top: 8px;
+    cursor: pointer;
+}
+
+    .ravesh-error-tip:hover {
+        background: #cf4534;
+    }
+
+    .ravesh-error-tip:after {
+        position: absolute;
+        top: -13px;
+        right: 13px;
+        border-top: 7px solid transparent;
+        border-right: 7px solid transparent;
+        border-left: 7px solid transparent;
+        border-bottom: 7px solid #dd4b39;
+        content: " ";
+    }
+
+[dir=ltr] .ravesh-error-tip:after {
+    left: 13px;
+    right: auto;
+}
+
+.ravesh-error-tip:hover:after {
+    border-bottom: 7px solid #cf4534;
+}
+
+/*tooltip-----------------*/
+.ravesh-tooltips {
+    background: rgba(0,0,0,0.7);
+    color: white;
+    font-size: 11px;
+    line-height: 18px;
+    border-radius: 3px;
+    max-width: 160px;
+    min-width: 45px;
+    box-sizing: border-box;
+    display: inline-block;
+    z-index: 1;
+    font-family: iransans,tahoma;
+    font-size: 8pt;
+    direction: rtl;
+}
+
+    .ravesh-tooltips:after {
+        position: absolute;
+        bottom: -7px;
+        left: 50%;
+        margin-left: -7px;
+        width: 0;
+        border-top: 7px solid rgba(0,0,0,0.7);
+        border-right: 7px solid transparent;
+        border-left: 7px solid transparent;
+        content: " ";
+        font-size: 0;
+        line-height: 0;
+    }
+
+
+
+.frm-toolbar {
+    background: #ffffff;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    min-height: 45px;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+}
+
+    .frm-toolbar .ravesh-countdown-small {
+        padding: 8px;
+        overflow: hidden;
+        line-height: 1;
+        cursor: default;
+        user-select: none;
+        text-align: center;
+        font-size: 12px;
+        float: left;
+    }
+
+    .frm-toolbar .ravesh-btn-logout {
+        float: right;
+        line-height: 45px;
+        color: #555;
+    }
+
+        .frm-toolbar .ravesh-btn-logout:hover {
+            color: #000;
+        }
+
+        .frm-toolbar .ravesh-btn-logout span {
+            float: right;
+            font-size: 13px;
+        }
+
+        .frm-toolbar .ravesh-btn-logout svg {
+            float: right;
+            margin: 10px 6px;
+        }
+
+.ravesh-editor-html {
+    font-family: IRANSansWeb,Tahoma;
+}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>فاکتور/پیش‌فاکتور ساز</h1>
+    <div class="muted">موبایل‌پسند • تاریخ جلالی • خروجی JPG/HTML • تاریخچه</div>
+  </div>
+
+  <div class="container">
+    <div class="section">
+      <h3>مشخصات فاکتور</h3>
+      <div class="grid">
+        <div>
+          <label>نوع سند</label>
+          <select id="docType">
+            <option value="فاکتور فروش">فاکتور فروش</option>
+            <option value="پیش‌فاکتور">پیش‌فاکتور</option>
+          </select>
+        </div>
+        <div>
+          <label>عنوان</label>
+          <input id="title" type="text" placeholder="عنوان" value="تست">
+        </div>
+        <div>
+          <label>شماره فاکتور</label>
+          <input id="number" type="text" placeholder="شماره">
+        </div>
+        <div>
+          <label>تاریخ ثبت (جلالی)</label>
+          <div class="row">
+            <input id="issueDate" type="text" placeholder="YYYY/MM/DD" style="flex:1">
+            <button class="btn" id="todayIssue" type="button">امروز</button>
+          </div>
+        </div>
+        <div>
+          <label>تاریخ سررسید (جلالی)</label>
+          <div class="row">
+            <input id="dueDate" type="text" placeholder="YYYY/MM/DD" style="flex:1">
+            <button class="btn" id="todayDue" type="button">+۷ روز</button>
+          </div>
+        </div>
+        <div>
+          <label>ارزش افزوده (%)</label>
+          <input id="vat" type="number" min="0" step="0.1" value="9">
+        </div>
+        <div>
+          <label>واحد قیمت</label>
+          <select id="currency">
+            <option value="تومان">تومان</option>
+            <option value="ریال">ریال</option>
+          </select>
+        </div>
+        <div class="row" style="align-items:center;margin-top:6px">
+          <input id="useFaDigits" type="checkbox"><label for="useFaDigits" style="margin:0">نمایش ارقام فارسی</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>مشخصات طرفین</h3>
+      <div class="grid">
+        <div>
+          <label>نام فروشنده *</label>
+          <input id="sellerName" type="text">
+        </div>
+        <div>
+          <label>تلفن فروشنده</label>
+          <input id="sellerPhone" type="tel">
+        </div>
+        <div class="grid" style="grid-template-columns:1fr">
+          <div>
+            <label>آدرس فروشنده</label>
+            <textarea id="sellerAddr"></textarea>
+          </div>
+        </div>
+
+        <div>
+          <label>نام خریدار *</label>
+          <input id="buyerName" type="text" value="علی">
+        </div>
+        <div>
+          <label>تلفن خریدار</label>
+          <input id="buyerPhone" type="tel" value="0902">
+        </div>
+        <div class="grid" style="grid-template-columns:1fr">
+          <div>
+            <label>آدرس خریدار</label>
+            <textarea id="buyerAddr">تهران</textarea>
+          </div>
+        </div>
+
+        <div>
+          <label>لوگو</label>
+          <input id="logo" type="file" accept="image/*">
+        </div>
+        <div>
+          <label>امضای فروشنده</label>
+          <input id="sign" type="file" accept="image/*">
+        </div>
+      </div>
+    </div>
+
+    <div class="section printable">
+      <h3>آیتم‌ها</h3>
+      <div id="itemsList" class="grid" style="grid-template-columns:1fr"></div>
+      <button class="btn primary full" id="addRowBtn" type="button">افزودن ردیف</button>
+      <div class="section" style="border-style:dashed;margin-top:10px">
+        <label>توضیحات فاکتور</label>
+        <textarea id="notes" placeholder="شرح/شرایط پرداخت..."></textarea>
+      </div>
+      <div class="grid">
+        <div class="row" style="justify-content:space-between">
+          <div>مجموع</div><strong id="sumSubtotal">۰</strong>
+        </div>
+        <div class="row" style="justify-content:space-between">
+          <div>تخفیف</div><strong id="sumDiscount">۰</strong>
+        </div>
+        <div class="row" style="justify-content:space-between">
+          <div>ارزش افزوده</div><strong id="sumVAT">۰</strong>
+        </div>
+        <div class="row" style="justify-content:space-between;font-weight:700">
+          <div>مبلغ نهایی</div><strong id="sumGrand">۰</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- پیش‌نمایشِ مخفی برای خروجی JPG (در تب جدید هم رندر می‌کنیم) -->
+    <div id="previewHolder" style="position:absolute;left:-99999px;top:-99999px">
+      <div id="FactorDefault">
+        <div class="FCHead" style="position:relative">
+          <div class="logo-slot" id="logoPreview" style="display:none"></div>
+          <div class="FCcompanyName" id="docTypePreview">فاکتور فروش</div>
+          <div class="FCtitle" id="titlePreview">تست</div>
+          <div class="FCcustdetail">
+            <div class="row" style="justify-content:space-between;margin:0">
+              <div class="FCcode" style="font-size:12px;text-align:right;width:49%"><b>شماره:&nbsp;</b><span id="numberPreview"></span></div>
+              <div class="FCdate" style="font-size:12px;text-align:left;width:49%"><b>تاریخ:&nbsp;</b><span id="issueDatePreview"></span></div>
+            </div>
+            <div style="border-top:2px solid #000;height:2px;margin:6px 0"></div>
+            <div style="text-align:right"><b>نام خریدار:&nbsp;</b><span id="buyerNamePreview">—</span></div>
+            <div class="FCcustCrm" style="text-align:right;font-size:10pt">
+              <b>تلفن/موبایل:&nbsp;</b><span id="buyerPhonePreview"></span>
+              <span style="margin:0 8px"></span>
+              <b>آدرس:&nbsp;</b><span id="buyerAddrPreview"></span>
+            </div>
+          </div>
+        </div>
+
+        <table id="itemsPreview">
+          <thead>
+            <tr>
+              <th style="width:50px">ردیف</th>
+              <th>نام کالا/خدمات</th>
+              <th>تعداد</th>
+              <th>تخفیف (تومان)</th>
+              <th>قیمت واحد (تومان)</th>
+              <th>جمع بدون تخفیف (تومان)</th>
+              <th>جمع کل (تومان)</th>
+            </tr>
+          </thead>
+          <tbody id="itemsPreviewBody"></tbody>
+        </table>
+
+        <table cellpadding="5" cellspacing="0" style="background:#eee;font-size:10pt;margin:5px 0;border-collapse:collapse;line-height:26px">
+          <tbody>
+            <tr class="TrDetail">
+              <td class="FCdetail" colspan="3" style="text-align:right"><span id="notesPreview"></span></td>
+              <td class="FCpricedocTitle" style="text-align:center;font-weight:bold">مجموع</td>
+              <td class="FCpricedoc" style="text-align:center" id="sumSubtotalPreview">۰</td>
+            </tr>
+            <tr class="TrDetail">
+              <td style="border:1px solid #888;padding:5px"></td>
+              <td class="FCdiscountTitle" style="text-align:center;font-weight:bold">تخفیف</td>
+              <td class="FCdiscount" style="text-align:center" id="sumDiscountPreview">۰</td>
+              <td class="FCtaxTitle" style="text-align:center;font-weight:bold">ارزش افزوده</td>
+              <td class="FCtax" style="text-align:center" id="sumVATPreview">۰</td>
+            </tr>
+            <tr class="TrDetail">
+              <td class="FCdetail" colspan="3" style="text-align:right"></td>
+              <td class="FCpricedocTitle" style="text-align:center;font-weight:bold">جمع کل</td>
+              <td class="FCpricedoc" style="text-align:center" id="sumGrandPreview">۰ تومان</td>
+            </tr>
+            <tr class="TrDetail">
+              <td colspan="5" class="FCpriceAlfa" style="text-align:right"><span id="priceWords"></span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="FCSettlement" style="line-height:28px">
+          <div><b>فروشنده:</b> <span id="sellerNamePreview">—</span> | <b>تلفن:</b> <span id="sellerPhonePreview"></span></div>
+          <div><b>آدرس فروشنده:</b> <span id="sellerAddrPreview"></span></div>
+          <div><b>تاریخ سررسید:</b> <span id="dueDatePreview">—</span></div>
+        </div>
+
+        <div class="FCFooter" style="width:100%">
+          <table cellpadding="0" cellspacing="0" style="width:100%;height:120px" dir="rtl">
+            <tbody>
+              <tr align="center">
+                <td width="33%" style="vertical-align:top">
+                  فروشنده<br><br>
+                  <div id="signPreview" style="height:60px"></div>
+                </td>
+                <td width="33%" style="vertical-align:top"></td>
+                <td width="33%" style="vertical-align:top">خریدار</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="FCcompanyAddress">
+          <b style="font-size:9pt">آدرس:&nbsp;</b><span id="sellerAddrPreview2"></span>
+          <span>&nbsp;&nbsp;</span>
+          <b style="font-size:9pt">تلفن:&nbsp;</b><span id="sellerPhonePreview2"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- نوار عملیات پایین (موبایل) -->
+  <div class="fabbar">
+    <div class="row">
+      <button class="btn" id="btnPreviewTab" type="button">پیش‌نمایش در تب جدید</button>
+      <button class="btn" id="btnCopyHTML" type="button">کپی HTML</button>
+      <button class="btn" id="btnJPG" type="button">خروجی JPG</button>
+      <button class="btn" id="btnShare" type="button">اشتراک</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn" id="btnSaveHistory" type="button">ذخیره در تاریخچه</button>
+      <button class="btn" id="btnHistory" type="button">تاریخچه</button>
+      <button class="btn" id="btnPrint" type="button">چاپ</button>
+      <button class="btn danger" id="btnNew" type="button">جدید</button>
+    </div>
+  </div>
+
+  <!-- مدال افزودن/ویرایش ردیف -->
+  <div class="modal" id="rowModal">
+    <div class="sheet">
+      <h3 class="title" id="rowModalTitle">افزودن ردیف</h3>
+      <div class="grid">
+        <div>
+          <label>نام کالا/خدمات *</label>
+          <input id="m_name" type="text" placeholder="مثلاً شیر">
+        </div>
+        <div>
+          <label>تعداد</label>
+          <input id="m_qty" type="number" min="0" step="1" value="1">
+        </div>
+        <div>
+          <label>قیمت واحد (تومان)</label>
+          <input id="m_unit" type="text" inputmode="numeric" value="0">
+        </div>
+        <div>
+          <label>تخفیف (تومان)</label>
+          <input id="m_off" type="text" inputmode="numeric" value="0">
+        </div>
+        <div class="grid" style="grid-template-columns:1fr">
+          <div>
+            <label>توضیح (اختیاری)</label>
+            <input id="m_desc" type="text" placeholder="مثلاً تست / مشخصات">
+          </div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="rowCancel" type="button">انصراف</button>
+        <button class="btn primary" id="rowSave" type="button">ذخیره</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- مدال تاریخچه -->
+  <div class="modal" id="historyModal">
+    <div class="sheet">
+      <h3 class="title">تاریخچه فاکتورها</h3>
+      <div class="row" style="margin-bottom:8px">
+        <button class="btn" id="btnExportAll" type="button">خروجی JSON</button>
+        <input id="importFile" type="file" accept="application/json" style="display:none">
+        <button class="btn" id="btnImport" type="button">وارد کردن JSON</button>
+      </div>
+      <div id="historyList" style="display:grid;gap:8px;max-height:50vh;overflow:auto"></div>
+      <div class="actions">
+        <button class="btn" id="histClose" type="button">بستن</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- html2canvas رسمی از CDN برای جلوگیری از خطای not a function -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <script>
+    // ====== ابزار اعداد/فارسی ======
+    const faDigits=['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+    const toFa=s=>String(s).replace(/[0-9]/g,d=>faDigits[d]);
+    const toEn=s=>String(s).replace(/[۰-۹٬,]/g,ch=>{
+      const i=faDigits.indexOf(ch); if(i>-1) return String(i);
+      return (ch==='٬'||ch===',')?'':ch;
+    });
+    const fmt=(n,useFa)=>{const v=isFinite(n)?Number(n).toLocaleString('en-US'):'0';return useFa?toFa(v):v};
+    const parseNum=v=>{v=toEn(String(v??'').trim()); if(!v) return 0; return Number(v.replace(/[^\d.]/g,''))||0};
+
+    // ====== تاریخ جلالی (خلاصه) ======
+    function g2d(gy,gm,gd){var a=Math.floor((14-gm)/12);var y=gy+4800-a;var m=gm+12*a-3;return gd+Math.floor((153*m+2)/5)+365*y+Math.floor(y/4)-Math.floor(y/100)+Math.floor(y/400)-32045}
+    function j2d(jy,jm,jd){jy=Math.floor(jy);jm=Math.floor(jm);jd=Math.floor(jd);var epbase=jy-(jy>=0?474:473);var epyear=474+epbase%2820;return jd+((jm<=7)?(jm-1)*31:((jm-7)*30+186))+Math.floor((epyear*682-110)/2816)+(epyear-1)*365+Math.floor(epbase/2820)*1029983+(1948320-1)}
+    function d2j(jdn){var depoch=jdn-2121446;var cycle=Math.floor(depoch/1029983);var cyear=depoch%1029983;var ycycle;if(cyear===1029982){ycycle=2820}else{var aux1=Math.floor(cyear/366);var aux2=cyear%366;ycycle=Math.floor((2134*aux1+2816*aux2+2815)/1028522)+aux1+1}var jy=ycycle+2820*cycle+474;if(jy<=0){jy--}var jday=jdn-j2d(jy,1,1)+1;var jm=jday<=186?Math.ceil(jday/31):Math.ceil((jday-186)/30)+6;var jd=jdn-j2d(jy,jm,1)+1;return{jy, jm, jd}}
+    function toJalali(date){const j=d2j(g2d(date.getFullYear(),date.getMonth()+1,date.getDate()));return `${j.jy}/${String(j.jm).padStart(2,'0')}/${String(j.jd).padStart(2,'0')}`}
+    function addDaysFromG(date,days){return toJalali(new Date(date.getTime()+days*86400000))}
+
+    // ====== عناصر ======
+    const $=id=>document.getElementById(id);
+    const els={
+      // form
+      docType:$('docType'), title:$('title'), number:$('number'),
+      issueDate:$('issueDate'), dueDate:$('dueDate'),
+      vat:$('vat'), currency:$('currency'), useFaDigits:$('useFaDigits'),
+      sellerName:$('sellerName'), sellerPhone:$('sellerPhone'), sellerAddr:$('sellerAddr'),
+      buyerName:$('buyerName'), buyerPhone:$('buyerPhone'), buyerAddr:$('buyerAddr'),
+      logo:$('logo'), sign:$('sign'), notes:$('notes'),
+      // items
+      itemsList:$('itemsList'), addRowBtn:$('addRowBtn'),
+      // totals
+      sumSubtotal:$('sumSubtotal'), sumDiscount:$('sumDiscount'), sumVAT:$('sumVAT'), sumGrand:$('sumGrand'),
+      // preview mirror
+      logoPreview:$('logoPreview'), docTypePreview:$('docTypePreview'), titlePreview:$('titlePreview'),
+      numberPreview:$('numberPreview'), issueDatePreview:$('issueDatePreview'), dueDatePreview:$('dueDatePreview'),
+      buyerNamePreview:$('buyerNamePreview'), buyerPhonePreview:$('buyerPhonePreview'), buyerAddrPreview:$('buyerAddrPreview'),
+      sellerNamePreview:$('sellerNamePreview'), sellerPhonePreview:$('sellerPhonePreview'), sellerAddrPreview:$('sellerAddrPreview'),
+      sellerAddrPreview2:$('sellerAddrPreview2'), sellerPhonePreview2:$('sellerPhonePreview2'),
+      itemsPreviewBody:$('itemsPreviewBody'), notesPreview:$('notesPreview'),
+      sumSubtotalPreview:$('sumSubtotalPreview'), sumDiscountPreview:$('sumDiscountPreview'),
+      sumVATPreview:$('sumVATPreview'), sumGrandPreview:$('sumGrandPreview'), priceWords:$('priceWords'),
+      signPreview:$('signPreview'),
+      // actions
+      btnPreviewTab:$('btnPreviewTab'), btnCopyHTML:$('btnCopyHTML'), btnJPG:$('btnJPG'),
+      btnShare:$('btnShare'), btnPrint:$('btnPrint'), btnNew:$('btnNew'),
+      btnSaveHistory:$('btnSaveHistory'), btnHistory:$('btnHistory'),
+      todayIssue:$('todayIssue'), todayDue:$('todayDue'),
+      // modals
+      rowModal:$('rowModal'), rowModalTitle:$('rowModalTitle'),
+      m_name:$('m_name'), m_qty:$('m_qty'), m_unit:$('m_unit'), m_off:$('m_off'), m_desc:$('m_desc'),
+      rowSave:$('rowSave'), rowCancel:$('rowCancel'),
+      historyModal:$('historyModal'), historyList:$('historyList'),
+      histClose:$('histClose'), btnExportAll:$('btnExportAll'), btnImport:$('btnImport'), importFile:$('importFile'),
+    };
+
+    // ====== وضعیت، تاریخچه ======
+    const LS_STATE='invoice_state_v3';
+    const LS_HISTORY='invoice_history_v1';
+
+    let rows=[];         // {id,name,desc,qty,unit,off}
+    let editingId=null;  // برای مدال
+
+    function makeRow(data={}){
+      const id = data.id || ('r'+Date.now()+Math.random().toString(16).slice(2));
+      return { id, name:data.name||'', desc:data.desc||'', qty:Number(data.qty??1), unit:Number(data.unit??0), off:Number(data.off??0) };
+    }
+
+    function renderRows(){
+      els.itemsList.innerHTML='';
+      const useFa = els.useFaDigits.checked;
+      rows.forEach((r,idx)=>{
+        const subtotal = r.qty * r.unit;
+        const total = Math.max(0, subtotal - r.off);
+        const card = document.createElement('div');
+        card.className='item-card';
+        card.innerHTML=`
+          <div class="item-top">
+            <div class="badge"># ${useFa?toFa(idx+1):idx+1}</div>
+            <div class="item-actions">
+              <button class="btn" data-act="edit">ویرایش</button>
+              <button class="btn danger" data-act="del">حذف</button>
+            </div>
+          </div>
+          <div><strong>${r.name||'—'}</strong> ${r.desc?`<span class="muted">— ${r.desc}</span>`:''}</div>
+          <div class="row" style="justify-content:space-between">
+            <span>تعداد</span><span>${useFa?toFa(r.qty):r.qty}</span>
+          </div>
+          <div class="row" style="justify-content:space-between">
+            <span>قیمت واحد</span><span>${fmt(r.unit,useFa)}</span>
+          </div>
+          <div class="row" style="justify-content:space-between">
+            <span>تخفیف</span><span>${fmt(r.off,useFa)}</span>
+          </div>
+          <div class="row" style="justify-content:space-between;font-weight:700">
+            <span>جمع کل</span><span>${fmt(total,useFa)}</span>
+          </div>
+        `;
+        card.querySelector('[data-act="edit"]').onclick=()=>openRowModal(r.id);
+        card.querySelector('[data-act="del"]').onclick=()=>{ rows = rows.filter(x=>x.id!==r.id); recalc(); saveState(); };
+        els.itemsList.appendChild(card);
+      });
+    }
+
+    function recalc(){
+      renderRows();
+      const useFa = els.useFaDigits.checked;
+      let sumSubtotal=0,sumDiscount=0,sumGrand=0;
+      // پیش‌نمایش جدول
+      els.itemsPreviewBody.innerHTML='';
+      rows.forEach((r,i)=>{
+        const subtotal=r.qty*r.unit;
+        const total=Math.max(0, subtotal - r.off);
+        sumSubtotal+=subtotal; sumDiscount+=r.off; sumGrand+=total;
+
+        const tr=document.createElement('tr');
+        tr.innerHTML=`
+          <td>${fmt(i+1,useFa)}</td>
+          <td style="text-align:center">
+            <div><span style="font-size:10pt">${escapeHtml(r.name||'—')}</span></div>
+            ${r.desc?`<div><span style="font-size:10pt">${escapeHtml(r.desc)}</span></div>`:''}
+          </td>
+          <td>${fmt(r.qty,useFa)}</td>
+          <td>${fmt(r.off,useFa)}</td>
+          <td>${fmt(r.unit,useFa)}</td>
+          <td>${fmt(subtotal,useFa)}</td>
+          <td>${fmt(total,useFa)}</td>
+        `;
+        els.itemsPreviewBody.appendChild(tr);
+      });
+
+      const vatRate=parseNum(els.vat.value||'0')/100;
+      const vatAmount=Math.max(0,sumGrand*vatRate);
+      const grand=sumGrand+vatAmount;
+      const cur = els.currency.value;
+      const curDisp = useFa?toFa(cur):cur;
+
+      els.sumSubtotal.textContent = `${fmt(sumSubtotal,useFa)} ${curDisp}`;
+      els.sumDiscount.textContent = `${fmt(sumDiscount,useFa)} ${curDisp}`;
+      els.sumVAT.textContent      = `${fmt(vatAmount,useFa)} ${curDisp}`;
+      els.sumGrand.textContent    = `${fmt(grand,useFa)} ${curDisp}`;
+
+      // هدر/طرفین در پیش‌نمایش
+      els.docTypePreview.textContent = els.docType.value;
+      els.titlePreview.textContent   = els.title.value || '—';
+      els.numberPreview.textContent  = els.number.value || '—';
+      const idate=els.issueDate.value||'—';
+      els.issueDatePreview.textContent = useFa?toFa(idate):idate;
+      const ddate=els.dueDate.value||'—';
+      els.dueDatePreview.textContent   = useFa?toFa(ddate):ddate;
+
+      els.buyerNamePreview.textContent = els.buyerName.value || '—';
+      els.buyerPhonePreview.textContent= els.buyerPhone.value || '';
+      els.buyerAddrPreview.textContent = els.buyerAddr.value || '';
+      els.sellerNamePreview.textContent= els.sellerName.value || '—';
+      els.sellerPhonePreview.textContent=els.sellerPhone.value||'';
+      els.sellerAddrPreview.textContent= els.sellerAddr.value || '';
+      els.sellerAddrPreview2.textContent=els.sellerAddr.value||'';
+      els.sellerPhonePreview2.textContent=els.sellerPhone.value||'';
+
+      els.notesPreview.textContent = els.notes.value || '';
+      els.sumSubtotalPreview.textContent = fmt(sumSubtotal,useFa);
+      els.sumDiscountPreview.textContent = fmt(sumDiscount,useFa);
+      els.sumVATPreview.textContent      = fmt(vatAmount,useFa);
+      els.sumGrandPreview.textContent    = `${fmt(grand,useFa)} ${curDisp}`;
+      els.priceWords.textContent         = amountToWords(grand, cur, useFa);
+    }
+
+    // مبلغ به حروف (مختصر فارسی)
+    function amountToWords(num,currency,useFa){
+      const n=Math.round(num); if(!(n>0)) return '';
+      const units=['','هزار','میلیون','میلیارد','هزار میلیارد'];
+      let t=n,i=0,parts=[];
+      while(t>0&&i<units.length){
+        const c=t%1000; if(c) parts.unshift(`${chunkToFa(c)} ${units[i]}`.trim());
+        t=Math.floor(t/1000); i++;
+      }
+      const s=(parts.join(' و ')+' '+currency).trim();
+      return useFa?toFa(s):s;
+    }
+    function chunkToFa(n){
+      const ones=['','یک','دو','سه','چهار','پنج','شش','هفت','هشت','نه','ده','یازده','دوازده','سیزده','چهارده','پانزده','شانزده','هفده','هجده','نوزده'];
+      const tens=['','','بیست','سی','چهل','پنجاه','شصت','هفتاد','هشتاد','نود'];
+      const hund=['','یکصد','دویست','سیصد','چهارصد','پانصد','ششصد','هفتصد','هشتصد','نهصد'];
+      let s=[]; const h=Math.floor(n/100), r=n%100;
+      if(h) s.push(hund[h]);
+      if(r){ if(r<20) s.push(ones[r]); else { const t=Math.floor(r/10),o=r%10; s.push(tens[t]); if(o) s.push(ones[o]); } }
+      return s.join(' و ');
+    }
+
+    // ====== تصاویر: لوگو/امضا ======
+    function fileToDataURL(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f);})}
+    function setPreviewImage(kind,dataUrl){
+      if(kind==='logo'){
+        els.logoPreview.innerHTML=`<img alt="logo" src="${dataUrl}">`;
+        els.logoPreview.style.display='block';
+        els.logoPreview.dataset.src=dataUrl;
+      } else {
+        els.signPreview.innerHTML=dataUrl?`<img alt="sign" src="${dataUrl}" style="height:60px;object-fit:contain">`:'';
+        if(dataUrl) els.signPreview.dataset.src=dataUrl;
+      }
+    }
+
+    // ====== ساخت/کپی HTML فرم‌افزار ======
+    function buildOutputHTML(){
+      const outer = $('FactorDefault').outerHTML;
+      return (`<html><head><title>فاکتور ساز آنلاین فرم افزار</title>
+<meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1,user-scalable=no">
+</head><body dir="rtl" class="ravesh-form-builder" style="font-size:11px;padding:10px;">
+<div class="ravesh-editor-html" style="direction:rtl;text-align:center">
+${outer}
+</div>
+<script>document.addEventListener('keydown',e=>{if(e.key==='p'&&(e.ctrlKey||e.metaKey))setTimeout(()=>window.print(),50)});<\/script>
+<style>.isEmpty{display:none}</style></body></html>`).trim();
+    }
+    function openPreviewTab(){
+      const html = buildOutputHTML();
+      const win = window.open('about:blank','_blank');
+      if(!win){ alert('پاپ‌آپ مسدود شد. اجازهٔ باز شدن تب جدید را بدهید.'); return; }
+      win.document.open(); win.document.write(html); win.document.close();
+    }
+    async function copyHTML(){
+      const html=buildOutputHTML();
+      try{ await navigator.clipboard.writeText(html); alert('HTML در کلیپ‌بورد کپی شد ✅'); }
+      catch(_){ const ta=document.createElement('textarea'); ta.value=html; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); alert('HTML کپی شد ✅'); }
+    }
+
+    // ====== خروجی JPG / اشتراک ======
+    async function exportJPG(share=false){
+      const node=$('FactorDefault');
+      try{
+        const canvas=await html2canvas(node,{scale:2,backgroundColor:'#fff',useCORS:true});
+        const blob = await new Promise(res=>canvas.toBlob(res,'image/jpeg',0.95));
+        const fileName=`invoice-${(els.number.value||'no')}.jpg`;
+        if(share && navigator.canShare){
+          const file=new File([blob],fileName,{type:'image/jpeg'});
+          if(navigator.canShare({files:[file]})){
+            await navigator.share({files:[file],title:document.title,text:els.title.value||''});
+            return;
+          }
+        }
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a'); a.href=url; a.download=fileName; a.click();
+        setTimeout(()=>URL.revokeObjectURL(url),1500);
+      }catch(err){
+        console.error(err);
+        alert('خروجی تصویر ناموفق بود. اطمینان از اتصال اینترنت برای لود فونت/CDN یا دوباره تلاش کنید.');
+      }
+    }
+
+    // ====== ذخیره وضعیت + تاریخچه ======
+    function getState(){
+      return {
+        docType:els.docType.value, title:els.title.value, number:els.number.value,
+        issueDate:els.issueDate.value, dueDate:els.dueDate.value,
+        vat:els.vat.value, currency:els.currency.value, useFaDigits:els.useFaDigits.checked,
+        sellerName:els.sellerName.value, sellerPhone:els.sellerPhone.value, sellerAddr:els.sellerAddr.value,
+        buyerName:els.buyerName.value, buyerPhone:els.buyerPhone.value, buyerAddr:els.buyerAddr.value,
+        notes:els.notes.value, rows:rows,
+        logo:els.logoPreview.dataset?.src||'', sign:els.signPreview.dataset?.src||'',
+      };
+    }
+    function setState(st){
+      els.docType.value=st.docType||'فاکتور فروش';
+      els.title.value=st.title||''; els.number.value=st.number||'';
+      els.issueDate.value=st.issueDate||toJalali(new Date());
+      els.dueDate.value=st.dueDate||addDaysFromG(new Date(),7);
+      els.vat.value=st.vat??9; els.currency.value=st.currency||'تومان';
+      els.useFaDigits.checked=!!st.useFaDigits;
+      els.sellerName.value=st.sellerName||''; els.sellerPhone.value=st.sellerPhone||''; els.sellerAddr.value=st.sellerAddr||'';
+      els.buyerName.value=st.buyerName||''; els.buyerPhone.value=st.buyerPhone||''; els.buyerAddr.value=st.buyerAddr||'';
+      els.notes.value=st.notes||'';
+      rows = (st.rows&&st.rows.length? st.rows.map(r=>makeRow(r)) : [makeRow({name:'شیر',desc:'تست',qty:1,unit:212121,off:0})]);
+      if(st.logo) setPreviewImage('logo',st.logo); else {els.logoPreview.innerHTML=''; els.logoPreview.style.display='none'; delete els.logoPreview.dataset.src;}
+      if(st.sign) setPreviewImage('sign',st.sign); else {els.signPreview.innerHTML=''; delete els.signPreview.dataset.src;}
+      recalc();
+    }
+    function saveState(){ localStorage.setItem(LS_STATE, JSON.stringify(getState())); }
+
+    function loadState(){
+      const raw=localStorage.getItem(LS_STATE);
+      if(raw){ try{ setState(JSON.parse(raw)); }catch(_){ initDefaults(); } }
+      else initDefaults();
+    }
+    function initDefaults(){
+      setState({}); // می‌گذارد پیش‌فرض‌ها تنظیم شود
+    }
+
+    // تاریخچه
+    function loadHistory(){ try{ return JSON.parse(localStorage.getItem(LS_HISTORY)||'[]'); }catch(_){ return []; } }
+    function saveHistory(list){ localStorage.setItem(LS_HISTORY, JSON.stringify(list)); }
+    function saveToHistory(){
+      const st=getState();
+      const entry={ id:'i'+Date.now(), ts:Date.now(), meta:{
+        title:st.title||'', number:st.number||'', buyer:st.buyerName||'', issueDate:st.issueDate||''
+      }, data:st };
+      const list=loadHistory(); list.unshift(entry); saveHistory(list);
+      alert('در تاریخچه ذخیره شد ✅');
+      renderHistory();
+    }
+    function renderHistory(){
+      const list=loadHistory();
+      els.historyList.innerHTML='';
+      if(!list.length){ els.historyList.innerHTML='<div class="muted">هنوز موردی ذخیره نشده است.</div>'; return; }
+      list.forEach(item=>{
+        const wrap=document.createElement('div');
+        wrap.className='item-card';
+        const d=new Date(item.ts);
+        wrap.innerHTML=`
+          <div class="item-top">
+            <div style="font-weight:700">${escapeHtml(item.meta.title||'بدون عنوان')}</div>
+            <div class="badge">${new Intl.DateTimeFormat('fa-IR',{dateStyle:'short',timeStyle:'short'}).format(d)}</div>
+          </div>
+          <div class="row" style="justify-content:space-between"><span>شماره</span><span>${escapeHtml(item.meta.number||'—')}</span></div>
+          <div class="row" style="justify-content:space-between"><span>خریدار</span><span>${escapeHtml(item.meta.buyer||'—')}</span></div>
+          <div class="row" style="justify-content:space-between"><span>تاریخ</span><span>${escapeHtml(item.meta.issueDate||'—')}</span></div>
+          <div class="item-actions">
+            <button class="btn" data-act="load">بارگذاری</button>
+            <button class="btn" data-act="dup">تکثیر</button>
+            <button class="btn" data-act="export">خروجی</button>
+            <button class="btn danger" data-act="del">حذف</button>
+          </div>
+        `;
+        wrap.querySelector('[data-act="load"]').onclick=()=>{ setState(item.data); saveState(); els.historyModal.classList.remove('show'); };
+        wrap.querySelector('[data-act="dup"]').onclick=()=>{ const list=loadHistory(); const copy={...item,id:'i'+Date.now()}; list.unshift(copy); saveHistory(list); renderHistory(); };
+        wrap.querySelector('[data-act="export"]').onclick=()=>{
+          const blob=new Blob([JSON.stringify(item)],{type:'application/json'});
+          const url=URL.createObjectURL(blob); const a=document.createElement('a');
+          a.href=url; a.download=`invoice-${item.meta.number||item.id}.json`; a.click();
+          setTimeout(()=>URL.revokeObjectURL(url),1200);
+        };
+        wrap.querySelector('[data-act="del"]').onclick=()=>{ if(confirm('حذف شود؟')){ const list=loadHistory().filter(x=>x.id!==item.id); saveHistory(list); renderHistory(); } };
+        els.historyList.appendChild(wrap);
+      });
+    }
+
+    // ====== مدال ردیف ======
+    function openRowModal(id=null){
+      editingId=id;
+      if(id){
+        const r=rows.find(x=>x.id===id);
+        els.rowModalTitle.textContent='ویرایش ردیف';
+        els.m_name.value=r.name; els.m_desc.value=r.desc;
+        els.m_qty.value=r.qty; els.m_unit.value=r.unit; els.m_off.value=r.off;
+      } else {
+        els.rowModalTitle.textContent='افزودن ردیف';
+        els.m_name.value=''; els.m_desc.value=''; els.m_qty.value=1; els.m_unit.value=0; els.m_off.value=0;
+      }
+      els.rowModal.classList.add('show');
+    }
+    function closeRowModal(){ els.rowModal.classList.remove('show'); }
+
+    // ====== کمکی‌ها ======
+    function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+    // ====== رویدادها ======
+    els.addRowBtn.onclick=()=>openRowModal(null);
+    els.rowCancel.onclick=closeRowModal;
+    els.rowSave.onclick=()=>{
+      const data={
+        name:els.m_name.value.trim(),
+        desc:els.m_desc.value.trim(),
+        qty:Number(els.m_qty.value||1),
+        unit:parseNum(els.m_unit.value||'0'),
+        off:parseNum(els.m_off.value||'0'),
+      };
+      if(!data.name){ alert('نام کالا/خدمات الزامی است.'); return; }
+      if(editingId){
+        rows = rows.map(r=>r.id===editingId? {...r,...data}:r);
+      } else {
+        rows.push(makeRow(data));
+      }
+      closeRowModal(); recalc(); saveState();
+    };
+
+    // فرم عمومی
+    ['docType','title','number','issueDate','dueDate','vat','currency','useFaDigits',
+     'sellerName','sellerPhone','sellerAddr','buyerName','buyerPhone','buyerAddr','notes'
+    ].forEach(id=>{ $(id).addEventListener('input',()=>{ recalc(); saveState(); }); });
+
+    // تاریخ سریع
+    els.todayIssue.onclick=()=>{ els.issueDate.value=toJalali(new Date()); recalc(); saveState(); };
+    els.todayDue.onclick=()=>{ els.dueDate.value=addDaysFromG(new Date(),7); recalc(); saveState(); };
+
+    // فایل‌ها
+    els.logo.onchange=async e=>{ const f=e.target.files?.[0]; if(!f) return; const data=await fileToDataURL(f); setPreviewImage('logo',data); saveState(); };
+    els.sign.onchange=async e=>{ const f=e.target.files?.[0]; if(!f) return; const data=await fileToDataURL(f); setPreviewImage('sign',data); saveState(); };
+
+    // دکمه‌ها
+    els.btnPreviewTab.onclick=openPreviewTab;
+    els.btnCopyHTML.onclick=copyHTML;
+    els.btnJPG.onclick=()=>exportJPG(false);
+    els.btnShare.onclick=()=>exportJPG(true);
+    els.btnPrint.onclick=()=>window.print();
+    els.btnNew.onclick=()=>{ if(confirm('فاکتور جدید؟ اطلاعات فعلی پاک شود؟')){ localStorage.removeItem(LS_STATE); setState({}); saveState(); } };
+    els.btnSaveHistory.onclick=saveToHistory;
+    els.btnHistory.onclick=()=>{ renderHistory(); els.historyModal.classList.add('show'); };
+    els.histClose.onclick=()=>els.historyModal.classList.remove('show');
+
+    // تاریخچه: وارد/خروج همه
+    els.btnExportAll.onclick=()=>{
+      const blob=new Blob([JSON.stringify(loadHistory())],{type:'application/json'});
+      const url=URL.createObjectURL(blob); const a=document.createElement('a');
+      a.href=url; a.download='invoice-history.json'; a.click();
+      setTimeout(()=>URL.revokeObjectURL(url),1200);
+    };
+    els.btnImport.onclick=()=>els.importFile.click();
+    els.importFile.onchange=async e=>{
+      const f=e.target.files?.[0]; if(!f) return;
+      try{
+        const text=await f.text();
+        const data=JSON.parse(text);
+        if(Array.isArray(data)){ saveHistory(data); renderHistory(); alert('تاریخچه وارد شد ✅'); }
+        else if(data && data.data){ // یک مورد
+          const list=loadHistory(); list.unshift(data); saveHistory(list); renderHistory(); alert('یک فاکتور به تاریخچه افزوده شد ✅');
+        } else { alert('فرمت JSON نامعتبر است.'); }
+      }catch(err){ alert('خطا در خواندن فایل JSON'); }
+    };
+
+    // ====== راه‌اندازی ======
+    function bootstrap(){
+      if(!els.issueDate.value) els.issueDate.value = toJalali(new Date());
+      if(!els.dueDate.value)   els.dueDate.value   = addDaysFromG(new Date(),7);
+      loadState();
+      recalc();
+      // اگر خالی، یک ردیف نمونه
+      if(!rows.length){ rows=[makeRow({name:'شیر',desc:'تست',qty:1,unit:212121,off:0})]; recalc(); saveState(); }
+    }
+    bootstrap();
+  </script>
+</body>
+</html>
