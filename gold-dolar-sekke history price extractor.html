@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paginated API Fetcher</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 1000px;
+            text-align: center;
+        }
+
+        /* Tab styles */
+        .tab-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            cursor: pointer;
+            border: none;
+            background: #f0f2f5;
+            color: #555;
+            font-size: 1.1em;
+            transition: background-color 0.3s, color 0.3s;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .tab-button.active {
+            background-color: #3498db;
+            color: white;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px 0;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Other common styles */
+        h1 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .export-btn {
+            background-color: #2ecc71;
+            display: none;
+        }
+        
+        .export-btn:hover {
+            background-color: #27ae60;
+        }
+
+        .progress-container {
+            width: 80%;
+            max-width: 600px;
+            margin: 25px auto;
+            background-color: #e9ecef;
+            border-radius: 15px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            height: 30px;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #3498db;
+            transition: width 0.4s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .status {
+            margin-top: 15px;
+            font-size: 1.1em;
+            color: #555;
+            min-height: 25px;
+        }
+
+        .data-display {
+            margin-top: 25px;
+            text-align: left;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+            display: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: right;
+            direction: rtl;
+        }
+
+        thead {
+            background-color: #f8f9fa;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:hover {
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Merge Paginated API Data</h1>
+        <p>Select a tab to fetch and display data for different indicators.</p>
+
+        <div class="tab-container">
+            <div class="tab-button active" onclick="switchTab('geram18')">Geram18 (Gold)</div>
+            <div class="tab-button" onclick="switchTab('price_dollar_rl')">USD (Dollar)</div>
+            <div class="tab-button" onclick="switchTab('sekee')">Sikke Imami (سکه)</div>
+        </div>
+
+        <div id="geram18" class="tab-content active">
+            <div class="controls">
+                <button class="fetch-btn" data-api-id="geram18">Start Fetching</button>
+                <button class="export-btn" data-api-id="geram18">Export to JSON</button>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar"></div>
+            </div>
+            <div class="status"></div>
+            <div class="data-display">
+                <h2>Merged Data</h2>
+                <table>
+                    <thead>
+                        <tr></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="price_dollar_rl" class="tab-content">
+            <div class="controls">
+                <button class="fetch-btn" data-api-id="price_dollar_rl">Start Fetching</button>
+                <button class="export-btn" data-api-id="price_dollar_rl">Export to JSON</button>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar"></div>
+            </div>
+            <div class="status"></div>
+            <div class="data-display">
+                <h2>Merged Data</h2>
+                <table>
+                    <thead>
+                        <tr></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="sekee" class="tab-content">
+            <div class="controls">
+                <button class="fetch-btn" data-api-id="sekee">Start Fetching</button>
+                <button class="export-btn" data-api-id="sekee">Export to JSON</button>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar"></div>
+            </div>
+            <div class="status"></div>
+            <div class="data-display">
+                <h2>Merged Data</h2>
+                <table>
+                    <thead>
+                        <tr></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_API_URL = "https://api.tgju.org/v1/market/indicator/summary-table-data/";
+        const RECORDS_PER_PAGE = 30;
+
+        const apiConfigs = {
+            "geram18": {
+                url: `${BASE_API_URL}geram18`,
+                data: [],
+                headers: ["بازگشایی", "کمترین", "بیشترین", "پایانی", "میزان تغییر", "درصد تغییر", "تاریخ / میلادی", "تاریخ / شمسی"]
+            },
+            "price_dollar_rl": {
+                url: `${BASE_API_URL}price_dollar_rl`,
+                data: [],
+                headers: ["بازگشایی", "کمترین", "بیشترین", "پایانی", "میزان تغییر", "درصد تغییر", "تاریخ / میلادی", "تاریخ / شمسی"]
+            },
+            "sekee": {
+                url: `${BASE_API_URL}sekee`,
+                data: [],
+                headers: ["بازگشایی", "کمترین", "بیشترین", "پایانی", "میزان تغییر", "درصد تغییر", "تاریخ / میلادی", "تاریخ / شمسی"]
+            }
+        };
+
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const apiId = button.textContent.includes('Geram18') ? 'geram18' : (button.textContent.includes('USD') ? 'price_dollar_rl' : 'sekee');
+                switchTab(apiId);
+            });
+        });
+
+        document.querySelectorAll('.fetch-btn').forEach(button => {
+            button.addEventListener('click', (event) => startFetching(event.target.getAttribute('data-api-id')));
+        });
+
+        document.querySelectorAll('.export-btn').forEach(button => {
+            button.addEventListener('click', (event) => exportData(event.target.getAttribute('data-api-id')));
+        });
+
+        function switchTab(apiId) {
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
+            document.getElementById(apiId).classList.add('active');
+            document.querySelector(`.tab-button[onclick*="'${apiId}'"]`).classList.add('active');
+        }
+
+        async function startFetching(apiId) {
+            const config = apiConfigs[apiId];
+            const tabContent = document.getElementById(apiId);
+            const fetchBtn = tabContent.querySelector('.fetch-btn');
+            const exportBtn = tabContent.querySelector('.export-btn');
+            const progressBarContainer = tabContent.querySelector('.progress-container');
+            const progressBar = tabContent.querySelector('.progress-bar');
+            const statusDiv = tabContent.querySelector('.status');
+            const dataDisplayDiv = tabContent.querySelector('.data-display');
+            const dataTable = tabContent.querySelector('table');
+
+            fetchBtn.disabled = true;
+            exportBtn.style.display = 'none';
+            dataDisplayDiv.style.display = 'none';
+            progressBarContainer.style.display = 'block';
+            dataTable.innerHTML = '<thead><tr></tr></thead><tbody></tbody>';
+            config.data = [];
+
+            try {
+                // Initial request to get total records
+                statusDiv.textContent = "Fetching initial data to determine total pages...";
+                const initialUrl = `${config.url}?lang=fa&start=0&length=${RECORDS_PER_PAGE}`;
+                const initialResponse = await fetch(initialUrl);
+                const initialData = await initialResponse.json();
+
+                if (!initialData.data || !Array.isArray(initialData.data) || typeof initialData.recordsTotal === 'undefined') {
+                    throw new Error("Invalid initial data format from API.");
+                }
+
+                const totalRecords = initialData.recordsTotal;
+                const totalPages = Math.ceil(totalRecords / RECORDS_PER_PAGE);
+
+                // Start with data from the first page
+                config.data = initialData.data;
+
+                // Loop through the remaining pages
+                for (let i = 1; i < totalPages; i++) {
+                    const start = i * RECORDS_PER_PAGE;
+                    const draw = i + 3; // The 'draw' parameter increments, starting from 3 in your sample.
+                    const url = `${config.url}?lang=fa&order_dir=asc&draw=${draw}&columns%5B0%5D%5Bdata%5D=0&columns%5B0%5D%5Bname%5D=&columns%5B0%5D%5Bsearchable%5D=true&columns%5B0%5D%5Borderable%5D=true&columns%5B0%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B0%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B1%5D%5Bdata%5D=1&columns%5B1%5D%5Bname%5D=&columns%5B1%5D%5Bsearchable%5D=true&columns%5B1%5D%5Borderable%5D=true&columns%5B1%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B1%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B2%5D%5Bdata%5D=2&columns%5B2%5D%5Bname%5D=&columns%5B2%5D%5Bsearchable%5D=true&columns%5B2%5D%5Borderable%5D=true&columns%5B2%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B2%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B3%5D%5Bdata%5D=3&columns%5B3%5D%5Bname%5D=&columns%5B3%5D%5Bsearchable%5D=true&columns%5B3%5D%5Borderable%5D=true&columns%5B3%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B3%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B4%5D%5Bdata%5D=4&columns%5B4%5D%5Bname%5D=&columns%5B4%5D%5Bsearchable%5D=true&columns%5B4%5D%5Borderable%5D=true&columns%5B4%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B4%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B5%5D%5Bdata%5D=5&columns%5B5%5D%5Bname%5D=&columns%5B5%5D%5Bsearchable%5D=true&columns%5B5%5D%5Borderable%5D=true&columns%5B5%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B5%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B6%5D%5Bdata%5D=6&columns%5B6%5D%5Bname%5D=&columns%5B6%5D%5Bsearchable%5D=true&columns%5B6%5D%5Borderable%5D=true&columns%5B6%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B6%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B7%5D%5Bdata%5D=7&columns%5B7%5D%5Bname%5D=&columns%5B7%5D%5Bsearchable%5D=true&columns%5B7%5D%5Borderable%5D=true&columns%5B7%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B7%5D%5Bsearch%5D%5Bregex%5D=false&start=${start}&length=${RECORDS_PER_PAGE}&search=&order_col=&order_dir=&from=&to=&convert_to_ad=1&_=${Date.now()}`;
+
+                    statusDiv.textContent = `Fetching page ${i + 1} of ${totalPages}...`;
+                    const progress = ((i + 1) / totalPages) * 100;
+                    progressBar.style.width = `${progress}%`;
+                    progressBar.textContent = `${Math.round(progress)}%`;
+
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    
+                    if (data.data && Array.isArray(data.data)) {
+                        config.data = config.data.concat(data.data);
+                    } else {
+                        throw new Error("Invalid data format received from API.");
+                    }
+                }
+
+            } catch (error) {
+                console.error("Failed to fetch data:", error);
+                statusDiv.textContent = `Error fetching data. Please check the console for details.`;
+            }
+
+            statusDiv.textContent = `Fetching complete! Merged ${config.data.length} records.`;
+            displayTable(config.data, dataTable, config.headers);
+            fetchBtn.disabled = false;
+            exportBtn.style.display = 'inline-block';
+        }
+
+        function displayTable(data, dataTable, headers) {
+            if (data.length === 0) {
+                dataTable.closest('.data-display').style.display = 'none';
+                return;
+            }
+            
+            dataTable.closest('.data-display').style.display = 'block';
+            const headerRow = dataTable.querySelector('thead tr');
+            headerRow.innerHTML = '';
+            headers.forEach(headerText => {
+                const th = document.createElement('th');
+                th.textContent = headerText;
+                headerRow.appendChild(th);
+            });
+
+            const tbody = dataTable.querySelector('tbody');
+            tbody.innerHTML = '';
+            data.forEach(rowData => {
+                const row = document.createElement('tr');
+                rowData.forEach(cellData => {
+                    const td = document.createElement('td');
+                    td.innerHTML = cellData;
+                    row.appendChild(td);
+                });
+                tbody.appendChild(row);
+            });
+        }
+
+        function exportData(apiId) {
+            const config = apiConfigs[apiId];
+            const dataWithLabels = config.data.map(item => {
+                let obj = {};
+                config.headers.forEach((header, index) => {
+                    const div = document.createElement('div');
+                    div.innerHTML = item[index];
+                    obj[header] = div.textContent.trim();
+                });
+                return obj;
+            });
+            
+            const dataStr = JSON.stringify(dataWithLabels, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${apiId}_data.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

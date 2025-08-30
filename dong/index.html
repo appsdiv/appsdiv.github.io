@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محاسبه دنگ سفر</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>محاسبه دنگ سفر</h1>
+
+        <section class="section">
+            <h2>اعضای سفر</h2>
+            <form id="add-member-form">
+                <input type="text" id="member-name" placeholder="نام عضو" required>
+                <input type="number" id="initial-amount" placeholder="مبلغ اولیه (اختیاری)" value="0">
+                <button type="submit">اضافه کردن</button>
+            </form>
+            <ul id="members-list"></ul>
+        </section>
+
+        <section class="section">
+            <h2>ثبت هزینه جدید</h2>
+            <form id="add-expense-form">
+                <input type="text" id="expense-description" placeholder="توضیحات هزینه" required>
+                <input type="number" id="expense-amount" placeholder="مبلغ" required>
+                <label for="payer">مادرخرج:</label>
+                <select id="payer" required></select>
+                <label for="beneficiaries">ذینفعان:</label>
+                <div id="beneficiaries-list" class="checkbox-group"></div>
+                <button type="submit">ثبت هزینه</button>
+            </form>
+        </section>
+
+        <section class="section">
+            <h2>گزارش بدهی و طلب</h2>
+            <ul id="summary-list"></ul>
+        </section>
+
+        <section class="section">
+            <h2>لاگ هزینه‌ها</h2>
+            <ul id="log-list"></ul>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
