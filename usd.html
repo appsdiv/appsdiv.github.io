@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حباب‌سنج طلا و سکه</title>
+    <style>
+        body {
+            font-family: 'B Nazanin', 'Vazirmatn', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            direction: rtl;
+            text-align: right;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #d4af37;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .price-item, .bubble-item, .advice {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-right: 4px solid #d4af37;
+        }
+        .price-item strong, .bubble-item strong {
+            color: #d4af37;
+        }
+        #loading-message {
+            text-align: center;
+            color: #666;
+            font-size: 1.2em;
+        }
+        .positive-bubble {
+            color: #e74c3c; /* Red */
+        }
+        .negative-bubble {
+            color: #2ecc71; /* Green */
+        }
+        .advice {
+            border-right: 4px solid #3498db;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>حباب‌سنج طلا و سکه 💰</h1>
+    
+    <div id="loading-message">در حال دریافت اطلاعات...</div>
+
+    <div id="price-data" style="display:none;">
+        <div class="price-item">
+            <strong>قیمت سکه امامی:</strong> <span id="seke-price"></span> ریال
+        </div>
+        <div class="price-item">
+            <strong>قیمت اونس جهانی:</strong> <span id="ounce-price"></span> دلار
+        </div>
+        <div class="price-item">
+            <strong>قیمت دلار:</strong> <span id="usd-price"></span> ریال
+        </div>
+    </div>
+
+    <div id="bubble-data" style="display:none;">
+        <div class="bubble-item">
+            <strong>حباب سکه:</strong> <span id="seke-bubble"></span>%
+        </div>
+    </div>
+
+    <div id="advice-box" style="display:none;">
+        <div class="advice">
+            <h3>📈 توصیه خرید و فروش</h3>
+            <p id="advice-text"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_URL = 'https://gold2.chbk.app/get-prices';
+    const OUNCE_GRAM = 31.103;
+    const SEKE_GRAM = 8.133;
+
+    async function getPricesAndCalculateBubble() {
+        const loadingMessage = document.getElementById('loading-message');
+        const priceData = document.getElementById('price-data');
+        const bubbleData = document.getElementById('bubble-data');
+        const adviceBox = document.getElementById('advice-box');
+        const adviceText = document.getElementById('advice-text');
+
+        loadingMessage.style.display = 'block';
+        priceData.style.display = 'none';
+        bubbleData.style.display = 'none';
+        adviceBox.style.display = 'none';
+
+        try {
+            const response = await fetch(API_URL);
+            const data = await response.json();
+
+            // Replace commas and convert to numbers
+            const sekePrice = parseFloat(data['Seke Emami'].replace(/,/g, ''));
+            const ouncePrice = parseFloat(data['Gold Ounce'].replace(/,/g, ''));
+            const usdPrice = parseFloat(data['USD'].replace(/,/g, ''));
+
+            // Calculate intrinsic value
+            const sekeIntrinsicValue = ((ouncePrice * usdPrice * SEKE_GRAM) / OUNCE_GRAM) * 10; // Convert to Rial from Toman
+
+            // Calculate bubble
+            const sekeBubble = ((sekePrice - sekeIntrinsicValue) / sekePrice) * 100;
+            const formattedSekeBubble = sekeBubble.toFixed(2);
+
+            // Display prices and bubble
+            document.getElementById('seke-price').innerText = sekePrice.toLocaleString();
+            document.getElementById('ounce-price').innerText = ouncePrice.toLocaleString();
+            document.getElementById('usd-price').innerText = usdPrice.toLocaleString();
+            
+            const sekeBubbleSpan = document.getElementById('seke-bubble');
+            sekeBubbleSpan.innerText = formattedSekeBubble;
+            if (sekeBubble > 0) {
+                sekeBubbleSpan.classList.add('positive-bubble');
+                sekeBubbleSpan.classList.remove('negative-bubble');
+            } else {
+                sekeBubbleSpan.classList.add('negative-bubble');
+                sekeBubbleSpan.classList.remove('positive-bubble');
+            }
+
+            // Provide advice based on bubble
+            if (sekeBubble > 5) {
+                adviceText.innerHTML = "🔴 <strong>حباب سکه به شدت مثبت است.</strong> توصیه می‌شود از خرید سکه خودداری کنید و در صورت تمایل، سکه‌های خود را فروخته و طلا (آب‌شده یا شمش) خریداری کنید.";
+            } else if (sekeBubble > 0) {
+                adviceText.innerHTML = "🟡 <strong>حباب سکه مثبت است.</strong> در بازار سکه احتیاط کنید.";
+            } else if (sekeBubble < -2) {
+                adviceText.innerHTML = "🟢 <strong>حباب سکه منفی است.</strong> قیمت سکه کمتر از ارزش ذاتی آن است. خرید سکه می‌تواند یک فرصت مناسب باشد.";
+            } else {
+                adviceText.innerHTML = "🔵 <strong>حباب سکه نزدیک به صفر است.</strong> بازار در تعادل نسبی قرار دارد.";
+            }
+
+            loadingMessage.style.display = 'none';
+            priceData.style.display = 'block';
+            bubbleData.style.display = 'block';
+            adviceBox.style.display = 'block';
+
+        } catch (error) {
+            loadingMessage.innerText = "خطا در دریافت اطلاعات. لطفاً دوباره تلاش کنید.";
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    // Run on page load
+    window.onload = getPricesAndCalculateBubble;
+
+    // Optional: Refresh every 5 minutes
+    setInterval(getPricesAndCalculateBubble, 300000); // 300000 ms = 5 minutes
+</script>
+
+</body>
+</html>
