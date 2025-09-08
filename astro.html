@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stargazer Pro</title>
+    <style>
+        :root {
+            --bg-color: #0c1524;
+            --card-color: #1a2233;
+            --text-color: #e0e6f0;
+            --highlight-color: #79a7ff;
+            --accent-color: #f77f00;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle, #1a2233 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1, h2 {
+            color: var(--highlight-color);
+            text-align: center;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            text-shadow: 0 0 10px rgba(121, 167, 255, 0.5);
+        }
+
+        .card {
+            background-color: var(--card-color);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        #status {
+            text-align: center;
+            font-style: italic;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .location-info p {
+            margin: 5px 0;
+            font-size: 1.1em;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .location-info span {
+            font-weight: bold;
+            color: var(--highlight-color);
+        }
+
+        /* Compass Styles */
+        #compass-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #compass-container {
+            width: 250px;
+            height: 250px;
+            position: relative;
+            margin: 20px 0;
+        }
+
+        #compass {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                #3a4860 0deg, #3a4860 1deg,
+                transparent 1deg, transparent 9deg
+            );
+            background-size: 10% 100%;
+            border: 2px solid var(--highlight-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        #compass::before {
+            content: 'N';
+            position: absolute;
+            top: 5px;
+            font-size: 2em;
+            color: var(--accent-color);
+        }
+        #compass::after {
+            content: 'S';
+            position: absolute;
+            bottom: 5px;
+            font-size: 2em;
+        }
+
+        #compass-needle {
+            width: 50%;
+            height: 50%;
+            position: absolute;
+            transform-origin: 50% 100%;
+            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        #needle-base {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--highlight-color);
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 15px var(--highlight-color);
+        }
+
+        #needle-north {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 120px solid var(--accent-color);
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            filter: drop-shadow(0 0 5px rgba(247, 127, 0, 0.8));
+        }
+        
+        #direction-text {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            margin-top: 10px;
+        }
+
+        /* Sky Objects List */
+        #object-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sky-object-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: background-color 0.2s ease;
+        }
+
+        .sky-object-item:hover {
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        
+        .object-name {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: var(--accent-color);
+        }
+        
+        .object-details {
+            text-align: right;
+            font-size: 0.9em;
+        }
+
+        .object-details span {
+            display: block;
+        }
+        
+        .alert {
+            background-color: var(--accent-color);
+            color: black;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(247, 127, 0, 0.4); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 15px rgba(247, 127, 0, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(247, 127, 0, 0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Stargazer Pro 🔭</h1>
+    <div id="status">Getting your location and sensor data...</div>
+
+    <div class="card" id="location-card">
+        <h2>Your Position</h2>
+        <div class="location-info">
+            <p>Latitude: <span id="latitude">--</span></p>
+            <p>Longitude: <span id="longitude">--</span></p>
+            <p>Altitude: <span id="altitude">--</span></p>
+        </div>
+    </div>
+    
+    <div class="card" id="compass-card">
+        <h2>Live Compass & Height Finder</h2>
+        <div id="compass-container">
+            <div id="compass">
+                <div id="compass-needle">
+                    <div id="needle-north"></div>
+                </div>
+                <div id="needle-base"></div>
+            </div>
+        </div>
+        <p id="direction-text">--</p>
+        <p id="height-angle-text">Angle: --</p>
+    </div>
+    
+    <div class="card" id="sky-objects-card">
+        <h2>Visible Sky Objects</h2>
+        <ul id="object-list">
+            </ul>
+    </div>
+</div>
+
+<script>
+    // Constants for astronomical calculations (for a few objects)
+    const SKY_OBJECTS = {
+        'Moon': { ra: 12.0, dec: 15.0 }, // Example coordinates
+        'Jupiter': { ra: 18.5, dec: -23.0 },
+        'Venus': { ra: 9.2, dec: 10.5 },
+        'Mars': { ra: 2.0, dec: 1.0 },
+        'Sirius': { ra: 6.75, dec: -16.71 },
+    };
+
+    // DOM Elements
+    const statusEl = document.getElementById('status');
+    const latitudeEl = document.getElementById('latitude');
+    const longitudeEl = document.getElementById('longitude');
+    const altitudeEl = document.getElementById('altitude');
+    const compassNeedle = document.getElementById('compass-needle');
+    const directionText = document.getElementById('direction-text');
+    const heightAngleText = document.getElementById('height-angle-text');
+    const objectListEl = document.getElementById('object-list');
+
+    // State Variables
+    let userLat = null;
+    let userLon = null;
+    let userAlt = null;
+
+    // Permissions and Geolocation
+    function initApp() {
+        if (!navigator.geolocation) {
+            statusEl.textContent = "Geolocation not supported.";
+            return;
+        }
+        
+        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+            DeviceOrientationEvent.requestPermission()
+                .then(permissionState => {
+                    if (permissionState === 'granted') {
+                        setupSensors();
+                        getLocation();
+                    } else {
+                        statusEl.textContent = "Sensor permission denied.";
+                    }
+                })
+                .catch(console.error);
+        } else {
+            // For browsers that don't need explicit permission (non-iOS)
+            setupSensors();
+            getLocation();
+        }
+    }
+
+    function getLocation() {
+        navigator.geolocation.watchPosition(
+            (position) => {
+                userLat = position.coords.latitude;
+                userLon = position.coords.longitude;
+                userAlt = position.coords.altitude;
+
+                latitudeEl.textContent = userLat.toFixed(4);
+                longitudeEl.textContent = userLon.toFixed(4);
+                altitudeEl.textContent = userAlt ? userAlt.toFixed(2) + ' m' : 'N/A';
+                statusEl.textContent = "Location updated.";
+                
+                calculateAndDisplayObjects();
+            },
+            (error) => {
+                statusEl.textContent = `Geolocation Error: ${error.message}`;
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0,
+            }
+        );
+    }
+
+    // Sensor Setup (Compass & Gyroscope)
+    function setupSensors() {
+        window.addEventListener('deviceorientation', (e) => {
+            const heading = e.webkitCompassHeading || (360 - e.alpha);
+            compassNeedle.style.transform = `rotate(${heading}deg)`;
+            
+            const directions = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+            const index = Math.round(heading / 22.5) % 16;
+            directionText.textContent = `${directions[index]} (${heading.toFixed(0)}°)`;
+            
+            // Height Angle (Pitch) - using beta
+            const beta = e.beta;
+            heightAngleText.textContent = `Angle: ${beta ? beta.toFixed(1) + '°' : 'N/A'}`;
+        });
+    }
+
+    // Astronomical Calculations (Simplified)
+    function calculateAndDisplayObjects() {
+        if (userLat === null || userLon === null) return;
+
+        const now = new Date();
+        const j2000 = new Date('2000-01-01T12:00:00Z');
+        const jd = (now.getTime() - j2000.getTime()) / 86400000 + 2451545.0; // Julian Day
+
+        objectListEl.innerHTML = '';
+        const objectsToAlert = [];
+
+        for (const [name, coords] of Object.entries(SKY_OBJECTS)) {
+            // This is a highly simplified calculation.
+            // A real app would use a full ephemeris library (e.g., astronom-js)
+            // to get up-to-date RA and Dec and then convert them.
+            
+            const lst = (100.46 + 0.985647 * (jd - 2451545) + userLon) % 360;
+            const ha = (lst - coords.ra * 15 + 360) % 360; // Hour Angle
+            
+            const radLat = userLat * Math.PI / 180;
+            const radDec = coords.dec * Math.PI / 180;
+            const radHa = ha * Math.PI / 180;
+            
+            const sinAlt = Math.sin(radLat) * Math.sin(radDec) + Math.cos(radLat) * Math.cos(radDec) * Math.cos(radHa);
+            const altitude = Math.asin(sinAlt) * 180 / Math.PI;
+
+            if (altitude > 0) { // Only show objects above the horizon
+                let cosAz = (Math.sin(radDec) - Math.sin(radLat) * sinAlt) / (Math.cos(radLat) * Math.cos(Math.asin(sinAlt)));
+                cosAz = Math.max(-1, Math.min(1, cosAz));
+                let azimuth = Math.acos(cosAz) * 180 / Math.PI;
+
+                if (Math.sin(radHa) > 0) {
+                    azimuth = 360 - azimuth;
+                }
+                
+                const listItem = document.createElement('li');
+                listItem.className = 'sky-object-item';
+                listItem.innerHTML = `
+                    <span class="object-name">${name}</span>
+                    <div class="object-details">
+                        <span>Azimuth: ${azimuth.toFixed(0)}°</span>
+                        <span>Altitude: ${altitude.toFixed(0)}°</span>
+                    </div>
+                `;
+                objectListEl.appendChild(listItem);
+                
+                if (altitude > 45) {
+                    objectsToAlert.push({ name, azimuth: azimuth.toFixed(0) });
+                }
+            }
+        }
+        
+        if (objectsToAlert.length > 0) {
+            const alertText = objectsToAlert.map(obj => `${obj.name} (Azimuth: ${obj.azimuth}°)`).join(', ');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert';
+            alertDiv.textContent = `High in the sky: ${alertText}!`;
+            document.querySelector('.container').appendChild(alertDiv);
+        }
+    }
+
+    // Initialize the application
+    initApp();
+
+</script>
+</body>
+</html>
