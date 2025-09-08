@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>AR Sky Finder — Planets • Stars • TV Sats</title>
+  <meta name="theme-color" content="#0b1020" />
+  <style>
+    :root{
+      --bg:#0b1020; --card:#111833; --muted:#8ea0c3; --text:#eaf0ff; --accent:#60a5fa; --ok:#34d399; --warn:#fbbf24; --err:#f87171;
+    }
+    html,body{height:100%; background:radial-gradient(1200px 800px at 70% -10%, #1a2457, #0b1020 55%); color:var(--text); font:16px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;}
+    *{box-sizing:border-box}
+    .app{display:grid; grid-template-rows:auto 1fr auto; height:100%;}
+    header{position:sticky; top:0; z-index:3; backdrop-filter:saturate(140%) blur(8px); background:linear-gradient(180deg, rgba(11,16,32,.9), rgba(11,16,32,.65)); border-bottom:1px solid rgba(255,255,255,.06)}
+    .bar{display:flex; gap:.5rem; align-items:center; justify-content:space-between; padding:.6rem .8rem}
+    .brand{display:flex; gap:.6rem; align-items:center; font-weight:700; letter-spacing:.3px}
+    .dot{width:.7rem; height:.7rem; border-radius:99px; background:conic-gradient(from 0deg, #60a5fa, #14b8a6, #f59e0b, #ef4444, #60a5fa); box-shadow:0 0 .6rem rgba(96,165,250,.8)}
+    .pill{display:inline-flex; gap:.35rem; align-items:center; padding:.36rem .6rem; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.07); color:var(--muted); font-size:.82rem}
+    .pill strong{color:var(--text)}
+    .controls{display:flex; flex-wrap:wrap; gap:.4rem}
+    .controls button,.controls .toggle{border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.05); color:var(--text); padding:.45rem .6rem; border-radius:.7rem; font-weight:600; cursor:pointer}
+    .controls button:hover{background:rgba(255,255,255,.08)}
+    .controls .toggle{display:flex; align-items:center; gap:.45rem}
+    .controls input[type="text"]{background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); color:var(--text); padding:.5rem .6rem; border-radius:.6rem; min-width:12rem}
+
+    /* Stage */
+    #stage{position:relative; overflow:hidden;}
+    #sky{position:absolute; inset:0; pointer-events:none}
+    #hud{position:absolute; inset:auto 0 0 0; display:flex; justify-content:center; padding:1rem; pointer-events:none}
+    #readout{background:rgba(17,24,51,.6); border:1px solid rgba(255,255,255,.06); border-radius:1rem; padding:.8rem 1rem; width:min(860px, calc(100% - 1rem)); box-shadow:0 .4rem 1.4rem rgba(0,0,0,.35)}
+    #readout .grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:.6rem}
+    #readout .tile{background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); border-radius:.8rem; padding:.6rem .7rem}
+    #readout h3{margin:.1rem 0 .4rem; font-size:.9rem; color:#bcd0ff; text-transform:uppercase; letter-spacing:.08em}
+    #readout p{margin:0; font-weight:700}
+
+    /* Crosshair + compass */
+    .crosshair{position:absolute; left:50%; top:50%; translate:-50% -50%; width:200px; height:200px; border-radius:999px; border:1px dashed rgba(255,255,255,.15)}
+    .crosshair:before,.crosshair:after{content:""; position:absolute; left:50%; top:50%; translate:-50% -50%; width:2px; height:110%; background:linear-gradient(180deg, transparent, rgba(255,255,255,.6), transparent)}
+    .crosshair:after{rotate:90deg}
+
+    .compass{position:absolute; left:50%; bottom:1rem; translate:-50% 0; width:min(560px, 88vw); height:54px; border-radius:1rem; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); display:grid; place-items:center; overflow:hidden}
+    .compass .tape{position:absolute; will-change:transform; display:flex; gap:20px; align-items:center;}
+    .compass .tick{height:24px; width:2px; background:rgba(255,255,255,.3)}
+    .compass .label{font-weight:700; color:#cfe1ff}
+
+    /* List */
+    #list{position:absolute; right:.8rem; top:5.1rem; max-height:52vh; overflow:auto; width:min(380px, 90vw); display:flex; flex-direction:column; gap:.6rem}
+    .card{background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); border-radius:.8rem; padding:.7rem .85rem}
+    .row{display:flex; gap:.5rem; align-items:center; justify-content:space-between}
+    .name{font-weight:700}
+    .tag{font-size:.75rem; color:#cbd5e1; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.1); padding:.15rem .45rem; border-radius:.5rem}
+    .angle{font-variant-numeric:tabular-nums}
+
+    footer{display:flex; align-items:center; justify-content:space-between; padding:.7rem .9rem; color:#cbd5e1; gap:.8rem; border-top:1px solid rgba(255,255,255,.08); background:linear-gradient(180deg, rgba(11,16,32,.65), rgba(11,16,32,.9));}
+    .hint{opacity:.9}
+    .btn{display:inline-flex; gap:.45rem; align-items:center; padding:.5rem .7rem; border-radius:.6rem; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.06); color:var(--text); cursor:pointer; font-weight:700}
+    .btn:hover{background:rgba(255,255,255,.1)}
+    .ok{color:var(--ok)} .warn{color:var(--warn)} .err{color:var(--err)}
+    @media (max-width: 760px){
+      #readout .grid{grid-template-columns:repeat(2,1fr)}
+      #list{position:static; max-height:unset; width:auto; padding:0 .8rem 1rem}
+    }
+  </style>
+
+  <!-- Import maps for ESM CDNs -->
+  <script type="importmap">
+  {
+    "imports": {
+      "astronomy-engine": "https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/+esm",
+      "geomagnetism": "https://cdn.jsdelivr.net/npm/geomagnetism@0.2.0/+esm"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="bar">
+        <div class="brand"><div class="dot"></div> AR Sky Finder <span class="pill" id="pwaStatus">PWA-ready</span></div>
+        <div class="controls">
+          <span class="pill" id="locPill">📍 <strong>Loc:</strong> <span id="locText">—</span></span>
+          <span class="pill" id="declPill">🧭 <strong>Decl:</strong> <span id="declText">auto…</span></span>
+          <label class="toggle"><input type="checkbox" id="togglePlanets" checked/> Planets</label>
+          <label class="toggle"><input type="checkbox" id="toggleStars" checked/> Bright Stars</label>
+          <label class="toggle"><input type="checkbox" id="toggleSats"/> TV/GEO Sats</label>
+          <button class="btn" id="calibrateBtn">🔧 Calibrate</button>
+          <input id="search" type="text" placeholder="Search: Vega, Jupiter, Astra 19.2E…" />
+        </div>
+      </div>
+    </header>
+
+    <main id="stage">
+      <canvas id="sky"></canvas>
+      <div class="crosshair" aria-hidden="true"></div>
+      <div id="list"></div>
+      <div id="hud">
+        <div id="readout">
+          <div class="grid">
+            <div class="tile"><h3>Pointing</h3><p id="pointAZ">Az —</p><p id="pointALT">Alt —</p></div>
+            <div class="tile"><h3>Nearest Object</h3><p id="nearestName">—</p><p id="nearestSep">—</p></div>
+            <div class="tile"><h3>Time (UTC)</h3><p id="timeNow">—</p><p id="compassQuality" class="warn">Calibration needed</p></div>
+            <div class="tile"><h3>Visibility</h3><p id="skySummary">—</p><p id="counts">—</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="compass"><div class="tape" id="compassTape"></div></div>
+    </main>
+
+    <footer>
+      <div class="hint">Tip: Point your phone at the sky and tap <b>Calibrate</b> while sighting a distant horizon. Shake gently to re‑calibrate compass.</div>
+      <div class="actions">
+        <button class="btn" id="installBtn" hidden>➕ Install</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Satellite.js UMD for TLE propagation (fallback if ESM import fails) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/satellite.js/1.3.0/satellite.min.js" defer></script>
+
+  <script type="module">
+    /***** Imports *****/
+    import * as Astro from 'astronomy-engine';
+    let geomag; // loaded lazily because some browsers block import maps on file://
+    try { geomag = await import('geomagnetism'); } catch(e){ console.warn('Geomagnetism ESM failed, will soft-fallback.', e); }
+
+    /***** DOM helpers *****/
+    const $ = sel => document.querySelector(sel);
+    const sky = $('#sky'); const ctx = sky.getContext('2d');
+    const listEl = $('#list'); const tape = $('#compassTape');
+    const declText = $('#declText'); const locText = $('#locText');
+    const pointAZ = $('#pointAZ'); const pointALT = $('#pointALT');
+    const nearestName = $('#nearestName'); const nearestSep = $('#nearestSep');
+    const timeNow = $('#timeNow'); const compassQuality = $('#compassQuality');
+    const skySummary = $('#skySummary'); const counts = $('#counts');
+
+    const state = {
+      observer: { lat: 0, lon: 0, elev_m: 0 },
+      declination: 0,
+      haveDeclination: false,
+      compassOffset: 0,        // user calibration offset (deg)
+      betaHorizonOffset: 0,    // pitch offset for horizon calibration (deg)
+      pointing: { az: 0, alt: 0 },
+      filters: { planets:true, stars:true, sats:false },
+      tle: [], satObjs: [], bright: [],
+      lastCompass: 0,
+    };
+
+    /***** Resize *****/
+    function fit(){ sky.width = stage.clientWidth; sky.height = stage.clientHeight; }
+    const stage = $('#stage'); window.addEventListener('resize', fit); fit();
+
+    /***** Magnetic declination via WMM2025 *****/
+    async function updateDeclination(){
+      try{
+        if (!geomag) geomag = await import('geomagnetism');
+        const model = geomag.model(new Date());
+        const info = model.point([state.observer.lat, state.observer.lon, state.observer.elev_m/1000]);
+        state.declination = info.decl; // deg, east positive
+        state.haveDeclination = true;
+        declText.textContent = `${info.decl.toFixed(1)}°`;
+      }catch(err){
+        console.warn('Declination auto-fill failed:', err);
+        declText.textContent = 'manual 0°';
+      }
+    }
+
+    /***** Location *****/
+    function setLocText(){
+      const {lat,lon} = state.observer;
+      locText.textContent = `${fmtDeg(lat,true)}, ${fmtDeg(lon,false)}`;
+    }
+    function fmtDeg(d,lat){
+      const a=Math.abs(d), deg=Math.floor(a), min=Math.floor((a-deg)*60), sec=((a-deg)*3600-60*min).toFixed(0);
+      const hemi = lat ? (d>=0?'N':'S') : (d>=0?'E':'W');
+      return `${deg}°${String(min).padStart(2,'0')}'${String(sec).padStart(2,'0')}" ${hemi}`;
+    }
+
+    await new Promise((resolve)=>{
+      if (!('geolocation' in navigator)) return resolve();
+      navigator.geolocation.getCurrentPosition(async (pos)=>{
+        const c = pos.coords; state.observer.lat = c.latitude; state.observer.lon = c.longitude; state.observer.elev_m = c.altitude||0; setLocText(); await updateDeclination(); resolve();
+      }, async ()=>{ setLocText(); await updateDeclination(); resolve(); }, { enableHighAccuracy:true, timeout:6000 });
+    });
+
+    /***** Build compass tape *****/
+    function buildTape(){
+      tape.innerHTML='';
+      const span=1080; // 3x wrap for smooth scroll
+      for(let az=-span; az<=span; az+=10){
+        const tick=document.createElement('div'); tick.className='tick'; tick.style.height = (az%30===0?28:16)+'px';
+        const wrap=document.createElement('div'); wrap.style.display='flex'; wrap.style.flexDirection='column'; wrap.style.alignItems='center';
+        wrap.style.gap='2px'; wrap.appendChild(tick);
+        if(az%30===0){ const lab=document.createElement('div'); lab.className='label'; let a=((az%360)+360)%360; lab.textContent= a===0?'N': a===90?'E': a===180?'S': a===270?'W': a; wrap.appendChild(lab); }
+        tape.appendChild(wrap);
+      }
+    } buildTape();
+
+    /***** Bright star catalog (J2000 RA[h], DEC[deg], Vmag) *****/
+    state.bright = [
+      {name:'Sirius', ra:6.752477, dec:-16.716116, mag:-1.46},
+      {name:'Canopus', ra:6.399192, dec:-52.695661, mag:-0.72},
+      {name:'Arcturus', ra:14.261021, dec:19.182417, mag:-0.05},
+      {name:'Vega', ra:18.615649, dec:38.783692, mag:0.03},
+      {name:'Capella', ra:5.278155, dec:45.997991, mag:0.08},
+      {name:'Rigel', ra:5.242298, dec:-8.201640, mag:0.12},
+      {name:'Procyon', ra:7.655034, dec:5.225016, mag:0.34},
+      {name:'Achernar', ra:1.628571, dec:-57.236753, mag:0.46},
+      {name:'Betelgeuse', ra:5.919529, dec:7.407064, mag:0.50},
+      {name:'Hadar', ra:14.063733, dec:-60.373039, mag:0.61},
+      {name:'Altair', ra:19.846389, dec:8.868322, mag:0.77},
+      {name:'Acrux', ra:12.443304, dec:-63.099091, mag:0.77},
+      {name:'Aldebaran', ra:4.598677, dec:16.509302, mag:0.85},
+      {name:'Antares', ra:16.490128, dec:-26.431946, mag:0.95},
+      {name:'Spica', ra:13.419883, dec:-11.161322, mag:0.97},
+      {name:'Pollux', ra:7.755263, dec:28.026199, mag:1.14},
+      {name:'Fomalhaut', ra:22.960848, dec:-29.622237, mag:1.16},
+      {name:'Deneb', ra:20.690531, dec:45.280338, mag:1.25},
+      {name:'Regulus', ra:10.139532, dec:11.967208, mag:1.35},
+      {name:'Castor', ra:7.576667, dec:31.888333, mag:1.58},
+      {name:'Gacrux', ra:12.519427, dec:-57.113212, mag:1.64},
+      {name:'Bellatrix', ra:5.418851, dec:6.349702, mag:1.64},
+      {name:'Elnath', ra:5.438197, dec:28.607450, mag:1.65},
+      {name:'Mimosa', ra:12.795362, dec:-59.688764, mag:1.25},
+      {name:'Kochab', ra:14.845098, dec:74.155504, mag:2.07}
+    ];
+
+    /***** Utility: convert J2000 RA/Dec to alt/az using rotation matrices *****/
+    function altazFromJ2000(raHours, decDeg, time, obs){
+      const ra = raHours; const dec = decDeg;
+      // Create J2000 vector from spherical coords
+      const sphere = { lat: dec, lon: ra*15, dist: 1 }; // deg
+      const vecEQJ = Astro.VectorFromSphere(sphere, Astro.Orientation.EQJ);
+      // Rotate to horizontal frame
+      const R = Astro.Rotation_EQJ_HOR(time, obs);
+      const vHor = Astro.RotateVector(R, vecEQJ);
+      const horiz = Astro.HorizonFromVector(vHor);
+      return { az: (horiz.azimuth+360)%360, alt: horiz.altitude };
+    }
+
+    /***** Planets data helper *****/
+    function planetAltAz(body, time, obs){
+      const eq = Astro.Equator(body, time, obs, true, true); // of-date for Horizon
+      const hor = Astro.Horizon(time, obs, eq.ra, eq.dec, 'normal');
+      return { az:(hor.azimuth+360)%360, alt:hor.altitude };
+    }
+
+    /***** TV/GEO satellites via CelesTrak (complete GEO list) *****/
+    async function loadGeoTLE(){
+      const urls = [
+        'https://celestrak.org/NORAD/elements/geo.txt',
+        'https://celestrak.com/NORAD/elements/geo.txt'
+      ];
+      for (const url of urls){
+        try{
+          const resp = await fetch(url, { cache:'no-store' });
+          if (!resp.ok) continue;
+          const txt = await resp.text();
+          state.tle = parseTLE(txt);
+          console.log('Loaded GEO TLEs:', state.tle.length, 'from', url);
+          break;
+        }catch(e){ console.warn('TLE fetch failed', url, e); }
+      }
+      if (state.tle.length===0) console.warn('Fell back: no TLEs loaded.');
+      buildSatObjects();
+    }
+
+    function parseTLE(text){
+      const lines = text.split(/\r?\n/).filter(Boolean);
+      const out=[];
+      for(let i=0;i<lines.length-2;i++){
+        if (lines[i].charAt(0)!=='1' && lines[i+1].charAt(0)==='1' && lines[i+2].charAt(0)==='2'){
+          out.push({ name: lines[i].trim(), l1: lines[i+1].trim(), l2: lines[i+2].trim() }); i+=2;
+        }
+      }
+      return out;
+    }
+
+    function buildSatObjects(){
+      // requires window.satellite from UMD (already loaded)
+      state.satObjs = state.tle.map(t => {
+        try{
+          const rec = window.satellite.twoline2satrec(t.l1, t.l2);
+          return { name: t.name, rec };
+        }catch{ return null; }
+      }).filter(Boolean);
+    }
+
+    /***** Sensors: compass + tilt *****/
+    let needPerm = (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function');
+    $('#calibrateBtn').addEventListener('click', async ()=>{
+      if (needPerm){
+        try{ const p = await DeviceOrientationEvent.requestPermission(); if (p !== 'granted') throw new Error('denied'); }catch{ alert('Permission required for motion sensors. Please enable in Settings.'); }
+      }
+      // Horizon calibration: set current pitch as horizon reference
+      if (lastBeta!=null){ state.betaHorizonOffset = lastBeta; }
+      // Compass soft-cal reset
+      state.compassOffset = 0; compassQuality.textContent = 'Calibrated'; compassQuality.className='ok';
+      navigator.vibrate?.(50);
+    });
+
+    let lastAlpha, lastBeta, lastGamma;
+    window.addEventListener('deviceorientation', (ev)=>{
+      lastAlpha = ev.alpha; lastBeta = ev.beta; lastGamma = ev.gamma;
+      updatePointing(ev);
+    }, true);
+
+    function normalizeDeg(a){ return (a%360+360)%360; }
+
+    function headingFromEuler(alpha, beta, gamma){
+      // Robust compass heading from Euler angles (radians math under the hood)
+      const degtorad=Math.PI/180; const x=beta*degtorad, y=gamma*degtorad, z=alpha*degtorad;
+      const cX=Math.cos(x), cY=Math.cos(y), cZ=Math.cos(z); const sX=Math.sin(x), sY=Math.sin(y), sZ=Math.sin(z);
+      const Vx = -cZ*sY - sZ*sX*cY; const Vy = -sZ*sY + cZ*sX*cY;
+      let heading = Math.atan2(Vx, Vy) * 180/Math.PI; // 0..360, 0=N
+      if (heading<0) heading += 360;
+      return heading;
+    }
+
+    function updatePointing(ev){
+      const a = ev?.webkitCompassHeading != null ? 360-ev.webkitCompassHeading : headingFromEuler(lastAlpha||0, lastBeta||0, lastGamma||0);
+      let trueAz = normalizeDeg(a + (state.haveDeclination? state.declination:0) + state.compassOffset);
+      // Pitch -> altitude: assume horizon at calibrated beta, increase when tilting up
+      const beta = lastBeta||0; // -180..180
+      let alt = Math.max(-5, Math.min(90, (beta - state.betaHorizonOffset)));
+      state.pointing = { az:trueAz, alt };
+      pointAZ.textContent = `Az ${trueAz.toFixed(1)}°`;
+      pointALT.textContent = `Alt ${alt.toFixed(1)}°`;
+      moveTape(trueAz);
+    }
+
+    function moveTape(az){
+      // Center label at az; 6px per degree (fits container width defined above)
+      const pxPerDeg = 4.0; // tuned for component width
+      tape.style.transform = `translateX(${(-az*pxPerDeg) % (360*pxPerDeg)}px)`;
+    }
+
+    /***** Compute scene *****/
+    async function tick(){
+      const now = new Date(); const time = new Astro.AstroTime(now);
+      timeNow.textContent = now.toISOString().replace('T',' ').replace('Z',' UTC');
+      const obs = new Astro.Observer(state.observer.lat, state.observer.lon, state.observer.elev_m/1000);
+      const show = [];
+      // Planets
+      if (state.filters.planets){
+        const bodies = ['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn'];
+        for(const b of bodies){
+          const A = planetAltAz(Astro.Body[b], time, obs); if (A.alt>-2) show.push({cat:'Planet', name:b, ...A});
+        }
+      }
+      // Stars
+      if (state.filters.stars){
+        for(const s of state.bright){
+          const A = altazFromJ2000(s.ra, s.dec, time, obs); if (A.alt>-2) show.push({cat:'Star', name:s.name, ...A});
+        }
+      }
+      // Sats
+      if (state.filters.sats && state.satObjs.length){
+        const gmst = satellite.gstime(now); // radians
+        const obsGd = { longitude: state.observer.lon*Math.PI/180, latitude: state.observer.lat*Math.PI/180, height: state.observer.elev_m/1000 };
+        for(const sat of state.satObjs){
+          try{
+            const posVel = satellite.propagate(sat.rec, now); if (!posVel.position) continue;
+            const ecf = satellite.eciToEcf(posVel.position, gmst);
+            const look = satellite.ecfToLookAngles(obsGd, ecf); // {azimuth,elevation,rangeSat}
+            const az = normalizeDeg(look.azimuth*180/Math.PI), alt = look.elevation*180/Math.PI;
+            if (alt>-2) show.push({cat:'TV Sat', name:sat.name, az, alt});
+          }catch{}
+        }
+      }
+
+      // Draw sky & list
+      drawSky(show);
+      renderList(show);
+      updateNearest(show);
+      counts.textContent = `Showing: ${show.filter(o=>o.cat==='Planet').length} planets, ${show.filter(o=>o.cat==='Star').length} stars, ${show.filter(o=>o.cat==='TV Sat').length} sats`;
+      requestAnimationFrame(tick);
+    }
+
+    function drawSky(objs){
+      const w=sky.width, h=sky.height; ctx.clearRect(0,0,w,h);
+      // faint starfield/backdrop
+      ctx.globalAlpha=.8; const grd=ctx.createRadialGradient(w/2,h/2,0,w/2,h/2,Math.max(w,h)*.8); grd.addColorStop(0,'rgba(255,255,255,.02)'); grd.addColorStop(1,'rgba(255,255,255,0)'); ctx.fillStyle=grd; ctx.fillRect(0,0,w,h);
+      // objects projected: map az (0=N) to angle and alt to radius
+      const R = Math.min(w,h)*.46; const cx=w/2, cy=h/2;
+      for(const o of objs){
+        const ang = (o.az-90) * Math.PI/180; // 0N -> left
+        const r = R * (1 - Math.max(-5, Math.min(90, o.alt+5))/95);
+        const x = cx + Math.cos(ang)*r; const y = cy + Math.sin(ang)*r;
+        // dot
+        ctx.beginPath(); ctx.arc(x,y, o.cat==='TV Sat'? 3: (o.cat==='Planet'?4:2.6), 0, Math.PI*2);
+        ctx.fillStyle = o.cat==='TV Sat'? 'rgba(250,220,120,.95)': (o.cat==='Planet'? 'rgba(140,200,255,.95)': 'rgba(255,255,255,.85)');
+        ctx.fill();
+        // label
+        ctx.font='600 12px system-ui,Segoe UI,Inter'; ctx.fillStyle='rgba(235,245,255,.9)';
+        ctx.fillText(o.name, x+6, y-6);
+      }
+    }
+
+    function renderList(objs){
+      const q = $('#search').value.trim().toLowerCase();
+      const sorted = objs.filter(o=>!q || o.name.toLowerCase().includes(q)).sort((a,b)=>b.alt-a.alt).slice(0,60);
+      listEl.innerHTML = sorted.map(o=>`<div class="card"><div class="row"><div class="name">${o.name}</div><span class="tag">${o.cat}</span></div><div class="row"><span class="angle">Az ${o.az.toFixed(1)}° · Alt ${o.alt.toFixed(1)}°</span><button class="btn" data-name="${o.name}" data-az="${o.az}" data-alt="${o.alt}">Aim</button></div></div>`).join('');
+      listEl.querySelectorAll('button[data-name]').forEach(btn=>btn.addEventListener('click', ()=>{
+        const az = parseFloat(btn.dataset.az), alt=parseFloat(btn.dataset.alt);
+        // set compass offset so tape centers on target
+        const diff = normalizeDeg(az - state.pointing.az);
+        state.compassOffset += diff; navigator.vibrate?.(30);
+      }));
+    }
+
+    function angularSeparation(a1, z1, a2, z2){
+      // great-circle separation in degrees using spherical law of cosines
+      const toR=d=>d*Math.PI/180; const A1=toR(a1), Z1=toR(90-z1), A2=toR(a2), Z2=toR(90-z2);
+      const cos = Math.sin(Z1)*Math.sin(Z2)*Math.cos(A1-A2) + Math.cos(Z1)*Math.cos(Z2);
+      return Math.max(0, Math.min(180, Math.acos(cos)*180/Math.PI));
+    }
+
+    function updateNearest(objs){
+      if (!objs.length) { nearestName.textContent='—'; nearestSep.textContent='—'; return; }
+      let best=null, bestSep=999;
+      for(const o of objs){ const s = angularSeparation(o.az,o.alt, state.pointing.az,state.pointing.alt); if (s<bestSep){ best=o; bestSep=s; } }
+      nearestName.textContent = `${best.name} (${best.cat})`;
+      nearestSep.textContent = `${bestSep.toFixed(1)}° away`;
+      // Alert if within 4°
+      if (bestSep < 4){ nearestSep.classList.add('ok'); navigator.vibrate?.(20); } else nearestSep.classList.remove('ok');
+    }
+
+    /***** Toggles & search *****/
+    $('#togglePlanets').addEventListener('change', e=> state.filters.planets = e.target.checked);
+    $('#toggleStars').addEventListener('change', e=> state.filters.stars   = e.target.checked);
+    $('#toggleSats').addEventListener('change', e=> { state.filters.sats = e.target.checked; if (e.target.checked && state.tle.length===0) loadGeoTLE(); });
+    $('#search').addEventListener('input', ()=>{});
+
+    /***** PWA manifest + service worker *****/
+    (function setupPWA(){
+      const manifest = {
+        name: "AR Sky Finder",
+        short_name: "SkyFinder",
+        description: "Point-and-name planets, bright stars, and TV (GEO) satellites. Declination auto-filled by GPS.",
+        display: "standalone",
+        start_url: ".",
+        background_color: "#0b1020",
+        theme_color: "#0b1020",
+        icons: [
+          { src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><radialGradient id='g' cx='60%' cy='40%'><stop offset='0' stop-color='%23aaf'/><stop offset='1' stop-color='%230b1020'/></radialGradient></defs><rect width='512' height='512' fill='url(%23g)'/><circle cx='256' cy='256' r='170' fill='none' stroke='%23fff' stroke-width='18'/><circle cx='256' cy='256' r='6' fill='%23fff'/></svg>", sizes:"512x512", type:"image/svg+xml" }
+        ]
+      };
+      const mblob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
+      const link = document.createElement('link'); link.rel='manifest'; link.href = URL.createObjectURL(mblob); document.head.appendChild(link);
+
+      // Service worker as a blob (works on most Chromium-based browsers). If your host blocks blob SW, deploy as /sw.js with same code.
+      const swCode = `self.addEventListener('install',e=>{e.waitUntil(caches.open('skyfinder-v2').then(c=>c.addAll(['./','./index.html','https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/+esm','https://cdnjs.cloudflare.com/ajax/libs/satellite.js/1.3.0/satellite.min.js'])))});
+        self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)))})`;
+      try{
+        if ('serviceWorker' in navigator){
+          const blob = new Blob([swCode], {type:'text/javascript'});
+          const url = URL.createObjectURL(blob);
+          navigator.serviceWorker.register(url).catch(()=>{});
+        }
+      }catch{}
+
+      // install prompt button
+      let deferred; window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferred=e; $('#installBtn').hidden=false; });
+      $('#installBtn').addEventListener('click', async()=>{ if (!deferred) return; deferred.prompt(); try{ await deferred.userChoice; }finally{ $('#installBtn').hidden=true; } });
+    })();
+
+    /***** Kickoff *****/
+    // Initial TLE load deferred until toggle enabled
+    requestAnimationFrame(tick);
+
+    // Simple sky summary
+    setInterval(()=>{ skySummary.textContent = state.pointing.alt>0? 'Sky above horizon visible':'Point at the sky'; }, 1000);
+
+  </script>
+</body>
+</html>
