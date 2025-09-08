@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stargazer Pro</title>
+    <title>Stargazer Pro Night Mode</title>
     <style>
         :root {
-            --bg-color: #0c1524;
-            --card-color: #1a2233;
-            --text-color: #e0e6f0;
-            --highlight-color: #79a7ff;
-            --accent-color: #f77f00;
+            --bg-color: #0d0000; /* Very dark red */
+            --card-color: #1a0505; /* Darker red-tinted background */
+            --text-color: #f0c0c0; /* Light red/pinkish text */
+            --highlight-color: #ff4a4a; /* Main red highlight */
+            --accent-color: #ffa04a; /* Orange for contrast/alerts */
+            --border-color: rgba(255, 74, 74, 0.2);
         }
 
         body {
@@ -24,8 +25,8 @@
             margin: 0;
             padding: 20px;
             overflow-x: hidden;
-            background-image: radial-gradient(circle, #1a2233 1px, transparent 1px);
-            background-size: 20px 20px;
+            background-image: radial-gradient(circle, #2a0505 1px, transparent 1px);
+            background-size: 30px 30px;
         }
 
         .container {
@@ -50,7 +51,8 @@
         
         h1 {
             font-size: 2.5em;
-            text-shadow: 0 0 10px rgba(121, 167, 255, 0.5);
+            text-shadow: 0 0 10px rgba(255, 74, 74, 0.5);
+            margin-bottom: 20px;
         }
         
         #permission-prompt {
@@ -59,7 +61,7 @@
         }
 
         #permission-button {
-            background-color: var(--accent-color);
+            background-color: var(--highlight-color);
             color: black;
             border: none;
             padding: 15px 30px;
@@ -67,11 +69,12 @@
             font-weight: bold;
             border-radius: 10px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
         #permission-button:hover {
-            background-color: #ff912a;
+            background-color: #ff7070;
+            transform: translateY(-2px);
         }
 
         .card {
@@ -79,7 +82,7 @@
             border-radius: 15px;
             padding: 25px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
             backdrop-filter: blur(5px);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
@@ -120,6 +123,9 @@
             height: 250px;
             position: relative;
             margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         #compass {
@@ -127,7 +133,7 @@
             height: 100%;
             border-radius: 50%;
             background: conic-gradient(
-                #3a4860 0deg, #3a4860 1deg,
+                #3a0f0f 0deg, #3a0f0f 1deg,
                 transparent 1deg, transparent 9deg
             );
             background-size: 10% 100%;
@@ -136,6 +142,17 @@
             justify-content: center;
             align-items: center;
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        #compass-center {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--highlight-color);
+            z-index: 2; /* Ensure it's above the needle */
+            box-shadow: 0 0 15px var(--highlight-color);
         }
 
         #compass::before {
@@ -144,32 +161,23 @@
             top: 5px;
             font-size: 2em;
             color: var(--accent-color);
+            z-index: 1;
         }
         #compass::after {
             content: 'S';
             position: absolute;
             bottom: 5px;
             font-size: 2em;
+            z-index: 1;
         }
 
         #compass-needle {
-            width: 50%;
-            height: 50%;
+            width: 4px; /* Thinner needle */
+            height: 90%; /* Extend closer to edge */
             position: absolute;
-            transform-origin: 50% 100%;
+            transform-origin: 50% 50%; /* Center of the needle */
             transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        #needle-base {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: var(--highlight-color);
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 15px var(--highlight-color);
+            z-index: 1;
         }
 
         #needle-north {
@@ -179,10 +187,10 @@
             border-right: 10px solid transparent;
             border-bottom: 120px solid var(--accent-color);
             position: absolute;
-            bottom: 50%;
+            bottom: 50%; /* Starts from the center */
             left: 50%;
             transform: translateX(-50%);
-            filter: drop-shadow(0 0 5px rgba(247, 127, 0, 0.8));
+            filter: drop-shadow(0 0 5px rgba(255, 160, 74, 0.8));
         }
         
         #direction-text {
@@ -190,6 +198,137 @@
             font-weight: bold;
             text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
             margin-top: 10px;
+            color: var(--accent-color);
+        }
+
+        /* 3D Angle Meter Styles */
+        #angle-meter-card {
+            padding-bottom: 10px; /* Adjust padding */
+        }
+        #angle-meter-display {
+            perspective: 1000px;
+            width: 100%;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        #pitch-roll-box {
+            width: 180px;
+            height: 100px;
+            background-color: rgba(255, 74, 74, 0.1);
+            border: 2px solid var(--highlight-color);
+            border-radius: 10px;
+            transform-style: preserve-3d;
+            transform: rotateX(0deg) rotateY(0deg); /* Initial state */
+            transition: transform 0.1s linear; /* Smooth movement */
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--text-color);
+            text-shadow: 0 0 5px rgba(255, 74, 74, 0.5);
+            box-shadow: 0 0 20px rgba(255, 74, 74, 0.3);
+        }
+        
+        #pitch-roll-box::before {
+            content: 'Level';
+            position: absolute;
+            font-size: 0.8em;
+            bottom: 5px;
+            color: var(--accent-color);
+        }
+
+        #target-pitch-line, #target-roll-line {
+            position: absolute;
+            background-color: #00ff00; /* Green target line */
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+            z-index: 10;
+            display: none; /* Hidden by default */
+        }
+
+        #target-pitch-line {
+            width: 100%;
+            height: 2px;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+        }
+
+        #target-roll-line {
+            width: 2px;
+            height: 100%;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #pitch-roll-indicator {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            box-shadow: 0 0 15px var(--accent-color);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 11;
+        }
+
+        /* Satellite Finder Mode */
+        #satellite-finder-card .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        #satellite-finder-card label {
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        #satellite-finder-card select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: rgba(0, 0, 0, 0.3);
+            color: var(--text-color);
+            font-size: 1em;
+            appearance: none; /* Remove default arrow */
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%20viewBox%3D%220%200%20292.4%20292.4%22%3E%3Cpath%20fill%3D%22%23ff4a4a%22%20d%3D%22M287%20114.5L146.2%20255.3%205.4%20114.5h281.6z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: 12px auto;
+        }
+
+        #satellite-finder-card select:focus {
+            outline: none;
+            border-color: var(--highlight-color);
+            box-shadow: 0 0 0 2px rgba(255, 74, 74, 0.3);
+        }
+
+        #target-guidance {
+            text-align: center;
+            font-size: 1.1em;
+            margin-top: 15px;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+        
+        .guidance-values {
+            font-size: 1.3em;
+            color: var(--highlight-color);
+            margin-top: 5px;
+            display: block;
         }
 
         /* Sky Objects List */
@@ -204,14 +343,16 @@
             justify-content: space-between;
             align-items: center;
             padding: 15px;
-            background-color: rgba(0, 0, 0, 0.2);
+            background-color: rgba(255, 74, 74, 0.05); /* Lighter red tint */
             border-radius: 10px;
             margin-bottom: 10px;
-            transition: background-color 0.2s ease;
+            border: 1px solid rgba(255, 74, 74, 0.1);
+            transition: background-color 0.2s ease, transform 0.2s ease;
         }
 
         .sky-object-item:hover {
-            background-color: rgba(0, 0, 0, 0.4);
+            background-color: rgba(255, 74, 74, 0.15);
+            transform: translateX(5px);
         }
         
         .object-name {
@@ -227,10 +368,11 @@
 
         .object-details span {
             display: block;
+            color: var(--text-color);
         }
-
+        
         .alert {
-            background-color: var(--accent-color);
+            background-color: var(--highlight-color);
             color: black;
             padding: 15px;
             border-radius: 10px;
@@ -241,16 +383,16 @@
         }
         
         @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(247, 127, 0, 0.4); }
-            70% { transform: scale(1.02); box-shadow: 0 0 0 15px rgba(247, 127, 0, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(247, 127, 0, 0); }
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 74, 74, 0.4); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 15px rgba(255, 74, 74, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 74, 74, 0); }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Stargazer Pro 🔭</h1>
+    <h1>Stargazer Pro Night Mode 🔭</h1>
     <div id="status">Please tap the button to enable location and sensors.</div>
 
     <div id="permission-prompt">
@@ -268,17 +410,47 @@
         </div>
         
         <div class="card" id="compass-card">
-            <h2>Live Compass & Height Finder</h2>
+            <h2>Live Compass</h2>
             <div id="compass-container">
                 <div id="compass">
                     <div id="compass-needle">
                         <div id="needle-north"></div>
                     </div>
-                    <div id="needle-base"></div>
+                    <div id="compass-center"></div>
                 </div>
             </div>
             <p id="direction-text">--</p>
-            <p id="height-angle-text">Angle: --</p>
+        </div>
+
+        <div class="card" id="angle-meter-card">
+            <h2>3D Angle Meter</h2>
+            <div id="angle-meter-display">
+                <div id="pitch-roll-box">
+                    <div id="target-pitch-line"></div>
+                    <div id="target-roll-line"></div>
+                    <div id="pitch-roll-indicator"></div>
+                    <span id="pitch-roll-values">Pitch: 0° Roll: 0°</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="satellite-finder-card">
+            <h2>Satellite Finder</h2>
+            <div class="input-group">
+                <label for="satellite-select">Select Satellite:</label>
+                <select id="satellite-select">
+                    <option value="">-- Select --</option>
+                    <option value="astra28">Astra 28.2°E</option>
+                    <option value="hotbird13">Hotbird 13°E</option>
+                    <option value="eutelsat16">Eutelsat 16°E</option>
+                    <option value="nilesat7">Nilesat 7°W</option>
+                </select>
+            </div>
+            <div id="target-guidance">
+                <p>Target Azimuth: <span class="guidance-values" id="target-azimuth">--</span></p>
+                <p>Target Elevation: <span class="guidance-values" id="target-elevation">--</span></p>
+                <p id="guidance-message"></p>
+            </div>
         </div>
         
         <div class="card" id="sky-objects-card">
@@ -290,13 +462,23 @@
 </div>
 
 <script>
-    // Constants for astronomical calculations (for a few objects)
+    // Constants for astronomical calculations (simplified)
+    // NOTE: For a real app, these would come from a comprehensive ephemeris or API.
+    // LEO/MEO satellites move rapidly; GEO satellites (like TV sats) are geostationary.
     const SKY_OBJECTS = {
-        'Moon': { ra: 12.0, dec: 15.0 }, // Example coordinates
+        'Moon': { ra: 12.0, dec: 15.0 }, 
         'Jupiter': { ra: 18.5, dec: -23.0 },
         'Venus': { ra: 9.2, dec: 10.5 },
         'Mars': { ra: 2.0, dec: 1.0 },
         'Sirius': { ra: 6.75, dec: -16.71 },
+    };
+
+    // Simplified Geostationary Satellite Data (Longitude in degrees East)
+    const SATELLITE_DATA = {
+        'astra28': { name: 'Astra 28.2°E', longitude: 28.2 },
+        'hotbird13': { name: 'Hotbird 13°E', longitude: 13.0 },
+        'eutelsat16': { name: 'Eutelsat 16°E', longitude: 16.0 },
+        'nilesat7': { name: 'Nilesat 7°W', longitude: -7.0 }, // West is negative
     };
 
     // DOM Elements
@@ -306,26 +488,60 @@
     const altitudeEl = document.getElementById('altitude');
     const compassNeedle = document.getElementById('compass-needle');
     const directionText = document.getElementById('direction-text');
-    const heightAngleText = document.getElementById('height-angle-text');
+    const pitchRollBox = document.getElementById('pitch-roll-box');
+    const pitchRollValues = document.getElementById('pitch-roll-values');
+    const pitchRollIndicator = document.getElementById('pitch-roll-indicator');
+    const targetPitchLine = document.getElementById('target-pitch-line');
+    const targetRollLine = document.getElementById('target-roll-line');
     const objectListEl = document.getElementById('object-list');
     const permissionButton = document.getElementById('permission-button');
     const appContent = document.getElementById('app-content');
     const permissionPrompt = document.getElementById('permission-prompt');
+    const satelliteSelect = document.getElementById('satellite-select');
+    const targetAzimuthEl = document.getElementById('target-azimuth');
+    const targetElevationEl = document.getElementById('target-elevation');
+    const guidanceMessage = document.getElementById('guidance-message');
 
     // State Variables
     let userLat = null;
     let userLon = null;
     let userAlt = null;
+    let currentHeading = 0;
+    let currentPitch = 0;
+    let currentRoll = 0;
+    let selectedSatellite = null;
+    let targetSatAzimuth = null;
+    let targetSatElevation = null;
 
-    // Main Initialization
+    // --- Utility Functions ---
+    function toRadians(degrees) {
+        return degrees * Math.PI / 180;
+    }
+
+    function toDegrees(radians) {
+        return radians * 180 / Math.PI;
+    }
+
+    // --- Main Initialization ---
     permissionButton.addEventListener('click', requestPermissionsAndInit);
+    satelliteSelect.addEventListener('change', (event) => {
+        const satId = event.target.value;
+        selectedSatellite = SATELLITE_DATA[satId];
+        if (selectedSatellite && userLat !== null && userLon !== null) {
+            calculateSatellitePosition(userLat, userLon, selectedSatellite.longitude);
+        } else {
+            targetAzimuthEl.textContent = '--';
+            targetElevationEl.textContent = '--';
+            guidanceMessage.textContent = 'Select a satellite and ensure location is active.';
+            targetPitchLine.style.display = 'none';
+            targetRollLine.style.display = 'none';
+        }
+    });
 
     function requestPermissionsAndInit() {
-        // Hide the button and show loading status
         permissionPrompt.style.display = 'none';
         statusEl.textContent = "Requesting permissions...";
 
-        // Request DeviceOrientation permission first
         if (typeof DeviceOrientationEvent.requestPermission === 'function') {
             DeviceOrientationEvent.requestPermission()
                 .then(permissionState => {
@@ -335,17 +551,16 @@
                         getLocation();
                         appContent.style.display = 'block';
                     } else {
-                        statusEl.textContent = "Motion sensor permission denied.";
+                        statusEl.textContent = "Motion sensor permission denied. Tap to retry.";
                         permissionPrompt.style.display = 'block';
                     }
                 })
                 .catch(error => {
-                    statusEl.textContent = "Error requesting motion sensor permission.";
+                    statusEl.textContent = "Error requesting motion sensor permission. Tap to retry.";
                     permissionPrompt.style.display = 'block';
                     console.error(error);
                 });
         } else {
-            // For browsers that don't need explicit permission (Android, etc.)
             statusEl.textContent = "Motion sensor permission not required. Getting location...";
             setupSensors();
             getLocation();
@@ -371,11 +586,14 @@
                 statusEl.textContent = "Location updated.";
                 
                 calculateAndDisplayObjects();
+                if (selectedSatellite) {
+                    calculateSatellitePosition(userLat, userLon, selectedSatellite.longitude);
+                }
             },
             (error) => {
-                let errorMsg = `Geolocation Error: ${error.message}`;
+                let errorMsg = `Geolocation Error: ${error.message}.`;
                 if (window.location.protocol === 'http:') {
-                    errorMsg += " Note: This feature requires HTTPS.";
+                    errorMsg += " HTTPS is required for location on many devices.";
                 }
                 statusEl.textContent = errorMsg;
                 console.error(error);
@@ -390,20 +608,30 @@
 
     function setupSensors() {
         window.addEventListener('deviceorientation', (e) => {
-            const heading = e.webkitCompassHeading || (360 - e.alpha);
-            compassNeedle.style.transform = `rotate(${heading}deg)`;
+            currentHeading = e.webkitCompassHeading || (360 - e.alpha);
+            compassNeedle.style.transform = `rotate(${currentHeading}deg)`;
             
             const directions = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
-            const index = Math.round(heading / 22.5) % 16;
-            directionText.textContent = `${directions[index]} (${heading.toFixed(0)}°)`;
+            const index = Math.round(currentHeading / 22.5) % 16;
+            directionText.textContent = `${directions[index]} (${currentHeading.toFixed(0)}°)`;
             
-            // Height Angle (Pitch) - using beta
-            const beta = e.beta;
-            heightAngleText.textContent = `Angle: ${beta ? beta.toFixed(1) + '°' : 'N/A'}`;
+            // 3D Angle Meter updates
+            currentPitch = e.beta; // X-axis rotation (front-back tilt)
+            currentRoll = e.gamma; // Y-axis rotation (side-to-side tilt)
+
+            // Clamp pitch and roll for visual stability (e.g., -90 to 90 for pitch)
+            currentPitch = Math.max(-90, Math.min(90, currentPitch));
+            currentRoll = Math.max(-90, Math.min(90, currentRoll));
+
+            pitchRollBox.style.transform = `rotateX(${currentPitch}deg) rotateY(${currentRoll}deg)`;
+            pitchRollValues.textContent = `Pitch: ${currentPitch.toFixed(0)}° Roll: ${currentRoll.toFixed(0)}°`;
+
+            // Update satellite guidance
+            updateSatelliteGuidance();
         });
     }
 
-    // Astronomical Calculations (Simplified)
+    // --- Astronomical Calculations (Simplified) ---
     function calculateAndDisplayObjects() {
         if (userLat === null || userLon === null) return;
 
@@ -418,17 +646,17 @@
             const lst = (100.46 + 0.985647 * (jd - 2451545) + userLon) % 360;
             const ha = (lst - coords.ra * 15 + 360) % 360; // Hour Angle
             
-            const radLat = userLat * Math.PI / 180;
-            const radDec = coords.dec * Math.PI / 180;
-            const radHa = ha * Math.PI / 180;
+            const radLat = toRadians(userLat);
+            const radDec = toRadians(coords.dec);
+            const radHa = toRadians(ha);
             
             const sinAlt = Math.sin(radLat) * Math.sin(radDec) + Math.cos(radLat) * Math.cos(radDec) * Math.cos(radHa);
-            const altitude = Math.asin(sinAlt) * 180 / Math.PI;
+            const altitude = toDegrees(Math.asin(sinAlt));
 
-            if (altitude > 0) {
-                let cosAz = (Math.sin(radDec) - Math.sin(radLat) * sinAlt) / (Math.cos(radLat) * Math.cos(Math.asin(sinAlt)));
-                cosAz = Math.max(-1, Math.min(1, cosAz));
-                let azimuth = Math.acos(cosAz) * 180 / Math.PI;
+            if (altitude > 0) { // Only show objects above the horizon
+                let cosAz = (Math.sin(radDec) - Math.sin(radLat) * sinAlt) / (Math.cos(radLat) * Math.cos(toRadians(altitude)));
+                cosAz = Math.max(-1, Math.min(1, cosAz)); // Clamp to avoid NaN from floating point errors
+                let azimuth = toDegrees(Math.acos(cosAz));
 
                 if (Math.sin(radHa) > 0) {
                     azimuth = 360 - azimuth;
@@ -445,7 +673,7 @@
                 `;
                 objectListEl.appendChild(listItem);
                 
-                if (altitude > 45) {
+                if (altitude > 45 && altitude < 80) { // Example alert for objects high but not directly overhead
                     objectsToAlert.push({ name, azimuth: azimuth.toFixed(0) });
                 }
             }
@@ -460,8 +688,131 @@
             const alertText = objectsToAlert.map(obj => `${obj.name} (Azimuth: ${obj.azimuth}°)`).join(', ');
             const alertDiv = document.createElement('div');
             alertDiv.className = 'alert';
-            alertDiv.textContent = `High in the sky: ${alertText}!`;
+            alertDiv.textContent = `Look out! ${alertText} are prominent now.`;
             document.querySelector('.container').appendChild(alertDiv);
+        }
+    }
+
+    // --- Satellite Position Calculation (Geostationary) ---
+    function calculateSatellitePosition(observerLat, observerLon, satLon) {
+        // All calculations in radians
+        const obsLatR = toRadians(observerLat);
+        const obsLonR = toRadians(observerLon);
+        const satLonR = toRadians(satLon);
+
+        const G = toRadians(satLon - observerLon); // Longitude difference
+
+        // Constants (approximations for GEO sat)
+        const Re = 6378.137; // Earth radius in km
+        const Rs = 42164;    // GEO satellite orbital radius in km (approx 35786 km above surface)
+
+        const sinEl = (Rs * Math.cos(obsLatR) * Math.sin(G) - Re * Math.sin(obsLatR)) / 
+                      (Math.sqrt(Rs * Rs + Re * Re - 2 * Rs * Re * Math.cos(obsLatR) * Math.cos(G)));
+        
+        const elevation = toDegrees(Math.asin(sinEl));
+
+        let azimuth;
+        if (Math.abs(elevation) < 0.1) { // If very close to horizon, azimuth can be tricky
+            azimuth = (G > 0 ? 90 : 270); // East or West
+        } else {
+            const sinAz = -Math.sin(G) * Math.cos(obsLatR) / Math.cos(toRadians(elevation));
+            const cosAz = (Math.sin(obsLatR) * Math.cos(G) * Math.cos(obsLatR) - Math.cos(obsLatR) * Math.sin(obsLatR)) / (Math.cos(toRadians(elevation)));
+            
+            // Simplified calculation for azimuth
+            azimuth = toDegrees(Math.atan2(-Math.sin(G), Math.tan(obsLatR) * Math.cos(G) - Math.sin(obsLatR) / Math.cos(G)));
+            azimuth = (azimuth + 360) % 360; // Ensure positive 0-360 range
+        }
+        
+        targetSatAzimuth = azimuth;
+        targetSatElevation = elevation;
+
+        targetAzimuthEl.textContent = `${azimuth.toFixed(1)}°`;
+        targetElevationEl.textContent = `${elevation.toFixed(1)}°`;
+
+        if (elevation < 1) {
+            guidanceMessage.textContent = "Satellite is below the horizon or too low for your location.";
+            targetPitchLine.style.display = 'none';
+            targetRollLine.style.display = 'none';
+        } else {
+            guidanceMessage.textContent = "Point your device towards the target!";
+            targetPitchLine.style.display = 'block';
+            targetRollLine.style.display = 'block';
+        }
+        updateSatelliteGuidance();
+    }
+
+    // --- Update Satellite Guidance (Visual) ---
+    function updateSatelliteGuidance() {
+        if (!selectedSatellite || targetSatAzimuth === null || targetSatElevation === null) {
+            targetPitchLine.style.display = 'none';
+            targetRollLine.style.display = 'none';
+            pitchRollIndicator.style.backgroundColor = var(--accent-color);
+            return;
+        }
+
+        // Compass Guidance
+        const diffAzimuth = (targetSatAzimuth - currentHeading + 360) % 360;
+        let rotationHint = '';
+        if (Math.abs(diffAzimuth) > 5) {
+            if (diffAzimuth > 180) { // Rotate left
+                rotationHint = `Turn Left ${ (360 - diffAzimuth).toFixed(0)}°`;
+            } else { // Rotate right
+                rotationHint = `Turn Right ${diffAzimuth.toFixed(0)}°`;
+            }
+        } else {
+             rotationHint = 'Heading aligned!';
+        }
+        guidanceMessage.textContent = rotationHint + ` | Elev: ${targetSatElevation.toFixed(0)}°`;
+
+        // 3D Angle Meter Guidance
+        // Adjust the target lines based on the required pitch (elevation)
+        // Pitch goes from -90 (down) to +90 (up). 0 is flat.
+        // We want the target line to appear at the target elevation.
+        // A direct mapping (target elevation = current pitch) is simplified.
+        // We simulate the "target" position within the box based on the required elevation.
+        
+        const targetPitch = targetSatElevation; // This is the pitch we want the device to be at.
+        const pitchTolerance = 5; // degrees
+
+        // Adjust the indicator's vertical position based on pitch difference
+        // A more advanced approach would transform the box, but this directly shows delta.
+        // For simplicity, we align target pitch line to center, and indicator moves.
+        
+        // This makes the target pitch line appear "level" within the 3D box when it's at the correct elevation.
+        // For a more direct "leveling" feel, consider mapping elevation to the *actual* pitch of the box.
+        
+        const currentPitchDiff = currentPitch - targetPitch;
+        
+        // Map currentPitchDiff to a visual offset in the box (e.g., -50 to 50 for top/bottom)
+        const indicatorPitchPos = -currentPitchDiff * (100 / 180); // Map -90 to 90 to -50 to 50px offset
+        pitchRollIndicator.style.top = `calc(50% + ${indicatorPitchPos}px)`;
+
+        // For Roll (side-to-side), we want it to be as close to 0 as possible.
+        const indicatorRollPos = currentRoll * (100 / 180); // Map -90 to 90 to -50 to 50px offset
+        pitchRollIndicator.style.left = `calc(50% - ${indicatorRollPos}px)`; // Invert for natural feel
+
+        // Change indicator color based on alignment
+        if (Math.abs(diffAzimuth) < pitchTolerance && Math.abs(currentPitchDiff) < pitchTolerance && Math.abs(currentRoll) < pitchTolerance) {
+            pitchRollIndicator.style.backgroundColor = '#00ff00'; // Green when aligned
+            pitchRollIndicator.style.boxShadow = '0 0 15px #00ff00';
+            guidanceMessage.textContent = `Locked on ${selectedSatellite.name}!`;
+        } else {
+            pitchRollIndicator.style.backgroundColor = var(--accent-color);
+            pitchRollIndicator.style.boxShadow = `0 0 15px ${var(--accent-color)}`;
+        }
+        
+        // Hide target lines if not in satellite mode
+        if (!selectedSatellite) {
+            targetPitchLine.style.display = 'none';
+            targetRollLine.style.display = 'none';
+        } else {
+            targetPitchLine.style.display = 'block';
+            targetRollLine.style.display = 'block';
+            // Position the target lines to guide the user towards 0 pitch and roll relative to the desired target.
+            // When currentPitch is equal to targetPitch, the indicator should be at the center of the box.
+            // This means the lines are centered.
+            targetPitchLine.style.transform = `translateY(-50%) rotateX(${currentPitch}deg)`; // This is a conceptual representation
+            targetRollLine.style.transform = `translateX(-50%) rotateY(${currentRoll}deg)`; // This is a conceptual representation
         }
     }
 </script>
