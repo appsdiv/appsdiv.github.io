@@ -548,6 +548,35 @@
             </div>
         </div>
 
+        <div class="card sky-finder-card" id="satellite-finder-card">
+            <h2>یابنده ماهواره</h2>
+            <div class="input-group">
+                <label for="satellite-select">انتخاب ماهواره:</label>
+                <select id="satellite-select">
+                    <option value="">-- انتخاب کنید --</option>
+                    <option value="astra28">Astra 28.2°E</option>
+                    <option value="hotbird13">Hotbird 13°E</option>
+                    <option value="eutelsat16">Eutelsat 16°E</option>
+                    <option value="yahsat52">Yahsat 52.5°E</option>
+                    <option value="turksat42">Turksat 42°E</option>
+                    <option value="intelsat68">Intelsat 68.5°E</option>
+                    <option value="badr26">Badr 26°E</option>
+                    <option value="monacosat52">MonacoSat (TurkmenÄlem) 52°E</option>
+                    <option value="express53">Express-AM6 53°E</option>
+                    <option value="nilesat7">Nilesat 7°W</option>
+                    <option value="galaxy19">Galaxy 19 97°W</option>
+                    <option value="asia3s105">AsiaSat 3S 105.5°E</option>
+                    <option value="intelsat2068">Intelsat 20 68.5°E</option>
+                    <option value="eutelsat7">Eutelsat 7°E</option>
+                    <option value="eutelsat9">Eutelsat 9°E</option>
+                </select>
+            </div>
+            <div id="target-guidance-sat">
+                <p>سمت هدف: <span class="guidance-values" id="target-azimuth-sat">--</span></p>
+                <p>ارتفاع هدف: <span class="guidance-values" id="target-elevation-sat">--</span></p>
+            </div>
+        </div>
+
         <div class="card sky-finder-card" id="auto-finder-card">
             <h2>اجرام در نزدیکی شما</h2>
             <ul id="sky-objects-list">
@@ -609,14 +638,35 @@
         'No objects found near your view.': 'جرم آسمانی در نزدیکی دید شما پیدا نشد.',
         'Azimuth:': 'سمت:',
         'Elevation:': 'ارتفاع:',
+        'Satellite Finder': 'یابنده ماهواره',
+        'Select Satellite:': 'انتخاب ماهواره:',
+        'Target Azimuth:': 'سمت هدف:',
+        'Target Elevation:': 'ارتفاع هدف:',
     };
 
     function translate(key) {
         return translations[key] || key;
     }
 
+    const SATELLITE_DATA = {
+        'astra28': { name: 'Astra 28.2°E', longitude: 28.2 },
+        'hotbird13': { name: 'Hotbird 13°E', longitude: 13.0 },
+        'eutelsat16': { name: 'Eutelsat 16°E', longitude: 16.0 },
+        'yahsat52': { name: 'Yahsat 52.5°E', longitude: 52.5 },
+        'turksat42': { name: 'Turksat 42°E', longitude: 42.0 },
+        'intelsat68': { name: 'Intelsat 68.5°E', longitude: 68.5 },
+        'badr26': { name: 'Badr 26°E', longitude: 26.0 },
+        'monacosat52': { name: 'MonacoSat (TurkmenÄlem) 52°E', longitude: 52.0 },
+        'express53': { name: 'Express-AM6 53°E', longitude: 53.0 },
+        'nilesat7': { name: 'Nilesat 7°W', longitude: -7.0 },
+        'galaxy19': { name: 'Galaxy 19 97°W', longitude: -97.0 },
+        'asia3s105': { name: 'AsiaSat 3S 105.5°E', longitude: 105.5 },
+        'intelsat2068': { name: 'Intelsat 20 68.5°E', longitude: 68.5 },
+        'eutelsat7': { name: 'Eutelsat 7°E', longitude: 7.0 },
+        'eutelsat9': { name: 'Eutelsat 9°E', longitude: 9.0 },
+    };
+
     const SKY_OBJECTS = {
-        // Planets & Moon
         'moon': { name: 'ماه', type: 'planet', visibility: 'naked_eye' },
         'mercury': { name: 'عطارد', type: 'planet', visibility: 'naked_eye' },
         'venus': { name: 'زهره', type: 'planet', visibility: 'naked_eye' },
@@ -624,23 +674,19 @@
         'jupiter': { name: 'مشتری', type: 'planet', visibility: 'naked_eye' },
         'saturn': { name: 'زحل', type: 'planet', visibility: 'naked_eye' },
         
-        // Stars
         'sirius': { name: 'شباهنگ (Sirius)', type: 'star', starId: 'Sirius', visibility: 'naked_eye' },
         'canopus': { name: 'سهیل (Canopus)', type: 'star', starId: 'Canopus', visibility: 'naked_eye' },
         'alpha_centauri': { name: 'آلفا قنطورس (Alpha Centauri)', type: 'star', starId: 'AlphaCentauri', visibility: 'naked_eye' },
         'vega': { name: 'نسر واقع (Vega)', type: 'star', starId: 'Vega', visibility: 'naked_eye' },
         'polaris': { name: 'ستاره قطبی (Polaris)', type: 'star', starId: 'Polaris', visibility: 'naked_eye' },
 
-        // Nebulae & Galaxies
         'andromeda': { name: 'کهکشان آندرومدا (M31)', type: 'dso', dsoId: 'M31', visibility: 'naked_eye' },
         'orion_nebula': { name: 'سحابی جبار (M42)', type: 'dso', dsoId: 'M42', visibility: 'naked_eye' },
 
-        // Satellites
         'iss': { name: 'ایستگاه فضایی بین‌المللی (ISS)', type: 'satellite', tle: ['1 25544U 98067A   20138.72895663  .00000851  00000-0  23062-4 0  9990', '2 25544  51.6441 332.2285 0001090 273.9664  86.1118 15.49202525227787'], visibility: 'naked_eye' },
-        // Simplified Starlink for demonstration. In a real app, this would require live data.
         'starlink': { name: 'استارلینک (Starlink)', type: 'satellite', visibility: 'naked_eye' },
     };
-
+    
     const statusEl = document.getElementById('status');
     const errorMessageEl = document.getElementById('error-message');
     const latitudeEl = document.getElementById('latitude');
@@ -660,15 +706,21 @@
     const visibilityNoteEl = document.getElementById('visibility-note');
     const skyObjectsListEl = document.getElementById('sky-objects-list');
 
+    const satelliteSelect = document.getElementById('satellite-select');
+    const targetAzimuthSatEl = document.getElementById('target-azimuth-sat');
+    const targetElevationSatEl = document.getElementById('target-elevation-sat');
+
     let userLat = null;
     let userLon = null;
     let userAlt = 0;
     let currentHeading = 0;
     let currentPitch = 0;
     let selectedObject = null;
-    let targetObjectAzimuth = null;
-    let targetObjectElevation = null;
+    let selectedSatellite = null;
+    let targetAzimuth = null;
+    let targetElevation = null;
     let lastVibrated = false;
+    let isCelestialMode = true; // Default to celestial finder
 
     const observer = new astronomy.Observer();
 
@@ -685,13 +737,32 @@
     }
 
     permissionButton.addEventListener('click', requestPermissionsAndInit);
+
     skyObjectSelect.addEventListener('change', (event) => {
         const objectId = event.target.value;
-        selectedObject = SKY_OBJECTS[objectId];
-        if (selectedObject && userLat !== null && userLon !== null) {
-            updateTargetObjectPosition();
-        } else {
-            resetGuidance();
+        if (objectId) {
+            isCelestialMode = true;
+            satelliteSelect.value = ''; // Clear other select
+            selectedObject = SKY_OBJECTS[objectId];
+            if (userLat !== null && userLon !== null) {
+                updateTargetPosition();
+            } else {
+                resetGuidance();
+            }
+        }
+    });
+
+    satelliteSelect.addEventListener('change', (event) => {
+        const satId = event.target.value;
+        if (satId) {
+            isCelestialMode = false;
+            skyObjectSelect.value = ''; // Clear other select
+            selectedSatellite = SATELLITE_DATA[satId];
+            if (userLat !== null && userLon !== null) {
+                updateTargetPosition();
+            } else {
+                resetGuidance();
+            }
         }
     });
 
@@ -723,7 +794,7 @@
                         statusEl.textContent = translate('Motion sensor permission granted. Getting location...');
                         setupSensors();
                         getLocation();
-                        appContent.style.display = 'block';
+                        appContent.style.display = 'flex';
                     } else {
                         statusEl.textContent = translate('Motion sensor permission denied. Tap to retry.');
                         permissionPrompt.style.display = 'block';
@@ -739,7 +810,7 @@
             statusEl.textContent = translate('Motion sensor permission not required. Getting location...');
             setupSensors();
             getLocation();
-            appContent.style.display = 'block';
+            appContent.style.display = 'flex';
         }
     }
 
@@ -765,7 +836,7 @@
                 statusEl.textContent = translate('Location updated.');
                 hideErrorMessage();
 
-                updateTargetObjectPosition();
+                updateTargetPosition();
                 updateNearbyObjects();
             },
             (error) => {
@@ -815,7 +886,15 @@
         updateNearbyObjects();
     }
 
-    function updateTargetObjectPosition() {
+    function updateTargetPosition() {
+        if (isCelestialMode) {
+            calculateCelestialPosition();
+        } else {
+            calculateSatellitePosition();
+        }
+    }
+
+    function calculateCelestialPosition() {
         if (!selectedObject || userLat === null) {
             resetGuidance();
             return;
@@ -823,7 +902,6 @@
 
         const today = new Date();
         let pos;
-        let constellation = '';
 
         try {
             if (selectedObject.type === 'planet') {
@@ -833,10 +911,8 @@
             } else if (selectedObject.type === 'dso') {
                 pos = astronomy.Equator(selectedObject.dsoId, today, observer, true);
             } else if (selectedObject.type === 'satellite') {
-                // TLEs for ISS and simplified placeholder for Starlink. 
-                // Starlink would need a more complex, dynamic API call to get real TLEs.
                 if (selectedObject.name === 'ایستگاه فضایی بین‌المللی (ISS)') {
-                    const tle = new astronomy.Tle(
+                     const tle = new astronomy.Tle(
                         '1 25544U 98067A   20138.72895663  .00000851  00000-0  23062-4 0  9990', 
                         '2 25544  51.6441 332.2285 0001090 273.9664  86.1118 15.49202525227787'
                     );
@@ -851,13 +927,13 @@
             }
 
             const horizontalPos = astronomy.Horizon(today, observer, pos.ra, pos.dec);
-            targetObjectAzimuth = horizontalPos.azimuth;
-            targetObjectElevation = horizontalPos.altitude;
+            targetAzimuth = horizontalPos.azimuth;
+            targetElevation = horizontalPos.altitude;
 
-            targetAzimuthEl.textContent = `${targetObjectAzimuth.toFixed(1)}°`;
-            targetElevationEl.textContent = `${targetObjectElevation.toFixed(1)}°`;
+            targetAzimuthEl.textContent = `${targetAzimuth.toFixed(1)}°`;
+            targetElevationEl.textContent = `${targetElevation.toFixed(1)}°`;
 
-            if (targetObjectElevation <= 0) {
+            if (targetElevation <= 0) {
                 guidanceMessagesContainer.innerHTML = `<div class="alert">${translate('Object is below the horizon.')}</div>`;
                 visibilityNoteEl.textContent = '';
             } else {
@@ -883,6 +959,44 @@
         }
     }
 
+    function calculateSatellitePosition() {
+        if (!selectedSatellite || userLat === null) {
+            targetAzimuthSatEl.textContent = '--';
+            targetElevationSatEl.textContent = '--';
+            return;
+        }
+
+        const obsLatR = toRadians(userLat);
+        const obsLonR = toRadians(userLon);
+        const satLonR = toRadians(selectedSatellite.longitude);
+
+        const G = toRadians(selectedSatellite.longitude - userLon);
+
+        const Re = 6378.137;
+        const Rs = 42164;
+
+        const sinEl = (Math.cos(obsLatR) * Math.cos(G) - (Re / Rs)) / (Math.sqrt(1 - 2 * (Re / Rs) * Math.cos(obsLatR) * Math.cos(G) + Math.pow(Re / Rs, 2)));
+        let elevation = toDegrees(Math.asin(sinEl));
+        
+        let azimuth = toDegrees(Math.atan2(-Math.sin(G), Math.tan(obsLatR) * Math.cos(G) - Math.sin(obsLatR) / Math.cos(G)));
+        azimuth = (azimuth + 360) % 360;
+
+        if (isNaN(elevation) || elevation <= 0) {
+            elevation = 0;
+            azimuth = '--';
+            document.getElementById('target-guidance-sat').innerHTML = `<div class="alert">${translate('Object is below the horizon.')}</div>`;
+            return;
+        }
+
+        targetAzimuth = azimuth;
+        targetElevation = elevation;
+
+        targetAzimuthSatEl.textContent = `${targetAzimuth.toFixed(1)}°`;
+        targetElevationSatEl.textContent = `${targetElevation.toFixed(1)}°`;
+
+        updateGuidance();
+    }
+
     function resetGuidance() {
         targetAzimuthEl.textContent = '--';
         targetElevationEl.textContent = '--';
@@ -893,7 +1007,7 @@
     }
 
     function updateGuidance() {
-        if (!selectedObject || targetObjectAzimuth === null || targetObjectElevation === null || targetObjectElevation <= 0) {
+        if (targetAzimuth === null || targetElevation === null || targetElevation <= 0) {
             document.body.classList.remove('aligned');
             lastVibrated = false;
             return;
@@ -902,8 +1016,8 @@
         const azTolerance = 5;
         const elTolerance = 5;
 
-        const diffAzimuth = Math.abs((targetObjectAzimuth - currentHeading + 360) % 360);
-        const diffPitch = Math.abs(currentPitch - targetObjectElevation);
+        const diffAzimuth = Math.abs((targetAzimuth - currentHeading + 360) % 360);
+        const diffPitch = Math.abs(currentPitch - targetElevation);
 
         let isAzimuthAligned = diffAzimuth < azTolerance || diffAzimuth > 360 - azTolerance;
         let isPitchAligned = diffPitch < elTolerance;
@@ -924,12 +1038,12 @@
             guidanceMessagesContainer.innerHTML = `
                 <div class="guidance-container" id="azimuth-guidance-box">
                     <span class="guidance-message">${translate('Azimuth')}:</span>
-                    <span class="guidance-value">${targetObjectAzimuth.toFixed(0)}°</span>
+                    <span class="guidance-value">${targetAzimuth.toFixed(0)}°</span>
                     <span class="guidance-subtext" id="azimuth-subtext"></span>
                 </div>
                 <div class="guidance-container" id="elevation-guidance-box">
                     <span class="guidance-message">${translate('Elevation')}:</span>
-                    <span class="guidance-value">${targetObjectElevation.toFixed(0)}°</span>
+                    <span class="guidance-value">${targetElevation.toFixed(0)}°</span>
                     <span class="guidance-subtext" id="elevation-subtext"></span>
                 </div>`;
 
@@ -949,8 +1063,8 @@
                 document.getElementById('elevation-guidance-box').classList.add('aligned');
                 elevationSubtextEl.textContent = translate('Correct Tilt');
             } else {
-                let tiltInstruction = currentPitch < targetObjectElevation ? translate('Move your device up') : translate('Move your device down');
-                let diffEl = Math.abs(currentPitch - targetObjectElevation).toFixed(0);
+                let tiltInstruction = currentPitch < targetElevation ? translate('Move your device up') : translate('Move your device down');
+                let diffEl = Math.abs(currentPitch - targetElevation).toFixed(0);
                 elevationSubtextEl.textContent = `${tiltInstruction} (${diffEl}°)`;
             }
         }
@@ -958,19 +1072,17 @@
 
 
     function updateNearbyObjects() {
-        if (userLat === null) {
+        if (userLat === null || !isCelestialMode) {
             return;
         }
 
         const now = new Date();
         const nearbyObjects = [];
-        const visibleObjects = [];
         
         for (const key in SKY_OBJECTS) {
             const obj = SKY_OBJECTS[key];
             let pos;
             let horizontalPos;
-            let constellation = '';
 
             try {
                 if (obj.type === 'planet') {
@@ -980,7 +1092,7 @@
                 } else if (obj.type === 'dso') {
                     pos = astronomy.Equator(obj.dsoId, now, observer, true);
                 } else if (obj.type === 'satellite') {
-                    if (obj.name === 'ایستگاه فضایی بین‌المللی (ISS)') {
+                     if (obj.name === 'ایستگاه فضایی بین‌المللی (ISS)') {
                          const tle = new astronomy.Tle(
                             '1 25544U 98067A   20138.72895663  .00000851  00000-0  23062-4 0  9990', 
                             '2 25544  51.6441 332.2285 0001090 273.9664  86.1118 15.49202525227787'
@@ -1001,14 +1113,12 @@
                     const distance = Math.sqrt(Math.pow(diffAzimuth, 2) + Math.pow(diffPitch, 2));
 
                     if (distance < 30) {
-                        constellation = astronomy.ConstellationName(pos.ra, pos.dec);
                         nearbyObjects.push({
                             id: key,
                             name: obj.name,
                             distance: distance,
                             azimuth: horizontalPos.azimuth,
                             elevation: horizontalPos.altitude,
-                            constellation: constellation,
                             visibility: obj.visibility
                         });
                     }
@@ -1044,8 +1154,9 @@
             item.addEventListener('click', (e) => {
                 const id = e.currentTarget.getAttribute('data-id');
                 skyObjectSelect.value = id;
+                isCelestialMode = true;
                 selectedObject = SKY_OBJECTS[id];
-                updateTargetObjectPosition();
+                updateTargetPosition();
             });
         });
     }
