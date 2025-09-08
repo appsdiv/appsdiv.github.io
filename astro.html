@@ -459,7 +459,46 @@
             70% { transform: scale(1.02); box-shadow: 0 0 0 15px rgba(74, 255, 74, 0); }
             100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(74, 255, 74, 0); }
         }
-
+        
+        /* New Styles for better UI and precision */
+        #guidance-messages-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+            text-align: center;
+            min-height: 80px; /* Prevents layout shift */
+        }
+        
+        .guidance-message {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .guidance-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--highlight-color-red);
+            margin: 5px 0;
+            display: block;
+        }
+        
+        .guidance-subtext {
+            font-size: 0.9em;
+            color: var(--text-color-red);
+            opacity: 0.8;
+        }
+        
+        .guidance-container {
+            border: 1px solid var(--border-color-red);
+            border-radius: 10px;
+            padding: 15px;
+            transition: all 0.5s ease;
+        }
+        
+        .aligned .guidance-container {
+            border-color: var(--border-color-green);
+        }
     </style>
 </head>
 <body>
@@ -531,8 +570,10 @@
             <div id="target-guidance">
                 <p>سمت هدف: <span class="guidance-values" id="target-azimuth">--</span></p>
                 <p>ارتفاع هدف: <span class="guidance-values" id="target-elevation">--</span></p>
-                <p id="guidance-message"></p>
-                <p id="tilt-instruction"></p>
+                <div id="guidance-messages-container">
+                    <p id="azimuth-instruction" class="guidance-container"><span class="guidance-message">جهت‌یابی:</span> <span class="guidance-value">--</span></p>
+                    <p id="elevation-instruction" class="guidance-container"><span class="guidance-message">شیب:</span> <span class="guidance-value">--</span></p>
+                </div>
             </div>
         </div>
     </div>
@@ -555,12 +596,12 @@
         'Target Elevation': 'ارتفاع هدف',
         'Satellite is below the horizon or too low for your location.': 'ماهواره زیر افق است یا برای موقعیت شما خیلی پایین است.',
         'Point your device towards the target!': 'دستگاه خود را به سمت هدف بگیرید!',
-        'Turn Left': 'به سمت چپ بچرخانید',
-        'Turn Right': 'به سمت راست بچرخانید',
+        'Turn Left': 'به چپ بچرخید',
+        'Turn Right': 'به راست بچرخید',
         'Heading aligned!': 'جهت‌یابی صحیح است!',
         'Select a satellite and ensure location is active.': 'یک ماهواره انتخاب کنید و از فعال بودن موقعیت خود مطمئن شوید.',
         '-- Select --': '-- انتخاب کنید --',
-        'Enable Sensors': 'فعال‌سازی حسگرها',
+        'Enable Sensors and Location': 'فعال‌سازی حسگرها و موقعیت',
         'Motion sensor access is restricted in PWA mode on iOS. Please open this app directly in Safari to use the compass and 3D angle meter.': 'دسترسی به حسگر حرکتی در حالت PWA در iOS محدود است. لطفاً این برنامه را مستقیماً در مرورگر سافاری باز کنید تا از قطب‌نما و زاویه‌سنج استفاده کنید.',
         'Open in Safari': 'باز کردن در سافاری',
         'Tap the button to enable sensors and get started!': 'برای فعال‌سازی حسگرها و شروع، دکمه را لمس کنید!',
@@ -573,13 +614,13 @@
         'Geolocation Error: ': 'خطای موقعیت‌یابی: ',
         'HTTPS is required for location on many devices.': 'پروتکل HTTPS برای موقعیت‌یابی در بسیاری از دستگاه‌ها مورد نیاز است.',
         'Location updated.': 'موقعیت به‌روز شد.',
-        'Tilt your phone up to ': 'گوشی را به سمت بالا مایل کنید تا به ',
-        ' degrees.': ' درجه برسد.',
-        'Tilt your phone down to ': 'گوشی را به سمت پایین مایل کنید تا به ',
-        ' degrees.': ' درجه برسد.',
-        'Phone is tilted correctly.': 'گوشی به درستی مایل شده است.',
+        'Tilt Up': 'شیب به بالا',
+        'Tilt Down': 'شیب به پایین',
+        'Correct Tilt': 'شیب صحیح',
+        'Phone aligned!': 'دستگاه هم‌راستا شد!',
         'N/A': 'نامشخص',
-        'Phone aligned!': 'دستگاه هم‌راستا شد!'
+        'Azimuth': 'سمت',
+        'Elevation': 'ارتفاع'
     };
 
     function translate(key) {
@@ -619,8 +660,9 @@
     const satelliteSelect = document.getElementById('satellite-select');
     const targetAzimuthEl = document.getElementById('target-azimuth');
     const targetElevationEl = document.getElementById('target-elevation');
-    const guidanceMessage = document.getElementById('guidance-message');
-    const tiltInstructionEl = document.getElementById('tilt-instruction');
+    const guidanceMessagesContainer = document.getElementById('guidance-messages-container');
+    const azimuthInstructionEl = document.getElementById('azimuth-instruction');
+    const elevationInstructionEl = document.getElementById('elevation-instruction');
 
     let userLat = null;
     let userLon = null;
@@ -652,8 +694,8 @@
         } else {
             targetAzimuthEl.textContent = '--';
             targetElevationEl.textContent = '--';
-            guidanceMessage.textContent = translate('Select a satellite and ensure location is active.');
-            tiltInstructionEl.textContent = '';
+            azimuthInstructionEl.querySelector('.guidance-value').textContent = '--';
+            elevationInstructionEl.querySelector('.guidance-value').textContent = '--';
             document.body.classList.remove('aligned');
         }
     });
@@ -781,10 +823,18 @@
         const Rs = 42164;
 
         const sinEl = (Math.cos(obsLatR) * Math.cos(G) - (Re / Rs)) / (Math.sqrt(1 - 2 * (Re / Rs) * Math.cos(obsLatR) * Math.cos(G) + Math.pow(Re / Rs, 2)));
-        const elevation = toDegrees(Math.asin(sinEl));
+        let elevation = toDegrees(Math.asin(sinEl));
         
         let azimuth = toDegrees(Math.atan2(-Math.sin(G), Math.tan(obsLatR) * Math.cos(G) - Math.sin(obsLatR) / Math.cos(G)));
         azimuth = (azimuth + 360) % 360;
+
+        // Correct for negative elevation
+        if (isNaN(elevation) || elevation < 0) {
+            elevation = 0;
+            azimuth = '--';
+            guidanceMessagesContainer.innerHTML = `<div class="alert">${translate('Satellite is below the horizon or too low for your location.')}</div>`;
+            return;
+        }
 
         targetSatAzimuth = azimuth;
         targetSatElevation = elevation;
@@ -792,17 +842,11 @@
         targetAzimuthEl.textContent = `${azimuth.toFixed(1)}°`;
         targetElevationEl.textContent = `${elevation.toFixed(1)}°`;
 
-        if (elevation < 1) {
-            guidanceMessage.textContent = translate('Satellite is below the horizon or too low for your location.');
-            tiltInstructionEl.textContent = '';
-        } else {
-            guidanceMessage.textContent = translate('Point your device towards the target!');
-        }
         updateSatelliteGuidance();
     }
 
     function updateSatelliteGuidance() {
-        if (!selectedSatellite || targetSatAzimuth === null || targetSatElevation === null) {
+        if (!selectedSatellite || targetSatAzimuth === null || targetSatElevation === null || targetSatElevation <= 0) {
             document.body.classList.remove('aligned');
             return;
         }
@@ -813,42 +857,54 @@
         const diffAzimuth = (targetSatAzimuth - currentHeading + 360) % 360;
         const diffPitch = -currentPitch - targetSatElevation;
 
-        let isAligned = false;
+        let isAzimuthAligned = false;
         if (Math.abs(diffAzimuth) < azTolerance || Math.abs(diffAzimuth - 360) < azTolerance) {
-            if (Math.abs(diffPitch) < elTolerance) {
-                isAligned = true;
-            }
+            isAzimuthAligned = true;
         }
+
+        let isPitchAligned = false;
+        if (Math.abs(diffPitch) < elTolerance) {
+            isPitchAligned = true;
+        }
+
+        let isAligned = isAzimuthAligned && isPitchAligned;
 
         if (isAligned) {
             document.body.classList.add('aligned');
-            guidanceMessage.textContent = translate('Phone aligned!');
-            tiltInstructionEl.textContent = '';
+            guidanceMessagesContainer.innerHTML = `<div class="alert">${translate('Phone aligned!')}</div>`;
         } else {
             document.body.classList.remove('aligned');
-            let rotationHint = '';
-            if (Math.abs(diffAzimuth) > 5) {
+            let azimuthHint = '';
+            if (isAzimuthAligned) {
+                azimuthHint = `<p class="guidance-message">${translate('Heading aligned!')}</p>`;
+            } else {
                 if (diffAzimuth > 180) {
-                    rotationHint = `${translate('Turn Left')} ${(360 - diffAzimuth).toFixed(0)}°`;
+                    azimuthHint = `<p class="guidance-message">${translate('Turn Left')}</p><span class="guidance-subtext">${(360 - diffAzimuth).toFixed(0)}°</span>`;
                 } else {
-                    rotationHint = `${translate('Turn Right')} ${diffAzimuth.toFixed(0)}°`;
+                    azimuthHint = `<p class="guidance-message">${translate('Turn Right')}</p><span class="guidance-subtext">${diffAzimuth.toFixed(0)}°</span>`;
                 }
-            } else {
-                 rotationHint = translate('Heading aligned!');
             }
 
-            let tiltHint = '';
-            if (Math.abs(diffPitch) > 5) {
+            let elevationHint = '';
+            if (isPitchAligned) {
+                elevationHint = `<p class="guidance-message">${translate('Correct Tilt')}</p>`;
+            } else {
                 if (diffPitch > 0) {
-                    tiltHint = `${translate('Tilt your phone down to ')} ${targetSatElevation.toFixed(0)}${translate(' degrees.')}`;
+                    elevationHint = `<p class="guidance-message">${translate('Tilt Down')}</p><span class="guidance-subtext"> ${-currentPitch.toFixed(0)}° / ${targetSatElevation.toFixed(0)}°</span>`;
                 } else {
-                    tiltHint = `${translate('Tilt your phone up to ')} ${targetSatElevation.toFixed(0)}${translate(' degrees.')}`;
+                    elevationHint = `<p class="guidance-message">${translate('Tilt Up')}</p><span class="guidance-subtext"> ${-currentPitch.toFixed(0)}° / ${targetSatElevation.toFixed(0)}°</span>`;
                 }
-            } else {
-                tiltHint = translate('Phone is tilted correctly.');
             }
-
-            guidanceMessage.textContent = rotationHint + " | " + tiltHint;
+            
+            guidanceMessagesContainer.innerHTML = `<div class="guidance-container" id="azimuth-guidance-box">${azimuthHint}</div><div class="guidance-container" id="elevation-guidance-box">${elevationHint}</div>`;
+            
+            // Apply alignment class to individual boxes if they are aligned
+            if (isAzimuthAligned) {
+                document.getElementById('azimuth-guidance-box').classList.add('aligned');
+            }
+            if (isPitchAligned) {
+                document.getElementById('elevation-guidance-box').classList.add('aligned');
+            }
         }
     }
 </script>
