@@ -393,10 +393,10 @@
 
 <div class="container">
     <h1>Stargazer Pro Night Mode 🔭</h1>
-    <div id="status">Please tap the button to enable location and sensors.</div>
+    <div id="status"></div>
 
     <div id="permission-prompt">
-        <button id="permission-button">Enable Location & Compass</button>
+        <button id="permission-button">Enable Sensors</button>
     </div>
 
     <div id="app-content" style="display:none;">
@@ -443,6 +443,9 @@
                     <option value="astra28">Astra 28.2°E</option>
                     <option value="hotbird13">Hotbird 13°E</option>
                     <option value="eutelsat16">Eutelsat 16°E</option>
+                    <option value="yahsat52">Yahsat 52.5°E</option>
+                    <option value="turksat42">Turksat 42°E</option>
+                    <option value="intelsat68">Intelsat 68.5°E</option>
                     <option value="nilesat7">Nilesat 7°W</option>
                 </select>
             </div>
@@ -474,6 +477,9 @@
         'astra28': { name: 'Astra 28.2°E', longitude: 28.2 },
         'hotbird13': { name: 'Hotbird 13°E', longitude: 13.0 },
         'eutelsat16': { name: 'Eutelsat 16°E', longitude: 16.0 },
+        'yahsat52': { name: 'Yahsat 52.5°E', longitude: 52.5 },
+        'turksat42': { name: 'Turksat 42°E', longitude: 42.0 },
+        'intelsat68': { name: 'Intelsat 68.5°E', longitude: 68.5 },
         'nilesat7': { name: 'Nilesat 7°W', longitude: -7.0 },
     };
 
@@ -525,23 +531,29 @@
         }
     });
 
+    // Check for iOS PWA mode on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isIOSPWA = window.matchMedia('(display-mode: standalone)').matches || ('standalone' in navigator && navigator.standalone);
+
+        if (isIOS && isIOSPWA) {
+            statusEl.textContent = "Motion sensor access is restricted in PWA mode on iOS. Please open this app directly in Safari to use the compass and 3D angle meter.";
+            permissionButton.textContent = 'Open in Safari';
+            permissionButton.onclick = () => {
+                // This won't actually open a new Safari window, but it's the right message to show the user
+                alert("Please open this app's URL directly in Safari for full functionality.");
+            };
+        } else {
+            statusEl.textContent = "Tap the button to enable sensors and get started!";
+            permissionButton.textContent = "Enable Sensors";
+            permissionButton.onclick = requestPermissionsAndInit;
+        }
+    });
+
     function requestPermissionsAndInit() {
         permissionPrompt.style.display = 'none';
         statusEl.textContent = "Requesting permissions...";
-
-        // Check if the app is running in PWA mode on iOS
-        const isIOSPWA = ('standalone' in navigator && navigator.standalone) || (window.matchMedia('(display-mode: standalone)').matches);
         
-        if (typeof DeviceOrientationEvent.requestPermission === 'function' && isIOSPWA) {
-            statusEl.textContent = "Motion sensor access is restricted in PWA mode on iOS. Please open this app directly in Safari to use the compass and 3D angle meter.";
-            permissionPrompt.style.display = 'block';
-            permissionButton.textContent = 'Open in Safari';
-            permissionButton.onclick = () => {
-                window.location.href = window.location.href; // Re-direct to self in Safari
-            };
-            return;
-        }
-
         if (typeof DeviceOrientationEvent.requestPermission === 'function') {
             DeviceOrientationEvent.requestPermission()
                 .then(permissionState => {
