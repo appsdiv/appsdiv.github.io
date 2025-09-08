@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>SkyFinder — Moon, Planets & Live Compass</title>
+  <meta name="theme-color" content="#0b1020" />
+  <style>
+    :root{
+      --bg:#0b1020;             /* starry midnight */
+      --panel:#11172eaa;        /* glass card */
+      --panel-solid:#11172e;    
+      --text:#e6ecff;
+      --muted:#8fa3c7;
+      --accent:#7aa2ff;         /* electric blue */
+      --good:#25d366;           /* green */
+      --warn:#ffcc00;           /* yellow */
+      --bad:#ff4d4f;            /* red */
+      --ring:#1e293b;           /* slate */
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:20px;
+    }
+
+    html,body{height:100%;}
+    body{
+      margin:0; background:radial-gradient(1200px 700px at 70% -10%, #1a2246 0%, transparent 70%),radial-gradient(900px 500px at 30% 120%, #151b37 0%, transparent 70%), var(--bg);
+      color:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Noto Sans, "Apple Color Emoji", "Segoe UI Emoji";
+      line-height:1.45; letter-spacing:.2px;
+    }
+
+    .stars{position:fixed; inset:0; pointer-events:none; background-image:radial-gradient(2px 2px at 20% 40%, #ffffff88 40%, transparent 41%),radial-gradient(1px 1px at 70% 20%, #ffffff66 40%, transparent 41%),radial-gradient(1.5px 1.5px at 80% 80%, #ffffff88 40%, transparent 41%),radial-gradient(1px 1px at 35% 75%, #ffffff55 40%, transparent 41%); background-repeat:repeat; background-size: 600px 600px; opacity:.35;}
+
+    .wrap{max-width:1100px; margin:0 auto; padding:18px 16px 80px;}
+
+    header{
+      display:flex; align-items:center; gap:12px; justify-content:space-between; margin-bottom:14px;
+    }
+    .brand{display:flex; align-items:center; gap:10px;}
+    .logo{ width:34px; height:34px; border-radius:10px; display:grid; place-items:center; background:linear-gradient(135deg,#2a3d8f,#6b8cff); box-shadow:var(--shadow); }
+    .logo svg{ width:22px; height:22px; }
+    .title{ font-size: clamp(18px, 2.8vw, 24px); font-weight:700; letter-spacing:.3px; }
+    .subtitle{ color:var(--muted); font-size:12px; }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border-radius:999px; background:linear-gradient(180deg, #0f1630aa, #0c1228aa); border:1px solid #1e2547; box-shadow: inset 0 1px 0 #2a3366; font-size:12px; color:var(--muted);
+    }
+    .pill b{color:var(--text); font-weight:600;}
+
+    .grid{ display:grid; gap:16px; grid-template-columns: 1fr; }
+    @media(min-width:900px){ .grid{ grid-template-columns: 420px 1fr; } }
+
+    .card{ background: linear-gradient(180deg, #11172eb3, #0e1430b0); border:1px solid #1b2347; border-radius: var(--radius); box-shadow: var(--shadow); overflow:hidden; }
+    .card h2{ margin:0; padding:14px 16px; font-size:14px; text-transform:uppercase; letter-spacing:1.2px; color:#b5c7ff; border-bottom:1px solid #1b2347; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .card .content{ padding:14px 14px 16px; }
+
+    .btn{ cursor:pointer; user-select:none; border:none; padding:10px 14px; border-radius:12px; background:linear-gradient(180deg,#1b2b6a,#162459); color:#e7efff; font-weight:600; box-shadow: 0 6px 20px #0008, inset 0 1px 0 #5a79ff44; transition:.2s transform, .2s filter, .2s opacity; }
+    .btn:hover{ filter:brightness(1.08); }
+    .btn:active{ transform:translateY(1px); }
+    .btn.ghost{ background:#0e143055; border:1px solid #26305e; color:#b9c7f0; }
+    .btn.secondary{ background:linear-gradient(180deg,#1a5b3a,#164d31); }
+    .btn.warn{ background:linear-gradient(180deg,#6a2b1b,#5a1e16); }
+
+    .toolbar{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+
+    .status{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .status .kv{ background:#0f1633; border:1px solid #1c2449; border-radius:12px; padding:8px 10px; }
+    .kv .k{ font-size:11px; color:#9db0dd; }
+    .kv .v{ font-size:14px; font-weight:700; margin-top:2px; }
+
+    /* === Radar === */
+    .radar{ position:relative; width:100%; aspect-ratio:1/1; background: radial-gradient(80% 80% at 50% 50%, #12193a 0%, #0e1430 70%); border:1px solid #1c2449; border-radius:16px; overflow:hidden; }
+    .radar canvas{ position:absolute; inset:0; width:100%; height:100%; }
+    .legend{ display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; font-size:12px; color:#b7c6ef; }
+    .dot{ display:inline-flex; align-items:center; gap:6px; background:#0e1430; border:1px solid #1c2449; padding:6px 10px; border-radius:999px; }
+    .dot::before{ content:""; width:8px; height:8px; border-radius:50%; display:inline-block; background:var(--accent); }
+
+    /* === Table === */
+    table{ width:100%; border-collapse:collapse; }
+    thead th{ font-size:12px; font-weight:600; color:#9db0dd; text-align:left; padding:8px 8px; border-bottom:1px solid #1b2347; position:sticky; top:0; background:#10183a; }
+    tbody td{ padding:10px 8px; border-bottom:1px solid #141b39; font-size:14px; }
+    tbody tr:hover{ background:#0f1635; }
+    .tag{ display:inline-flex; align-items:center; gap:6px; padding:6px 8px; border-radius:999px; font-size:12px; border:1px solid #26305e; background:#0e1430; color:#c0cdf3; }
+    .chip{ font-size:12px; padding:3px 8px; border-radius:999px; border:1px solid #26305e; color:#b6c3ef; }
+
+    .ok{ color:var(--good); }
+    .warn{ color:var(--warn); }
+    .bad{ color:var(--bad); }
+    .muted{ color:var(--muted); }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+    .toast{ position:fixed; left:50%; bottom:18px; transform:translateX(-50%); background:#0e1430; border:1px solid #2b345f; padding:10px 14px; border-radius:12px; box-shadow:var(--shadow); display:none; }
+    .toast.show{ display:block; }
+
+    .inline-help{ font-size:12px; color:#9db0dd; margin-top:8px; }
+
+    .footnote{ margin-top:14px; color:#8ea3ce; font-size:12px; }
+    .note{ background:#0e1430; border:1px dashed #2b345f; padding:10px 12px; border-radius:12px; }
+
+    .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; font-size:11px; background:#18224a; border:1px solid #28356e; color:#c6d4ff; }
+  </style>
+  <!-- Astronomy Engine (Sun, Moon, Planets, horizon coords) -->
+  <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+</head>
+<body>
+  <div class="stars"></div>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" title="SkyFinder"> 
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v3m0 12v3M3 12h3m12 0h3M5 5l2.2 2.2M16.8 16.8L19 19M19 5l-2.2 2.2M5 19l2.2-2.2"/>
+            <circle cx="12" cy="12" r="5"/>
+          </svg>
+        </div>
+        <div>
+          <div class="title">SkyFinder</div>
+          <div class="subtitle">Moon, planets & compass — live</div>
+        </div>
+      </div>
+      <div class="toolbar">
+        <div class="pill" id="gpsStatus">📍 Loc: <b id="locText">—</b></div>
+        <div class="pill" id="accStatus">🎯 Acc: <b id="accText">—</b></div>
+        <button class="btn" id="btnSensors">Enable Motion & Compass</button>
+        <button class="btn ghost" id="btnCal">Set Horizon</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: Radar + debug -->
+      <div class="card">
+        <h2>
+          Live sky radar
+          <span class="badge"><span id="headingText">Heading: —</span> · <span id="pitchText">Pitch: —</span></span>
+        </h2>
+        <div class="content">
+          <div class="radar">
+            <canvas id="radar"></canvas>
+          </div>
+          <div class="legend">
+            <span class="dot" style="--accent:#ffd166"><b>Sun</b></span>
+            <span class="dot" style="--accent:#9be1ff"><b>Moon</b></span>
+            <span class="dot" style="--accent:#7aa2ff"><b>Planets</b></span>
+            <span class="dot" style="--accent:#25d366"><b>Target</b></span>
+          </div>
+          <div class="inline-help">Point your phone like a viewfinder. When a body is within your crosshair (±8° azimuth & elevation), you’ll get a haptic and on‑screen alert.</div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Table -->
+      <div class="card">
+        <h2>
+          Objects now (alt° / az° / dir)
+          <span class="badge" id="timeText">—</span>
+        </h2>
+        <div class="content">
+          <div class="status" style="margin-bottom:10px">
+            <div class="kv"><div class="k">Latitude</div><div class="v mono" id="lat">—</div></div>
+            <div class="kv"><div class="k">Longitude</div><div class="v mono" id="lon">—</div></div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Body</th>
+                <th>Alt (°)</th>
+                <th>Az (°)</th>
+                <th>Dir</th>
+                <th>Mag</th>
+                <th>Visible</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+          <div class="footnote">
+            <div class="note">Tip: for best compass accuracy, be outdoors, away from metal and magnets; move the phone in a ∞ motion once to calibrate.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">🎯 On target: <b id="toastName"></b></div>
+  </div>
+
+  <script>
+    /* === Utilities === */
+    const D2R = Math.PI/180, R2D = 180/Math.PI;
+    const clamp=(x,a,b)=> Math.min(b, Math.max(a,x));
+    const fmt=(n, d=1)=> (n==null||!isFinite(n))?"—":Number(n).toFixed(d);
+    function dirFromAz(az){
+      const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+      return dirs[Math.round(((az%360)/22.5))%16];
+    }
+    function haptic(){ if(navigator.vibrate) navigator.vibrate(35); }
+
+    /* === State === */
+    let loc = { lat:null, lon:null, h: 0, acc: null };
+    let heading = null;     // degrees 0..360 (0=N)
+    let pitch = null;       // degrees -90..+90 (up positive)
+    let pitchOffset = 0;    // horizon calibration offset
+    let allowMotion = false;
+    let lastToast = 0;
+
+    const radar = document.getElementById('radar');
+    const rctx = radar.getContext('2d');
+    function resizeCanvas(){
+      const rect = radar.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      radar.width = Math.round(rect.width * dpr);
+      radar.height = Math.round(rect.height * dpr);
+      rctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    new ResizeObserver(resizeCanvas).observe(radar);
+
+    /* === Sensors === */
+    document.getElementById('btnSensors').addEventListener('click', async () => {
+      try{
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+          const resp = await DeviceOrientationEvent.requestPermission();
+          if (resp !== 'granted') throw new Error('Permission denied');
+        }
+        window.addEventListener('deviceorientation', onOrient, true);
+        allowMotion = true;
+      }catch(err){
+        alert('Motion/compass permission failed. Open in HTTPS and allow Motion & Orientation.');
+      }
+    });
+
+    document.getElementById('btnCal').addEventListener('click', ()=>{
+      // Set current pitch as horizon (0°).
+      if(pitch!=null){ pitchOffset = pitch; toast('Horizon calibrated'); }
+    });
+
+    function toast(t){
+      const box = document.getElementById('toast');
+      document.getElementById('toastName').textContent = t;
+      box.classList.add('show');
+      setTimeout(()=> box.classList.remove('show'), 1800);
+    }
+
+    function onOrient(e){
+      // Heading
+      let hdg = null;
+      if (e.webkitCompassHeading!=null && !isNaN(e.webkitCompassHeading)) {
+        hdg = e.webkitCompassHeading; // iOS: 0=N, clockwise
+      } else if (e.absolute === true && e.alpha!=null) {
+        // W3C spec suggests 360 - alpha as compass heading when absolute.
+        hdg = (360 - e.alpha);
+      } else if (e.alpha!=null) {
+        hdg = (360 - e.alpha);
+      }
+      if(hdg!=null) heading = ( (hdg%360)+360 )%360;
+
+      // Pitch estimate from beta (portrait). Holding phone vertically: beta ~ 90 near horizon.
+      if (e.beta!=null){
+        const raw = 90 - e.beta; // approx: +up, -down
+        pitch = clamp(raw - pitchOffset, -90, 90);
+      }
+
+      // UI labels
+      document.getElementById('headingText').textContent = `Heading: ${heading==null? '—' : fmt(heading,0)}° ${heading!=null? '('+dirFromAz(heading)+')':''}`;
+      document.getElementById('pitchText').textContent = `Pitch: ${pitch==null? '—' : fmt(pitch,0)}°`;
+    }
+
+    /* === Geolocation === */
+    function startLocation(){
+      if(!('geolocation' in navigator)){
+        alert('Geolocation not supported on this device.');
+        return;
+      }
+      const id = navigator.geolocation.watchPosition(pos=>{
+        const c = pos.coords;
+        loc.lat = c.latitude; loc.lon = c.longitude; loc.h = c.altitude || 0; loc.acc = c.accuracy;
+        document.getElementById('lat').textContent = c.latitude.toFixed(6);
+        document.getElementById('lon').textContent = c.longitude.toFixed(6);
+        document.getElementById('locText').textContent = `${c.latitude.toFixed(4)}, ${c.longitude.toFixed(4)}`;
+        document.getElementById('accText').textContent = `${Math.round(c.accuracy)} m`;
+      }, err=>{
+        console.warn('geo error', err);
+        document.getElementById('gpsStatus').innerHTML = '📍 Loc: <b>blocked</b>';
+      }, { enableHighAccuracy:true, maximumAge: 1000, timeout: 15000 });
+      return id;
+    }
+
+    /* === Astronomy === */
+    const Bodies = [
+      { key: Astronomy.Body.Sun,     name:'Sun',    color:'#ffd166' },
+      { key: Astronomy.Body.Moon,    name:'Moon',   color:'#9be1ff' },
+      { key: Astronomy.Body.Mercury, name:'Mercury',color:'#9fb0c2' },
+      { key: Astronomy.Body.Venus,   name:'Venus',  color:'#f3c5ff' },
+      { key: Astronomy.Body.Mars,    name:'Mars',   color:'#ff6b6b' },
+      { key: Astronomy.Body.Jupiter, name:'Jupiter',color:'#ffe0a3' },
+      { key: Astronomy.Body.Saturn,  name:'Saturn', color:'#e6d8a0' },
+      { key: Astronomy.Body.Uranus,  name:'Uranus', color:'#a6f0ff' },
+      { key: Astronomy.Body.Neptune, name:'Neptune',color:'#8db0ff' }
+    ];
+
+    function computeBodies(){
+      if(loc.lat==null || loc.lon==null) return [];
+      const now = new Date();
+      document.getElementById('timeText').textContent = now.toLocaleString();
+      const observer = new Astronomy.Observer(loc.lat, loc.lon, loc.h||0);
+      const out = [];
+      for(const b of Bodies){
+        // equatorial of date (ofdate=true) + aberration=true (recommended for alt/az)
+        const eq = Astronomy.Equator(b.key, now, observer, true, true);
+        const hor = Astronomy.Horizon(now, observer, eq.ra, eq.dec, 'normal');
+        let mag = null;
+        try { const ill = Astronomy.Illumination(b.key, now); mag = ill.mag; } catch{}
+        const visible = hor.altitude > 0;
+        out.push({ name:b.name, key:b.key, alt:hor.altitude, az:hor.azimuth, mag, visible, color:b.color });
+      }
+      return out.sort((a,b)=> b.visible - a.visible || b.alt - a.alt);
+    }
+
+    function updateTable(list){
+      const tb = document.getElementById('rows');
+      tb.innerHTML = '';
+      for(const o of list){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span class="tag" style="border-color:${o.color}33; background:${o.color}11">● ${o.name}</span></td>
+          <td class="mono">${fmt(o.alt,1)}</td>
+          <td class="mono">${fmt(o.az,1)}</td>
+          <td>${dirFromAz(o.az)}</td>
+          <td class="mono">${o.mag!=null? fmt(o.mag,1): '—'}</td>
+          <td>${o.visible? '<span class="ok">Above</span>' : '<span class="muted">Below</span>'}</td>`;
+        tb.appendChild(tr);
+      }
+    }
+
+    function drawRadar(list){
+      const w = radar.clientWidth, h = radar.clientHeight; const cx = w/2, cy = h/2; const R = Math.min(cx,cy) - 12;
+      rctx.clearRect(0,0,w,h);
+      // grid rings (horizon to zenith)
+      rctx.strokeStyle = '#243056'; rctx.lineWidth = 1.2;
+      for(const a of [0,30,60,80]){ // denser near zenith
+        const r = R * (90-a)/90; rctx.beginPath(); rctx.arc(cx, cy, r, 0, Math.PI*2); rctx.stroke();
+      }
+      // cardinal lines
+      rctx.beginPath(); rctx.moveTo(cx-R, cy); rctx.lineTo(cx+R, cy); rctx.moveTo(cx, cy-R); rctx.lineTo(cx, cy+R); rctx.stroke();
+      // labels
+      rctx.fillStyle = '#9db0dd'; rctx.font='12px system-ui, -apple-system, Segoe UI, Roboto'; rctx.textAlign='center';
+      rctx.fillText('N', cx, cy-R-6); rctx.fillText('S', cx, cy+R+12); rctx.fillText('W', cx-R-8, cy+4); rctx.fillText('E', cx+R+8, cy+4);
+
+      // objects (polar projection: az around, radius by altitude)
+      for(const o of list){
+        if(!isFinite(o.az) || !isFinite(o.alt)) continue;
+        const theta = (o.az-90) * D2R; // az 0=N -> up; convert to canvas angle (0=+x)
+        const r = R * (90 - clamp(o.alt, -10, 90)) / 90; // horizon outer, zenith center
+        const x = cx + r*Math.cos(theta);
+        const y = cy + r*Math.sin(theta);
+        // dot
+        rctx.fillStyle = o.color || '#7aa2ff';
+        rctx.beginPath(); rctx.arc(x, y, 5, 0, Math.PI*2); rctx.fill();
+        // label
+        rctx.fillStyle = '#cfe0ff';
+        rctx.textAlign='left';
+        rctx.fillText(o.name, x+8, y-6);
+      }
+
+      // heading needle
+      if(heading!=null){
+        const theta = (heading-90) * D2R;
+        rctx.strokeStyle = '#6ea8ff'; rctx.lineWidth=2.2;
+        rctx.beginPath(); rctx.moveTo(cx, cy); rctx.lineTo(cx + R*Math.cos(theta), cy + R*Math.sin(theta)); rctx.stroke();
+        rctx.fillStyle = '#6ea8ff'; rctx.beginPath(); rctx.arc(cx, cy, 3, 0, Math.PI*2); rctx.fill();
+      }
+
+      // crosshair for pitch (approximate)
+      if(pitch!=null){
+        const r = R * (90 - clamp(pitch, -90, 90)) / 90;
+        rctx.strokeStyle = '#25d366'; rctx.setLineDash([5,4]);
+        rctx.beginPath(); rctx.arc(cx, cy, r, 0, Math.PI*2); rctx.stroke();
+        rctx.setLineDash([]);
+      }
+    }
+
+    function checkTarget(list){
+      if(heading==null || pitch==null) return;
+      const now = Date.now();
+      const AZ_TOL = 8, ALT_TOL = 10; // degrees
+      for(const o of list){
+        if(!o.visible) continue;
+        const daz = Math.abs(((o.az - heading + 540)%360) - 180); // shortest wrap-around diff
+        const dalt = Math.abs(o.alt - pitch);
+        if(daz <= AZ_TOL && dalt <= ALT_TOL){
+          if(now - lastToast > 1800){ toast(o.name); haptic(); lastToast = now; }
+          break;
+        }
+      }
+    }
+
+    /* === Main loop === */
+    let lastCompute = 0; let lastList = [];
+    function tick(){
+      const now = performance.now();
+      if(now - lastCompute > 1000){
+        lastList = computeBodies();
+        updateTable(lastList);
+        lastCompute = now;
+      }
+      drawRadar(lastList);
+      checkTarget(lastList);
+      requestAnimationFrame(tick);
+    }
+
+    // Kick off
+    resizeCanvas();
+    startLocation();
+    requestAnimationFrame(tick);
+
+    // HTTPS guard
+    if(location.protocol !== 'https:' && location.hostname !== 'localhost'){
+      setTimeout(()=> alert('For motion & compass to work, open this page over HTTPS.'), 500);
+    }
+  </script>
+</body>
+</html>
