@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>SkyFinder — AR Planets • Stars • TV Sats</title>
+  <meta name="theme-color" content="#0b1020" />
+  <!-- iOS PWA essentials -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SkyFinder">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><radialGradient id='g' cx='60%' cy='40%'><stop offset='0' stop-color='%23aaf'/><stop offset='1' stop-color='%230b1020'/></radialGradient></defs><rect width='512' height='512' fill='url(%23g)'/><circle cx='256' cy='256' r='170' fill='none' stroke='%23fff' stroke-width='18'/><circle cx='256' cy='256' r='6' fill='%23fff'/></svg>">
+
+  <style>
+    :root{ --bg:#0b1020; --card:#111833; --muted:#8ea0c3; --text:#eaf0ff; --accent:#60a5fa; --ok:#34d399; --warn:#fbbf24; --err:#f87171; }
+    html,body{height:100%; background:radial-gradient(1200px 800px at 70% -10%, #1a2457, #0b1020 55%); color:var(--text); font:16px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif; margin:0}
+    *{box-sizing:border-box}
+    .app{display:grid; grid-template-rows:auto 1fr auto; height:100%}
+    header{position:sticky; top:0; z-index:3; backdrop-filter:saturate(140%) blur(8px); background:linear-gradient(180deg, rgba(11,16,32,.9), rgba(11,16,32,.65)); border-bottom:1px solid rgba(255,255,255,.06)}
+    .bar{display:flex; gap:.5rem; align-items:center; justify-content:space-between; padding:.6rem .8rem}
+    .brand{display:flex; gap:.6rem; align-items:center; font-weight:700; letter-spacing:.3px}
+    .dot{width:.7rem; height:.7rem; border-radius:99px; background:conic-gradient(from 0deg, #60a5fa, #14b8a6, #f59e0b, #ef4444, #60a5fa); box-shadow:0 0 .6rem rgba(96,165,250,.8)}
+    .pill{display:inline-flex; gap:.35rem; align-items:center; padding:.36rem .6rem; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.07); color:var(--muted); font-size:.82rem}
+    .pill strong{color:var(--text)}
+    .controls{display:flex; flex-wrap:wrap; gap:.4rem}
+    .controls button,.controls .toggle{border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.05); color:var(--text); padding:.45rem .6rem; border-radius:.7rem; font-weight:600; cursor:pointer}
+    .controls button:hover{background:rgba(255,255,255,.08)}
+
+    #stage{position:relative; overflow:hidden}
+    #sky{position:absolute; inset:0; pointer-events:none}
+    #hud{position:absolute; inset:auto 0 0 0; display:flex; justify-content:center; padding:1rem; pointer-events:none}
+    #readout{background:rgba(17,24,51,.6); border:1px solid rgba(255,255,255,.06); border-radius:1rem; padding:.8rem 1rem; width:min(860px, calc(100% - 1rem)); box-shadow:0 .4rem 1.4rem rgba(0,0,0,.35)}
+    #readout .grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:.6rem}
+    #readout .tile{background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); border-radius:.8rem; padding:.6rem .7rem}
+    #readout h3{margin:.1rem 0 .4rem; font-size:.9rem; color:#bcd0ff; text-transform:uppercase; letter-spacing:.08em}
+    #readout p{margin:0; font-weight:700}
+
+    .crosshair{position:absolute; left:50%; top:50%; translate:-50% -50%; width:200px; height:200px; border-radius:999px; border:1px dashed rgba(255,255,255,.15)}
+    .crosshair:before,.crosshair:after{content:""; position:absolute; left:50%; top:50%; translate:-50% -50%; width:2px; height:110%; background:linear-gradient(180deg, transparent, rgba(255,255,255,.6), transparent)}
+    .crosshair:after{rotate:90deg}
+
+    .compass{position:absolute; left:50%; bottom:1rem; translate:-50% 0; width:min(560px, 88vw); height:54px; border-radius:1rem; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); display:grid; place-items:center; overflow:hidden}
+    .compass .tape{position:absolute; will-change:transform; display:flex; gap:20px; align-items:center}
+    .compass .tick{height:24px; width:2px; background:rgba(255,255,255,.3)}
+    .compass .label{font-weight:700; color:#cfe1ff}
+
+    #list{position:absolute; right:.8rem; top:5.1rem; max-height:52vh; overflow:auto; width:min(380px, 90vw); display:flex; flex-direction:column; gap:.6rem}
+    .card{background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); border-radius:.8rem; padding:.7rem .85rem}
+    .row{display:flex; gap:.5rem; align-items:center; justify-content:space-between}
+    .name{font-weight:700}
+    .tag{font-size:.75rem; color:#cbd5e1; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.1); padding:.15rem .45rem; border-radius:.5rem}
+    .angle{font-variant-numeric:tabular-nums}
+
+    footer{display:flex; align-items:center; justify-content:space-between; padding:.7rem .9rem; color:#cbd5e1; gap:.8rem; border-top:1px solid rgba(255,255,255,.08); background:linear-gradient(180deg, rgba(11,16,32,.65), rgba(11,16,32,.9))}
+    .hint{opacity:.9}
+    .btn{display:inline-flex; gap:.45rem; align-items:center; padding:.5rem .7rem; border-radius:.6rem; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.06); color:var(--text); cursor:pointer; font-weight:700}
+    .btn:hover{background:rgba(255,255,255,.1)}
+    .ok{color:var(--ok)} .warn{color:var(--warn)} .err{color:var(--err)}
+    @media (max-width: 760px){ #readout .grid{grid-template-columns:repeat(2,1fr)} #list{position:static; max-height:unset; width:auto; padding:0 .8rem 1rem} }
+
+    /* Fullscreen start overlay for iOS permissions */
+    #start{position:fixed; inset:0; background:linear-gradient(180deg,#0b1020,#071027); display:grid; place-items:center; z-index:99}
+    .panel{background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); padding:16px 18px; border-radius:14px; width:min(520px, 92vw); box-shadow:0 20px 80px rgba(0,0,0,.45)}
+    .panel h1{margin:.2rem 0 .3rem; font-size:1.25rem}
+    .panel p{margin:.2rem 0; color:#cbd5e1}
+    .panel ul{margin:.4rem 0 .8rem; padding-left:1.1rem; color:#cbd5e1}
+    .panel button{margin-top:.6rem}
+  </style>
+
+  <!-- Libraries (UMD) to maximize iOS PWA compatibility -->
+  <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/satellite.js/1.3.0/satellite.min.js"></script>
+  <!-- We'll attempt to load a UMD build of geomagnetism for WMM declination; falls back gracefully if blocked. -->
+</head>
+<body>
+  <div id="start">
+    <div class="panel">
+      <h1>SkyFinder setup</h1>
+      <p>To work on iPhone/iPad (especially from Home Screen), iOS requires a tap before it lets the app use motion sensors and camera.</p>
+      <ul>
+        <li>Be sure the app is opened over <b>HTTPS</b>.</li>
+        <li>In <b>Settings ▸ Safari</b>, enable <b>Motion & Orientation Access</b>.</li>
+        <li>Stand outside, point at a distant horizon.</li>
+      </ul>
+      <button class="btn" id="startBtn">✅ Start AR</button>
+    </div>
+  </div>
+
+  <div class="app" aria-hidden="true" id="appRoot">
+    <header>
+      <div class="bar">
+        <div class="brand"><div class="dot"></div> SkyFinder <span class="pill" id="standalonePill"></span></div>
+        <div class="controls">
+          <span class="pill" id="locPill">📍 <strong>Loc:</strong> <span id="locText">—</span></span>
+          <span class="pill" id="declPill">🧭 <strong>Decl:</strong> <span id="declText">auto…</span></span>
+          <label class="toggle"><input type="checkbox" id="togglePlanets" checked/> Planets</label>
+          <label class="toggle"><input type="checkbox" id="toggleStars" checked/> Bright Stars</label>
+          <label class="toggle"><input type="checkbox" id="toggleSats"/> TV/GEO Sats</label>
+          <button class="btn" id="calibrateBtn">🔧 Calibrate</button>
+        </div>
+      </div>
+    </header>
+
+    <main id="stage">
+      <canvas id="sky"></canvas>
+      <div class="crosshair" aria-hidden="true"></div>
+      <div id="list"></div>
+      <div id="hud">
+        <div id="readout">
+          <div class="grid">
+            <div class="tile"><h3>Pointing</h3><p id="pointAZ">Az —</p><p id="pointALT">Alt —</p></div>
+            <div class="tile"><h3>Nearest Object</h3><p id="nearestName">—</p><p id="nearestSep">—</p></div>
+            <div class="tile"><h3>Time (UTC)</h3><p id="timeNow">—</p><p id="compassQuality" class="warn">Awaiting motion…</p></div>
+            <div class="tile"><h3>Visibility</h3><p id="skySummary">—</p><p id="counts">—</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="compass"><div class="tape" id="compassTape"></div></div>
+    </main>
+
+    <footer>
+      <div class="hint">Tip: tap <b>Calibrate</b> while sighting the real horizon. Then aim at the Moon and tap <b>Calibrate</b> again to fine‑tune heading.</div>
+      <div class="actions"></div>
+    </footer>
+  </div>
+
+  <script>
+    // ---- helpers ----
+    const $ = s => document.querySelector(s);
+    const fmtDeg = (d,lat) => { const a=Math.abs(d), D=Math.floor(a), M=Math.floor((a-D)*60), S=Math.round((a-D)*3600-60*M); const H=lat?(d>=0?'N':'S'):(d>=0?'E':'W'); return `${D}°${String(M).padStart(2,'0')}'${String(S).padStart(2,'0')}" ${H}` };
+    const norm = a => (a%360+360)%360;
+
+    const state = {
+      obs:{ lat:0, lon:0, elev_m:0 },
+      decl:0, haveDecl:false,
+      compassOffset:0, betaHorizon:0,
+      pointing:{ az:0, alt:0 },
+      filters:{ planets:true, stars:true, sats:false },
+      tle:[], satObjs:[],
+      bright:[
+        {name:'Sirius', ra:6.752477, dec:-16.716116, mag:-1.46},
+        {name:'Canopus', ra:6.399192, dec:-52.695661, mag:-0.72},
+        {name:'Arcturus', ra:14.261021, dec:19.182417, mag:-0.05},
+        {name:'Vega', ra:18.615649, dec:38.783692, mag:0.03},
+        {name:'Capella', ra:5.278155, dec:45.997991, mag:0.08},
+        {name:'Rigel', ra:5.242298, dec:-8.201640, mag:0.12},
+        {name:'Procyon', ra:7.655034, dec:5.225016, mag:0.34},
+        {name:'Betelgeuse', ra:5.919529, dec:7.407064, mag:0.50},
+        {name:'Altair', ra:19.846389, dec:8.868322, mag:0.77},
+        {name:'Aldebaran', ra:4.598677, dec:16.509302, mag:0.85},
+        {name:'Antares', ra:16.490128, dec:-26.431946, mag:0.95},
+        {name:'Spica', ra:13.419883, dec:-11.161322, mag:0.97},
+        {name:'Fomalhaut', ra:22.960848, dec:-29.622237, mag:1.16},
+        {name:'Deneb', ra:20.690531, dec:45.280338, mag:1.25},
+        {name:'Regulus', ra:10.139532, dec:11.967208, mag:1.35},
+        {name:'Castor', ra:7.576667, dec:31.888333, mag:1.58},
+        {name:'Kochab', ra:14.845098, dec:74.155504, mag:2.07}
+      ]
+    };
+
+    const sky = $('#sky'); const ctx = sky.getContext('2d'); const stage = $('#stage');
+    function fit(){ sky.width = stage.clientWidth; sky.height = stage.clientHeight; }
+    window.addEventListener('resize', fit);
+
+    // ---- start overlay logic (iOS requires gesture) ----
+    $('#startBtn').addEventListener('click', async ()=>{
+      try{
+        // Motion/orientation permission (iOS)
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+          const r = await DeviceOrientationEvent.requestPermission(); if(r!=='granted') throw new Error('orientation denied');
+        }
+      }catch(e){ alert('Please enable Motion & Orientation Access in Settings > Safari.'); }
+
+      // Begin sensors
+      window.addEventListener('deviceorientation', onOrient, true);
+
+      // Location (high accuracy)
+      if('geolocation' in navigator){
+        navigator.geolocation.getCurrentPosition((pos)=>{
+          const c=pos.coords; state.obs.lat=c.latitude; state.obs.lon=c.longitude; state.obs.elev_m=c.altitude||0; setLocText(); autoDeclination();
+        }, ()=>{ setLocText(); autoDeclination(); }, { enableHighAccuracy:true, timeout:6000 });
+        navigator.geolocation.watchPosition((pos)=>{
+          const c=pos.coords; state.obs.lat=c.latitude; state.obs.lon=c.longitude; state.obs.elev_m=c.altitude||0; setLocText(); }, ()=>{}, { enableHighAccuracy:true, maximumAge:1000 });
+      }
+
+      // Hide overlay and show app
+      $('#start').style.display='none'; $('#appRoot').removeAttribute('aria-hidden');
+
+      // Kick off
+      buildTape(); fit(); loop();
+    });
+
+    function setLocText(){ $('#locText').textContent = `${fmtDeg(state.obs.lat,true)}, ${fmtDeg(state.obs.lon,false)}`; }
+
+    // ---- attempt to load geomagnetism UMD for WMM declination ----
+    async function loadGeomag(){
+      const urls=[
+        'https://cdn.jsdelivr.net/npm/geomagnetism@0.2.0/dist/geomagnetism.min.js',
+        'https://cdn.jsdelivr.net/npm/geomagnetism@0.2.0/geomagnetism.min.js',
+        'https://cdn.jsdelivr.net/npm/geomagnetism@0.2.0/geomagnetism.js'
+      ];
+      for(const u of urls){
+        try{ await new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=u; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); if(window.geomagnetism) return true; }catch{}
+      }
+      return false;
+    }
+
+    async function autoDeclination(){
+      const ok = await loadGeomag();
+      if (ok){
+        try{
+          const model = window.geomagnetism.model(new Date());
+          const info = model.point([state.obs.lat, state.obs.lon, state.obs.elev_m/1000]);
+          state.decl = info.decl; state.haveDecl=true; $('#declText').textContent = info.decl.toFixed(1)+'°'; return;
+        }catch(e){ console.warn('geomag failed', e); }
+      }
+      // Fallback: manual 0°, but encourage alignment
+      state.haveDecl=false; $('#declText').textContent = 'set via Align';
+    }
+
+    // ---- compass tape ----
+    const tape = $('#compassTape');
+    function buildTape(){ tape.innerHTML=''; for(let az=-720; az<=720; az+=10){ const tick=document.createElement('div'); tick.className='tick'; tick.style.height=(az%30===0?28:16)+'px'; const wrap=document.createElement('div'); wrap.style.display='flex'; wrap.style.flexDirection='column'; wrap.style.alignItems='center'; wrap.style.gap='2px'; wrap.appendChild(tick); if(az%30===0){ const lab=document.createElement('div'); lab.className='label'; let a=((az%360)+360)%360; lab.textContent= a===0?'N': a===90?'E': a===180?'S': a===270?'W': a; wrap.appendChild(lab);} tape.appendChild(wrap);} }
+    function moveTape(az){ const pxPerDeg = 4.0; tape.style.transform = `translateX(${(-az*pxPerDeg) % (360*pxPerDeg)}px)`; }
+
+    // ---- orientation handling ----
+    let lastAlpha=null, lastBeta=null, lastGamma=null;
+    function onOrient(e){ lastAlpha=e.alpha; lastBeta=e.beta; lastGamma=e.gamma; updatePointing(); $('#compassQuality').textContent='OK'; $('#compassQuality').className='ok'; }
+
+    function headingFromEuler(alpha, beta, gamma){
+      // Convert Euler to compass heading (0=N). Works on iOS PWAs.
+      const toR=Math.PI/180; const x=(beta||0)*toR, y=(gamma||0)*toR, z=(alpha||0)*toR; const cX=Math.cos(x), cY=Math.cos(y), cZ=Math.cos(z), sX=Math.sin(x), sY=Math.sin(y), sZ=Math.sin(z); const Vx=-cZ*sY - sZ*sX*cY; const Vy=-sZ*sY + cZ*sX*cY; let h=Math.atan2(Vx,Vy)*180/Math.PI; if(h<0) h+=360; return h;
+    }
+
+    function updatePointing(){
+      let az = headingFromEuler(lastAlpha,lastBeta,lastGamma);
+      if (state.haveDecl) az = norm(az + state.decl);
+      az = norm(az + state.compassOffset);
+      const alt = Math.max(-5, Math.min(90, (lastBeta||0) - state.betaHorizon));
+      state.pointing = { az, alt };
+      $('#pointAZ').textContent = `Az ${az.toFixed(1)}°`;
+      $('#pointALT').textContent = `Alt ${alt.toFixed(1)}°`;
+      moveTape(az);
+    }
+
+    // ---- calibration ----
+    $('#calibrateBtn').addEventListener('click', ()=>{
+      // First press: set horizon
+      if (lastBeta!=null) state.betaHorizon = lastBeta;
+      // Optional fine tune: when aiming at Moon/Sun, press again after a few seconds; we nudge compass to center the object.
+      fineTuneToNearest();
+      navigator.vibrate?.(30);
+    });
+
+    function fineTuneToNearest(){ if(!latestObjs.length) return; const t = nearest(latestObjs, state.pointing.az, state.pointing.alt); if(!t) return; const diff = norm(t.az - state.pointing.az); if (Math.abs(diff) < 20) state.compassOffset += diff; }
+
+    // ---- astronomy ----
+    function altazFromJ2000(raHours, decDeg, time, obs){ const sphere = { lat: decDeg, lon: raHours*15, dist: 1 }; const vecEQJ = Astronomy.VectorFromSphere(sphere, Astronomy.Orientation.EQJ); const R = Astronomy.Rotation_EQJ_HOR(time, obs); const vHor = Astronomy.RotateVector(R, vecEQJ); const horiz = Astronomy.HorizonFromVector(vHor); return { az: norm(horiz.azimuth), alt: horiz.altitude }; }
+    function planetAltAz(body, time, obs){ const eq = Astronomy.Equator(body, time, obs, true, true); const hor = Astronomy.Horizon(time, obs, eq.ra, eq.dec, 'normal'); return { az: norm(hor.azimuth), alt: hor.altitude } }
+
+    // ---- satellites (GEO) ----
+    async function loadGeoTLE(){ const urls=['https://celestrak.org/NORAD/elements/geo.txt','https://celestrak.com/NORAD/elements/geo.txt']; for (const url of urls){ try{ const resp=await fetch(url,{cache:'no-store'}); if(!resp.ok) continue; const txt=await resp.text(); state.tle=parseTLE(txt); break; }catch(e){ console.warn('TLE fetch failed', url, e); } } buildSatObjects(); }
+    function parseTLE(text){ const lines=text.split(/\r?\n/).filter(Boolean); const out=[]; for(let i=0;i<lines.length-2;i++){ if(lines[i].charAt(0)!=='1' && lines[i+1]?.charAt(0)==='1' && lines[i+2]?.charAt(0)==='2'){ out.push({ name:lines[i].trim(), l1:lines[i+1].trim(), l2:lines[i+2].trim() }); i+=2; } } return out; }
+    function buildSatObjects(){ state.satObjs = state.tle.map(t=>{ try{ const rec = satellite.twoline2satrec(t.l1,t.l2); return {name:t.name, rec}; }catch{ return null; } }).filter(Boolean); }
+
+    // ---- render ----
+    const objsList = $('#list');
+    function renderList(objs){ const sorted = objs.sort((a,b)=>b.alt-a.alt).slice(0,80); objsList.innerHTML = sorted.map(o=>`<div class="card"><div class="row"><div class="name">${o.name}</div><span class="tag">${o.cat}</span></div><div class="row"><span class="angle">Az ${o.az.toFixed(1)}° · Alt ${o.alt.toFixed(1)}°</span></div></div>`).join(''); }
+
+    function drawSky(objs){ const w=sky.width, h=sky.height; ctx.clearRect(0,0,w,h); const grd=ctx.createRadialGradient(w/2,h/2,0,w/2,h/2,Math.max(w,h)*.8); grd.addColorStop(0,'rgba(255,255,255,.02)'); grd.addColorStop(1,'rgba(255,255,255,0)'); ctx.fillStyle=grd; ctx.fillRect(0,0,w,h); const R=Math.min(w,h)*.46, cx=w/2, cy=h/2; for(const o of objs){ const ang=(o.az-90)*Math.PI/180; const r= R * (1 - Math.max(-5,Math.min(90,o.alt+5))/95); const x=cx+Math.cos(ang)*r, y=cy+Math.sin(ang)*r; ctx.beginPath(); ctx.arc(x,y, o.cat==='TV Sat'? 3: (o.cat==='Planet'?4:2.6), 0, Math.PI*2); ctx.fillStyle= o.cat==='TV Sat'? 'rgba(250,220,120,.95)': (o.cat==='Planet'? 'rgba(140,200,255,.95)': 'rgba(255,255,255,.85)'); ctx.fill(); ctx.font='600 12px system-ui,Segoe UI,Inter'; ctx.fillStyle='rgba(235,245,255,.9)'; ctx.fillText(o.name, x+6, y-6); } }
+
+    function angularSep(a1,z1,a2,z2){ const toR=d=>d*Math.PI/180; const A1=toR(a1), Z1=toR(90-z1), A2=toR(a2), Z2=toR(90-z2); const cos=Math.sin(Z1)*Math.sin(Z2)*Math.cos(A1-A2)+Math.cos(Z1)*Math.cos(Z2); return Math.max(0, Math.min(180, Math.acos(cos)*180/Math.PI)); }
+    function nearest(arr, az, alt){ let best=null, bestSep=999; for(const o of arr){ const s=angularSep(o.az,o.alt,az,alt); if(s<bestSep){best=o;bestSep=s;} } return best; }
+
+    // ---- main loop ----
+    let latestObjs=[];
+    async function loop(){ const now = new Date(); $('#timeNow').textContent = now.toISOString().replace('T',' ').replace('Z',' UTC'); const time = new Astronomy.AstroTime(now); const obs = new Astronomy.Observer(state.obs.lat, state.obs.lon, state.obs.elev_m/1000);
+      const show=[]; // collect objects above horizon
+      if(state.filters.planets){ for(const name of ['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn']){ const A = planetAltAz(Astronomy.Body[name], time, obs); if(A.alt>-2) show.push({cat:'Planet', name, ...A}); } }
+      if(state.filters.stars){ for(const s of state.bright){ const A = altazFromJ2000(s.ra,s.dec,time,obs); if(A.alt>-2) show.push({cat:'Star', name:s.name, ...A}); } }
+      if(state.filters.sats && state.satObjs.length){ const gmst=satellite.gstime(now); const obsGd={ longitude: state.obs.lon*Math.PI/180, latitude: state.obs.lat*Math.PI/180, height: state.obs.elev_m/1000}; for(const sat of state.satObjs){ try{ const pv=satellite.propagate(sat.rec, now); if(!pv.position) continue; const ecf=satellite.eciToEcf(pv.position, gmst); const look=satellite.ecfToLookAngles(obsGd, ecf); const az=norm(look.azimuth*180/Math.PI), alt=look.elevation*180/Math.PI; if(alt>-2) show.push({cat:'TV Sat', name:sat.name, az, alt}); }catch{} } }
+      latestObjs = show;
+      renderList(show); drawSky(show);
+      const n = nearest(show, state.pointing.az, state.pointing.alt); if(n){ $('#nearestName').textContent=`${n.name} (${n.cat})`; $('#nearestSep').textContent=`${angularSep(n.az,n.alt,state.pointing.az,state.pointing.alt).toFixed(1)}° away`; }
+      $('#counts').textContent = `Showing: ${show.filter(o=>o.cat==='Planet').length} planets, ${show.filter(o=>o.cat==='Star').length} stars, ${show.filter(o=>o.cat==='TV Sat').length} sats`;
+      $('#skySummary').textContent = state.pointing.alt>0? 'Sky above horizon visible':'Point higher';
+      requestAnimationFrame(loop);
+    }
+
+    // ---- toggles ----
+    $('#togglePlanets').addEventListener('change', e=> state.filters.planets = e.target.checked);
+    $('#toggleStars').addEventListener('change', e=> state.filters.stars   = e.target.checked);
+    $('#toggleSats').addEventListener('change', e=> { state.filters.sats = e.target.checked; if (e.target.checked && state.tle.length===0) loadGeoTLE(); });
+
+    // ---- iOS PWA detection ----
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone; $('#standalonePill').textContent = isStandalone? 'Home‑screen app' : 'Browser mode';
+
+  </script>
+</body>
+</html>
