@@ -3,21 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stargazer Pro - حالت شب</title>
+    <title>یابنده ماهواره - حالت شب</title>
     <style>
         :root {
-            --bg-color: #001a00; /* Very dark green */
-            --card-color: #052a05; /* Darker green-tinted background */
-            --text-color: #c0f0c0; /* Light green/minty text */
-            --highlight-color: #4aff4a; /* Main green highlight */
-            --accent-color: #a0ff4a; /* Yellow-green for contrast/alerts */
-            --border-color: rgba(74, 255, 74, 0.2);
+            --bg-color-red: #0d0000;
+            --card-color-red: #1a0505;
+            --text-color-red: #f0c0c0;
+            --highlight-color-red: #ff4a4a;
+            --accent-color-red: #ffa04a;
+            --border-color-red: rgba(255, 74, 74, 0.2);
+            
+            --bg-color-green: #001a00;
+            --card-color-green: #052a05;
+            --text-color-green: #c0f0c0;
+            --highlight-color-green: #4aff4a;
+            --accent-color-green: #a0ff4a;
+            --border-color-green: rgba(74, 255, 74, 0.2);
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: var(--bg-color-red);
+            color: var(--text-color-red);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -25,8 +32,9 @@
             margin: 0;
             padding: 20px;
             overflow-x: hidden;
-            background-image: radial-gradient(circle, #0a3a0a 1px, transparent 1px);
+            background-image: radial-gradient(circle, #2a0505 1px, transparent 1px);
             background-size: 30px 30px;
+            transition: background-color 0.5s ease;
         }
 
         .container {
@@ -42,16 +50,59 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
+        body.aligned {
+            background-color: var(--bg-color-green);
+        }
+        body.aligned .card {
+            background-color: var(--card-color-green);
+            border-color: var(--border-color-green);
+        }
+        body.aligned h1, body.aligned h2 {
+            color: var(--highlight-color-green);
+            text-shadow: 0 0 10px rgba(74, 255, 74, 0.5);
+        }
+        body.aligned .location-info span, body.aligned .gyro-values span, body.aligned .guidance-values {
+            color: var(--highlight-color-green);
+        }
+        body.aligned .sky-object-item {
+            background-color: rgba(74, 255, 74, 0.05);
+            border-color: rgba(74, 255, 74, 0.1);
+        }
+        body.aligned .sky-object-item:hover {
+            background-color: rgba(74, 255, 74, 0.15);
+        }
+        body.aligned .card-title {
+            color: var(--highlight-color-green);
+        }
+        body.aligned #compass::before, body.aligned #compass::after, body.aligned #compass-center, body.aligned #direction-text {
+            color: var(--accent-color-green);
+        }
+        body.aligned #compass {
+            border-color: var(--highlight-color-green);
+        }
+        body.aligned #pitch-roll-box {
+            border-color: var(--highlight-color-green);
+            background-color: rgba(74, 255, 74, 0.1);
+            text-shadow: 0 0 5px rgba(74, 255, 74, 0.5);
+            box-shadow: 0 0 20px rgba(74, 255, 74, 0.3);
+        }
+        body.aligned .alert {
+            background-color: var(--highlight-color-green);
+        }
+        body.aligned #elev-meter-display {
+            border-color: var(--highlight-color-green);
+        }
 
         h1, h2 {
-            color: var(--highlight-color);
+            color: var(--highlight-color-red);
             text-align: center;
             margin: 0;
         }
         
         h1 {
             font-size: 2.5em;
-            text-shadow: 0 0 10px rgba(74, 255, 74, 0.5);
+            text-shadow: 0 0 10px rgba(255, 74, 74, 0.5);
             margin-bottom: 20px;
         }
 
@@ -61,7 +112,7 @@
         }
 
         #permission-button {
-            background-color: var(--highlight-color);
+            background-color: var(--highlight-color-red);
             color: black;
             border: none;
             padding: 15px 30px;
@@ -73,18 +124,18 @@
         }
 
         #permission-button:hover {
-            background-color: #70ff70;
+            background-color: #ff7070;
             transform: translateY(-2px);
         }
 
         .card {
-            background-color: var(--card-color);
+            background-color: var(--card-color-red);
             border-radius: 15px;
             padding: 25px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border-color-red);
             backdrop-filter: blur(5px);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: background-color 0.5s ease, border-color 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .card:hover {
@@ -95,12 +146,12 @@
         #status {
             text-align: center;
             font-style: italic;
-            color: var(--accent-color);
+            color: var(--accent-color-red);
             font-weight: bold;
         }
         
         .error-message {
-            color: var(--highlight-color);
+            color: var(--highlight-color-red);
             font-weight: bold;
             margin-top: 10px;
         }
@@ -114,10 +165,9 @@
         
         .location-info span {
             font-weight: bold;
-            color: var(--highlight-color);
+            color: var(--highlight-color-red);
         }
 
-        /* Compass Styles */
         #compass-card {
             display: flex;
             flex-direction: column;
@@ -143,12 +193,13 @@
                 transparent 1deg, transparent 9deg
             );
             background-size: 10% 100%;
-            border: 2px solid var(--highlight-color);
+            border: 2px solid var(--highlight-color-red);
             display: flex;
             justify-content: center;
             align-items: center;
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
             position: relative;
+            transition: border-color 0.5s ease;
         }
 
         #compass-center {
@@ -156,24 +207,27 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background-color: var(--highlight-color);
+            background-color: var(--highlight-color-red);
             z-index: 2;
-            box-shadow: 0 0 15px var(--highlight-color);
+            box-shadow: 0 0 15px var(--highlight-color-red);
+            transition: background-color 0.5s ease, box-shadow 0.5s ease;
         }
 
         #compass::before {
-            content: 'ش'; /* N for North in Persian */
+            content: 'ش';
             position: absolute;
             top: 5px;
             font-size: 2em;
-            color: var(--accent-color);
+            color: var(--accent-color-red);
             z-index: 1;
+            transition: color 0.5s ease;
         }
         #compass::after {
-            content: 'ج'; /* S for South in Persian */
+            content: 'ج';
             position: absolute;
             bottom: 5px;
             font-size: 2em;
+            color: var(--text-color-red);
             z-index: 1;
         }
 
@@ -191,12 +245,13 @@
             height: 0;
             border-left: 10px solid transparent;
             border-right: 10px solid transparent;
-            border-bottom: 120px solid var(--accent-color);
+            border-bottom: 120px solid var(--accent-color-red);
             position: absolute;
             bottom: 50%;
             left: 50%;
             transform: translateX(-50%);
-            filter: drop-shadow(0 0 5px rgba(160, 255, 74, 0.8));
+            filter: drop-shadow(0 0 5px rgba(255, 160, 74, 0.8));
+            transition: border-bottom-color 0.5s ease, filter 0.5s ease;
         }
         
         #direction-text {
@@ -204,10 +259,10 @@
             font-weight: bold;
             text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
             margin-top: 10px;
-            color: var(--accent-color);
+            color: var(--accent-color-red);
+            transition: color 0.5s ease;
         }
-
-        /* 3D Angle Meter Styles */
+        
         #angle-meter-card {
             padding-bottom: 10px;
         }
@@ -226,34 +281,34 @@
         #pitch-roll-box {
             width: 180px;
             height: 100px;
-            background-color: rgba(74, 255, 74, 0.1);
-            border: 2px solid var(--highlight-color);
+            background-color: rgba(255, 74, 74, 0.1);
+            border: 2px solid var(--highlight-color-red);
             border-radius: 10px;
             transform-style: preserve-3d;
             transform: rotateX(0deg) rotateY(0deg);
-            transition: transform 0.1s linear;
+            transition: transform 0.1s linear, background-color 0.5s ease, border-color 0.5s ease;
             position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 1.2em;
             font-weight: bold;
-            color: var(--text-color);
-            text-shadow: 0 0 5px rgba(74, 255, 74, 0.5);
-            box-shadow: 0 0 20px rgba(74, 255, 74, 0.3);
+            color: var(--text-color-red);
+            text-shadow: 0 0 5px rgba(255, 74, 74, 0.5);
+            box-shadow: 0 0 20px rgba(255, 74, 74, 0.3);
         }
         
         #pitch-roll-box::before {
-            content: 'سطح'; /* Level in Persian */
+            content: 'سطح';
             position: absolute;
             font-size: 0.8em;
             bottom: 5px;
-            color: var(--accent-color);
+            color: var(--accent-color-red);
         }
 
         #target-pitch-line, #target-roll-line {
             position: absolute;
-            background-color: #00ffff; /* Cyan for target lines */
+            background-color: #00ffff;
             box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
             z-index: 10;
             display: none;
@@ -280,15 +335,15 @@
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            background-color: var(--accent-color);
-            box-shadow: 0 0 15px var(--accent-color);
+            background-color: var(--accent-color-red);
+            box-shadow: 0 0 15px var(--accent-color-red);
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 11;
+            transition: background-color 0.5s ease, box-shadow 0.5s ease;
         }
-
-        /* Elev Meter Styles */
+        
         #elev-meter-card {
             text-align: center;
         }
@@ -296,7 +351,7 @@
             width: 100px;
             height: 100px;
             border-radius: 50%;
-            border: 2px solid var(--highlight-color);
+            border: 2px solid var(--highlight-color-red);
             margin: 20px auto 10px;
             position: relative;
             display: flex;
@@ -304,39 +359,28 @@
             align-items: center;
             overflow: hidden;
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
-            background-color: rgba(74, 255, 74, 0.05);
+            background-color: rgba(255, 74, 74, 0.05);
+            transition: background-color 0.5s ease, border-color 0.5s ease;
         }
 
         #elev-meter-line {
             position: absolute;
             width: 100%;
             height: 2px;
-            background-color: var(--accent-color);
+            background-color: var(--accent-color-red);
             transform-origin: center center;
-            transition: transform 0.1s linear;
+            transition: transform 0.1s linear, background-color 0.5s ease;
         }
         #elev-meter-value {
             position: absolute;
             font-size: 1.5em;
             font-weight: bold;
-            color: var(--highlight-color);
-            text-shadow: 0 0 5px rgba(74, 255, 74, 0.5);
+            color: var(--highlight-color-red);
+            text-shadow: 0 0 5px rgba(255, 74, 74, 0.5);
             z-index: 2;
+            transition: color 0.5s ease, text-shadow 0.5s ease;
         }
-
-        /* Gyroscope Display */
-        #gyroscope-card .gyro-values p {
-            margin: 5px 0;
-            display: flex;
-            justify-content: space-between;
-        }
-        #gyroscope-card .gyro-values span {
-            font-weight: bold;
-            color: var(--highlight-color);
-        }
-
-
-        /* Satellite Finder Mode */
+        
         #satellite-finder-card .input-group {
             display: flex;
             flex-direction: column;
@@ -346,88 +390,50 @@
 
         #satellite-finder-card label {
             font-weight: bold;
-            color: var(--text-color);
+            color: var(--text-color-red);
         }
 
         #satellite-finder-card select {
             width: 100%;
             padding: 10px;
             border-radius: 8px;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border-color-red);
             background-color: rgba(0, 0, 0, 0.3);
-            color: var(--text-color);
+            color: var(--text-color-red);
             font-size: 1em;
             appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%20viewBox%3D%220%200%20292.4%20292.4%22%3E%3Cpath%20fill%3D%22%234aff4a%22%20d%3D%22M287%20114.5L146.2%20255.3%205.4%20114.5h281.6z%22%2F%3E%3C%2Fsvg%3E');
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%20viewBox%3D%220%200%20292.4%20292.4%22%3E%3Cpath%20fill%3D%22%23ff4a4a%22%20d%3D%22M287%20114.5L146.2%20255.3%205.4%20114.5h281.6z%22%2F%3E%3C%2Fsvg%3E');
             background-repeat: no-repeat;
-            background-position: left 10px top 50%; /* Changed to left for RTL */
+            background-position: left 10px top 50%;
             background-size: 12px auto;
-            padding-left: 30px; /* Make space for the arrow */
+            padding-left: 30px;
         }
 
         #satellite-finder-card select:focus {
             outline: none;
-            border-color: var(--highlight-color);
-            box-shadow: 0 0 0 2px rgba(74, 255, 74, 0.3);
+            border-color: var(--highlight-color-red);
+            box-shadow: 0 0 0 2px rgba(255, 74, 74, 0.3);
         }
 
         #target-guidance {
             text-align: center;
             font-size: 1.1em;
             margin-top: 15px;
-            color: var(--accent-color);
+            color: var(--accent-color-red);
             font-weight: bold;
+            transition: color 0.5s ease;
         }
         
         .guidance-values {
             font-size: 1.3em;
-            color: var(--highlight-color);
+            color: var(--highlight-color-red);
             margin-top: 5px;
             display: block;
-        }
-
-        /* Sky Objects List */
-        #object-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .sky-object-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background-color: rgba(74, 255, 74, 0.05);
-            border-radius: 10px;
-            margin-bottom: 10px;
-            border: 1px solid rgba(74, 255, 74, 0.1);
-            transition: background-color 0.2s ease, transform 0.2s ease;
-        }
-
-        .sky-object-item:hover {
-            background-color: rgba(74, 255, 74, 0.15);
-            transform: translateX(5px);
-        }
-        
-        .object-name {
-            font-weight: bold;
-            font-size: 1.2em;
-            color: var(--accent-color);
-        }
-        
-        .object-details {
-            text-align: left; /* Changed to left for RTL */
-            font-size: 0.9em;
-        }
-
-        .object-details span {
-            display: block;
-            color: var(--text-color);
+            transition: color 0.5s ease;
         }
         
         .alert {
-            background-color: var(--highlight-color);
+            background-color: var(--highlight-color-red);
             color: black;
             padding: 15px;
             border-radius: 10px;
@@ -435,20 +441,32 @@
             text-align: center;
             font-weight: bold;
             animation: pulse 1.5s infinite;
+            transition: background-color 0.5s ease;
         }
         
         @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 74, 74, 0.4); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 15px rgba(255, 74, 74, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 74, 74, 0); }
+        }
+        
+        .aligned .alert {
+            animation-name: pulse-green;
+        }
+
+        @keyframes pulse-green {
             0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(74, 255, 74, 0.4); }
             70% { transform: scale(1.02); box-shadow: 0 0 0 15px rgba(74, 255, 74, 0); }
             100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(74, 255, 74, 0); }
         }
+
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Stargazer Pro - حالت شب 🔭</h1>
-    <div id="status"></div>
+    <h1>یابنده ماهواره پیشرفته 🔭</h1>
+    <div id="status">در حال بررسی مجوزها...</div>
     <div id="error-message" class="error-message" style="display:none;"></div>
 
     <div id="permission-prompt">
@@ -466,7 +484,7 @@
         </div>
         
         <div class="card" id="compass-card">
-            <h2>قطب‌نما زنده</h2>
+            <h2>قطب‌نما</h2>
             <div id="compass-container">
                 <div id="compass">
                     <div id="compass-needle">
@@ -478,18 +496,6 @@
             <p id="direction-text">--</p>
         </div>
 
-        <div class="card" id="angle-meter-card">
-            <h2>زاویه‌سنج سه‌بعدی</h2>
-            <div id="angle-meter-display">
-                <div id="pitch-roll-box">
-                    <div id="target-pitch-line"></div>
-                    <div id="target-roll-line"></div>
-                    <div id="pitch-roll-indicator"></div>
-                    <span id="pitch-roll-values">شیب: 0° چرخش: 0°</span>
-                </div>
-            </div>
-        </div>
-
         <div class="card" id="elev-meter-card">
             <h2>ارتفاع‌سنج (شیب)</h2>
             <div id="elev-meter-display">
@@ -497,15 +503,6 @@
                 <span id="elev-meter-value">0°</span>
             </div>
             <p>شیب دستگاه شما نسبت به افق</p>
-        </div>
-
-        <div class="card" id="gyroscope-card">
-            <h2>داده‌های ژیروسکوپ (چرخش)</h2>
-            <div class="gyro-values">
-                <p>X (Pitch Rate): <span id="gyro-alpha">--</span></p>
-                <p>Y (Roll Rate): <span id="gyro-beta">--</span></p>
-                <p>Z (Yaw Rate): <span id="gyro-gamma">--</span></p>
-            </div>
         </div>
 
         <div class="card" id="satellite-finder-card">
@@ -525,85 +522,69 @@
                     <option value="express53">Express-AM6 53°E</option>
                     <option value="nilesat7">Nilesat 7°W</option>
                     <option value="galaxy19">Galaxy 19 97°W</option>
+                    <option value="asia3s105">AsiaSat 3S 105.5°E</option>
+                    <option value="intelsat2068">Intelsat 20 68.5°E</option>
+                    <option value="eutelsat7">Eutelsat 7°E</option>
+                    <option value="eutelsat9">Eutelsat 9°E</option>
                 </select>
             </div>
             <div id="target-guidance">
                 <p>سمت هدف: <span class="guidance-values" id="target-azimuth">--</span></p>
                 <p>ارتفاع هدف: <span class="guidance-values" id="target-elevation">--</span></p>
                 <p id="guidance-message"></p>
+                <p id="tilt-instruction"></p>
             </div>
-        </div>
-        
-        <div class="card" id="sky-objects-card">
-            <h2>اجرام آسمانی قابل مشاهده</h2>
-            <ul id="object-list">
-                </ul>
         </div>
     </div>
 </div>
 
 <script>
     const translations = {
-        'N': 'ش', 'NNE': 'ش‌ش‌خ', 'NE': 'ش‌خ', 'ENE': 'ش‌ش‌ش‌خ', 'E': 'خ', 'ESE': 'ج‌ج‌ش‌خ', 'SE': 'ج‌خ', 'SSE': 'ج‌ج‌ش',
-        'S': 'ج', 'SSW': 'ج‌ج‌غ', 'SW': 'ج‌غ', 'WSW': 'ج‌ج‌ش‌غ', 'W': 'غ', 'WNW': 'ش‌ش‌ش‌غ', 'NW': 'ش‌غ', 'NNW': 'ش‌ش‌غ',
-        'Level': 'سطح',
+        'N': 'ش', 'NNE': 'ش‌ش‌خ', 'NE': 'ش‌خ', 'ENE': 'خ‌ش‌ش', 'E': 'خ', 'ESE': 'خ‌ج‌ج', 'SE': 'خ‌ج', 'SSE': 'ج‌ج‌خ',
+        'S': 'ج', 'SSW': 'ج‌ج‌غ', 'SW': 'ج‌غ', 'WSW': 'غ‌ج‌ج', 'W': 'غ', 'WNW': 'غ‌ش‌ش', 'NW': 'غ‌ش', 'NNW': 'ش‌ش‌غ',
         'Your Position': 'موقعیت شما',
         'Latitude': 'عرض جغرافیایی',
         'Longitude': 'طول جغرافیایی',
         'Altitude': 'ارتفاع',
-        'Live Compass': 'قطب‌نما زنده',
-        '3D Angle Meter': 'زاویه‌سنج سه‌بعدی',
-        'Pitch': 'شیب',
-        'Roll': 'چرخش',
+        'Live Compass': 'قطب‌نما',
         'Elev Meter (Tilt)': 'ارتفاع‌سنج (شیب)',
         'Device tilt relative to horizon': 'شیب دستگاه شما نسبت به افق',
-        'Gyroscope Data (Rotation Rate)': 'داده‌های ژیروسکوپ (نرخ چرخش)',
-        'X (Pitch Rate)': 'X (نرخ شیب)',
-        'Y (Roll Rate)': 'Y (نرخ چرخش)',
-        'Z (Yaw Rate)': 'Z (نرخ انحراف)',
         'Satellite Finder': 'یابنده ماهواره',
-        'Select Satellite': 'انتخاب ماهواره:',
-        'Target Azimuth': 'سمت هدف:',
-        'Target Elevation': 'ارتفاع هدف:',
-        'Sky Objects': 'اجرام آسمانی قابل مشاهده',
-        'Azimuth': 'سمت',
-        'Altitude': 'ارتفاع',
-        'Look out!': 'توجه! ',
-        'are prominent now.': 'اکنون قابل مشاهده هستند.',
-        'Locked on ': 'قفل شد روی ',
-        'Satellite is below the horizon or too low for your location.': 'ماهواره زیر افق یا برای موقعیت شما خیلی پایین است.',
+        'Select Satellite:': 'انتخاب ماهواره:',
+        'Target Azimuth': 'سمت هدف',
+        'Target Elevation': 'ارتفاع هدف',
+        'Satellite is below the horizon or too low for your location.': 'ماهواره زیر افق است یا برای موقعیت شما خیلی پایین است.',
         'Point your device towards the target!': 'دستگاه خود را به سمت هدف بگیرید!',
-        'Turn Left': 'بچرخانید چپ',
-        'Turn Right': 'بچرخانید راست',
-        'Heading aligned!': 'جهت‌گیری صحیح است!',
-        'Select a satellite and ensure location is active.': 'یک ماهواره انتخاب کنید و اطمینان حاصل کنید که موقعیت فعال است.',
+        'Turn Left': 'به سمت چپ بچرخانید',
+        'Turn Right': 'به سمت راست بچرخانید',
+        'Heading aligned!': 'جهت‌یابی صحیح است!',
+        'Select a satellite and ensure location is active.': 'یک ماهواره انتخاب کنید و از فعال بودن موقعیت خود مطمئن شوید.',
         '-- Select --': '-- انتخاب کنید --',
-        'Enable Sensors': 'فعال‌سازی حسگرها و موقعیت',
-        'Motion sensor access is restricted in PWA mode on iOS. Please open this app directly in Safari to use the compass and 3D angle meter.': 'دسترسی به حسگرهای حرکتی در حالت PWA در iOS محدود است. لطفاً این برنامه را مستقیماً در مرورگر سافاری باز کنید تا از قطب‌نما و زاویه‌سنج سه‌بعدی استفاده کنید.',
+        'Enable Sensors': 'فعال‌سازی حسگرها',
+        'Motion sensor access is restricted in PWA mode on iOS. Please open this app directly in Safari to use the compass and 3D angle meter.': 'دسترسی به حسگر حرکتی در حالت PWA در iOS محدود است. لطفاً این برنامه را مستقیماً در مرورگر سافاری باز کنید تا از قطب‌نما و زاویه‌سنج استفاده کنید.',
         'Open in Safari': 'باز کردن در سافاری',
         'Tap the button to enable sensors and get started!': 'برای فعال‌سازی حسگرها و شروع، دکمه را لمس کنید!',
-        'Requesting permissions...': 'درخواست مجوزها...',
+        'Requesting permissions...': 'در حال درخواست مجوزها...',
         'Motion sensor permission granted. Getting location...': 'مجوز حسگر حرکتی اعطا شد. در حال دریافت موقعیت...',
         'Motion sensor permission denied. Tap to retry.': 'مجوز حسگر حرکتی رد شد. برای امتحان مجدد لمس کنید.',
         'Error requesting motion sensor permission. Tap to retry.': 'خطا در درخواست مجوز حسگر حرکتی. برای امتحان مجدد لمس کنید.',
         'Motion sensor permission not required. Getting location...': 'مجوز حسگر حرکتی مورد نیاز نیست. در حال دریافت موقعیت...',
-        'Geolocation not supported by this browser.': 'موقعیت جغرافیایی توسط این مرورگر پشتیبانی نمی‌شود.',
-        'Geolocation Error: ': 'خطای موقعیت جغرافیایی: ',
-        'HTTPS is required for location on many devices.': 'HTTPS برای موقعیت‌یابی در بسیاری از دستگاه‌ها مورد نیاز است.',
+        'Geolocation not supported by this browser.': 'موقعیت‌یابی توسط این مرورگر پشتیبانی نمی‌شود.',
+        'Geolocation Error: ': 'خطای موقعیت‌یابی: ',
+        'HTTPS is required for location on many devices.': 'پروتکل HTTPS برای موقعیت‌یابی در بسیاری از دستگاه‌ها مورد نیاز است.',
         'Location updated.': 'موقعیت به‌روز شد.',
+        'Tilt your phone up to ': 'گوشی را به سمت بالا مایل کنید تا به ',
+        ' degrees.': ' درجه برسد.',
+        'Tilt your phone down to ': 'گوشی را به سمت پایین مایل کنید تا به ',
+        ' degrees.': ' درجه برسد.',
+        'Phone is tilted correctly.': 'گوشی به درستی مایل شده است.',
+        'N/A': 'نامشخص',
+        'Phone aligned!': 'دستگاه هم‌راستا شد!'
     };
 
     function translate(key) {
         return translations[key] || key;
     }
-
-    const SKY_OBJECTS = {
-        'Moon': { ra: 12.0, dec: 15.0 }, 
-        'Jupiter': { ra: 18.5, dec: -23.0 },
-        'Venus': { ra: 9.2, dec: 10.5 },
-        'Mars': { ra: 2.0, dec: 1.0 },
-        'Sirius': { ra: 6.75, dec: -16.71 },
-    };
 
     const SATELLITE_DATA = {
         'astra28': { name: 'Astra 28.2°E', longitude: 28.2 },
@@ -618,7 +599,7 @@
         'nilesat7': { name: 'Nilesat 7°W', longitude: -7.0 },
         'galaxy19': { name: 'Galaxy 19 97°W', longitude: -97.0 },
         'asia3s105': { name: 'AsiaSat 3S 105.5°E', longitude: 105.5 },
-        'intelsat2068': { name: 'Intelsat 20 68.5°E', longitude: 68.5 }, // Duplicate, but common
+        'intelsat2068': { name: 'Intelsat 20 68.5°E', longitude: 68.5 },
         'eutelsat7': { name: 'Eutelsat 7°E', longitude: 7.0 },
         'eutelsat9': { name: 'Eutelsat 9°E', longitude: 9.0 },
     };
@@ -630,17 +611,8 @@
     const altitudeEl = document.getElementById('altitude');
     const compassNeedle = document.getElementById('compass-needle');
     const directionText = document.getElementById('direction-text');
-    const pitchRollBox = document.getElementById('pitch-roll-box');
-    const pitchRollValues = document.getElementById('pitch-roll-values');
-    const pitchRollIndicator = document.getElementById('pitch-roll-indicator');
-    const targetPitchLine = document.getElementById('target-pitch-line');
-    const targetRollLine = document.getElementById('target-roll-line');
     const elevMeterLine = document.getElementById('elev-meter-line');
     const elevMeterValue = document.getElementById('elev-meter-value');
-    const gyroAlphaEl = document.getElementById('gyro-alpha');
-    const gyroBetaEl = document.getElementById('gyro-beta');
-    const gyroGammaEl = document.getElementById('gyro-gamma');
-    const objectListEl = document.getElementById('object-list');
     const permissionButton = document.getElementById('permission-button');
     const appContent = document.getElementById('app-content');
     const permissionPrompt = document.getElementById('permission-prompt');
@@ -648,13 +620,13 @@
     const targetAzimuthEl = document.getElementById('target-azimuth');
     const targetElevationEl = document.getElementById('target-elevation');
     const guidanceMessage = document.getElementById('guidance-message');
+    const tiltInstructionEl = document.getElementById('tilt-instruction');
 
     let userLat = null;
     let userLon = null;
     let userAlt = null;
     let currentHeading = 0;
-    let currentPitch = 0; // Device's front-back tilt (beta)
-    let currentRoll = 0;  // Device's side-to-side tilt (gamma)
+    let currentPitch = 0;
     let selectedSatellite = null;
     let targetSatAzimuth = null;
     let targetSatElevation = null;
@@ -681,37 +653,12 @@
             targetAzimuthEl.textContent = '--';
             targetElevationEl.textContent = '--';
             guidanceMessage.textContent = translate('Select a satellite and ensure location is active.');
-            targetPitchLine.style.display = 'none';
-            targetRollLine.style.display = 'none';
+            tiltInstructionEl.textContent = '';
+            document.body.classList.remove('aligned');
         }
     });
 
     document.addEventListener('DOMContentLoaded', () => {
-        // Translate static elements on load
-        document.querySelector('h1').textContent = 'Stargazer Pro - حالت شب 🔭';
-        document.querySelector('#location-card h2').textContent = translate('Your Position');
-        document.querySelector('#location-card p:nth-child(1)').innerHTML = translate('Latitude') + ': <span id="latitude">--</span>';
-        document.querySelector('#location-card p:nth-child(2)').innerHTML = translate('Longitude') + ': <span id="longitude">--</span>';
-        document.querySelector('#location-card p:nth-child(3)').innerHTML = translate('Altitude') + ': <span id="altitude">--</span>';
-        document.querySelector('#compass-card h2').textContent = translate('Live Compass');
-        document.querySelector('#angle-meter-card h2').textContent = translate('3D Angle Meter');
-        document.querySelector('#pitch-roll-box').setAttribute('data-before', translate('Level')); // Update pseudoelement via JS
-        document.querySelector('#angle-meter-card span').textContent = translate('Pitch') + ': 0° ' + translate('Roll') + ': 0°';
-        document.querySelector('#elev-meter-card h2').textContent = translate('Elev Meter (Tilt)');
-        document.querySelector('#elev-meter-card p').textContent = translate('Device tilt relative to horizon');
-        document.querySelector('#gyroscope-card h2').textContent = translate('Gyroscope Data (Rotation Rate)');
-        document.querySelector('#gyroscope-card p:nth-child(1)').innerHTML = translate('X (Pitch Rate)') + ': <span id="gyro-alpha">--</span>';
-        document.querySelector('#gyroscope-card p:nth-child(2)').innerHTML = translate('Y (Roll Rate)') + ': <span id="gyro-beta">--</span>';
-        document.querySelector('#gyroscope-card p:nth-child(3)').innerHTML = translate('Z (Yaw Rate)') + ': <span id="gyro-gamma">--</span>';
-        document.querySelector('#satellite-finder-card h2').textContent = translate('Satellite Finder');
-        document.querySelector('#satellite-finder-card label').textContent = translate('Select Satellite');
-        document.querySelector('#satellite-finder-card select option[value=""]').textContent = translate('-- Select --');
-        document.querySelector('#target-guidance p:nth-child(1)').innerHTML = translate('Target Azimuth') + ': <span class="guidance-values" id="target-azimuth">--</span>';
-        document.querySelector('#target-guidance p:nth-child(2)').innerHTML = translate('Target Elevation') + ': <span class="guidance-values" id="target-elevation">--</span>';
-        document.querySelector('#sky-objects-card h2').textContent = translate('Sky Objects');
-        permissionButton.textContent = translate('Enable Sensors');
-
-        // Check for iOS PWA mode
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
         const isIOSPWA = window.matchMedia('(display-mode: standalone)').matches || ('standalone' in navigator && navigator.standalone);
 
@@ -752,7 +699,6 @@
                     console.error(error);
                 });
         } else {
-            // For browsers/devices that don't need explicit permission (e.g., Android Chrome)
             statusEl.textContent = translate('Motion sensor permission not required. Getting location...');
             setupSensors();
             getLocation();
@@ -777,7 +723,6 @@
                 altitudeEl.textContent = userAlt ? userAlt.toFixed(2) + ' m' : translate('N/A');
                 statusEl.textContent = translate('Location updated.');
                 hideErrorMessage();
-                calculateAndDisplayObjects();
                 if (selectedSatellite) {
                     calculateSatellitePosition(userLat, userLon, selectedSatellite.longitude);
                 }
@@ -796,128 +741,33 @@
     }
 
     function setupSensors() {
-        // Prioritize 'deviceorientationabsolute' for true north if available
-        if (window.DeviceOrientationAbsoluteEvent) {
-            window.addEventListener('deviceorientationabsolute', handleDeviceOrientation);
-        } else if (window.DeviceOrientationEvent) {
+        if (window.DeviceOrientationEvent) {
             window.addEventListener('deviceorientation', handleDeviceOrientation);
         } else {
-            statusEl.textContent = "Device orientation sensors not supported.";
             showErrorMessage("حسگرهای جهت‌گیری دستگاه پشتیبانی نمی‌شوند.");
-        }
-
-        if (window.DeviceMotionEvent) {
-            window.addEventListener('devicemotion', handleDeviceMotion);
-        } else {
-            console.warn("Device motion sensors not supported.");
-            // Optionally, show a message for gyroscope data not being available
         }
     }
 
     function handleDeviceOrientation(e) {
-        // Use webkitCompassHeading for iOS if available and alpha is not absolute
-        // Otherwise, use alpha and convert to 0-360 range
         currentHeading = e.webkitCompassHeading || (e.absolute ? e.alpha : (360 - e.alpha + 360) % 360);
-        
-        // Compensate for screen orientation (if not handled by deviceorientation)
-        let screenOrientation = window.orientation || 0; // 0, 90, -90, 180
+        let screenOrientation = window.orientation || 0;
         if (screenOrientation === 90) currentHeading += 90;
         if (screenOrientation === -90) currentHeading -= 90;
         if (screenOrientation === 180) currentHeading += 180;
         currentHeading = (currentHeading + 360) % 360;
 
-
         compassNeedle.style.transform = `rotate(${currentHeading}deg)`;
         const directions = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
-        const persianDirections = ["ش", "ش‌ش‌خ", "ش‌خ", "ش‌ش‌ش‌خ", "خ", "ج‌ج‌ش‌خ", "ج‌خ", "ج‌ج‌ش", "ج", "ج‌ج‌غ", "ج‌غ", "ج‌ج‌ش‌غ", "غ", "ش‌ش‌ش‌غ", "ش‌غ", "ش‌ش‌غ"];
+        const persianDirections = ["ش", "ش‌ش‌خ", "ش‌خ", "خ‌ش‌ش", "خ", "خ‌ج‌ج", "خ‌ج", "ج‌ج‌خ", "ج", "ج‌ج‌غ", "ج‌غ", "غ‌ج‌ج", "غ", "غ‌ش‌ش", "غ‌ش", "ش‌ش‌غ"];
         const index = Math.round(currentHeading / 22.5) % 16;
         directionText.textContent = `${persianDirections[index]} (${currentHeading.toFixed(0)}°)`;
         
-        currentPitch = e.beta; // X-axis rotation (front-back tilt)
-        currentRoll = e.gamma; // Y-axis rotation (side-to-side tilt)
-
+        currentPitch = e.beta;
         currentPitch = Math.max(-90, Math.min(90, currentPitch));
-        currentRoll = Math.max(-90, Math.min(90, currentRoll));
-
-        pitchRollBox.style.transform = `rotateX(${currentPitch}deg) rotateY(${currentRoll}deg)`;
-        pitchRollValues.textContent = `${translate('Pitch')}: ${currentPitch.toFixed(0)}° ${translate('Roll')}: ${currentRoll.toFixed(0)}°`;
-
-        // Elev Meter Update
-        elevMeterLine.style.transform = `rotate(${currentPitch}deg)`;
-        elevMeterValue.textContent = `${currentPitch.toFixed(0)}°`;
+        elevMeterLine.style.transform = `rotate(${-currentPitch}deg)`;
+        elevMeterValue.textContent = `${-currentPitch.toFixed(0)}°`;
 
         updateSatelliteGuidance();
-    }
-
-    function handleDeviceMotion(event) {
-        // Raw gyroscope data (rotation rate)
-        if (event.rotationRate) {
-            gyroAlphaEl.textContent = event.rotationRate.alpha ? event.rotationRate.alpha.toFixed(2) : '--';
-            gyroBetaEl.textContent = event.rotationRate.beta ? event.rotationRate.beta.toFixed(2) : '--';
-            gyroGammaEl.textContent = event.rotationRate.gamma ? event.rotationRate.gamma.toFixed(2) : '--';
-        }
-    }
-
-
-    function calculateAndDisplayObjects() {
-        if (userLat === null || userLon === null) return;
-
-        const now = new Date();
-        const j2000 = new Date('2000-01-01T12:00:00Z');
-        const jd = (now.getTime() - j2000.getTime()) / 86400000 + 2451545.0;
-
-        objectListEl.innerHTML = '';
-        const objectsToAlert = [];
-
-        for (const [name, coords] of Object.entries(SKY_OBJECTS)) {
-            const lst = (100.46 + 0.985647 * (jd - 2451545) + userLon) % 360;
-            const ha = (lst - coords.ra * 15 + 360) % 360;
-            
-            const radLat = toRadians(userLat);
-            const radDec = toRadians(coords.dec);
-            const radHa = toRadians(ha);
-            
-            const sinAlt = Math.sin(radLat) * Math.sin(radDec) + Math.cos(radLat) * Math.cos(radDec) * Math.cos(radHa);
-            const altitude = toDegrees(Math.asin(sinAlt));
-
-            if (altitude > 0) {
-                let cosAz = (Math.sin(radDec) - Math.sin(radLat) * sinAlt) / (Math.cos(radLat) * Math.cos(toRadians(altitude)));
-                cosAz = Math.max(-1, Math.min(1, cosAz));
-                let azimuth = toDegrees(Math.acos(cosAz));
-
-                if (Math.sin(radHa) > 0) {
-                    azimuth = 360 - azimuth;
-                }
-                
-                const listItem = document.createElement('li');
-                listItem.className = 'sky-object-item';
-                listItem.innerHTML = `
-                    <span class="object-name">${name}</span>
-                    <div class="object-details">
-                        <span>${translate('Azimuth')}: ${azimuth.toFixed(0)}°</span>
-                        <span>${translate('Altitude')}: ${altitude.toFixed(0)}°</span>
-                    </div>
-                `;
-                objectListEl.appendChild(listItem);
-                
-                if (altitude > 45 && altitude < 80) {
-                    objectsToAlert.push({ name, azimuth: azimuth.toFixed(0) });
-                }
-            }
-        }
-        
-        const existingAlert = document.querySelector('.alert');
-        if (existingAlert) {
-            existingAlert.remove();
-        }
-
-        if (objectsToAlert.length > 0) {
-            const alertText = objectsToAlert.map(obj => `${obj.name} (Azimuth: ${obj.azimuth}°)`).join(', ');
-            const alertDiv = document.createElement('div');
-            alertDiv.className = 'alert';
-            alertDiv.textContent = `${translate('Look out!')} ${alertText} ${translate('are prominent now.')}`;
-            document.querySelector('.container').appendChild(alertDiv);
-        }
     }
 
     function calculateSatellitePosition(observerLat, observerLon, satLon) {
@@ -930,12 +780,10 @@
         const Re = 6378.137;
         const Rs = 42164;
 
-        const sinEl = ((Rs * Math.cos(obsLatR) * Math.cos(G)) - Re) / 
-                      (Math.sqrt(Math.pow(Rs, 2) + Math.pow(Re, 2) - (2 * Rs * Re * Math.cos(obsLatR) * Math.cos(G))));
-        
+        const sinEl = (Math.cos(obsLatR) * Math.cos(G) - (Re / Rs)) / (Math.sqrt(1 - 2 * (Re / Rs) * Math.cos(obsLatR) * Math.cos(G) + Math.pow(Re / Rs, 2)));
         const elevation = toDegrees(Math.asin(sinEl));
-
-        let azimuth = toDegrees(Math.atan2(-Math.sin(G) * Math.cos(obsLatR), (Math.cos(G) - (Re / Rs) * Math.cos(obsLatR)) * Math.sin(obsLatR) ));
+        
+        let azimuth = toDegrees(Math.atan2(-Math.sin(G), Math.tan(obsLatR) * Math.cos(G) - Math.sin(obsLatR) / Math.cos(G)));
         azimuth = (azimuth + 360) % 360;
 
         targetSatAzimuth = azimuth;
@@ -946,75 +794,62 @@
 
         if (elevation < 1) {
             guidanceMessage.textContent = translate('Satellite is below the horizon or too low for your location.');
-            targetPitchLine.style.display = 'none';
-            targetRollLine.style.display = 'none';
+            tiltInstructionEl.textContent = '';
         } else {
             guidanceMessage.textContent = translate('Point your device towards the target!');
-            targetPitchLine.style.display = 'block';
-            targetRollLine.style.display = 'block';
         }
         updateSatelliteGuidance();
     }
 
     function updateSatelliteGuidance() {
         if (!selectedSatellite || targetSatAzimuth === null || targetSatElevation === null) {
-            targetPitchLine.style.display = 'none';
-            targetRollLine.style.display = 'none';
-            pitchRollIndicator.style.backgroundColor = 'var(--accent-color)';
+            document.body.classList.remove('aligned');
             return;
         }
 
+        const azTolerance = 5;
+        const elTolerance = 5;
+
         const diffAzimuth = (targetSatAzimuth - currentHeading + 360) % 360;
-        let rotationHint = '';
-        if (Math.abs(diffAzimuth) > 5) {
-            if (diffAzimuth > 180) {
-                rotationHint = `${translate('Turn Left')} ${(360 - diffAzimuth).toFixed(0)}°`;
-            } else {
-                rotationHint = `${translate('Turn Right')} ${diffAzimuth.toFixed(0)}°`;
+        const diffPitch = -currentPitch - targetSatElevation;
+
+        let isAligned = false;
+        if (Math.abs(diffAzimuth) < azTolerance || Math.abs(diffAzimuth - 360) < azTolerance) {
+            if (Math.abs(diffPitch) < elTolerance) {
+                isAligned = true;
             }
+        }
+
+        if (isAligned) {
+            document.body.classList.add('aligned');
+            guidanceMessage.textContent = translate('Phone aligned!');
+            tiltInstructionEl.textContent = '';
         } else {
-             rotationHint = translate('Heading aligned!');
+            document.body.classList.remove('aligned');
+            let rotationHint = '';
+            if (Math.abs(diffAzimuth) > 5) {
+                if (diffAzimuth > 180) {
+                    rotationHint = `${translate('Turn Left')} ${(360 - diffAzimuth).toFixed(0)}°`;
+                } else {
+                    rotationHint = `${translate('Turn Right')} ${diffAzimuth.toFixed(0)}°`;
+                }
+            } else {
+                 rotationHint = translate('Heading aligned!');
+            }
+
+            let tiltHint = '';
+            if (Math.abs(diffPitch) > 5) {
+                if (diffPitch > 0) {
+                    tiltHint = `${translate('Tilt your phone down to ')} ${targetSatElevation.toFixed(0)}${translate(' degrees.')}`;
+                } else {
+                    tiltHint = `${translate('Tilt your phone up to ')} ${targetSatElevation.toFixed(0)}${translate(' degrees.')}`;
+                }
+            } else {
+                tiltHint = translate('Phone is tilted correctly.');
+            }
+
+            guidanceMessage.textContent = rotationHint + " | " + tiltHint;
         }
-        
-        const pitchTolerance = 5; // degrees
-        const currentPitchDiff = currentPitch - targetSatElevation; // Difference from desired elevation
-        const rollTolerance = 5; // degrees for roll
-        
-        // Map currentPitchDiff to a visual offset in the box (e.g., -50 to 50 for top/bottom)
-        // Adjust these mappings based on how you want the indicator to move
-        const indicatorPitchPos = -currentPitchDiff * (50 / 90); // Maps -90 to 90 pitch diff to -50 to 50px vertical movement
-        pitchRollIndicator.style.top = `calc(50% + ${indicatorPitchPos}px)`;
-
-        const indicatorRollPos = currentRoll * (50 / 90); // Maps -90 to 90 roll to -50 to 50px horizontal movement
-        pitchRollIndicator.style.left = `calc(50% - ${indicatorRollPos}px)`; // Invert for natural feel
-
-        let pitchGuidance = '';
-        if (Math.abs(currentPitchDiff) > pitchTolerance) {
-            pitchGuidance = currentPitchDiff > 0 ? ` ${translate('Tilt Down')} ${currentPitchDiff.toFixed(0)}°` : ` ${translate('Tilt Up')} ${Math.abs(currentPitchDiff).toFixed(0)}°`;
-        }
-
-        let rollGuidance = '';
-        if (Math.abs(currentRoll) > rollTolerance) {
-            rollGuidance = currentRoll > 0 ? ` ${translate('Roll Left')} ${currentRoll.toFixed(0)}°` : ` ${translate('Roll Right')} ${Math.abs(currentRoll).toFixed(0)}°`;
-        }
-
-        guidanceMessage.textContent = `${rotationHint} | ${translate('Elev')}: ${targetSatElevation.toFixed(0)}° ${pitchGuidance}${rollGuidance}`;
-
-
-        // Change indicator color based on alignment
-        if (Math.abs(diffAzimuth) < pitchTolerance && Math.abs(currentPitchDiff) < pitchTolerance && Math.abs(currentRoll) < rollTolerance) {
-            pitchRollIndicator.style.backgroundColor = '#00ffff'; // Cyan when aligned
-            pitchRollIndicator.style.boxShadow = '0 0 15px #00ffff';
-            guidanceMessage.textContent = `${translate('Locked on ')} ${selectedSatellite.name}!`;
-        } else {
-            pitchRollIndicator.style.backgroundColor = 'var(--accent-color)';
-            pitchRollIndicator.style.boxShadow = `0 0 15px var(--accent-color)`;
-        }
-        
-        // Target lines in 3D Angle Meter are essentially the "level" reference for the target.
-        // They will be centered, and the indicator moves around them.
-        targetPitchLine.style.display = 'block';
-        targetRollLine.style.display = 'block';
     }
 </script>
 </body>
