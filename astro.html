@@ -288,7 +288,6 @@
             createCompassMarkers();
 
             async function requestPermissions() {
-                // ... (Permission logic remains the same as previous version)
                 permissionBtn.disabled = true;
                 permissionBtn.textContent = 'کمی صبر کنید...';
                 
@@ -362,7 +361,6 @@
                 elevationVal.textContent = `${targetElevation.toFixed(1)}°`;
                 
                 // Update target UI elements
-                compassRing.style.transform = `rotate(${-targetAzimuth}deg)`;
                 const elevationPercent = (targetElevation / 90) * 100;
                 elevationTargetLine.style.bottom = `calc(${elevationPercent}% - 1px)`;
                 
@@ -374,18 +372,26 @@
             function handleOrientation(event) {
                 if (!event.alpha) return;
                 
-                // --- FIX: Use webkitCompassHeading for accurate iOS heading ---
-                const currentAzimuth = event.webkitCompassHeading !== undefined ? event.webkitCompassHeading : event.alpha;
-                // --- END FIX ---
-
-                // Calculate elevation relative to the horizontal plane
+                // Get the accurate compass heading (azimuth)
+                const currentAzimuth = event.webkitCompassHeading !== undefined ? event.webkitCompassHeading : 360 - event.alpha;
                 const currentElevation = 90 - event.beta;
 
                 currentAzimuthVal.textContent = `${currentAzimuth.toFixed(1)}°`;
                 currentElevationVal.textContent = `${currentElevation.toFixed(1)}°`;
                 
-                // Update phone UI elements
-                compass.style.transform = `rotate(${-currentAzimuth}deg)`; // Also change this line for correct visual rotation
+                // --- FIX: Correct visual rotation logic ---
+                // Rotate the entire compass container to match the phone's heading.
+                // This makes the top of the phone always align with North on the visual compass.
+                compass.style.transform = `rotate(${-currentAzimuth}deg)`;
+
+                // Rotate the compass ring to align the target satellite.
+                // The target marker is on the ring, so rotating the ring moves it.
+                const diff = (targetAzimuth - currentAzimuth + 360) % 360;
+                const rotation = diff > 180 ? 360 - diff : -diff;
+                compassRing.style.transform = `rotate(${rotation}deg)`;
+                // --- END FIX ---
+
+
                 const currentElevationPercent = (currentElevation / 90) * 100;
                 elevationCurrentLevel.style.height = `${currentElevationPercent}%`;
 
@@ -448,7 +454,6 @@
             }
 
             function calculateSatelliteAngles(lat, lon, satLon) {
-                // ... (Calculation logic remains the same)
                 const toRad = Math.PI / 180;
                 lat *= toRad; lon *= toRad; satLon *= toRad;
                 const g = lon - satLon;
