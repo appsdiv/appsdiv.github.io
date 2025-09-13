@@ -1,0 +1,470 @@
+<!--
+Project: Golden Hours — Mobile‑first PWA (Tailwind)
+Files in this snippet:
+  1) index.html (this file)
+  2) sw.js        (service worker)
+  3) manifest.webmanifest (PWA manifest)
+Create the other two files alongside index.html with the exact filenames shown below.
+-->
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Golden Hours</title>
+  <meta name="description" content="Precise golden hour, sunrise/sunset, and twilight times with live countdowns." />
+  <meta name="theme-color" content="#0b1220" id="themeColorMeta" />
+
+  <!-- Tailwind CDN (mobile-first) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { fontFamily: { display: ['system-ui','-apple-system','Segoe UI','Roboto','Vazirmatn','sans-serif'] } } }
+    }
+  </script>
+
+  <!-- Icon (you can replace with your own) -->
+  <link rel="icon" href="icons/icon-192.png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.webmanifest" />
+
+  <!-- Solar calc + time zone helpers -->
+  <script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
+  <script src="https://unpkg.com/geo-tz@6.0.1/dist/geo-tz.umd.min.js"></script>
+
+  <style>
+    /* Smooth background transitions */
+    .bg-sky { background-image: linear-gradient(180deg, var(--bg-from), var(--bg-to)); }
+  </style>
+</head>
+<body id="appBody" class="min-h-screen text-slate-100 bg-sky transition-colors duration-700">
+  <!-- Safelist hidden theme classes for Tailwind CDN JIT -->
+  <div class="hidden">
+    <div class="from-slate-950 to-black"></div>
+    <div class="from-indigo-950 to-slate-900"></div>
+    <div class="from-indigo-900 to-indigo-950"></div>
+    <div class="from-purple-900 to-indigo-900"></div>
+    <div class="from-amber-300 to-orange-500"></div>
+    <div class="from-sky-300 to-sky-600"></div>
+    <div class="text-slate-900 text-slate-100"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6"><path fill="currentColor" d="M6 14q-1.65 0-2.825-1.175T2 10q0-1.65 1.175-2.825T6 6q1.65 0 2.825 1.175T10 10q0 1.65-1.175 2.825T6 14m12 0q-1.65 0-2.825-1.175T14 10q0-1.65 1.175-2.825T18 6q1.65 0 2.825 1.175T22 10q0 1.65-1.175 2.825T18 14M6 22q-1.65 0-2.825-1.175T2 18q0-1.65 1.175-2.825T6 14q1.65 0 2.825 1.175T10 18q0 1.65-1.175 2.825T6 22m12 0q-1.65 0-2.825-1.175T14 18q0-1.65 1.175-2.825T18 14q1.65 0 2.825 1.175T22 18q0 1.65-1.175 2.825T18 22"/></svg>
+      <h1 class="font-semibold tracking-tight text-lg">Golden Hours</h1>
+    </div>
+    <button id="installBtn" class="text-xs px-3 py-1 rounded-full bg-white/20 hover:bg-white/30">Install</button>
+  </header>
+
+  <!-- Location + Date Controls -->
+  <section class="px-4 pb-2 space-y-3">
+    <div class="grid grid-cols-1 gap-2">
+      <div class="flex gap-2">
+        <button id="gpsBtn" class="flex-1 px-3 py-2 rounded-xl bg-white/15 backdrop-blur border border-white/10">Use GPS</button>
+      </div>
+      <div>
+        <div class="relative">
+          <input id="search" type="text" inputmode="search" placeholder="Type a place (city, landmark)…" class="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/10 outline-none placeholder:text-slate-300/70" autocomplete="off" />
+          <div id="results" class="absolute z-20 mt-1 w-full rounded-xl overflow-hidden shadow-lg hidden"></div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <input id="datePick" type="date" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10" />
+        <button id="todayBtn" class="px-3 py-2 rounded-xl bg-white/15 border border-white/10">Today</button>
+      </div>
+      <p id="locLine" class="text-sm text-white/80"></p>
+    </div>
+  </section>
+
+  <!-- Status + Countdown -->
+  <section class="px-4 py-2">
+    <div class="rounded-2xl p-4 bg-white/10 border border-white/10 backdrop-blur">
+      <p class="text-xs uppercase tracking-widest opacity-80">Now</p>
+      <div class="flex items-baseline justify-between mt-1">
+        <h2 id="phaseText" class="text-2xl font-bold">—</h2>
+        <p id="timeNow" class="text-sm opacity-90">—</p>
+      </div>
+      <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
+        <div class="rounded-xl bg-white/10 p-3 border border-white/10">
+          <p class="opacity-80">Next Golden Hour</p>
+          <p id="nextGolden" class="text-lg font-semibold">—</p>
+          <p id="goldenCountdown" class="opacity-80 mt-0.5">—</p>
+        </div>
+        <div class="rounded-xl bg-white/10 p-3 border border-white/10">
+          <p class="opacity-80">Next Sunrise / Sunset</p>
+          <p id="nextRiseSet" class="text-lg font-semibold">—</p>
+          <p id="riseSetCountdown" class="opacity-80 mt-0.5">—</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Times Grid -->
+  <section class="px-4 py-2">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <div class="rounded-2xl p-4 bg-white/10 border border-white/10 backdrop-blur">
+        <h3 class="font-semibold">Golden Hour</h3>
+        <div class="mt-2 text-sm space-y-1">
+          <div class="flex justify-between"><span>Morning start</span><span id="ghAmStart">—</span></div>
+          <div class="flex justify-between"><span>Morning end</span><span id="ghAmEnd">—</span></div>
+          <div class="flex justify-between"><span>Evening start</span><span id="ghPmStart">—</span></div>
+          <div class="flex justify-between"><span>Evening end</span><span id="ghPmEnd">—</span></div>
+        </div>
+      </div>
+      <div class="rounded-2xl p-4 bg-white/10 border border-white/10 backdrop-blur">
+        <h3 class="font-semibold">Sunrise & Sunset</h3>
+        <div class="mt-2 text-sm space-y-1">
+          <div class="flex justify-between"><span>Sunrise</span><span id="sunrise">—</span></div>
+          <div class="flex justify-between"><span>Solar noon</span><span id="solarNoon">—</span></div>
+          <div class="flex justify-between"><span>Sunset</span><span id="sunset">—</span></div>
+          <div class="flex justify-between"><span>Day length</span><span id="dayLength">—</span></div>
+        </div>
+      </div>
+      <div class="rounded-2xl p-4 bg-white/10 border border-white/10 backdrop-blur">
+        <h3 class="font-semibold">Civil / Nautical / Astronomical</h3>
+        <div class="mt-2 text-sm space-y-1">
+          <div class="flex justify-between"><span>Civil dawn</span><span id="civilDawn">—</span></div>
+          <div class="flex justify-between"><span>Civil dusk</span><span id="civilDusk">—</span></div>
+          <div class="flex justify-between"><span>Nautical dawn</span><span id="nautDawn">—</span></div>
+          <div class="flex justify-between"><span>Nautical dusk</span><span id="nautDusk">—</span></div>
+          <div class="flex justify-between"><span>Astronomical dawn</span><span id="astroDawn">—</span></div>
+          <div class="flex justify-between"><span>Astronomical dusk</span><span id="astroDusk">—</span></div>
+        </div>
+      </div>
+      <div class="rounded-2xl p-4 bg-white/10 border border-white/10 backdrop-blur">
+        <h3 class="font-semibold">Sun Position (now)</h3>
+        <div class="mt-2 text-sm space-y-1">
+          <div class="flex justify-between"><span>Altitude</span><span id="altitude">—</span></div>
+          <div class="flex justify-between"><span>Azimuth</span><span id="azimuth">—</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="px-4 py-6 text-center text-xs opacity-80">Offline-ready PWA • Data from SunCalc • Geocoding by OpenStreetMap Nominatim</footer>
+
+  <script>
+    const DateTime = luxon.DateTime;
+
+    // ---- State ----
+    let state = {
+      lat: null, lon: null, tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      placeLabel: '',
+      date: DateTime.now().setZone(Intl.DateTimeFormat().resolvedOptions().timeZone).toISODate()
+    };
+
+    // Restore last selection
+    try {
+      const saved = JSON.parse(localStorage.getItem('gh_state')||'null');
+      if (saved && saved.lat && saved.lon) state = Object.assign(state, saved);
+    } catch(e){}
+
+    const $ = (id) => document.getElementById(id);
+
+    // UI refs
+    const themeMeta = document.getElementById('themeColorMeta');
+    const appBody = document.getElementById('appBody');
+    const gpsBtn = $('gpsBtn');
+    const search = $('search');
+    const results = $('results');
+    const datePick = $('datePick');
+    const todayBtn = $('todayBtn');
+
+    // Init inputs
+    datePick.value = state.date;
+
+    function setPlace(lat, lon, label){
+      // Time zone lookup
+      let tz = state.tz;
+      try { tz = (GeoTZ.find(lat, lon)||[])[0] || tz; } catch(e){}
+
+      state = { ...state, lat, lon, tz, placeLabel: label || `${lat.toFixed(4)}, ${lon.toFixed(4)}` };
+      localStorage.setItem('gh_state', JSON.stringify(state));
+      $('locLine').textContent = `Location: ${state.placeLabel}  •  Time zone: ${state.tz}`;
+      computeAndRender();
+    }
+
+    // Geolocation
+    gpsBtn.addEventListener('click', () => {
+      if (!navigator.geolocation) return alert('Geolocation not supported');
+      navigator.geolocation.getCurrentPosition(pos => {
+        const { latitude, longitude } = pos.coords;
+        setPlace(latitude, longitude, 'My GPS Location');
+      }, err => alert(err.message), { enableHighAccuracy: true, timeout: 10000 });
+    });
+
+    // Type-ahead search (OpenStreetMap Nominatim)
+    let searchTimer;
+    search.addEventListener('input', () => {
+      const q = search.value.trim();
+      clearTimeout(searchTimer);
+      if (q.length < 3) { results.classList.add('hidden'); results.innerHTML = ''; return; }
+      searchTimer = setTimeout(async () => {
+        try {
+          const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(q)}&addressdetails=1&limit=6`;
+          const res = await fetch(url, { headers: { 'Accept-Language': 'en', 'Referer': location.href } });
+          const data = await res.json();
+          results.innerHTML = data.map(row => {
+            const name = row.display_name;
+            return `<button data-lat="${row.lat}" data-lon="${row.lon}" class=\"w-full text-left px-3 py-2 bg-white/95 text-slate-900 hover:bg-slate-100\">${name}</button>`;
+          }).join('');
+          results.classList.toggle('hidden', data.length===0);
+        } catch(e) { results.classList.add('hidden'); }
+      }, 250);
+    });
+
+    results.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-lat]');
+      if (!btn) return;
+      const lat = parseFloat(btn.getAttribute('data-lat'));
+      const lon = parseFloat(btn.getAttribute('data-lon'));
+      const label = btn.textContent.trim();
+      results.classList.add('hidden'); results.innerHTML=''; search.value='';
+      setPlace(lat, lon, label);
+    });
+
+    // Date handlers
+    todayBtn.addEventListener('click', ()=>{
+      state.date = DateTime.now().setZone(state.tz).toISODate();
+      datePick.value = state.date; computeAndRender();
+    });
+    datePick.addEventListener('change', ()=>{ state.date = datePick.value; computeAndRender(); });
+
+    // Helpers
+    function fmt(dt, withDate=false){
+      if (!dt) return '—';
+      return withDate ? dt.toFormat('ccc, dd LLL yyyy • HH:mm') : dt.toFormat('HH:mm');
+    }
+    function fmtLen(ms){
+      if (!isFinite(ms)) return '—';
+      const s = Math.round(ms/1000);
+      const h = Math.floor(s/3600), m = Math.floor((s%3600)/60);
+      return `${h}h ${m}m`;
+    }
+    function fmtCountdown(ms){
+      const neg = ms < 0; const t = Math.abs(ms);
+      const s = Math.floor(t/1000)%60; const m = Math.floor(t/60000)%60; const h = Math.floor(t/3600000)%24; const d = Math.floor(t/86400000);
+      const core = `${d?d+"d ":""}${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+      return neg ? `−${core}` : core;
+    }
+    function safeDT(d){
+      if (!d || isNaN(d.getTime())) return null; return DateTime.fromJSDate(d).setZone(state.tz);
+    }
+
+    function makeTimes(dateISO){
+      if (state.lat==null || state.lon==null) return null;
+      const dLocalNoon = DateTime.fromISO(dateISO, { zone: state.tz }).set({ hour: 12, minute: 0, second: 0, millisecond: 0 });
+      const forSun = new Date(dLocalNoon.toUTC().toMillis());
+      const t = SunCalc.getTimes(forSun, state.lat, state.lon);
+      const posNow = SunCalc.getPosition(new Date(), state.lat, state.lon);
+      return {
+        sunrise: safeDT(t.sunrise),
+        sunriseEnd: safeDT(t.sunriseEnd),
+        solarNoon: safeDT(t.solarNoon),
+        sunsetStart: safeDT(t.sunsetStart),
+        sunset: safeDT(t.sunset),
+        goldenAmStart: safeDT(t.sunrise),
+        goldenAmEnd: safeDT(t.goldenHourEnd),
+        goldenPmStart: safeDT(t.goldenHour),
+        goldenPmEnd: safeDT(t.sunset),
+        civilDawn: safeDT(t.dawn),
+        civilDusk: safeDT(t.dusk),
+        nautDawn: safeDT(t.nauticalDawn),
+        nautDusk: safeDT(t.nauticalDusk),
+        astroDawn: safeDT(t.nightEnd),
+        astroDusk: safeDT(t.night),
+        dayLengthMs: (safeDT(t.sunset) && safeDT(t.sunrise)) ? (t.sunset - t.sunrise) : NaN,
+        posNow
+      };
+    }
+
+    function setTheme(phase){
+      // Map phase -> colors + text tone
+      let from = '#0b1220', to = '#000000', textDark = false, themeColor = '#0b1220';
+      switch(phase){
+        case 'golden': from='#fcd34d'; to='#f97316'; textDark=true; themeColor='#f59e0b'; break; // amber→orange
+        case 'day': from='#7dd3fc'; to='#0284c7'; textDark=true; themeColor='#22d3ee'; break; // sky→blue
+        case 'civil': from='#6d28d9'; to='#1e3a8a'; themeColor='#312e81'; break; // purple→indigo
+        case 'nautical': from='#3730a3'; to='#1e293b'; themeColor='#1f2937'; break; // indigo→slate
+        case 'astro': from='#0f172a'; to='#0b1220'; themeColor='#0b1220'; break; // deep night
+        case 'night': default: from='#0b1220'; to='#000000'; themeColor='#0b1220'; break;
+      }
+      appBody.style.setProperty('--bg-from', from);
+      appBody.style.setProperty('--bg-to', to);
+      appBody.classList.toggle('text-slate-900', !!textDark);
+      appBody.classList.toggle('text-slate-100', !textDark);
+      themeMeta.setAttribute('content', themeColor);
+    }
+
+    function detectPhase(now, T){
+      // Order of bands
+      if (T.goldenAmStart && now >= T.goldenAmStart && now <= T.goldenAmEnd) return 'golden';
+      if (T.goldenPmStart && now >= T.goldenPmStart && now <= T.goldenPmEnd) return 'golden';
+      if (T.sunrise && T.sunset && now > T.sunrise && now < T.sunset) return 'day';
+      if (T.civilDawn && now >= T.civilDawn && now < T.sunrise) return 'civil';
+      if (T.civilDusk && now > T.sunset && now <= T.civilDusk) return 'civil';
+      if (T.nautDawn && now >= T.nautDawn && now < T.civilDawn) return 'nautical';
+      if (T.nautDusk && now > T.civilDusk && now <= T.nautDusk) return 'nautical';
+      if (T.astroDawn && now >= T.astroDawn && now < T.nautDawn) return 'astro';
+      if (T.astroDusk && now > T.nautDusk && now <= T.astroDusk) return 'astro';
+      return 'night';
+    }
+
+    function nextGoldenEvent(now, T, Tnext){
+      // Return label + when (DateTime)
+      const windows = [
+        ['Morning golden starts', T.goldenAmStart],
+        ['Morning golden ends', T.goldenAmEnd],
+        ['Evening golden starts', T.goldenPmStart],
+        ['Evening golden ends', T.goldenPmEnd],
+        ['Morning golden starts', Tnext.goldenAmStart]
+      ].filter(([,dt])=>dt);
+      for (const [label, dt] of windows){ if (dt > now) return { label, at: dt }; }
+      return { label: 'Morning golden starts', at: Tnext.goldenAmStart };
+    }
+
+    function nextRiseSet(now, T, Tnext){
+      const windows = [
+        ['Sunrise', T.sunrise], ['Sunset', T.sunset], ['Sunrise', Tnext.sunrise]
+      ].filter(([,dt])=>dt);
+      for (const [label, dt] of windows){ if (dt > now) return { label, at: dt }; }
+      return { label: 'Sunrise', at: Tnext.sunrise };
+    }
+
+    function computeAndRender(){
+      if (state.lat==null || state.lon==null) { $('phaseText').textContent = 'Pick a location'; return; }
+      const T = makeTimes(state.date);
+      const Tnext = makeTimes(DateTime.fromISO(state.date, {zone: state.tz}).plus({days:1}).toISODate());
+      if (!T) return;
+
+      const now = DateTime.now().setZone(state.tz);
+
+      // Update text line
+      $('timeNow').textContent = now.toFormat('ccc, dd LLL yyyy • HH:mm:ss ZZZZ');
+
+      // Phase + theme
+      const phase = detectPhase(now, T);
+      $('phaseText').textContent = phase.charAt(0).toUpperCase() + phase.slice(1);
+      setTheme(phase);
+
+      // Fill times
+      $('ghAmStart').textContent = fmt(T.goldenAmStart);
+      $('ghAmEnd').textContent   = fmt(T.goldenAmEnd);
+      $('ghPmStart').textContent = fmt(T.goldenPmStart);
+      $('ghPmEnd').textContent   = fmt(T.goldenPmEnd);
+
+      $('sunrise').textContent   = fmt(T.sunrise);
+      $('solarNoon').textContent = fmt(T.solarNoon);
+      $('sunset').textContent    = fmt(T.sunset);
+      $('dayLength').textContent = fmtLen(T.dayLengthMs);
+
+      $('civilDawn').textContent = fmt(T.civilDawn);
+      $('civilDusk').textContent = fmt(T.civilDusk);
+      $('nautDawn').textContent  = fmt(T.nautDawn);
+      $('nautDusk').textContent  = fmt(T.nautDusk);
+      $('astroDawn').textContent = fmt(T.astroDawn);
+      $('astroDusk').textContent = fmt(T.astroDusk);
+
+      // Sun position now
+      if (T.posNow) {
+        const alt = (T.posNow.altitude * 180 / Math.PI);
+        const azi = (T.posNow.azimuth * 180 / Math.PI);
+        $('altitude').textContent = `${alt.toFixed(2)}°`;
+        $('azimuth').textContent = `${(azi+180).toFixed(2)}°`; // convert from radians East-of-South to bearing
+      }
+
+      // Next events + countdowns
+      const ng = nextGoldenEvent(now, T, Tnext);
+      $('nextGolden').textContent = `${ng.label} • ${fmt(ng.at, true)}`;
+      $('goldenCountdown').dataset.at = ng.at.toMillis();
+
+      const nr = nextRiseSet(now, T, Tnext);
+      $('nextRiseSet').textContent = `${nr.label} • ${fmt(nr.at, true)}`;
+      $('riseSetCountdown').dataset.at = nr.at.toMillis();
+    }
+
+    function tick(){
+      // live clock + countdowns
+      if (!state.tz) return;
+      const now = DateTime.now().setZone(state.tz);
+      $('timeNow').textContent = now.toFormat('ccc, dd LLL yyyy • HH:mm:ss ZZZZ');
+      for (const el of [$('goldenCountdown'), $('riseSetCountdown')]){
+        const at = parseInt(el.dataset.at||'NaN', 10);
+        if (isFinite(at)) el.textContent = fmtCountdown(at - now.toMillis());
+      }
+    }
+    setInterval(tick, 1000);
+
+    // First render (if we had a saved location)
+    if (state.lat && state.lon) setPlace(state.lat, state.lon, state.placeLabel);
+
+    // PWA: Service worker + install prompt
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; $('installBtn').classList.remove('hidden'); });
+    $('installBtn').addEventListener('click', async ()=>{ if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; } });
+  </script>
+</body>
+</html>
+
+<!-- ============================
+File: sw.js
+============================= -->
+<script type="text/plain" data-filename="sw.js">
+const CACHE_NAME = 'golden-hours-v1';
+const ASSETS = [
+  './',
+  './index.html',
+  './manifest.webmanifest',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  'https://cdn.tailwindcss.com',
+  'https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js',
+  'https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js',
+  'https://unpkg.com/geo-tz@6.0.1/dist/geo-tz.umd.min.js'
+];
+self.addEventListener('install', (e) => {
+  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
+});
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    caches.keys().then(keys => Promise.all(keys.filter(k => k!==CACHE_NAME).map(k => caches.delete(k))))
+  );
+});
+self.addEventListener('fetch', (e) => {
+  const req = e.request;
+  e.respondWith(
+    caches.match(req).then(cached => cached || fetch(req).then(res => {
+      if (req.method === 'GET' && res.ok && new URL(req.url).origin === location.origin) {
+        const clone = res.clone(); caches.open(CACHE_NAME).then(c => c.put(req, clone));
+      }
+      return res;
+    }).catch(()=>cached))
+  );
+});
+</script>
+
+<!-- ============================
+File: manifest.webmanifest
+============================= -->
+<script type="application/manifest+json" data-filename="manifest.webmanifest">{
+  "name": "Golden Hours",
+  "short_name": "Golden",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "theme_color": "#0b1220",
+  "background_color": "#0b1220",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
+</script>

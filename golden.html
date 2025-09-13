@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Golden Hour</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+        body {
+            font-family: 'SF Pro Display', sans-serif;
+            transition: background-color 1s ease-in-out;
+            touch-action: pan-y;
+            color: #E5E7EB; /* Light gray text for better contrast */
+        }
+        .bg-night { background-color: #0d1117; }
+        .bg-sunrise { background-color: #ff914d; }
+        .bg-goldenhour { background-color: #ffd700; }
+        .bg-sunset { background-color: #ffb86c; }
+
+        .app-container { min-height: 100vh; }
+        .glass-card {
+            background-color: rgba(45, 55, 72, 0.3);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        .text-gradient {
+            background: linear-gradient(45deg, #ffd700, #ff914d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .pulse-animation { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body class="bg-night transition-colors duration-1000">
+    <div class="app-container flex flex-col items-center justify-center p-4 text-center">
+        <h1 class="text-4xl sm:text-5xl font-light mb-8 text-white pulse-animation text-gradient">Golden Hour</h1>
+
+        <div class="w-full max-w-sm glass-card p-6 rounded-3xl mb-6 shadow-xl">
+            <input id="locationInput" type="text" placeholder="Enter city, state, or zip" class="w-full p-4 rounded-full bg-gray-800 bg-opacity-50 text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-50 text-center transition-all duration-300">
+            <button id="getLocationBtn" class="w-full p-4 mt-4 rounded-full font-bold bg-white bg-opacity-10 hover:bg-opacity-20 transition-colors duration-300 text-white">
+                <span class="mr-2">📍</span> Use My Location
+            </button>
+            <ul id="locationSuggestions" class="mt-2 text-left text-sm"></ul>
+        </div>
+
+        <div id="results" class="w-full max-w-xl hidden">
+            <h2 id="locationTitle" class="text-2xl sm:text-3xl font-light mb-4 text-white text-opacity-90"></h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="glass-card p-6 rounded-3xl shadow-lg">
+                    <h3 class="text-xl font-medium mb-2 text-yellow-300">🌅 Morning</h3>
+                    <p class="text-sm sm:text-base mb-1"><span class="font-bold">Twilight:</span> <span id="morningTwilightTime" class="font-light"></span></p>
+                    <p class="text-sm sm:text-base mb-1"><span class="font-bold">Sunrise:</span> <span id="sunriseTime" class="font-light"></span></p>
+                    <p class="text-sm sm:text-base"><span class="font-bold">Golden Hour:</span> <span id="morningGoldenHour" class="font-light"></span></p>
+                </div>
+
+                <div class="glass-card p-6 rounded-3xl shadow-lg">
+                    <h3 class="text-xl font-medium mb-2 text-orange-400">🌇 Evening</h3>
+                    <p class="text-sm sm:text-base mb-1"><span class="font-bold">Twilight:</span> <span id="eveningTwilightTime" class="font-light"></span></p>
+                    <p class="text-sm sm:text-base mb-1"><span class="font-bold">Sunset:</span> <span id="sunsetTime" class="font-light"></span></p>
+                    <p class="text-sm sm:text-base"><span class="font-bold">Golden Hour:</span> <span id="eveningGoldenHour" class="font-light"></span></p>
+                </div>
+            </div>
+
+            <div id="countdownContainer" class="glass-card p-6 rounded-3xl mt-4 shadow-lg">
+                <h3 class="text-base sm:text-lg text-gray-400 font-light">Next Event in</h3>
+                <p id="countdownText" class="text-4xl sm:text-5xl font-light text-white text-opacity-90 mt-2"></p>
+                <p id="countdownEvent" class="text-sm sm:text-base text-gray-400 font-light mt-1"></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/suncalc@1.9.0/suncalc.js"></script>
+    <script>
+        // PWA registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js').catch(err => console.log('SW registration failed:', err));
+            });
+        }
+        
+        const GEOCODING_API = 'https://nominatim.openstreetmap.org/search?format=json&limit=5&q=';
+        const locationInput = document.getElementById('locationInput');
+        const getLocationBtn = document.getElementById('getLocationBtn');
+        const locationSuggestions = document.getElementById('locationSuggestions');
+        const resultsContainer = document.getElementById('results');
+        const locationTitle = document.getElementById('locationTitle');
+        const sunriseTime = document.getElementById('sunriseTime');
+        const sunsetTime = document.getElementById('sunsetTime');
+        const morningTwilightTime = document.getElementById('morningTwilightTime');
+        const eveningTwilightTime = document.getElementById('eveningTwilightTime');
+        const morningGoldenHour = document.getElementById('morningGoldenHour');
+        const eveningGoldenHour = document.getElementById('eveningGoldenHour');
+        const countdownText = document.getElementById('countdownText');
+        const countdownEvent = document.getElementById('countdownEvent');
+        const body = document.body;
+        let currentLat, currentLon;
+
+        locationInput.addEventListener('input', debounce(handleSearch, 300));
+        locationInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSearch(locationInput.value); });
+        getLocationBtn.addEventListener('click', getLocation);
+
+        function debounce(func, delay) {
+            let timeoutId;
+            return (...args) => {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+
+        async function handleSearch(query) {
+            if (query.length < 3) {
+                locationSuggestions.innerHTML = '';
+                return;
+            }
+            try {
+                const response = await fetch(GEOCODING_API + encodeURIComponent(query));
+                const data = await response.json();
+                locationSuggestions.innerHTML = '';
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        const li = document.createElement('li');
+                        li.className = 'p-2 bg-white bg-opacity-5 hover:bg-opacity-10 cursor-pointer rounded-lg mt-1 transition-all duration-200';
+                        li.textContent = item.display_name;
+                        li.addEventListener('click', () => {
+                            locationInput.value = item.display_name;
+                            locationSuggestions.innerHTML = '';
+                            currentLat = item.lat;
+                            currentLon = item.lon;
+                            calculateTimes(currentLat, currentLon, item.display_name);
+                        });
+                        locationSuggestions.appendChild(li);
+                    });
+                }
+            } catch (error) { console.error('Error fetching location:', error); }
+        }
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    currentLat = position.coords.latitude;
+                    currentLon = position.coords.longitude;
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLon}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            const name = data.address.city || data.address.country || 'Your Location';
+                            locationInput.value = name;
+                            calculateTimes(currentLat, currentLon, name);
+                        });
+                }, error => {
+                    alert('Could not get your location. Please enter it manually.');
+                });
+            } else {
+                alert('Geolocation is not supported by your browser.');
+            }
+        }
+
+        function calculateTimes(lat, lon, name) {
+            const times = SunCalc.getTimes(new Date(), lat, lon);
+            const formatTime = (date) => date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+            locationTitle.textContent = name;
+            sunriseTime.textContent = formatTime(times.sunrise);
+            sunsetTime.textContent = formatTime(times.sunset);
+            morningTwilightTime.textContent = `${formatTime(times.dawn)} - ${formatTime(times.sunrise)}`;
+            eveningTwilightTime.textContent = `${formatTime(times.dusk)} - ${formatTime(times.night)}`;
+            morningGoldenHour.textContent = `${formatTime(times.sunrise)} - ${formatTime(times.goldenHourEnd)}`;
+            eveningGoldenHour.textContent = `${formatTime(times.goldenHour)} - ${formatTime(times.sunset)}`;
+
+            resultsContainer.classList.remove('hidden');
+
+            updateCountdownAndColors(times);
+            setInterval(() => updateCountdownAndColors(times), 1000);
+        }
+
+        function updateCountdownAndColors(times) {
+            const now = new Date();
+            let nextEvent = null;
+            let eventName = '';
+            let bgColorClass = 'bg-night';
+
+            const events = [
+                { name: 'Morning Twilight', time: times.dawn },
+                { name: 'Sunrise', time: times.sunrise },
+                { name: 'Morning Golden Hour', time: times.goldenHourEnd },
+                { name: 'Evening Golden Hour', time: times.goldenHour },
+                { name: 'Sunset', time: times.sunset },
+                { name: 'Evening Twilight', time: times.dusk }
+            ];
+
+            events.sort((a, b) => a.time - b.time);
+
+            // Determine current background color based on time
+            if (now >= times.goldenHour && now <= times.sunsetStart) {
+                bgColorClass = 'bg-goldenhour';
+            } else if (now >= times.sunsetStart && now <= times.sunset) {
+                bgColorClass = 'bg-sunset';
+            } else if (now >= times.sunset && now <= times.dusk) {
+                bgColorClass = 'bg-sunset';
+            } else if (now >= times.dawn && now <= times.sunrise) {
+                bgColorClass = 'bg-sunrise';
+            } else if (now >= times.sunrise && now <= times.goldenHourEnd) {
+                bgColorClass = 'bg-goldenhour';
+            } else {
+                bgColorClass = 'bg-night';
+            }
+            body.className = `transition-colors duration-1000 ${bgColorClass}`;
+
+            for (const event of events) {
+                if (event.time > now) {
+                    nextEvent = event.time;
+                    eventName = event.name;
+                    break;
+                }
+            }
+
+            if (nextEvent) {
+                const diff = nextEvent - now;
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                countdownText.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                countdownEvent.textContent = eventName;
+            } else {
+                countdownText.textContent = '00:00:00';
+                countdownEvent.textContent = 'Waiting for tomorrow';
+            }
+        }
+    </script>
+</body>
+</html>

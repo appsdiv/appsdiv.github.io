@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="fa" dir="rtl" translate="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <title>الکامهرکیمیا — نسخه حرفه‌ای (Frosted · iOS-clean)</title>
+
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Vazirmatn','-apple-system','SF Pro Text','Inter','system-ui','Segoe UI','Roboto','Helvetica Neue','Arial','sans-serif'] },
+          colors: { brand:'#0ea5e9', ink:'#0f172a' },
+          boxShadow: {
+            soft:'0 10px 24px rgba(2,6,23,.06)',
+            card:'0 24px 60px rgba(2,6,23,.12)',
+            glow:'0 10px 50px rgba(14,165,233,.20)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    :root{
+      --glass: rgba(255,255,255,.56);
+      --glass-deep: rgba(255,255,255,.42);
+      --stroke: rgba(255,255,255,.28);
+      --ink-stroke: rgba(2,6,23,.08);
+      --rad: 16px;
+      --dur: 48s; /* ticker speed (slower, smoother) */
+      --safe-top: env(safe-area-inset-top, 0px);
+    }
+
+    html{scroll-behavior:smooth}
+    body{
+      background: radial-gradient(900px 580px at 70% -10%, #eef5ff 0%, #f8fafc 55%, #ffffff 100%);
+    }
+    html.dark body{
+      background: #0b1220 radial-gradient(1100px 680px at 50% -20%, #0b1220 0%, #0a0f1b 50%, #070d18 100%) no-repeat;
+    }
+    html, body{overflow-x:hidden}
+
+    /* Frosted glass (iOS-like) */
+    .glass{
+      border-radius: var(--rad);
+      background: linear-gradient(180deg, var(--glass), var(--glass-deep));
+      backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid var(--stroke);
+      box-shadow: 0 1px 0 rgba(255,255,255,.35) inset, 0 12px 40px rgba(2,6,23,.08);
+    }
+    html.dark .glass{
+      background: linear-gradient(180deg, rgba(16,20,28,.82), rgba(16,20,28,.58));
+      border-color: rgba(255,255,255,.14);
+      box-shadow: 0 40px 100px rgba(0,0,0,.70), 0 1px 0 rgba(255,255,255,.06) inset;
+    }
+
+    /* Header (sticky) */
+    header{position:sticky; top:0; z-index:50; padding-top: max(var(--safe-top), 0px)}
+    .nav-link{padding:.55rem .9rem;border-radius:9999px;transition:.2s}
+    .nav-link:hover{background:rgba(2,6,23,.06)}
+    html.dark .nav-link:hover{background:rgba(255,255,255,.08)}
+
+    /* Focus (iOS style) */
+    .focusable{outline:none}
+    .focusable:focus-visible{box-shadow:0 0 0 2px rgba(14,165,233,.45), 0 0 0 6px rgba(14,165,233,.18)}
+
+    /* Ticker (seamless infinite, compact) */
+    .ticker{
+      -webkit-mask-image: linear-gradient(to left, transparent, black 28px, black calc(100% - 28px), transparent);
+              mask-image: linear-gradient(to left, transparent, black 28px, black calc(100% - 28px), transparent);
+    }
+    .ticker-rail{overflow:hidden}
+    .ticker-track{display:flex;gap:16px;white-space:nowrap;will-change:transform;animation:ticker var(--dur) linear infinite}
+    .ticker:hover .ticker-track{animation-play-state:paused}
+    @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    @media (prefers-reduced-motion: reduce){ .ticker-track{animation:none} }
+
+    /* Section titles */
+    .eyebrow{font-weight:700;font-size:.72rem;letter-spacing:.08em;color:rgba(15,23,42,.6)}
+    html.dark .eyebrow{color:rgba(255,255,255,.62)}
+    .h2{font-weight:900;letter-spacing:.1px;line-height:1.25;font-size:clamp(20px,2.8vw,30px);margin-top:.25rem}
+    .section-head{margin-bottom:1rem}
+    .hairline{height:1px;background:rgba(2,6,23,.07)}
+    html.dark .hairline{background:rgba(255,255,255,.10)}
+
+    /* Drawer */
+    .drawer{position:fixed; inset:0; display:none; z-index:9999;}
+    .drawer.open{display:block}
+    .drawer .panel{position:absolute; top:0; right:0; width:min(85vw,360px); height:100%;
+      padding:20px; display:flex; flex-direction:column; gap:10px}
+
+    .drawer a.nav-row{display:flex; align-items:center; gap:.75rem; padding:.9rem .4rem; border-radius:14px;
+      font-weight:800; font-size:1rem; text-decoration:none}
+    .drawer a.nav-row:hover{background:rgba(2,6,23,.06)}
+    html.dark .drawer a.nav-row:hover{background:rgba(255,255,255,.08)}
+
+    /* Hero arrows */
+    .hero-arrow{
+      width:42px; height:42px; display:grid; place-items:center; border-radius:9999px;
+      box-shadow: 0 1px 0 rgba(255,255,255,.5) inset;
+    }
+    .hero-arrow:hover{transform: translateY(-1px)}
+  </style>
+</head>
+<body class="font-sans text-ink/90 dark:text-white/90 antialiased selection:bg-cyan-200/60 dark:selection:bg-cyan-500/40">
+
+  <!-- ===== Header ===== -->
+  <header class="backdrop-blur-2xl bg-white/65 dark:bg-neutral-900/65 border-b border-black/5 dark:border-white/10">
+    <div class="max-w-6xl mx-auto px-4 py-2.5">
+
+      <!-- MOBILE -->
+      <div class="md:hidden flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2 min-w-0">
+          <img src="https://elkamehr.com/wp-content/uploads/2024/03/emk-logo3-1.png" class="w-12 h-12 rounded-xl object-contain" alt="EMK" decoding="async">
+          <div class="leading-5 min-w-0">
+            <div class="font-extrabold tracking-tight truncate">الکامهرکیمیا</div>
+            <div class="text-[11px] text-ink/60 dark:text-white/60 truncate">مرکز تخصصی محصولات آلومینیومی</div>
+          </div>
+        </div>
+        <button id="menuBtn" class="px-3 py-2 rounded-full glass focusable" aria-label="منو">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+
+      <!-- DESKTOP -->
+      <div class="hidden md:flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <img src="https://elkamehr.com/wp-content/uploads/2024/03/emk-logo3-1.png" class="w-20 h-auto" alt="EMK" decoding="async">
+          <div>
+            <div class="font-extrabold tracking-tight leading-5">الکامهرکیمیا</div>
+            <div class="text-xs text-ink/60 dark:text-white/60 leading-5">مرکز تخصصی محصولات آلومینیومی</div>
+          </div>
+        </div>
+        <nav class="flex items-center gap-1">
+          <a href="#products" class="nav-link focusable">محصولات</a>
+          <a href="#contact"  class="nav-link focusable">تماس باما</a>
+          <a href="#about"    class="nav-link focusable">درباره ما</a>
+          <a href="#certs"    class="nav-link focusable">گواهینامه‌ها</a>
+        </nav>
+        <div class="flex items-center gap-2">
+          <div class="relative" id="langMenu">
+            <button class="px-3 py-1.5 rounded-full glass transition flex items-center gap-1 focusable" aria-haspopup="menu" aria-expanded="false">
+              <i class="fa-solid fa-globe"></i><span id="langLabel">FA</span><i class="fa-solid fa-chevron-down opacity-60 text-xs"></i>
+            </button>
+            <div class="hidden absolute left-0 mt-2 w-40 rounded-xl glass shadow-card overflow-hidden" data-menu role="menu">
+              <button data-lang="fa" class="w-full text-right px-3 py-2 hover:bg-black/5 dark:hover:bg-white/10">FA — فارسی</button>
+              <button data-lang="en" class="w-full text-right px-3 py-2 hover:bg-black/5 dark:hover:bg-white/10">EN — English</button>
+              <button data-lang="tr" class="w-full text-right px-3 py-2 hover:bg-black/5 dark:hover:bg-white/10">TR — Türkçe</button>
+            </div>
+          </div>
+          <button id="themeBtn" class="px-3 py-1.5 rounded-full glass transition focusable" aria-label="تغییر تم"><i class="fa-solid fa-moon"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== LME TICKER (compact) ===== -->
+    <div class="border-t border-black/5 dark:border-white/10">
+      <div class="max-w-6xl mx-auto px-4 py-1 ticker">
+        <div class="ticker-rail">
+          <div id="tickerTrack" class="ticker-track"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== Hero ===== -->
+  <section id="hero" class="max-w-6xl mx-auto px-4 mt-6" aria-label="ویترین">
+    <div class="relative overflow-hidden rounded-2xl glass">
+      <div class="flex transition-transform duration-500 will-change-transform" data-track>
+        <!-- Slide 1 -->
+        <article class="min-w-full grid md:grid-cols-2 gap-6 p-6 md:p-12 items-center">
+          <div class="space-y-3">
+            <span class="inline-flex items-center gap-2 text-xs px-2.5 py-1 rounded-full glass"><i class="fa-solid fa-bolt"></i> راد آلومینیوم EC/1350</span>
+            <h1 class="text-2xl md:text-4xl font-black leading-snug tracking-tight">کیفیت پایدار و سطح صیقلی برای خطوط هادی</h1>
+            <p class="text-ink/70 dark:text-white/70 leading-8">تولید و تامین راد و مفتول آلومینیومی با کنترل کیفی دقیق، آماده کشش و هادی‌های هوایی.</p>
+            <div class="flex gap-2">
+              <a href="#products" class="px-4 py-2 rounded-full bg-ink text-white font-bold shadow-soft focusable">مشاهده محصولات</a>
+              <a href="#contact" class="px-4 py-2 rounded-full glass focusable">سفارش سریع</a>
+            </div>
+          </div>
+          <img class="w-full max-h-80 object-contain drop-shadow-xl" src="https://placehold.co/1200x680/png?text=Hero+1" alt="راد آلومینیوم" loading="lazy" decoding="async" />
+        </article>
+        <!-- Slide 2 -->
+        <article class="min-w-full grid md:grid-cols-2 gap-6 p-6 md:p-12 items-center">
+          <div class="space-y-3">
+            <span class="inline-flex items-center gap-2 text-xs px-2.5 py-1 rounded-full glass"><i class="fa-solid fa-tower-broadcast"></i> هادی‌ها — AAC/AAAC/ABC</span>
+            <h2 class="text-2xl md:text-4xl font-black leading-snug tracking-tight">هادی‌های استاندارد با یکنواختی سطح و مقطع</h2>
+            <p class="text-ink/70 dark:text-white/70 leading-8">طیف کامل مقاطع برای خطوط توزیع؛ کیفیت سطح ممتاز و تست‌شده.</p>
+            <div class="flex gap-2">
+              <a href="#products" class="px-4 py-2 rounded-full bg-ink text-white font-bold shadow-soft focusable">مشاهده هادی‌ها</a>
+              <a href="#about" class="px-4 py-2 rounded-full glass focusable">درباره کیفیت</a>
+            </div>
+          </div>
+          <img class="w-full max-h-80 object-contain drop-shadow-xl" src="https://placehold.co/1200x680/png?text=Hero+2" alt="هادی آلومینیومی" loading="lazy" decoding="async" />
+        </article>
+        <!-- Slide 3 -->
+        <article class="min-w-full grid md:grid-cols-2 gap-6 p-6 md:p-12 items-center">
+          <div class="space-y-3">
+            <span class="inline-flex items-center gap-2 text-xs px-2.5 py-1 rounded-full glass"><i class="fa-solid fa-cubes"></i> شمش و گرانول</span>
+            <h2 class="text-2xl md:text-4xl font-black leading-snug tracking-tight">مواد اولیه کنترل‌شده برای تولید دقیق</h2>
+            <p class="text-ink/70 dark:text-white/70 leading-8">تامین شمش آلیاژی و گرانول با پشتیبانی فنی برای اکستروژن، نورد و ریخته‌گری.</p>
+            <div class="flex gap-2">
+              <a href="#products" class="px-4 py-2 rounded-full bg-ink text-white font-bold shadow-soft focusable">لیست مواد اولیه</a>
+              <a href="#contact" class="px-4 py-2 rounded-full glass focusable">استعلام قیمت</a>
+            </div>
+          </div>
+          <img class="w-full max-h-80 object-contain drop-shadow-xl" src="https://placehold.co/1200x680/png?text=Hero+3" alt="شمش و گرانول" loading="lazy" decoding="async" />
+        </article>
+      </div>
+
+      <!-- Progress + dots -->
+      <div class="absolute inset-x-0 bottom-0 h-[2px] bg-black/10 dark:bg-white/10">
+        <div class="h-full bg-ink dark:bg-white" style="width:0%" data-progress></div>
+      </div>
+      <div class="absolute inset-x-0 bottom-3 flex items-center justify-center gap-1.5" data-dots></div>
+
+      <!-- Arrows (fixed) -->
+      <div class="absolute inset-y-0 left-2 flex items-center">
+        <button class="hero-arrow glass focusable" data-prev aria-label="قبلی"><i class="fa-solid fa-angle-left"></i></button>
+      </div>
+      <div class="absolute inset-y-0 right-2 flex items-center">
+        <button class="hero-arrow glass focusable" data-next aria-label="بعدی"><i class="fa-solid fa-angle-right"></i></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== About ===== -->
+  <section id="about" class="max-w-6xl mx-auto px-4 mt-10">
+    <div class="section-head">
+      <div class="eyebrow">درباره الکامهرکیمیا</div>
+      <h2 class="h2">کیفیت صنعتی با استاندارد جهانی</h2>
+      <div class="hairline"></div>
+    </div>
+    <div class="grid md:grid-cols-12 gap-4 items-stretch">
+      <figure class="md:col-span-5 order-2 md:order-1 rounded-2xl overflow-hidden glass">
+        <img class="w-full h-full object-cover aspect-[4/3]" src="https://placehold.co/800x600/png?text=Factory+Photo" alt="کارخانه الکامهرکیمیا" loading="lazy" decoding="async"/>
+      </figure>
+      <div class="md:col-span-7 order-1 md:order-2 rounded-2xl glass p-6 md:p-8">
+        <p class="leading-8 text-ink/80 dark:text-white/70">یکی از بزرگ‌ترین و به‌روزترین تولیدکنندگان راد آلومینیوم 9.5 و 12 خالص و آلیاژی، خرید مفتول خالص 1.6–5.5 میلی‌متر و مفتول آلیاژی سری 4،5،6 ، هادی های AAC ، AAAC و ACSR ، فویل، ظروف آلومینیومی و گرانول (نیم‌کره) اکسیژن زدا ، شمش های آلیاژی در شمال‌غرب کشور است.</p>
+        <p class="mt-3 leading-8 text-ink/80 dark:text-white/70">محصولات با پایداری، رسانایی و دوام عالی؛ مناسب صنایع فولاد، برق، بسته‌بندی و خودرو.</p>
+        <div class="mt-5 flex flex-wrap gap-2">
+          <span class="px-3 py-1.5 rounded-full glass text-sm">ISO 9001</span>
+          <span class="px-3 py-1.5 rounded-full glass text-sm">ISO 14001</span>
+          <span class="px-3 py-1.5 rounded-full glass text-sm">AAAC · AAC · ABC</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Products ===== -->
+  <section id="products" class="max-w-6xl mx-auto px-4 mt-10">
+    <div class="section-head">
+      <div class="eyebrow">محصولات</div>
+      <h2 class="h2">منتخب امروز</h2>
+      <div class="hairline"></div>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+      <template id="product-card-template">
+        <article class="rounded-2xl glass hover:shadow-card transition overflow-hidden">
+          <a class="block focus:outline-none focus:ring-2 focus:ring-brand/40" href="#">
+            <div class="h-36 sm:h-40 grid place-items-center p-3">
+              <img class="max-h-28 sm:max-h-32 object-contain" alt=""/>
+            </div>
+            <div class="px-3 pb-3 sm:px-4 sm:pb-4">
+              <h3 class="font-bold leading-tight text-[15px] sm:text-base"></h3>
+              <p class="text-xs sm:text-sm text-ink/70 dark:text-white/60 mt-1 line-clamp-2"></p>
+              <div class="mt-2">
+                <span class="inline-flex items-center gap-1 text-xs sm:text-sm text-brand font-bold">
+                  جزئیات <i class="fa-solid fa-arrow-left-long text-[11px]"></i>
+                </span>
+              </div>
+            </div>
+          </a>
+        </article>
+      </template>
+      <div id="products-grid" class="contents"></div>
+    </div>
+  </section>
+
+  <!-- ===== Certificates ===== -->
+  <section id="certs" class="max-w-6xl mx-auto px-4 mt-12">
+    <div class="section-head">
+      <div class="eyebrow">گواهی‌نامه‌ها</div>
+      <h2 class="h2">استانداردها و تاییدیه‌ها</h2>
+      <div class="hairline"></div>
+    </div>
+    <div class="rounded-2xl glass p-4">
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 items-start">
+        <figure class="text-center">
+          <img class="w-full h-40 object-contain" src="https://placehold.co/215x300/png?text=ISO" alt="ISO 14001:2005" loading="lazy" decoding="async">
+          <figcaption class="text-xs mt-2 text-ink/70 dark:text-white/60">ISO 14001:2005</figcaption>
+        </figure>
+        <figure class="text-center">
+          <img class="w-full h-40 object-contain" src="https://placehold.co/211x300/png?text=ISO" alt="ISO 10004:2018" loading="lazy" decoding="async">
+          <figcaption class="text-xs mt-2 text-ink/70 dark:text-white/60">ISO 10004:2018</figcaption>
+        </figure>
+        <figure class="text-center">
+          <img class="w-full h-40 object-contain" src="https://placehold.co/220x300/png?text=ISO" alt="ISO 9001:2015" loading="lazy" decoding="async">
+          <figcaption class="text-xs mt-2 text-ink/70 dark:text-white/60">ISO 9001:2015</figcaption>
+        </figure>
+        <figure class="text-center">
+          <img class="w-full h-40 object-contain" src="https://placehold.co/212x300/png?text=ISO" alt="ISO 14001:2015" loading="lazy" decoding="async">
+          <figcaption class="text-xs mt-2 text-ink/70 dark:text-white/60">ISO 14001:2015</figcaption>
+        </figure>
+        <figure class="text-center">
+          <img class="w-full h-40 object-contain" src="https://placehold.co/216x300/png?text=DoC" alt="DoC" loading="lazy" decoding="async">
+          <figcaption class="text-xs mt-2 text-ink/70 dark:text-white/60">Declaration of Conformity</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Blog ===== -->
+  <section id="blog" class="max-w-6xl mx-auto px-4 mt-12">
+    <div class="section-head">
+      <div class="eyebrow">از وبلاگ</div>
+      <h2 class="h2">آخرین نوشته‌ها</h2>
+      <div class="hairline"></div>
+    </div>
+    <div class="grid md:grid-cols-3 gap-4">
+      <article class="rounded-2xl overflow-hidden glass hover:shadow-card transition">
+        <img class="h-40 w-full object-cover" src="https://placehold.co/1200x400/png?text=Blog" alt="post" loading="lazy" decoding="async"/>
+        <div class="p-4">
+          <h3 class="font-bold">راهنمای انتخاب هادی مناسب شبکه توزیع</h3>
+          <p class="text-sm text-ink/70 dark:text-white/60 mt-1">نکات فنی برای انتخاب AAC/AAAC/ABC بر اساس شرایط محیطی.</p>
+          <a class="inline-flex items-center gap-1 mt-3 text-brand font-bold" href="#">ادامه مطلب</a>
+        </div>
+      </article>
+      <article class="rounded-2xl overflow-hidden glass hover:shadow-card transition">
+        <img class="h-40 w-full object-cover" src="https://placehold.co/1200x400/png?text=Blog" alt="post" loading="lazy" decoding="async"/>
+        <div class="p-4">
+          <h3 class="font-bold">کنترل کیفیت سطح در تولید راد و مفتول</h3>
+          <p class="text-sm text-ink/70 dark:text-white/60 mt-1">پارامترهای کلیدی پرداخت، اکسیداسیون و یکنواختی.</p>
+          <a class="inline-flex items-center gap-1 mt-3 text-brand font-bold" href="#">ادامه مطلب</a>
+        </div>
+      </article>
+      <article class="rounded-2xl overflow-hidden glass hover:shadow-card transition">
+        <img class="h-40 w-full object-cover" src="https://placehold.co/1200x400/png?text=Blog" alt="post" loading="lazy" decoding="async"/>
+        <div class="p-4">
+          <h3 class="font-bold">آشنایی با آلیاژهای رایج آلومینیوم</h3>
+          <p class="text-sm text-ink/70 dark:text-white/60 mt-1">مروری سریع بر گریدهای پرکاربرد صنعتی و برق.</p>
+          <a class="inline-flex items-center gap-1 mt-3 text-brand font-bold" href="#">ادامه مطلب</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== Contact ===== -->
+  <section id="contact" class="max-w-6xl mx-auto px-4 mt-12 mb-10">
+    <div class="section-head">
+      <div class="eyebrow">ارتباط</div>
+      <h2 class="h2">راه‌های ارتباطی</h2>
+      <div class="hairline"></div>
+    </div>
+    <div class="rounded-2xl glass p-5">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+        <a class="flex items-center gap-2 px-3 py-2 rounded-full glass" href="tel:+984136589245" title="شماره تماس دفتر">
+          <i class="fa-solid fa-phone text-emerald-600 dark:text-emerald-400"></i>
+          <span class="text-sm">دفتر: 36589245(41)96+</span>
+        </a>
+        <a class="flex items-center gap-2 px-3 py-2 rounded-full glass" href="tel:+984136570990" title="شماره تماس فکس">
+          <i class="fa-solid fa-fax text-sky-600 dark:text-sky-400"></i>
+          <span class="text-sm">فکس: 36570990(41)98+</span>
+        </a>
+        <a class="flex items-center gap-2 px-3 py-2 rounded-full glass" href="tel:+984134329258" title="شماره تماس کارخانه">
+          <i class="fa-solid fa-industry text-indigo-600 dark:text-indigo-400"></i>
+          <span class="text-sm">کارخانه: 9-34329258(41)98+</span>
+        </a>
+        <a class="flex items-center gap-2 px-3 py-2 rounded-full glass" href="tel:+989144106495" title="شماره تماس فروش">
+          <i class="fa-solid fa-mobile-screen-button text-rose-600 dark:text-rose-400"></i>
+          <span class="text-sm">فروش: 989144106495+</span>
+        </a>
+        <a class="flex items-center gap-2 px-3 py-2 rounded-full glass" href="mailto:info@elkamehr.com" title="ایمیل">
+          <i class="fa-solid fa-envelope text-amber-600 dark:text-amber-400"></i>
+          <span class="text-sm">info@elkamehr.com</span>
+        </a>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="rounded-2xl glass p-4">
+          <h4 class="font-bold mb-1">دفتر</h4>
+          <p class="text-ink/80 dark:text-white/70 text-sm leading-7">آذربایجان شرقی - تبریز - خیابان فارابی (چای کنار) - پایین تر از ایستگاه پل سنگی - جنب باغ صبا - ساختمان صبا - پلاک 215 - طبقه سوم</p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <a class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-sm" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=%D8%A2%D8%B0%D8%B1%D8%A8%D8%A7%DB%8C%D8%AC%D8%A7%D9%86%20%D8%B4%D8%B1%D9%82%DB%8C%20%D8%AA%D8%A8%D8%B1%DB%8C%D8%B2%20%D8%AE%DB%8C%D8%A7%D8%A8%D8%A7%D9%86%20%D9%81%D8%A7%D8%B1%D8%A7%D8%A8%DB%8C%20%D9%BE%D8%A7%DB%8C%DB%8C%D9%86%20%D8%AA%D8%B1%20%D8%A7%DB%8C%D8%B3%D8%AA%DA%AF%D8%A7%D9%87%20%D9%BE%D9%84%20%D8%B3%D9%86%DA%AF%DB%8C%20%20%D8%AC%D9%86%D8%A8%20%D8%A8%D8%A7%D8%BA%20%D8%B5%D8%A8%D8%A7%20%D8%B3%D8%A7%D8%AE%D8%AA%D9%85%D8%A7%D9%86%20%D8%B5%D8%A8%D8%A7%20215">
+              <i class="fa-solid fa-location-arrow"></i> مسیر در گوگل‌مپ
+            </a>
+          </div>
+        </div>
+        <div class="rounded-2xl glass p-4">
+          <h4 class="font-bold mb-1">کارخانه</h4>
+          <p class="text-ink/80 dark:text-white/70 text-sm leading-7">آذربایجان شرقی - جاده تبریز به آذرشهر - شهرک صنعتی شهید سلیمی - انتهای خیابان 45 متری اصلی - سی متری چهارم شمالی - بیست متری پنجاهم</p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <a class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-sm" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=%D8%B4%D9%87%D8%B1%DA%A9%20%D8%B5%D9%86%D8%B9%D8%AA%DB%8C%20%D8%B4%D9%87%DB%8C%D8%AF%20%D8%B3%D9%84%DB%8C%D9%85%DB%8C%20%D8%AA%D8%A8%D8%B1%DB%8C%D8%B2">
+              <i class="fa-solid fa-location-arrow"></i> مسیر در گوگل‌مپ
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4 mt-4">
+        <iframe class="w-full h-56 rounded-2xl glass" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=%D8%AA%D8%A8%D8%B1%DB%8C%D8%B2%20%D8%AE%DB%8C%D8%A7%D8%A8%D8%A7%D9%86%20%D9%81%D8%A7%D8%B1%D8%A7%D8%A8%DB%8C&output=embed"></iframe>
+        <iframe class="w-full h-56 rounded-2xl glass" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=%D8%B4%D9%87%D8%B1%DA%A9%20%D8%B5%D9%86%D8%B9%D8%AA%DB%8C%20%D8%B4%D9%87%DB%8C%D8%AF%20%D8%B3%D9%84%DB%8C%D9%85%DB%8C%20%D8%AA%D8%A8%D8%B1%DB%8C%D8%B2&output=embed"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <footer class="max-w-6xl mx-auto px-4 mb-10">
+    <div class="rounded-2xl glass p-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div>
+          <div class="font-black">در ارتباط بمانیم</div>
+          <p class="text-ink/70 dark:text-white/60">ایمیل: <a class="text-brand" href="mailto:info@elkamehr.com">info@elkamehr.com</a></p>
+        </div>
+        <a href="#contact" class="px-4 py-2 rounded-full bg-ink text-white font-bold focusable">تماس و مسیر</a>
+      </div>
+    </div>
+    <p class="text-center text-sm text-ink/60 dark:text-white/50 mt-4">© ۲۰۲۵ الکامهرکیمیا — طراحی شیشه‌ای مینیمال</p>
+  </footer>
+
+  <!-- ===== App JS ===== -->
+  <script>
+    // Theme (desktop toggle; mobile toggle lives in drawer)
+    const themeBtn = document.getElementById('themeBtn');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedTheme = localStorage.getItem('emk-theme');
+    if(savedTheme){ document.documentElement.classList.toggle('dark', savedTheme==='dark'); }
+    else{ document.documentElement.classList.toggle('dark', prefersDark); }
+    const setThemeIcon = ()=>{
+      const isDark = document.documentElement.classList.contains('dark');
+      if(themeBtn) themeBtn.innerHTML = `<i class="fa-solid ${isDark?'fa-sun':'fa-moon'}"></i>`;
+    };
+    setThemeIcon();
+    function toggleTheme(){
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('emk-theme', isDark ? 'dark' : 'light');
+      setThemeIcon();
+    }
+    themeBtn && themeBtn.addEventListener('click', toggleTheme);
+
+    // Language menu
+    (function(){
+      const menuBox = document.querySelector('#langMenu [data-menu]');
+      const btn  = document.querySelector('#langMenu button');
+      const label= document.getElementById('langLabel');
+      if(btn && menuBox){
+        btn.addEventListener('click', ()=>{
+          const open = menuBox.classList.toggle('hidden') ? 'false' : 'true';
+          btn.setAttribute('aria-expanded', open);
+        });
+        document.addEventListener('click', (e)=>{ if(!document.getElementById('langMenu').contains(e.target)) menuBox.classList.add('hidden'); });
+      }
+      const map = { fa: {dir:'rtl',label:'FA'}, en: {dir:'ltr',label:'EN'}, tr: {dir:'ltr',label:'TR'} };
+      function applyLang(l){ const conf = map[l] || map.fa; document.documentElement.lang = l; document.documentElement.dir  = conf.dir; if(label) label.textContent = conf.label; localStorage.setItem('emk-lang', l); }
+      document.querySelectorAll('[data-lang]').forEach(b=> b.addEventListener('click', ()=>{ applyLang(b.dataset.lang); menuBox && menuBox.classList.add('hidden'); }));
+      applyLang(localStorage.getItem('emk-lang')||'fa');
+    })();
+
+    // Drawer (mobile) — FIX: use <a> instead of nested <a> in <button>
+    (function(){
+      const drawer = document.createElement('div');
+      drawer.className = 'drawer';
+      drawer.innerHTML = `
+        <div class="absolute inset-0 bg-black/45" data-close></div>
+        <aside class="panel glass">
+          <div class="flex items-center justify-between mb-2">
+            <strong>منو</strong>
+            <button class="px-3 py-2 rounded-full glass" data-close><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <nav class="flex flex-col gap-1">
+            <a class="nav-row" href="#products"><i class="fa-solid fa-box-open ms-1"></i> محصولات</a>
+            <a class="nav-row" href="#contact"><i class="fa-solid fa-phone-volume ms-1"></i> تماس باما</a>
+            <a class="nav-row" href="#about"><i class="fa-solid fa-circle-info ms-1"></i> درباره ما</a>
+            <a class="nav-row" href="#certs"><i class="fa-solid fa-award ms-1"></i> گواهینامه‌ها</a>
+          </nav>
+          <div class="hairline my-2"></div>
+          <div class="eyebrow">زبان</div>
+          <div class="flex gap-2">
+            <button data-lang="fa" class="flex-1 px-3 py-2 rounded-full glass">FA</button>
+            <button data-lang="en" class="flex-1 px-3 py-2 rounded-full glass">EN</button>
+            <button data-lang="tr" class="flex-1 px-3 py-2 rounded-full glass">TR</button>
+          </div>
+          <div class="eyebrow mt-3">نمایش</div>
+          <div class="flex gap-2">
+            <button id="themeBtnM" class="flex-1 px-3 py-2 rounded-full glass"><i class="fa-solid fa-moon"></i> تیره/روشن</button>
+          </div>
+        </aside>`;
+      document.body.appendChild(drawer);
+      const menuBtn = document.getElementById('menuBtn');
+      const open = ()=> drawer.classList.add('open'), close=()=> drawer.classList.remove('open');
+      menuBtn && menuBtn.addEventListener('click', open);
+      drawer.querySelectorAll('[data-close]').forEach(x=> x.addEventListener('click', close));
+      drawer.addEventListener('click', e=>{ if(e.target===drawer) close(); });
+      const themeBtnM = drawer.querySelector('#themeBtnM'); themeBtnM && themeBtnM.addEventListener('click', toggleTheme);
+      drawer.querySelectorAll('[data-lang]').forEach(b=> b.addEventListener('click', ()=> drawer.classList.remove('open')));
+      drawer.querySelectorAll('a.nav-row').forEach(a=> a.addEventListener('click', close));
+    })();
+
+    // Hero Slider — FIXED: arrows + keyboard + pause on hover
+    (()=>{
+      const hero = document.getElementById('hero');
+      const track = hero.querySelector('[data-track]');
+      const slides = track.children.length;
+      const dotsWrap = hero.querySelector('[data-dots]');
+      const bar = hero.querySelector('[data-progress]');
+      const prevBtn = hero.querySelector('[data-prev]');
+      const nextBtn = hero.querySelector('[data-next]');
+
+      let i=0, timer=null, D=6000, progress=null, w=0, playing=true;
+
+      // dots
+      for(let k=0;k<slides;k++){
+        const b=document.createElement('button');
+        b.className='w-6 h-[2px] rounded-sm bg-black/20 dark:bg-white/20 data-[on=true]:bg-ink dark:data-[on=true]:bg-white transition-all';
+        b.addEventListener('click',()=>go(k,true));
+        dotsWrap.appendChild(b);
+      }
+      const dots=[...dotsWrap.children];
+      const setBar=p=> bar.style.width=p+'%';
+
+      function go(n, user=false){
+        i=(n+slides)%slides;
+        track.style.transform=`translateX(${-i*100}%)`;
+        dots.forEach((d,di)=>d.dataset.on = (di===i));
+        if(user) reset();
+      }
+      const step=()=>go(i+1);
+      function play(){
+        if(timer) return;
+        timer=setInterval(step,D);
+        w=0; setBar(0);
+        progress=setInterval(()=>{ w+=100/(D/50); if(w>100) w=100; setBar(w); },50);
+      }
+      function stop(){ clearInterval(timer); timer=null; clearInterval(progress); progress=null; }
+      function reset(){ stop(); if(playing) play(); }
+
+      // Visibility
+      const io=new IntersectionObserver((e)=>{ playing = e[0].isIntersecting; playing?play():stop(); },{threshold:.2});
+      io.observe(hero);
+
+      // Touch
+      let sx=0,dx=0;
+      track.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;stop()},{passive:true});
+      track.addEventListener('touchmove',e=>{dx=e.touches[0].clientX-sx},{passive:true});
+      track.addEventListener('touchend',()=>{ if(Math.abs(dx)>40) go(i+(dx<0?1:-1),true); dx=0; reset();});
+
+      // Hover pause (desktop)
+      hero.addEventListener('mouseenter', stop);
+      hero.addEventListener('mouseleave', reset);
+
+      // FIX: Arrows
+      prevBtn && prevBtn.addEventListener('click', ()=> go(i-1, true));
+      nextBtn && nextBtn.addEventListener('click', ()=> go(i+1, true));
+
+      // Keyboard (arrow keys)
+      document.addEventListener('keydown', (e)=>{
+        if(!hero.matches(':hover') && document.activeElement && !hero.contains(document.activeElement)) return;
+        if(e.key==='ArrowLeft') { go(i-1,true); }
+        if(e.key==='ArrowRight'){ go(i+1,true); }
+      });
+
+      play(); go(0);
+    })();
+
+    // Products seed (cards tuned for mobile)
+    (function(){
+      const data = [
+        {img:'https://placehold.co/300x200/png?text=EC+Wire', title:'مفتول آلومینیوم EC', sub:'گرید 1350 با رسانایی بالا'},
+        {img:'https://placehold.co/300x200/png?text=Rod+9.5', title:'راد آلومینیوم Φ9.5', sub:'سطح صیقلی و دقیق'},
+        {img:'https://placehold.co/300x200/png?text=AAAC', title:'هادی AAAC', sub:'مقاومت کششی بالا'},
+        {img:'https://placehold.co/300x200/png?text=Alloy+Ingot', title:'شمش آلیاژی', sub:'کنترل ناخالصی دقیق'},
+        {img:'https://placehold.co/300x200/png?text=ABC', title:'هادی ABC', sub:'ایمن و نصب سریع'},
+        {img:'https://placehold.co/300x200/png?text=Granule', title:'گرانول آلومینیوم', sub:'بسته‌بندی صادراتی'},
+        {img:'https://placehold.co/300x200/png?text=Foil+Trays', title:'ظروف آلومینیومی', sub:'بهداشتی و مقاوم به حرارت'},
+        {img:'https://placehold.co/300x200/png?text=AAC', title:'هادی AAC', sub:'وزن سبک، قیمت رقابتی'}
+      ];
+      const tpl=document.getElementById('product-card-template'); const grid=document.getElementById('products-grid');
+      data.forEach(d=>{
+        const n=tpl.content.cloneNode(true);
+        const img=n.querySelector('img'); img.src=d.img; img.alt=d.title; img.loading='lazy'; img.decoding='async';
+        n.querySelector('h3').textContent=d.title; n.querySelector('p').textContent=d.sub;
+        grid.appendChild(n);
+      });
+    })();
+
+    // LME Ticker (seamless loop, gentle drift)
+    (function(){
+      const track = document.getElementById('tickerTrack');
+      const base = [
+        {t:'LME AL 3M', v:2535, ch:+0.6},
+        {t:'LME AL Cash', v:2522, ch:-0.2},
+        {t:'LME Alloy', v:2140, ch:+0.3},
+        {t:'Premium MJP', v:115, ch:+0.1},
+        {t:'USD/IRR (ref)', v:600000, ch:+0.0}
+      ];
+      const pill = (r)=>{
+        const up = r.ch >= 0; const sign = up?'+':'';
+        return `<div class="flex items-center gap-2 px-3 py-1 rounded-full glass">
+          <span class="text-xs font-bold">${r.t}</span>
+          <span class="text-sm tabular-nums">${Math.round(r.v).toLocaleString()}</span>
+          <span class="text-xs ${up?'text-emerald-600 dark:text-emerald-400':'text-rose-600 dark:text-rose-400'}">${sign}${r.ch.toFixed(1)}%</span>
+        </div>`;
+      };
+      function paint(){
+        const line = `<div class="flex gap-3">${base.map(pill).join('')}</div>`;
+        track.innerHTML = line + line; // seamless 50% repeat
+      }
+      paint();
+      setInterval(()=>{
+        base.forEach(s=>{
+          const drift=(Math.random()-0.5)*0.6;
+          s.ch=Math.max(-2,Math.min(2,s.ch+drift));
+          s.v=Math.max(1,s.v*(1+(drift/120)));
+        });
+        paint();
+      }, 4000);
+    })();
+  </script>
+</body>
+</html>
