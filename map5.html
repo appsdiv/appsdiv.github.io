@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="fa" dir="rtl" translate="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0ea5e9" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>نزدیک من — کافه، رستوران، پارک…</title>
+  <link rel="manifest" id="manifestLink" />
+  <style>
+    :root{--bg:#0b1220;--card:rgba(20,28,46,.6);--stroke:rgba(255,255,255,.08);--text:#e8eefc;--muted:#a9b6d7;--brand:#0ea5e9;--glass:blur(12px) saturate(140%)}
+    *{box-sizing:border-box}html,body{height:100%}
+    body{margin:0;background:radial-gradient(1200px 800px at 100% -10%,rgba(14,165,233,.15),transparent),radial-gradient(1000px 700px at -10% 120%,rgba(34,197,94,.08),transparent),var(--bg);color:var(--text);font-family:-apple-system,system-ui,Segoe UI,Roboto,Arial,"Vazirmatn",sans-serif;-webkit-font-smoothing:antialiased}
+    .app-header{position:sticky;top:0;z-index:50;backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);background:linear-gradient(180deg,rgba(11,18,32,.75),rgba(11,18,32,.45));border-bottom:1px solid var(--stroke);padding:10px 12px;display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .brand{display:flex;gap:10px;align-items:center}.logo{font-size:26px}.brand h1{font-size:18px;margin:0}.brand small{display:block;color:var(--muted);font-size:12px}
+    .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .btn,.select,.input{appearance:none;border:1px solid var(--stroke);background:rgba(255,255,255,.05);color:var(--text);padding:10px 12px;border-radius:10px;font-size:14px;cursor:pointer}
+    .btn.primary{background:linear-gradient(180deg, rgba(14,165,233,.9), rgba(14,165,233,.75));border:0}
+    #main{max-width:980px;margin:0 auto;padding:14px}
+    .status{border:1px dashed var(--stroke);color:var(--muted);padding:10px 12px;border-radius:12px;margin-bottom:12px;background:rgba(255,255,255,.03)}
+    .filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+    .filters label{border:1px solid var(--stroke);padding:8px 10px;border-radius:999px;background:rgba(255,255,255,.04);font-size:13px;cursor:pointer}
+    .cards{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
+    @media (min-width:600px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (min-width:900px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    .card{display:flex;flex-direction:column;overflow:hidden;border-radius:16px;backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid var(--stroke);box-shadow:0 24px 60px rgba(2,6,23,.25)}
+    .media{position:relative;aspect-ratio:4/3;background:rgba(255,255,255,.03)}.media img{width:100%;height:100%;object-fit:cover;display:block}
+    .badge{position:absolute;bottom:10px;left:10px;font-size:12px;padding:6px 8px;border-radius:999px;background:rgba(0,0,0,.45);border:1px solid var(--stroke)}
+    .badge.open{background:rgba(16,185,129,.2);border-color:rgba(16,185,129,.45)}.badge.closed{background:rgba(239,68,68,.2);border-color:rgba(239,68,68,.45)}
+    .meta{padding:10px 12px;display:flex;flex-direction:column;gap:6px}.name{margin:0;font-size:16px}
+    .line{display:flex;gap:6px;color:var(--muted);font-size:13px}.addr,.cats{color:var(--muted);font-size:13px}.sep{opacity:.6}
+    .actions{display:flex;gap:8px;padding:10px 12px;padding-top:0;margin-top:-4px}.actions .btn{flex:1;text-align:center}
+    .row{display:flex;gap:8px;flex-wrap:wrap}
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand"><span class="logo">📍</span><div><h1>نزدیک من</h1><small>کافه • رستوران • سرویس‌بهداشتی • پارک • دیدنی‌ها</small></div></div>
+    <div class="controls">
+      <button id="locBtn" class="btn primary">تشخیص موقعیت</button>
+      <select id="sortSelect" class="select" title="مرتب‌سازی"><option value="distance">نزدیک‌ترین</option><option value="rating">امتیاز</option></select>
+      <button id="refreshBtn" class="btn">به‌روزرسانی</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section id="statusBar" class="status">برای شروع روی «تشخیص موقعیت» بزن.</section>
+
+    <section id="filters" class="filters">
+      <label><input type="checkbox" data-q="cafe" checked> کافه</label>
+      <label><input type="checkbox" data-q="restaurant" checked> رستوران</label>
+      <label><input type="checkbox" data-q="toilet restroom wc" checked> سرویس‌بهداشتی</label>
+      <label><input type="checkbox" data-q="park" checked> پارک</label>
+      <label><input type="checkbox" data-q="attraction landmark museum" checked> دیدنی‌ها</label>
+    </section>
+
+    <section class="row" style="margin-bottom:12px">
+      <input id="manualLat" class="input" placeholder="عرض جغرافیایی (اختیاری)" inputmode="decimal" style="width:170px">
+      <input id="manualLng" class="input" placeholder="طول جغرافیایی (اختیاری)" inputmode="decimal" style="width:170px">
+      <button id="useManual" class="btn">استفاده از مختصات دستی</button>
+    </section>
+
+    <section id="cards" class="cards"></section>
+  </main>
+
+  <footer class="app-footer" style="opacity:.75;color:#a9b6d7;text-align:center;padding:20px 12px">
+    <span>© 2025 • نسخه سبک PWA — iPhone Ready</span>
+  </footer>
+
+  <template id="cardTpl">
+    <article class="card">
+      <div class="media"><img loading="lazy" alt="" /><span class="badge open-state"></span></div>
+      <div class="meta">
+        <h3 class="name"></h3>
+        <div class="line"><span class="rating"></span><span class="sep">•</span><span class="distance"></span></div>
+        <div class="addr"></div><div class="cats"></div>
+      </div>
+      <div class="actions"><a class="btn directions" target="_blank" rel="noopener">مسیر</a></div>
+    </article>
+  </template>
+
+  <script type="module">
+    // ---------- Manifest in-memory ----------
+    const manifest = {"name":"نزدیک من","short_name":"نزدیک من","dir":"rtl","lang":"fa","display":"standalone","start_url":".","background_color":"#0b1220","theme_color":"#0ea5e9","icons":[]};
+    const manifestBlob = new Blob([JSON.stringify(manifest)], {type: "application/manifest+json"});
+    document.getElementById("manifestLink").href = URL.createObjectURL(manifestBlob);
+
+    // ---------- Service Worker (network-first) ----------
+    const swCode = `self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));self.addEventListener('fetch',e=>{e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)))})`;
+    if ('serviceWorker' in navigator) {
+      const swUrl = URL.createObjectURL(new Blob([swCode], {type:'text/javascript'}));
+      navigator.serviceWorker.register(swUrl).catch(()=>{});
+    }
+
+    // ---------- API key (light obfuscation; not security) ----------
+    function decodeKey(){return "NYPKSWBVLNHHUONKGQ3J2KEMQGMOWLP05XNBGR23OOJ0QEKP";}
+    const FSQ_KEY = decodeKey();
+
+    // ---------- UI refs ----------
+    const statusBar = document.getElementById('statusBar');
+    const cardsEl = document.getElementById('cards');
+    const tpl = document.getElementById('cardTpl');
+    const locBtn = document.getElementById('locBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const sortSelect = document.getElementById('sortSelect');
+    const filterEl = document.getElementById('filters');
+    const manualLat = document.getElementById('manualLat');
+    const manualLng = document.getElementById('manualLng');
+    const useManual = document.getElementById('useManual');
+
+    let userPos = null;
+    let placesCache = [];
+
+    // ---------- Helpers ----------
+    const setStatus = (msg)=> statusBar.textContent = msg;
+    const metersToKm = (m)=> (m<1000? `${m|0} m` : (m/1000).toFixed(m<10000?2:1)+" km");
+    const toAppleMaps = (lat,lng,name)=> `maps://?daddr=${lat},${lng}&q=${encodeURIComponent(name||"Destination")}`;
+    const toGoogleMaps = (lat,lng,name)=> `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving&dir_action=navigate&destination_place=${encodeURIComponent(name||"Destination")}`;
+    const haversine=(a,b,c,d)=>{const R=6371000,toRad=x=>x*Math.PI/180;const dLa=toRad(c-a),dLo=toRad(d-b);const A=Math.sin(dLa/2)**2+Math.cos(toRad(a))*Math.cos(toRad(c))*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(A));};
+
+    // ---------- Secure-context checks ----------
+    function checkSecure(){
+      if (!window.isSecureContext) {
+        setStatus("⚠️ این صفحه در secure context نیست. لطفاً از طریق https یا http://localhost باز کنید؛ file:// جواب نمی‌دهد.");
+        return false;
+      }
+      return true;
+    }
+
+    // ---------- Geolocation (robust) ----------
+    function getPositionOnce(){
+      return new Promise((resolve, reject)=>{
+        if(!navigator.geolocation) return reject(new Error("GPS در مرورگر در دسترس نیست."));
+        navigator.geolocation.getCurrentPosition(
+          pos=>resolve(pos.coords),
+          err=>reject(err),
+          { enableHighAccuracy:true, timeout:15000, maximumAge:0 }
+        );
+      });
+    }
+    function watchPositionOnce(){
+      return new Promise((resolve, reject)=>{
+        if(!navigator.geolocation) return reject(new Error("GPS در مرورگر در دسترس نیست."));
+        const id = navigator.geolocation.watchPosition(
+          pos=>{navigator.geolocation.clearWatch(id); resolve(pos.coords);},
+          err=>{navigator.geolocation.clearWatch(id); reject(err);},
+          { enableHighAccuracy:true, maximumAge:0, timeout:20000 }
+        );
+      });
+    }
+    async function getPositionRobust(){
+      // race getCurrentPosition with watchPosition fallback
+      const p = Promise.race([getPositionOnce(), watchPositionOnce()]);
+      return await p;
+    }
+
+    // ---------- FSQ API ----------
+    async function fsqSearch(ll, query, limit=30, radius=4000){
+      const url = new URL("https://api.foursquare.com/v3/places/search");
+      url.searchParams.set("ll", ll);
+      url.searchParams.set("query", query);
+      url.searchParams.set("radius", radius);
+      url.searchParams.set("limit", Math.min(limit, 50));
+      url.searchParams.set("sort", "DISTANCE");
+      const res = await fetch(url, {headers:{Accept:"application/json", Authorization:FSQ_KEY}});
+      if(!res.ok) throw new Error("Foursquare search failed");
+      const data = await res.json();
+      return data.results||[];
+    }
+    async function fsqDetails(id){
+      const res = await fetch(`https://api.foursquare.com/v3/places/${id}`, {headers:{Accept:"application/json", Authorization:FSQ_KEY}});
+      return res.ok? res.json(): null;
+    }
+    async function fsqHours(id){
+      const res = await fetch(`https://api.foursquare.com/v3/places/${id}/hours`, {headers:{Accept:"application/json", Authorization:FSQ_KEY}});
+      return res.ok? res.json(): null;
+    }
+    async function fsqPhoto(id){
+      const res = await fetch(`https://api.foursquare.com/v3/places/${id}/photos?limit=1`, {headers:{Accept:"application/json", Authorization:FSQ_KEY}});
+      if(!res.ok) return null; const arr = await res.json();
+      if(!Array.isArray(arr)||!arr.length) return null; const p=arr[0]; return `${p.prefix}360x240${p.suffix}`;
+    }
+    const uniqById = (arr)=>{const s=new Set();const out=[];for(const x of arr){if(!x.fsq_id||s.has(x.fsq_id)) continue;s.add(x.fsq_id);out.push(x)}return out;};
+
+    async function loadPlaces(){
+      if(!userPos) throw new Error("موقعیت کاربر مشخص نیست.");
+      const qList = [...filterEl.querySelectorAll('input[type=checkbox]')].filter(ch=>ch.checked).map(ch=>ch.dataset.q);
+      if(qList.length===0){ setStatus("حداقل یک دسته را انتخاب کنید."); return; }
+
+      setStatus("دریافت نتایج نزدیک…");
+      const ll = `${userPos.latitude},${userPos.longitude}`;
+      const resArrays = await Promise.allSettled(qList.map(q=>fsqSearch(ll,q,30,4000)));
+
+      let merged=[]; for(const r of resArrays){ if(r.status==="fulfilled") merged=merged.concat(r.value); }
+      let unique = uniqById(merged);
+      unique.sort((a,b)=>(a.distance??1e9)-(b.distance??1e9));
+      const top = unique.slice(0,40);
+
+      setStatus("تکمیل اطلاعات مکان‌ها…");
+      const enriched = await Promise.all(top.map(async p=>{
+        const [detail,hours,photo] = await Promise.all([fsqDetails(p.fsq_id), fsqHours(p.fsq_id), fsqPhoto(p.fsq_id)]);
+        const rating = detail?.rating ?? null;
+        const addr = detail?.location?.formatted_address || p.location?.formatted_address || "";
+        const cats = (detail?.categories||p.categories||[]).map(c=>c.name).join("، ");
+        const isOpen = hours?.is_open ?? detail?.hours?.is_open ?? null;
+        const name = detail?.name || p.name || "بدون‌نام";
+        const lat = detail?.geocodes?.main?.latitude ?? p.geocodes?.main?.latitude;
+        const lng = detail?.geocodes?.main?.longitude ?? p.geocodes?.main?.longitude;
+        const distance = p.distance ?? ((typeof lat==="number"&&typeof lng==="number")? haversine(userPos.latitude,userPos.longitude,lat,lng): null);
+        return {id:p.fsq_id,name,rating,addr,cats,isOpen,lat,lng,distance,photo:photo||null};
+      }));
+      placesCache = enriched.filter(x=>x.lat&&x.lng);
+      applySortAndRender();
+      setStatus(`${Math.min(placesCache.length,30)} مورد نزدیک یافت شد.`);
+    }
+
+    function applySortAndRender(){
+      const mode = sortSelect.value;
+      let arr = [...placesCache];
+      if(mode==="rating"){
+        arr.sort((a,b)=>((typeof b.rating==="number"?b.rating:-1)-(typeof a.rating==="number"?a.rating:-1))||((a.distance??1e9)-(b.distance??1e9)));
+      } else {
+        arr.sort((a,b)=>(a.distance??1e9)-(b.distance??1e9));
+      }
+      renderCards(arr.slice(0,30));
+    }
+
+    function renderCards(items){
+      cardsEl.innerHTML="";
+      for(const it of items){
+        const n = tpl.content.firstElementChild.cloneNode(true);
+        const img = n.querySelector("img");
+        const badge = n.querySelector(".open-state");
+        n.querySelector(".name").textContent = it.name;
+        n.querySelector(".rating").textContent = (typeof it.rating==="number")? `امتیاز: ${it.rating.toFixed(1)}` : "امتیاز: نامشخص";
+        n.querySelector(".distance").textContent = (typeof it.distance==="number")? `فاصله: ${metersToKm(it.distance)}` : "فاصله: —";
+        n.querySelector(".addr").textContent = it.addr || "آدرس نامشخص";
+        n.querySelector(".cats").textContent = it.cats || "";
+        if(it.isOpen===true){ badge.textContent="باز"; badge.classList.add("badge","open"); }
+        else if(it.isOpen===false){ badge.textContent="بسته"; badge.classList.add("badge","closed"); }
+        else { badge.textContent="نامشخص"; badge.classList.add("badge"); }
+        img.src = it.photo || "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 480'><defs><linearGradient id='g' x1='0' x2='1'><stop stop-color='#0ea5e9'/><stop offset='1' stop-color='#0b1220'/></linearGradient></defs><rect width='640' height='480' fill='url(#g)' /><text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='28' fill='white' opacity='.8'>بدون عکس</text></svg>`);
+        img.alt = it.name;
+
+        const dir = n.querySelector(".directions");
+        const apple = toAppleMaps(it.lat,it.lng,it.name);
+        const google = toGoogleMaps(it.lat,it.lng,it.name);
+        dir.href = apple;
+        dir.addEventListener('click', ()=>{ setTimeout(()=>window.open(google,"_blank","noopener"), 400); });
+
+        cardsEl.appendChild(n);
+      }
+    }
+
+    // ---------- Events ----------
+    locBtn.addEventListener('click', async ()=>{
+      if(!checkSecure()) return;
+      setStatus("درخواست دسترسی به GPS… اگر پیغامی آمد «Allow» را بزنید.");
+      try{
+        // iOS: فقط در تعامل کاربر
+        const coords = await getPositionRobust();
+        userPos = coords;
+        setStatus(`مختصات شما: ${coords.latitude.toFixed(5)}, ${coords.longitude.toFixed(5)} — دریافت مکان‌های نزدیک…`);
+        await loadPlaces();
+      }catch(e){
+        console.error(e);
+        const code = e.code;
+        let msg = "عدم دسترسی به GPS.";
+        if(code===1) msg = "اجازهٔ دسترسی رد شده. مسیر: Settings → Safari → Location → Allow/Ask";
+        else if(code===2) msg = "امکان تعیین موقعیت وجود ندارد. لطفاً Location Services را فعال کنید.";
+        else if(code===3) msg = "درخواست زمان‌بر شد. دوباره تلاش کنید یا به فضای بازتر بروید.";
+        setStatus(`⚠️ ${msg}`);
+      }
+    });
+
+    refreshBtn.addEventListener('click', async ()=>{
+      if(!userPos){ setStatus("ابتدا «تشخیص موقعیت» را بزنید یا مختصات دستی وارد کنید."); return; }
+      try{ setStatus("به‌روزرسانی نتایج…"); await loadPlaces(); }catch{ setStatus("بروزرسانی ناموفق بود."); }
+    });
+    sortSelect.addEventListener('change', applySortAndRender);
+    filterEl.addEventListener('change', async ()=>{ if(userPos){ try{ await loadPlaces(); }catch{} } });
+
+    // ورود دستی مختصات (اگر کاربر اجازه ندهد)
+    useManual.addEventListener('click', async ()=>{
+      const lat = parseFloat(manualLat.value), lng = parseFloat(manualLng.value);
+      if(isFinite(lat) && isFinite(lng)){
+        userPos = {latitude:lat, longitude:lng};
+        setStatus(`مختصات دستی: ${lat.toFixed(5)}, ${lng.toFixed(5)} — دریافت مکان‌های نزدیک…`);
+        try{ await loadPlaces(); }catch(e){ setStatus("دریافت مکان‌ها با خطا مواجه شد."); }
+      } else {
+        setStatus("لطفاً مختصات معتبر وارد کنید (مثلاً 35.6892 و 51.3890).");
+      }
+    });
+
+    // نکته: تلاش خودکار حذف شد تا درخواست فقط با تعامل کاربر باشد (سازگار با iOS)
+  </script>
+</body>
+</html>
