@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="fa" dir="rtl" translate="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no"/>
+  <meta name="color-scheme" content="light dark"/>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>نزدیکِ من — کافه · رستوران · دستشویی</title>
+  <style>
+    :root{
+      --ink:#0f172a; --muted:#64748b; --bg:#0b1220; --card:rgba(255,255,255,.08);
+      --glass:rgba(255,255,255,.06); --stroke:rgba(255,255,255,.12); --brand:#0ea5e9;
+      --ok:#16a34a; --warn:#f59e0b; --err:#ef4444;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: Vazirmatn, -apple-system, "SF Pro Text", Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(1200px 1200px at 80% -10%, rgba(14,165,233,.18), transparent 60%) ,
+                  radial-gradient(800px 800px at -10% 110%, rgba(99,102,241,.18), transparent 60%),
+                  #0a0f1f;
+      color:#e5e7eb; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    }
+    header{
+      position:sticky; top:0; z-index:999;
+      backdrop-filter:saturate(140%) blur(16px);
+      background:linear-gradient(180deg, rgba(9,12,20,.85), rgba(9,12,20,.65));
+      border-bottom:1px solid var(--stroke);
+    }
+    .bar{
+      display:flex; align-items:center; gap:.75rem; padding:.75rem .9rem;
+    }
+    .logo{display:flex; align-items:center; gap:.6rem; font-weight:800; letter-spacing:.2px}
+    .logo i{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#22d3ee,#0ea5e9);box-shadow:0 10px 24px rgba(14,165,233,.35)}
+    .muted{color:var(--muted); font-size:.85rem}
+    .chip{display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .6rem;border:1px solid var(--stroke);
+      border-radius:999px;background:var(--glass); font-size:.8rem}
+    .btn{
+      display:inline-flex;align-items:center;gap:.5rem;border:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      color:#eaf2ff; padding:.6rem .9rem; border-radius:14px; font-weight:600;
+      box-shadow:0 10px 20px rgba(2,6,23,.18); cursor:pointer; transition:.2s transform;
+    }
+    .btn:active{transform:scale(.98)}
+    .grid{display:grid;grid-template-columns:1fr;gap:.9rem;padding:1rem .9rem 2rem}
+    @media(min-width:480px){ .grid{grid-template-columns:1fr 1fr} }
+    @media(min-width:880px){ .grid{grid-template-columns:1fr 1fr 1fr} }
+    .card{
+      border:1px solid var(--stroke); border-radius:18px; overflow:hidden;
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.025));
+      box-shadow:0 24px 60px rgba(2,6,23,.25);
+    }
+    .thumb{width:100%;height:170px;background:#0b1220;object-fit:cover}
+    .body{padding:.8rem .9rem 1rem}
+    .title{font-weight:800; line-height:1.3}
+    .meta{display:flex;flex-wrap:wrap;gap:.5rem;margin:.55rem 0;color:#cbd5e1;font-size:.86rem}
+    .badge{padding:.25rem .5rem;border-radius:999px;border:1px solid var(--stroke);background:var(--glass)}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-top:.7rem}
+    .row .addr{color:#cbd5e1;font-size:.85rem}
+    .actions{display:flex;gap:.5rem}
+    .icon{width:18px;height:18px;display:inline-block;vertical-align:-3px;opacity:.9}
+    .tabs{display:flex;gap:.5rem;overflow:auto;padding:.5rem .9rem .75rem;border-bottom:1px solid var(--stroke)}
+    .tab{
+      white-space:nowrap; padding:.45rem .8rem; border-radius:10px; border:1px solid var(--stroke);
+      background:var(--glass); font-weight:700; color:#e2e8f0; cursor:pointer
+    }
+    .tab[aria-selected="true"]{background:rgba(14,165,233,.15);border-color:rgba(14,165,233,.5);box-shadow:0 12px 20px rgba(14,165,233,.2)}
+    .empty, .warn{
+      margin:1rem; border:1px dashed var(--stroke); border-radius:16px; padding:1rem; background:rgba(255,255,255,.02)
+    }
+    .footer{padding:1.1rem .9rem 2rem; color:#9fb0c6; font-size:.8rem}
+    .spinner{width:18px;height:18px;border:3px solid rgba(255,255,255,.28);border-top-color:#fff;border-radius:50%;animation:sp 1s linear infinite}
+    @keyframes sp{to{transform:rotate(1turn)}}
+    .pill{display:inline-flex;align-items:center;gap:.45rem;padding:.35rem .6rem;border-radius:999px;border:1px solid var(--stroke);background:var(--glass)}
+    .kicker{display:flex;align-items:center;gap:.6rem; padding:.35rem .9rem .7rem .9rem}
+    .kicker .dot{width:8px;height:8px;border-radius:50%;background:#34d399;box-shadow:0 0 0 0 rgba(52,211,153,.8);animation:pulse 2s infinite}
+    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,211,153,.6)}70%{box-shadow:0 0 0 14px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+    .toast{position:fixed;inset:auto .9rem 1rem .9rem;z-index:1000;display:none}
+    .toast.show{display:block}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <div class="logo" aria-label="نزدیک من">
+        <i></i><span>نزدیکِ من</span>
+      </div>
+      <div class="muted" id="status">آماده...</div>
+      <div style="flex:1"></div>
+      <button class="btn" id="btnRefresh">
+        <span class="spinner" id="spin" style="display:none"></span>
+        دریافت اطراف
+      </button>
+    </div>
+    <div class="kicker">
+      <span class="dot" aria-hidden="true"></span>
+      <span class="muted">با فعال‌سازی موقعیت مکانی، نزدیک‌ترین مکان‌ها را می‌آوریم.</span>
+    </div>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-type="all" aria-selected="true">همه</button>
+      <button class="tab" role="tab" data-type="cafe">کافه</button>
+      <button class="tab" role="tab" data-type="restaurant">رستوران</button>
+      <button class="tab" role="tab" data-type="wc">دستشویی</button>
+    </div>
+  </header>
+
+  <main id="app">
+    <div class="warn" id="httpsWarn" style="display:none">
+      برای دسترسی به GPS و نصب PWA، صفحه باید از <b>HTTPS</b> یا <b>localhost</b> ارائه شود.
+    </div>
+    <div class="grid" id="list"></div>
+    <div class="empty" id="empty" style="display:none">موردی یافت نشد.</div>
+  </main>
+
+  <div class="footer">
+    منبع داده: Foursquare Places • <span class="pill">مرتب‌سازی: نزدیک‌ترین</span>
+  </div>
+
+  <div class="toast" id="toast"><span class="pill">⚠️ خطا در ارتباط با سرویس — بعداً دوباره تلاش کنید.</span></div>
+
+  <script>
+  // ====== تنظیمات ======
+  const FSQ_API_KEY = "fsq3hCo3uTtEHcT4q+ykBmbgGFFRaRak95Qs577BjEdbK4E="; // کلید شما
+  const SEARCH_LIMIT = 20; // برای هر نوع
+  const SEARCH_RADIUS = 2500; // متر
+  const ENABLE_PHOTOS = true; // عکس اول هر مکان
+  const ENABLE_RATING = true; // امتیاز (در صورت در دسترس)
+  // =====================
+
+  const state = { ll:null, list:[], filtered:'all' };
+  const $ = (s, root=document) => root.querySelector(s);
+  const $$ = (s, root=document) => Array.from(root.querySelectorAll(s));
+  const statusEl = $("#status"), listEl = $("#list"), emptyEl = $("#empty");
+  const spinEl = $("#spin"), toastEl = $("#toast");
+
+  // PWA: مانيفست و سرویس‌ورکر (همه در یک فایل)
+  (function setupPWA(){
+    const manifest = {
+      name:"نزدیکِ من",
+      short_name:"نزدیکِ من",
+      dir:"rtl", lang:"fa",
+      start_url:"./",
+      scope:"./",
+      display:"standalone",
+      background_color:"#0a0f1f",
+      theme_color:"#0a0f1f",
+      icons:[{src:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAACq8/9RAAAAJ0lEQVR42u3MMQEAAAgDINc/9CwYkQ3m8qfEo8EAAAAAAAAAAAAAADgE1EoAAHcXJb1AAAAAElFTkSuQmCC",sizes:"144x144",type:"image/png"}]
+    };
+    const blob = new Blob([JSON.stringify(manifest)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("link");
+    link.rel = "manifest"; link.href = url; document.head.appendChild(link);
+
+    const swCode = `
+      const CACHE = 'nearby-v1';
+      self.addEventListener('install', e=>{
+        e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./'])));
+        self.skipWaiting();
+      });
+      self.addEventListener('activate', e=>self.clients.claim());
+      self.addEventListener('fetch', e=>{
+        const req = e.request;
+        // فقط HTML صفحه را کش کن؛ درخواست‌های API کش نشوند
+        if(req.method==='GET' && req.headers.get('accept')?.includes('text/html')){
+          e.respondWith(
+            caches.match('./').then(cached=> cached || fetch(req).then(r=>{
+              const r2 = r.clone();
+              caches.open(CACHE).then(c=>c.put('./', r2));
+              return r;
+            }).catch(()=>cached))
+          );
+        }
+      });
+    `;
+    const swBlob = new Blob([swCode], {type:"text/javascript"});
+    const swUrl = URL.createObjectURL(swBlob);
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register(swUrl).catch(()=>{});
+    }
+  })();
+
+  // راه‌اندازی
+  window.addEventListener('DOMContentLoaded', ()=>{
+    if(location.protocol!=='https:' && location.hostname!=='localhost'){
+      $("#httpsWarn").style.display = 'block';
+    }
+    bindUI();
+    getLocationAndLoad();
+  });
+
+  function bindUI(){
+    $("#btnRefresh").addEventListener('click', getLocationAndLoad);
+    $$(".tab").forEach(tab=>{
+      tab.addEventListener('click', ()=>{
+        $$(".tab").forEach(t=>t.setAttribute('aria-selected','false'));
+        tab.setAttribute('aria-selected','true');
+        state.filtered = tab.dataset.type;
+        render();
+      });
+    });
+  }
+
+  function toast(msg, ms=3000){
+    if(msg) $("#toast .pill").textContent = msg;
+    toastEl.classList.add('show');
+    setTimeout(()=>toastEl.classList.remove('show'), ms);
+  }
+
+  // دریافت موقعیت
+  function getLocationAndLoad(){
+    if(!('geolocation' in navigator)){
+      status('GPS در دسترس نیست', true); return;
+    }
+    spin(true); status('در حال دریافت مکان شما...');
+    navigator.geolocation.getCurrentPosition(async pos=>{
+      const {latitude, longitude} = pos.coords;
+      state.ll = `${latitude.toFixed(6)},${longitude.toFixed(6)}`;
+      status('یافت شد — در حال جستجو...');
+      await loadAll();
+      spin(false); status('آماده');
+    }, err=>{
+      spin(false);
+      status('اجازه‌ی دسترسی به مکان داده نشد یا خطا رخ داد.', true);
+      toast('اجازه‌ی دسترسی به موقعیت یا GPS را بررسی کنید.');
+    }, {enableHighAccuracy:true, timeout:12000, maximumAge:30000});
+  }
+
+  function spin(on){ spinEl.style.display = on ? 'inline-block' : 'none'; }
+  function status(t, bad=false){ statusEl.textContent = t; statusEl.style.color = bad ? 'var(--err)' : '#9fb0c6'; }
+
+  // فراخوانی Foursquare
+  const BASE='https://api.foursquare.com/v3';
+  const HEADERS={ 'Accept':'application/json', 'Authorization':FSQ_API_KEY };
+
+  async function fsq(url, opts={}){
+    const ctrl = new AbortController(); const t = setTimeout(()=>ctrl.abort(), 12000);
+    try{
+      const res = await fetch(url, {headers:HEADERS, signal:ctrl.signal, ...opts});
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      return await res.json();
+    } finally{ clearTimeout(t); }
+  }
+
+  async function searchType(query){
+    // یک جستجو با مرتب‌سازی بر اساس فاصله
+    const url = `${BASE}/places/search?ll=${encodeURIComponent(state.ll)}&query=${encodeURIComponent(query)}&limit=${SEARCH_LIMIT}&radius=${SEARCH_RADIUS}&sort=DISTANCE`;
+    const data = await fsq(url);
+    return (data.results||[]).map(x=>normPlace(x));
+  }
+
+  function normPlace(x){
+    const lat = x.geocodes?.main?.latitude, lng = x.geocodes?.main?.longitude;
+    return {
+      id:x.fsq_id, name:x.name||'—',
+      distance:x.distance ?? null,
+      address: x.location?.formatted_address || [x.location?.address, x.location?.locality].filter(Boolean).join('، '),
+      lat, lng, rating: (typeof x.rating==='number') ? x.rating : null,
+      link: x.link || null,
+      category: (x.categories?.[0]?.name)||'',
+      photo:null, // بعداً پر می‌کنیم
+      type: null   // بعداً ست می‌کنیم
+    };
+  }
+
+  async function enrichPhoto(p){
+    if(!ENABLE_PHOTOS) return p;
+    try{
+      const js = await fsq(`${BASE}/places/${p.id}/photos?limit=1`);
+      const ph = js?.[0];
+      if(ph?.prefix && ph?.suffix){
+        p.photo = `${ph.prefix}original${ph.suffix}`;
+      }
+    }catch(_){}
+    return p;
+  }
+  async function enrichRating(p){
+    if(!ENABLE_RATING || typeof p.rating==='number') return p;
+    try{
+      const js = await fsq(`${BASE}/places/${p.id}?fields=rating,link`);
+      if(typeof js?.rating==='number') p.rating = js.rating;
+      if(js?.link) p.link = js.link;
+    }catch(_){}
+    return p;
+  }
+
+  async function loadAll(){
+    if(!state.ll){ empty(); return; }
+    listEl.innerHTML = ''; empty(false);
+    spin(true);
+
+    // سه نوع: کافه، رستوران، دستشویی
+    const tasks = [
+      searchType('cafe').then(arr=>arr.map(o=>({...o, type:'cafe'}))),
+      searchType('restaurant').then(arr=>arr.map(o=>({...o, type:'restaurant'}))),
+      // برای دستشویی چند تلاش با کلیدواژه‌های متفاوت
+      (async()=>{
+        let arr = await searchType('toilet');
+        if(arr.length<6) arr = arr.concat(await searchType('restroom'));
+        if(arr.length<6) arr = arr.concat(await searchType('wc'));
+        // یکتا و برچسب
+        const uniq = new Map();
+        arr.forEach(o=>uniq.set(o.id, {...o, type:'wc'}));
+        return [...uniq.values()];
+      })()
+    ];
+
+    try{
+      const groups = await Promise.all(tasks);
+      let all = groups.flat();
+      // غنی‌سازی (عکس + امتیاز) با کنترل همزمانی
+      all.sort((a,b)=>(a.distance??1e9)-(b.distance??1e9));
+      const concurrency = 6;
+      const runBatch = async (items, fn)=>{
+        for(let i=0;i<items.length;i+=concurrency){
+          await Promise.all(items.slice(i,i+concurrency).map(fn));
+          render(); // تدریجی رندر کن
+        }
+      };
+      await runBatch(all, async p=>enrichPhoto(p));
+      await runBatch(all, async p=>enrichRating(p));
+
+      state.list = all;
+      render();
+    }catch(e){
+      toast('دریافت داده از Foursquare ناموفق بود.'); console.error(e);
+    }finally{
+      spin(false);
+    }
+  }
+
+  function empty(show=true){ emptyEl.style.display = show ? 'block' : 'none'; }
+  function formatDist(m){
+    if(m==null) return '—';
+    return m<1000 ? `${Math.round(m)} متر` : `${(m/1000).toFixed(1)} کیلومتر`;
+  }
+  function starBadge(r){
+    if(typeof r!=='number') return '<span class="badge">⭐ —</span>';
+    return `<span class="badge">⭐ ${r.toFixed(1)}</span>`;
+  }
+  function typeBadge(t){
+    const map={cafe:'کافه', restaurant:'رستوران', wc:'دستشویی'};
+    return `<span class="badge">${map[t]||'—'}</span>`;
+  }
+  function mapsDirLink(p){
+    const q = encodeURIComponent(p.name||'مقصد');
+    const ll = `${p.lat},${p.lng}`;
+    // Apple Maps روی iOS، گوگل برای بقیه
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    return isIOS ? `https://maps.apple.com/?q=${q}&ll=${ll}` : `https://www.google.com/maps/dir/?api=1&destination=${ll}&destination_place_id=&travelmode=driving`;
+  }
+
+  function render(){
+    const data = state.list.filter(p=> state.filtered==='all' ? true : p.type===state.filtered);
+    listEl.innerHTML = data.map(p=>{
+      const img = p.photo ? `<img class="thumb" loading="lazy" src="${p.photo}" alt="تصویر ${p.name}">`
+                          : `<div class="thumb" style="display:flex;align-items:center;justify-content:center;color:#93c5fd">بدون تصویر</div>`;
+      return `
+        <article class="card">
+          ${img}
+          <div class="body">
+            <div class="title">${p.name}</div>
+            <div class="meta">
+              ${typeBadge(p.type)} ${starBadge(p.rating)}
+              <span class="badge">📍 ${formatDist(p.distance)}</span>
+            </div>
+            <div class="row">
+              <div class="addr">${p.address||'—'}</div>
+            </div>
+            <div class="row">
+              <div class="actions">
+                <a class="btn" href="${mapsDirLink(p)}" rel="noopener" target="_blank">مسیر</a>
+                ${p.link ? `<a class="btn" href="${p.link}" rel="noopener" target="_blank">صفحه</a>`:''}
+              </div>
+              <span class="muted">ID: ${p.id.slice(0,6)}…</span>
+            </div>
+          </div>
+        </article>
+      `;
+    }).join('');
+    empty(data.length===0);
+  }
+  </script>
+</body>
+</html>
