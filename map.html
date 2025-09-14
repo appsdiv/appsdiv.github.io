@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>مکان یاب</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts for a nice Persian font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/manifest+json;base64,ew0KICAibmFtZSI6ICJNZWthbiBZYWIiLA0KICAic2hvcnRfbmFtZSI6ICJNZWthbllhYiIsDQogICJpY29ucyI6IFsNCiAgICB7DQogICAgICAic3JjIjogImh0dHBzOi8vcGxhY2Vob2xkLmNvLzE5MngxOTIvMDAwMDAwL2ZmZmZmZj90ZXh0PSVEOSU4NSVEOCVCMiVEOCVBNyVEOSU4NiVEOSU4QSVEOCVBOCIsDQogICAgICAic2l6ZXMiOiAiMTkyeDE5MiIsDQogICAgICAidHlwZSI6ICJpbWFnZS9wbmciDQogICAgfSwNCiAgICB7DQogICAgICAic3JjIjogImh0dHBzOi8vcGxhY2Vob2xkLmNvLzUxMng1MTIvMDAwMDAwL2ZmZmZmZj90ZXh0PSVEOSU4NSVEOCVCMiVEOCVBNyVEOSU4NiVEOSU4QSVEOCVBOCIsDQogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsDQogICAgICAidHlwZSI6ICJpbWFnZS9wbmciDQogICAgfQ0KICBdLA0KICAic3RhcnRfdXJsIjogIi4iLA0KICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwNCiAgInRoZW1lX2NvbG9yIjogIiMxMTExMWIiLA0KICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMTExMTFiIg0KfQ==">
+    
+    <!-- PWA Meta Tags for iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="مکان یاب">
+    <link rel="apple-touch-icon" href="https://placehold.co/180x180/000000/ffffff?text=%D9%85%DA%A9%D8%A7%D9%86">
+    
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            -webkit-tap-highlight-color: transparent; /* Disable tap highlight on iOS */
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-left-color: #ffffff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        .safe-padding-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .card-animate {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-black text-white selection:bg-blue-500 selection:text-white">
+
+    <div id="app-container" class="min-h-screen pb-24">
+        <!-- Header -->
+        <header class="bg-gray-900/70 backdrop-blur-lg sticky top-0 z-10 border-b border-gray-800">
+            <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+                 <button id="refresh-button" class="p-2 rounded-full hover:bg-gray-700 transition-colors">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5M20 4h-5v5M4 20h5v-5" /></svg>
+                </button>
+                <h1 id="header-title" class="text-xl font-bold">کافه ها</h1>
+                 <button id="gps-button" class="p-2 rounded-full hover:bg-gray-700 transition-colors">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto p-4">
+            <div id="status" class="flex flex-col items-center justify-center text-center mt-16">
+                <div class="spinner mb-4"></div>
+                <p class="text-lg text-gray-400">در حال دریافت موقعیت مکانی شما...</p>
+            </div>
+            <div id="places-list" class="grid grid-cols-1 gap-4"></div>
+        </main>
+    </div>
+
+    <!-- iOS Style Tab Bar -->
+    <footer id="tab-bar" class="fixed bottom-0 left-0 right-0 bg-gray-900/80 backdrop-blur-lg border-t border-gray-700 safe-padding-bottom z-20">
+        <nav class="flex justify-around max-w-md mx-auto">
+            <button data-category="cafe" class="tab-item flex-1 flex flex-col items-center justify-center p-3 text-blue-500 transition-colors duration-200 transform hover:scale-110">
+                <svg class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14c-2.21 0-4-1.79-4-4h8c0 2.21-1.79 4-4 4zm-1-8V6h2v2h-2z"/></svg>
+                <span class="text-xs font-medium">کافه</span>
+            </button>
+            <button data-category="restaurant" class="tab-item flex-1 flex flex-col items-center justify-center p-3 text-gray-400 transition-colors duration-200 transform hover:scale-110">
+                 <svg class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                <span class="text-xs font-medium">رستوران</span>
+            </button>
+            <button data-category="park" class="tab-item flex-1 flex flex-col items-center justify-center p-3 text-gray-400 transition-colors duration-200 transform hover:scale-110">
+                <svg class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l-2-2 2-2M12 4l2 2-2 2M20 16l2-2-2-2M8 12l-2 2 2 2m8 0l2-2-2-2m-6-6l2-2 2 2"/></svg>
+                <span class="text-xs font-medium">پارک</span>
+            </button>
+            <button data-category="wc" class="tab-item flex-1 flex flex-col items-center justify-center p-3 text-gray-400 transition-colors duration-200 transform hover:scale-110">
+                 <svg class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 22s8-4.5 8-11.8A8 8 0 0012 2a8 8 0 00-8 8.2c0 7.3 8 11.8 8 11.8z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12a3 3 0 100-6 3 3 0 000 6z" /></svg>
+                <span class="text-xs font-medium">سرویس بهداشتی</span>
+            </button>
+            <button data-category="interesting" class="tab-item flex-1 flex flex-col items-center justify-center p-3 text-gray-400 transition-colors duration-200 transform hover:scale-110">
+                <svg class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M5 21v-4M3 19h4M12 3v4M10 5h4M12 21v-4M10 19h4M19 3v4M17 5h4M19 21v-4M17 19h4" /></svg>
+                <span class="text-xs font-medium">مکان های جالب</span>
+            </button>
+        </nav>
+    </footer>
+
+    <script>
+        // --- PWA Service Worker Registration ---
+        if ('serviceWorker' in navigator) { /* ... (Service worker code remains the same) ... */ }
+
+        // --- Application State and Elements ---
+        const statusDiv = document.getElementById('status');
+        const placesList = document.getElementById('places-list');
+        const headerTitle = document.getElementById('header-title');
+        const tabBar = document.getElementById('tab-bar');
+        const refreshButton = document.getElementById('refresh-button');
+        const gpsButton = document.getElementById('gps-button');
+        
+        let allPlaces = [];
+        let currentCategory = 'cafe';
+        let userLocation = null;
+
+        const categoryTitles = {
+            cafe: 'کافه ها', restaurant: 'رستوران ها', park: 'پارک ها',
+            wc: 'سرویس های بهداشتی', interesting: 'مکان های جالب'
+        };
+        
+        // OpenStreetMap amenity tags
+        const osmPlaceTypes = {
+            cafe: 'cafe',
+            restaurant: 'restaurant',
+            park: 'park',
+            wc: 'toilets',
+            interesting: 'attraction'
+        };
+        
+        // --- Data Fetching with OpenStreetMap Overpass API ---
+        async function fetchNearbyPlaces(latitude, longitude, category) {
+            const radius = 5000; // 5km radius
+            const amenity = osmPlaceTypes[category];
+            const overpassApiUrl = 'https://overpass-api.de/api/interpreter';
+
+            // Overpass QL query to find amenities near the user
+            const query = `
+                [out:json][timeout:25];
+                (
+                  node["amenity"="${amenity}"](around:${radius},${latitude},${longitude});
+                  way["amenity"="${amenity}"](around:${radius},${latitude},${longitude});
+                  relation["amenity"="${amenity}"](around:${radius},${latitude},${longitude});
+                );
+                out center;
+            `;
+
+            try {
+                const response = await fetch(overpassApiUrl, {
+                    method: 'POST',
+                    body: new URLSearchParams({ data: query })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Overpass API error: ${response.statusText}`);
+                }
+                const data = await response.json();
+
+                return data.elements.map(place => {
+                    const tags = place.tags || {};
+                    let address = [tags['addr:street'], tags['addr:housenumber'], tags['addr:city']].filter(Boolean).join(', ');
+                    if (!address) address = "آدرس نامشخص";
+                    
+                    let lat, lon;
+                    if (place.type === 'node') {
+                        lat = place.lat;
+                        lon = place.lon;
+                    } else if (place.center) { // For ways/relations
+                        lat = place.center.lat;
+                        lon = place.center.lon;
+                    }
+
+                    return {
+                        id: place.id,
+                        name: tags.name || "نام نامشخص",
+                        photo: `https://placehold.co/600x400/1a202c/ffffff?text=${encodeURIComponent(tags.name || "مکان")}`,
+                        address: address,
+                        lat: lat,
+                        lon: lon,
+                        category: category
+                    };
+                }).filter(p => p.lat && p.lon && p.name !== "نام نامشخص"); // Filter out items with no name or coordinates
+
+            } catch (error) {
+                console.error("Failed to fetch from Overpass API:", error);
+                statusDiv.innerHTML = `<p class="text-lg text-red-400 p-4 bg-red-900/50 rounded-lg">خطا در دریافت اطلاعات از OpenStreetMap.</p>`;
+                return [];
+            }
+        }
+
+        // --- UI Rendering ---
+        function renderPlaces() {
+            // No rating to sort by, so we just filter
+            const placesToRender = allPlaces.filter(p => p.category === currentCategory);
+
+            placesList.innerHTML = '';
+            
+            if (placesToRender.length === 0) {
+                 statusDiv.style.display = 'flex';
+                 statusDiv.innerHTML = `<p class="text-lg text-gray-400 mt-8">موردی در این دسته بندی یافت نشد.</p>`;
+                 return;
+            } else {
+                statusDiv.style.display = 'none';
+            }
+            
+            placesToRender.forEach((place, index) => {
+                const cardHTML = `
+                    <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden flex flex-col card-animate" style="animation-delay: ${index * 100}ms;">
+                        <img src="${place.photo}" alt="${place.name}" class="w-full h-48 object-cover bg-gray-700">
+                        <div class="p-4 flex flex-col flex-grow">
+                            <h2 class="text-xl font-bold mb-3">${place.name}</h2>
+                            <p class="text-gray-400 text-sm mb-4 flex-grow">${place.address}</p>
+                            <button onclick="openDirections(${place.lat}, ${place.lon})" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                مسیریابی
+                            </button>
+                        </div>
+                    </div>
+                `;
+                placesList.innerHTML += cardHTML;
+            });
+        }
+        
+        function updateActiveTab() {
+            headerTitle.innerText = categoryTitles[currentCategory];
+            document.querySelectorAll('.tab-item').forEach(item => {
+                item.classList.toggle('text-blue-500', item.dataset.category === currentCategory);
+                item.classList.toggle('text-gray-400', item.dataset.category !== currentCategory);
+            });
+        }
+
+        // --- Event Handlers & Initializer ---
+        function openDirections(lat, lon) {
+            window.open(`https://www.google.com/maps?daddr=${lat},${lon}`, '_blank');
+        }
+
+        tabBar.addEventListener('click', (e) => {
+            const tabButton = e.target.closest('.tab-item');
+            if (tabButton && tabButton.dataset.category !== currentCategory) {
+                currentCategory = tabButton.dataset.category;
+                updateActiveTab();
+                if (userLocation) {
+                    handleDataFetch();
+                }
+            }
+        });
+        
+        refreshButton.addEventListener('click', handleDataFetch);
+        gpsButton.addEventListener('click', main);
+
+        async function handleDataFetch() {
+            if (!userLocation) {
+                console.error("Cannot fetch data without user location.");
+                statusDiv.innerHTML = `<p class="text-lg text-red-400">ابتدا موقعیت مکانی را مشخص کنید.</p>`;
+                return;
+            }
+            statusDiv.style.display = 'flex';
+            statusDiv.innerHTML = `<div class="spinner mb-4"></div><p class="text-lg text-gray-300">در حال جستجوی ${categoryTitles[currentCategory]}...</p>`;
+            placesList.innerHTML = '';
+            
+            const { latitude, longitude } = userLocation.coords;
+            allPlaces = await fetchNearbyPlaces(latitude, longitude, currentCategory);
+            renderPlaces();
+        }
+
+        async function main() {
+            statusDiv.style.display = 'flex';
+            statusDiv.innerHTML = `<div class="spinner mb-4"></div><p class="text-lg text-gray-400">در حال دریافت موقعیت مکانی شما...</p>`;
+            placesList.innerHTML = '';
+
+            try {
+                userLocation = await new Promise((resolve, reject) => {
+                    if (!navigator.geolocation) {
+                        reject(new Error("موقعیت یابی توسط مرورگر شما پشتیبانی نمی شود."));
+                        return;
+                    }
+                    navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+                });
+                
+                handleDataFetch();
+
+            } catch (error) {
+                 let errorMessage = "خطایی در دریافت موقعیت مکانی رخ داد.";
+                if (error.code) {
+                    switch (error.code) {
+                        case 1: errorMessage = "لطفا دسترسی به موقعیت مکانی را فعال کنید."; break;
+                        case 2: errorMessage = "امکان تعیین موقعیت مکانی شما وجود ندارد."; break;
+                        case 3: errorMessage = "زمان انتظار برای دریافت موقعیت به پایان رسید."; break;
+                    }
+                }
+                statusDiv.innerHTML = `<p class="text-lg text-red-400 p-4 bg-red-900/50 rounded-lg">${errorMessage}</p>`;
+            }
+        }
+        
+        window.addEventListener('load', main);
+
+    </script>
+</body>
+</html>
+
