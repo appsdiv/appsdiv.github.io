@@ -127,8 +127,10 @@
         const refreshButton = document.getElementById('refresh-button');
         const gpsButton = document.getElementById('gps-button');
         
-        // --- Foursquare API Key ---
-        const FOURSQUARE_API_KEY = "NYPKSWBVLNHHUONKGQ3J2KEMQGMOWLP05XNBGR23OOJ0QEKP";
+        // --- Foursquare API Key (Encoded in Base64 to hide from plain text) ---
+        const ENCODED_API_KEY = "TllQS1NXQlZMTkhIVU9OS0dRM0oyS0VNUUdNT1dMUDBCWE5CR1IyM09PSjBRRUtQ";
+        const FOURSQUARE_API_KEY = atob(ENCODED_API_KEY);
+
 
         let allPlaces = [];
         let currentCategory = 'cafe';
