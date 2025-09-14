@@ -42,15 +42,9 @@
         }
         .skeleton-card {
             background-color: #1f2937; /* gray-800 */
-            border-radius: 0.75rem;
-            padding: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
         }
         .skeleton-line {
             background-color: #374151; /* gray-700 */
-            border-radius: 0.25rem;
             animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         @keyframes spin {
@@ -91,7 +85,7 @@
             <div id="status" class="flex flex-col items-center justify-center text-center mt-16">
                 <!-- Initial loading spinner is shown here -->
             </div>
-            <div id="places-list" class="grid grid-cols-1 gap-3"></div>
+            <div id="places-list" class="grid grid-cols-1 gap-4"></div>
         </main>
     </div>
 
@@ -133,6 +127,9 @@
         const refreshButton = document.getElementById('refresh-button');
         const gpsButton = document.getElementById('gps-button');
         
+        // --- Foursquare API Key ---
+        const FOURSQUARE_API_KEY = "NYPKSWBVLNHHUONKGQ3J2KEMQGMOWLP05XNBGR23OOJ0QEKP";
+
         let allPlaces = [];
         let currentCategory = 'cafe';
         let userLocation = null;
@@ -142,94 +139,76 @@
             wc: 'سرویس های بهداشتی', interesting: 'مکان های جالب'
         };
         
-        // OpenStreetMap amenity tags
-        const osmPlaceTypes = {
-            cafe: 'cafe',
-            restaurant: 'restaurant',
-            park: 'park',
-            wc: 'toilets',
-            interesting: 'attraction'
+        // Foursquare Category IDs
+        const foursquarePlaceTypes = {
+            cafe: '13032',
+            restaurant: '13065',
+            park: '16032',
+            wc: '11145',
+            interesting: '10000' // Arts & Entertainment
         };
 
         // --- Utility Functions ---
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Radius of the Earth in km
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a =
-                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return R * c; // Distance in km
+        function formatDistance(meters) {
+            const km = meters / 1000;
+            if (km < 1) {
+                return `${Math.round(meters)} متر`;
+            }
+            return `${km.toFixed(1)} کیلومتر`;
         }
 
-        function formatDistance(km) {
-            if (km < 1) {
-                return `${Math.round(km * 1000)} متر`;
-            }
-            return `${km.toFixed(2)} کیلومتر`;
-        }
-        
-        // --- Data Fetching with Timeout ---
-        async function fetchWithTimeout(resource, options = {}, timeout = 8000) {
+        async function fetchWithTimeout(resource, options = {}, timeout = 10000) {
             const controller = new AbortController();
             const id = setTimeout(() => controller.abort(), timeout);
-            const response = await fetch(resource, {
-                ...options,
-                signal: controller.signal  
-            });
+            const response = await fetch(resource, { ...options, signal: controller.signal });
             clearTimeout(id);
             return response;
         }
 
+        // --- Data Fetching with Foursquare API ---
         async function fetchNearbyPlaces(latitude, longitude, category) {
+            const fsqCategory = foursquarePlaceTypes[category];
             const radius = 5000;
-            const amenity = osmPlaceTypes[category];
-            const overpassApiUrl = 'https://overpass-api.de/api/interpreter';
-            const query = `[out:json][timeout:25];(node["amenity"="${amenity}"](around:${radius},${latitude},${longitude});way["amenity"="${amenity}"](around:${radius},${latitude},${longitude});relation["amenity"="${amenity}"](around:${radius},${latitude},${longitude}););out center;`;
+            const fields = 'fsq_id,name,geocodes,location,distance,rating,closed_bucket,photos';
+            // Increased limit to 50 for a more complete list
+            const apiUrl = `https://api.foursquare.com/v3/places/search?ll=${latitude},${longitude}&radius=${radius}&categories=${fsqCategory}&sort=DISTANCE&limit=50&fields=${fields}`;
 
             try {
-                const response = await fetchWithTimeout(overpassApiUrl, {
-                    method: 'POST',
-                    body: new URLSearchParams({ data: query })
-                }, 10000); // 10 second timeout
+                const response = await fetchWithTimeout(apiUrl, {
+                    headers: { 'Authorization': FOURSQUARE_API_KEY, 'Accept': 'application/json' }
+                });
 
-                if (!response.ok) throw new Error(`Overpass API error: ${response.statusText}`);
+                if (!response.ok) throw new Error(`Foursquare API error: ${response.status} ${response.statusText}`);
                 const data = await response.json();
 
-                return data.elements.map(place => {
-                    const tags = place.tags || {};
-                    let address = [tags['addr:city'], tags['addr:suburb'], tags['addr:street'], tags['addr:housenumber']].filter(Boolean).join('، ');
-                    if (!address) address = "آدرس در دسترس نیست";
+                return (data.results || []).map(place => {
+                    const photo = place.photos && place.photos.length > 0
+                        ? `${place.photos[0].prefix}original${place.photos[0].suffix}`
+                        : `https://placehold.co/600x400/1a202c/ffffff?text=${encodeURIComponent(place.name)}`;
                     
-                    let lat, lon;
-                    if (place.type === 'node') {
-                        lat = place.lat;
-                        lon = place.lon;
-                    } else if (place.center) {
-                        lat = place.center.lat;
-                        lon = place.center.lon;
-                    }
-                    
-                    const distance = userLocation ? calculateDistance(userLocation.coords.latitude, userLocation.coords.longitude, lat, lon) : 0;
+                    const isOpen = place.closed_bucket ? !['CLOSED', 'VERY_LIKELY_CLOSED'].includes(place.closed_bucket) : true;
 
                     return {
-                        id: place.id,
-                        name: tags.name || "نام نامشخص",
-                        address: address,
-                        lat: lat,
-                        lon: lon,
-                        distance: distance,
+                        id: place.fsq_id,
+                        name: place.name || "نام نامشخص",
+                        photo: photo,
+                        rating: place.rating, // out of 10
+                        isOpen: isOpen,
+                        address: place.location.formatted_address || "آدرس نامشخص",
+                        lat: place.geocodes.main.latitude,
+                        lon: place.geocodes.main.longitude,
+                        distance: place.distance, // in meters
                         category: category
                     };
-                }).filter(p => p.lat && p.lon && p.name !== "نام نامشخص");
+                });
 
             } catch (error) {
-                console.error("Failed to fetch from Overpass API:", error);
-                let message = "خطا در دریافت اطلاعات.";
+                console.error("Failed to fetch from Foursquare API:", error);
+                let message = "خطا در دریافت اطلاعات از Foursquare.";
                 if (error.name === 'AbortError') {
-                    message = "پاسخی از سرور دریافت نشد، لطفا دوباره تلاش کنید.";
+                    message = "پاسخی از سرور Foursquare دریافت نشد، لطفا دوباره تلاش کنید.";
+                } else if (error.message.includes("401")) {
+                    message = "کلید API Foursquare نامعتبر است.";
                 }
                 statusDiv.innerHTML = `<p class="text-lg text-red-400 p-4 bg-red-900/50 rounded-lg">${message}</p>`;
                 return [];
@@ -240,50 +219,71 @@
         function showSkeletonLoader() {
             placesList.innerHTML = '';
             statusDiv.style.display = 'none';
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 3; i++) {
                 placesList.innerHTML += `
-                    <div class="skeleton-card">
-                        <div class="w-2/3">
-                            <div class="skeleton-line h-5 w-48 mb-3"></div>
-                            <div class="skeleton-line h-4 w-full"></div>
+                    <div class="skeleton-card rounded-xl shadow-lg overflow-hidden flex flex-col">
+                        <div class="skeleton-line h-48 w-full"></div>
+                        <div class="p-4">
+                            <div class="skeleton-line h-6 w-3/4 mb-4"></div>
+                            <div class="skeleton-line h-4 w-full mb-2"></div>
+                             <div class="skeleton-line h-4 w-2/3 mb-4"></div>
+                            <div class="skeleton-line h-4 w-full mb-4"></div>
+                            <div class="skeleton-line h-12 w-full rounded-lg"></div>
                         </div>
-                        <div class="skeleton-line h-12 w-24"></div>
                     </div>
                 `;
             }
         }
-
+        
         function renderPlaces() {
             const placesToRender = allPlaces.filter(p => p.category === currentCategory);
-            placesToRender.sort((a, b) => a.distance - b.distance);
-
+            
             placesList.innerHTML = '';
             
             if (placesToRender.length === 0) {
                  statusDiv.style.display = 'flex';
-                 statusDiv.innerHTML = `
-                    <div class="text-center text-gray-500">
-                        <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2H5a2 2 0 01-2-2z" /></svg>
-                        <p class="mt-4 text-lg">موردی در این دسته بندی یافت نشد.</p>
-                    </div>`;
+                 statusDiv.innerHTML = `<div class="text-center text-gray-500"><svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2H5a2 2 0 01-2-2z" /></svg><p class="mt-4 text-lg">موردی در این دسته بندی یافت نشد.</p></div>`;
                  return;
             } else {
                 statusDiv.style.display = 'none';
             }
             
             placesToRender.forEach((place, index) => {
+                const statusClass = place.isOpen ? 'bg-green-500' : 'bg-red-500';
+                const statusText = place.isOpen ? 'باز است' : 'بسته است';
+                const ratingDisplay = place.rating ? (place.rating / 2).toFixed(1) : 'N/A';
+                // Calculate walking time: average walking speed is about 80 meters per minute.
+                const walkTime = Math.round(place.distance / 80);
+                
                 const cardHTML = `
-                    <div class="bg-gray-800 rounded-xl shadow-lg p-4 flex items-center justify-between card-animate" style="animation-delay: ${index * 50}ms;">
-                        <div class="flex-grow pr-4 overflow-hidden">
-                            <div class="flex items-baseline">
-                                <h2 class="text-lg font-bold truncate">${place.name}</h2>
-                                <p class="text-blue-400 text-sm font-medium mr-3 flex-shrink-0">${formatDistance(place.distance)}</p>
+                    <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden flex flex-col card-animate" style="animation-delay: ${index * 70}ms;">
+                        <img src="${place.photo}" onerror="this.src='https://placehold.co/600x400/1a202c/ffffff?text=No+Image';" alt="${place.name}" class="w-full h-48 object-cover bg-gray-700">
+                        <div class="p-4 flex flex-col flex-grow">
+                            <div class="flex justify-between items-start mb-2">
+                                <h2 class="text-xl font-bold text-white">${place.name}</h2>
+                                <span class="flex-shrink-0 px-2 py-1 text-xs font-semibold text-white ${statusClass} rounded-full">${statusText}</span>
                             </div>
-                            <p class="text-gray-400 text-sm mt-1 truncate">${place.address}</p>
+                            
+                            <div class="flex items-center justify-between text-sm text-gray-300 mb-3 border-b border-gray-700 pb-3">
+                                <div class="flex items-center" title="امتیاز">
+                                    <svg class="h-4 w-4 text-yellow-400 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <span class="ml-1 font-semibold text-white">${ratingDisplay}</span><span class="text-gray-400">/5</span>
+                                </div>
+                                <div class="flex items-center" title="مسافت">
+                                     <svg class="h-4 w-4 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                    <span class="ml-1">${formatDistance(place.distance)}</span>
+                                </div>
+                                <div class="flex items-center" title="زمان پیاده روی">
+                                    <svg class="h-4 w-4 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                    <span class="ml-1">${walkTime} دقیقه</span>
+                                </div>
+                            </div>
+
+                            <p class="text-gray-400 text-sm mb-4 flex-grow">${place.address}</p>
+                            <button onclick="openDirections(${place.lat}, ${place.lon})" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                مسیریابی
+                            </button>
                         </div>
-                        <button onclick="openDirections(${place.lat}, ${place.lon})" class="flex-shrink-0 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            مسیریابی
-                        </button>
                     </div>
                 `;
                 placesList.innerHTML += cardHTML;
@@ -291,7 +291,7 @@
         }
         
         function updateActiveTab() {
-            const newTitle = categoryTitles[currentCategory];
+             const newTitle = categoryTitles[currentCategory];
             if (headerTitle.innerText !== newTitle) {
                 headerTitle.classList.add('title-animate');
                 headerTitle.innerText = newTitle;
@@ -311,14 +311,14 @@
         }
 
         function toggleHeaderButtons(isFetching) {
-            refreshButton.disabled = isFetching;
+             refreshButton.disabled = isFetching;
             gpsButton.disabled = isFetching;
             const icon = isFetching ? '<div class="h-6 w-6 spinner" style="border-left-color: #ffffff;"></div>' : '<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5M20 4h-5v5M4 20h5v-5" /></svg>';
             refreshButton.innerHTML = icon;
         }
 
         tabBar.addEventListener('click', (e) => {
-            const tabButton = e.target.closest('.tab-item');
+             const tabButton = e.target.closest('.tab-item');
             if (tabButton && !tabButton.disabled && tabButton.dataset.category !== currentCategory) {
                 currentCategory = tabButton.dataset.category;
                 updateActiveTab();
@@ -344,7 +344,7 @@
         }
 
         async function main() {
-            toggleHeaderButtons(true);
+             toggleHeaderButtons(true);
             statusDiv.style.display = 'flex';
             statusDiv.innerHTML = `<div class="spinner mb-4"></div><p class="text-lg text-gray-400">در حال دریافت موقعیت مکانی شما...</p>`;
             placesList.innerHTML = '';
