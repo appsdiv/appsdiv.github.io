@@ -122,6 +122,13 @@
       .lb-img{max-width:90vw;max-height:88vh}
       .lb-nav{padding:0 22px}
     }
+    /* اسکرول افقی مخصوص iPhone/Safari */
+.scroll-wrap{
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  padding-inline:8px; /* گاتر تا برشِ ستون اول اتفاق نیفته */
+}
+
   </style>
 
   <!-- Product JSON-LD -->
@@ -337,35 +344,63 @@
   </section>
 
   <!-- Specs & Composition -->
-  <section id="specs" class="max-w-6xl mx-auto px-4 mt-8">
-    <div class="rounded-2xl glass p-4">
-      <div class="section-head">
-        <div class="eyebrow">مشخصات فنی و مکانیکی</div>
-        <h2 class="h2">تلرانس‌ها، خواص و استانداردها</h2>
-      </div>
-      <div class="grid md:grid-cols-2 gap-4">
-        <!-- Table 1 -->
-        <table class="w-full text-sm rounded-xl overflow-hidden glass table-rows">
+<section id="specs" class="max-w-6xl mx-auto px-4 mt-8">
+  <div class="rounded-2xl glass p-4">
+    <div class="section-head">
+      <div class="eyebrow">مشخصات فنی و مکانیکی</div>
+      <h2 class="h2">تلرانس‌ها، خواص و استانداردها</h2>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4">
+      <!-- جدول 1: ابعادی/استانداردها -->
+      <div class="scroll-wrap" dir="ltr">
+        <table dir="rtl"
+               class="w-full text-sm rounded-xl overflow-hidden glass table-rows min-w-[520px]">
           <tbody>
             <tr><td class="p-3 text-ink/60 dark:text-white/60">قطر اسمی</td><td class="p-3 font-bold">9.5 میلی‌متر</td></tr>
             <tr><td class="p-3 text-ink/60 dark:text-white/60">تلرانس قطر</td><td class="p-3">±0.3 میلی‌متر</td></tr>
             <tr><td class="p-3 text-ink/60 dark:text-white/60">تلرانس اوالی</td><td class="p-3">حداکثر 0.3 میلی‌متر</td></tr>
-            <tr><td class="p-3 text-ink/60 dark:text-white/60">استانداردها</td><td class="p-3">GB/T6892 · ASTM B221 · ASTM B233 · GOST 13843–78 · EN 1715 · EN 755</td></tr>
+            <tr><td class="p-3 text-ink/60 dark:text-white/60">استانداردها</td>
+                <td class="p-3">GB/T6892 · ASTM B221 · ASTM B233 · GOST 13843–78 · EN 1715 · EN 755</td></tr>
           </tbody>
         </table>
-        <!-- Table 2 -->
-        <table class="w-full text-sm rounded-xl overflow-hidden glass table-rows">
+      </div>
+
+      <!-- جدول 2: خواص مکانیکی/الکتریکی (عریض) -->
+      <div class="scroll-wrap" dir="ltr">
+        <table dir="rtl"
+               class="w-full text-sm rounded-xl overflow-hidden glass table-rows min-w-[720px]">
           <thead>
-            <tr class="bg-black/5 dark:bg-white/10"><th class="p-3 text-right">آلیاژ</th><th class="p-3 text-right">استحکام کششی (MPa)</th><th class="p-3 text-right">افزایش طول (%)</th><th class="p-3 text-right">هدایت (%IACS)</th><th class="p-3 text-right">ρ (nΩ·m)</th></tr>
+            <tr class="bg-black/5 dark:bg-white/10">
+              <th class="p-3 text-right">آلیاژ</th>
+              <th class="p-3 text-right">استحکام کششی (MPa)</th>
+              <th class="p-3 text-right">افزایش طول (%)</th>
+              <th class="p-3 text-right">هدایت (%IACS)</th>
+              <th class="p-3 text-right">ρ (nΩ·m)</th>
+            </tr>
           </thead>
           <tbody>
-            <tr><td class="p-3 font-bold">6101-T4</td><td class="p-3">150–220</td><td class="p-3">≥10</td><td class="p-3">52</td><td class="p-3">≤35</td></tr>
-            <tr><td class="p-3 font-bold">6201-T4</td><td class="p-3">160–220</td><td class="p-3">≥10</td><td class="p-3">51</td><td class="p-3">≤36</td></tr>
+            <tr>
+              <td class="p-3 font-bold">6101-T4</td>
+              <td class="p-3">150–220</td>
+              <td class="p-3">≥10</td>
+              <td class="p-3">52</td>
+              <td class="p-3">≤35</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-bold">6201-T4</td>
+              <td class="p-3">160–220</td>
+              <td class="p-3">≥10</td>
+              <td class="p-3">51</td>
+              <td class="p-3">≤36</td>
+            </tr>
           </tbody>
         </table>
       </div>
     </div>
-  </section>
+  </div>
+</section>
+
 
   <section id="chem" class="max-w-6xl mx-auto px-4 mt-8">
     <div class="rounded-2xl glass p-4">
