@@ -25,14 +25,9 @@
     <style>
         body {
             font-family: 'Vazirmatn', sans-serif;
-            -webkit-tap-highlight-color: transparent; /* Disable tap highlight on iOS */
+            -webkit-tap-highlight-color: transparent;
         }
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.2);
-            border-left-color: #ffffff;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
+        .spinner, .icon-spin {
             animation: spin 1s linear infinite;
         }
         .safe-padding-bottom {
@@ -42,32 +37,50 @@
             animation: fadeInUp 0.5s ease-out forwards;
             opacity: 0;
         }
+        .title-animate {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .skeleton-card {
+            background-color: #1f2937; /* gray-800 */
+            border-radius: 0.75rem;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .skeleton-line {
+            background-color: #374151; /* gray-700 */
+            border-radius: 0.25rem;
+            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
         }
     </style>
 </head>
-<body class="bg-black text-white selection:bg-blue-500 selection:text-white">
+<body class="bg-black text-white selection:bg-blue-500 selection-text-white">
 
     <div id="app-container" class="min-h-screen pb-24">
         <!-- Header -->
         <header class="bg-gray-900/70 backdrop-blur-lg sticky top-0 z-10 border-b border-gray-800">
             <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-                 <button id="refresh-button" class="p-2 rounded-full hover:bg-gray-700 transition-colors">
+                 <button id="refresh-button" class="p-2 rounded-full hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-wait">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5M20 4h-5v5M4 20h5v-5" /></svg>
                 </button>
-                <h1 id="header-title" class="text-xl font-bold">کافه ها</h1>
-                 <button id="gps-button" class="p-2 rounded-full hover:bg-gray-700 transition-colors">
+                <h1 id="header-title" class="text-xl font-bold"></h1>
+                 <button id="gps-button" class="p-2 rounded-full hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-wait">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                 </button>
             </div>
@@ -76,10 +89,9 @@
         <!-- Main Content -->
         <main class="container mx-auto p-4">
             <div id="status" class="flex flex-col items-center justify-center text-center mt-16">
-                <div class="spinner mb-4"></div>
-                <p class="text-lg text-gray-400">در حال دریافت موقعیت مکانی شما...</p>
+                <!-- Initial loading spinner is shown here -->
             </div>
-            <div id="places-list" class="grid grid-cols-1 gap-4"></div>
+            <div id="places-list" class="grid grid-cols-1 gap-3"></div>
         </main>
     </div>
 
@@ -138,77 +150,122 @@
             wc: 'toilets',
             interesting: 'attraction'
         };
+
+        // --- Utility Functions ---
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the Earth in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c; // Distance in km
+        }
+
+        function formatDistance(km) {
+            if (km < 1) {
+                return `${Math.round(km * 1000)} متر`;
+            }
+            return `${km.toFixed(2)} کیلومتر`;
+        }
         
-        // --- Data Fetching with OpenStreetMap Overpass API ---
+        // --- Data Fetching with Timeout ---
+        async function fetchWithTimeout(resource, options = {}, timeout = 8000) {
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), timeout);
+            const response = await fetch(resource, {
+                ...options,
+                signal: controller.signal  
+            });
+            clearTimeout(id);
+            return response;
+        }
+
         async function fetchNearbyPlaces(latitude, longitude, category) {
-            const radius = 5000; // 5km radius
+            const radius = 5000;
             const amenity = osmPlaceTypes[category];
             const overpassApiUrl = 'https://overpass-api.de/api/interpreter';
-
-            // Overpass QL query to find amenities near the user
-            const query = `
-                [out:json][timeout:25];
-                (
-                  node["amenity"="${amenity}"](around:${radius},${latitude},${longitude});
-                  way["amenity"="${amenity}"](around:${radius},${latitude},${longitude});
-                  relation["amenity"="${amenity}"](around:${radius},${latitude},${longitude});
-                );
-                out center;
-            `;
+            const query = `[out:json][timeout:25];(node["amenity"="${amenity}"](around:${radius},${latitude},${longitude});way["amenity"="${amenity}"](around:${radius},${latitude},${longitude});relation["amenity"="${amenity}"](around:${radius},${latitude},${longitude}););out center;`;
 
             try {
-                const response = await fetch(overpassApiUrl, {
+                const response = await fetchWithTimeout(overpassApiUrl, {
                     method: 'POST',
                     body: new URLSearchParams({ data: query })
-                });
+                }, 10000); // 10 second timeout
 
-                if (!response.ok) {
-                    throw new Error(`Overpass API error: ${response.statusText}`);
-                }
+                if (!response.ok) throw new Error(`Overpass API error: ${response.statusText}`);
                 const data = await response.json();
 
                 return data.elements.map(place => {
                     const tags = place.tags || {};
-                    let address = [tags['addr:street'], tags['addr:housenumber'], tags['addr:city']].filter(Boolean).join(', ');
-                    if (!address) address = "آدرس نامشخص";
+                    let address = [tags['addr:city'], tags['addr:suburb'], tags['addr:street'], tags['addr:housenumber']].filter(Boolean).join('، ');
+                    if (!address) address = "آدرس در دسترس نیست";
                     
                     let lat, lon;
                     if (place.type === 'node') {
                         lat = place.lat;
                         lon = place.lon;
-                    } else if (place.center) { // For ways/relations
+                    } else if (place.center) {
                         lat = place.center.lat;
                         lon = place.center.lon;
                     }
+                    
+                    const distance = userLocation ? calculateDistance(userLocation.coords.latitude, userLocation.coords.longitude, lat, lon) : 0;
 
                     return {
                         id: place.id,
                         name: tags.name || "نام نامشخص",
-                        photo: `https://placehold.co/600x400/1a202c/ffffff?text=${encodeURIComponent(tags.name || "مکان")}`,
                         address: address,
                         lat: lat,
                         lon: lon,
+                        distance: distance,
                         category: category
                     };
-                }).filter(p => p.lat && p.lon && p.name !== "نام نامشخص"); // Filter out items with no name or coordinates
+                }).filter(p => p.lat && p.lon && p.name !== "نام نامشخص");
 
             } catch (error) {
                 console.error("Failed to fetch from Overpass API:", error);
-                statusDiv.innerHTML = `<p class="text-lg text-red-400 p-4 bg-red-900/50 rounded-lg">خطا در دریافت اطلاعات از OpenStreetMap.</p>`;
+                let message = "خطا در دریافت اطلاعات.";
+                if (error.name === 'AbortError') {
+                    message = "پاسخی از سرور دریافت نشد، لطفا دوباره تلاش کنید.";
+                }
+                statusDiv.innerHTML = `<p class="text-lg text-red-400 p-4 bg-red-900/50 rounded-lg">${message}</p>`;
                 return [];
             }
         }
 
         // --- UI Rendering ---
+        function showSkeletonLoader() {
+            placesList.innerHTML = '';
+            statusDiv.style.display = 'none';
+            for (let i = 0; i < 5; i++) {
+                placesList.innerHTML += `
+                    <div class="skeleton-card">
+                        <div class="w-2/3">
+                            <div class="skeleton-line h-5 w-48 mb-3"></div>
+                            <div class="skeleton-line h-4 w-full"></div>
+                        </div>
+                        <div class="skeleton-line h-12 w-24"></div>
+                    </div>
+                `;
+            }
+        }
+
         function renderPlaces() {
-            // No rating to sort by, so we just filter
             const placesToRender = allPlaces.filter(p => p.category === currentCategory);
+            placesToRender.sort((a, b) => a.distance - b.distance);
 
             placesList.innerHTML = '';
             
             if (placesToRender.length === 0) {
                  statusDiv.style.display = 'flex';
-                 statusDiv.innerHTML = `<p class="text-lg text-gray-400 mt-8">موردی در این دسته بندی یافت نشد.</p>`;
+                 statusDiv.innerHTML = `
+                    <div class="text-center text-gray-500">
+                        <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2H5a2 2 0 01-2-2z" /></svg>
+                        <p class="mt-4 text-lg">موردی در این دسته بندی یافت نشد.</p>
+                    </div>`;
                  return;
             } else {
                 statusDiv.style.display = 'none';
@@ -216,15 +273,17 @@
             
             placesToRender.forEach((place, index) => {
                 const cardHTML = `
-                    <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden flex flex-col card-animate" style="animation-delay: ${index * 100}ms;">
-                        <img src="${place.photo}" alt="${place.name}" class="w-full h-48 object-cover bg-gray-700">
-                        <div class="p-4 flex flex-col flex-grow">
-                            <h2 class="text-xl font-bold mb-3">${place.name}</h2>
-                            <p class="text-gray-400 text-sm mb-4 flex-grow">${place.address}</p>
-                            <button onclick="openDirections(${place.lat}, ${place.lon})" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                مسیریابی
-                            </button>
+                    <div class="bg-gray-800 rounded-xl shadow-lg p-4 flex items-center justify-between card-animate" style="animation-delay: ${index * 50}ms;">
+                        <div class="flex-grow pr-4 overflow-hidden">
+                            <div class="flex items-baseline">
+                                <h2 class="text-lg font-bold truncate">${place.name}</h2>
+                                <p class="text-blue-400 text-sm font-medium mr-3 flex-shrink-0">${formatDistance(place.distance)}</p>
+                            </div>
+                            <p class="text-gray-400 text-sm mt-1 truncate">${place.address}</p>
                         </div>
+                        <button onclick="openDirections(${place.lat}, ${place.lon})" class="flex-shrink-0 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            مسیریابی
+                        </button>
                     </div>
                 `;
                 placesList.innerHTML += cardHTML;
@@ -232,7 +291,14 @@
         }
         
         function updateActiveTab() {
-            headerTitle.innerText = categoryTitles[currentCategory];
+            const newTitle = categoryTitles[currentCategory];
+            if (headerTitle.innerText !== newTitle) {
+                headerTitle.classList.add('title-animate');
+                headerTitle.innerText = newTitle;
+                headerTitle.addEventListener('animationend', () => {
+                    headerTitle.classList.remove('title-animate');
+                }, { once: true });
+            }
             document.querySelectorAll('.tab-item').forEach(item => {
                 item.classList.toggle('text-blue-500', item.dataset.category === currentCategory);
                 item.classList.toggle('text-gray-400', item.dataset.category !== currentCategory);
@@ -244,14 +310,19 @@
             window.open(`https://www.google.com/maps?daddr=${lat},${lon}`, '_blank');
         }
 
+        function toggleHeaderButtons(isFetching) {
+            refreshButton.disabled = isFetching;
+            gpsButton.disabled = isFetching;
+            const icon = isFetching ? '<div class="h-6 w-6 spinner" style="border-left-color: #ffffff;"></div>' : '<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5M20 4h-5v5M4 20h5v-5" /></svg>';
+            refreshButton.innerHTML = icon;
+        }
+
         tabBar.addEventListener('click', (e) => {
             const tabButton = e.target.closest('.tab-item');
-            if (tabButton && tabButton.dataset.category !== currentCategory) {
+            if (tabButton && !tabButton.disabled && tabButton.dataset.category !== currentCategory) {
                 currentCategory = tabButton.dataset.category;
                 updateActiveTab();
-                if (userLocation) {
-                    handleDataFetch();
-                }
+                if (userLocation) handleDataFetch();
             }
         });
         
@@ -260,20 +331,20 @@
 
         async function handleDataFetch() {
             if (!userLocation) {
-                console.error("Cannot fetch data without user location.");
                 statusDiv.innerHTML = `<p class="text-lg text-red-400">ابتدا موقعیت مکانی را مشخص کنید.</p>`;
                 return;
             }
-            statusDiv.style.display = 'flex';
-            statusDiv.innerHTML = `<div class="spinner mb-4"></div><p class="text-lg text-gray-300">در حال جستجوی ${categoryTitles[currentCategory]}...</p>`;
-            placesList.innerHTML = '';
+            toggleHeaderButtons(true);
+            showSkeletonLoader();
             
             const { latitude, longitude } = userLocation.coords;
             allPlaces = await fetchNearbyPlaces(latitude, longitude, currentCategory);
             renderPlaces();
+            toggleHeaderButtons(false);
         }
 
         async function main() {
+            toggleHeaderButtons(true);
             statusDiv.style.display = 'flex';
             statusDiv.innerHTML = `<div class="spinner mb-4"></div><p class="text-lg text-gray-400">در حال دریافت موقعیت مکانی شما...</p>`;
             placesList.innerHTML = '';
@@ -287,8 +358,7 @@
                     navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
                 });
                 
-                handleDataFetch();
-
+                await handleDataFetch();
             } catch (error) {
                  let errorMessage = "خطایی در دریافت موقعیت مکانی رخ داد.";
                 if (error.code) {
@@ -299,10 +369,14 @@
                     }
                 }
                 statusDiv.innerHTML = `<p class="text-lg text-red-400 p-4 bg-red-900/50 rounded-lg">${errorMessage}</p>`;
+                toggleHeaderButtons(false);
             }
         }
         
-        window.addEventListener('load', main);
+        window.addEventListener('load', () => {
+            updateActiveTab();
+            main();
+        });
 
     </script>
 </body>
