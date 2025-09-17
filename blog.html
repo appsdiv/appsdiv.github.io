@@ -3,204 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog Posts | Excellent Design</title>
+    <title>Blog | Aluminum Manufacturing Insights</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* Base styles */
+        /* CSS Variables for a Dark, Industrial Glassmorphic Theme */
         :root {
-            --background-color: #f4f6f9;
-            --card-background: #ffffff;
-            --text-primary: #1d2d44;
-            --text-secondary: #5a6a7e;
-            --shadow-color: rgba(67, 86, 100, 0.15);
+            --glass-bg: rgba(255, 255, 255, 0.08); /* More subtle, darker glass */
+            --glass-border: rgba(255, 255, 255, 0.15); /* Faint border */
+            --glass-shadow: rgba(0, 0, 0, 0.2); /* Deeper shadow for depth */
+            --dark-background-start: #1e3c72; /* Darker blue for industrial feel */
+            --dark-background-end: #2a5298; /* Another dark blue */
+            --text-primary-light: #e0e0e0; /* Light text for dark background */
+            --text-secondary-light: #b0c4de; /* Softer light text */
+            --steel-blue-light: #aabed8; /* Accent color */
         }
 
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-primary);
+            background-color: var(--dark-background-start); /* Fallback */
+            color: var(--text-primary-light);
             margin: 0;
             padding: 40px 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
-        }
-
-        /* Header */
-        h1 {
-            font-size: clamp(2rem, 5vw, 2.8rem); /* Responsive font size */
-            font-weight: 800;
-            margin-bottom: 50px;
+            min-height: 100vh;
             position: relative;
-            padding-bottom: 15px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+            overflow-x: hidden; /* Prevent horizontal scroll */
         }
 
-        h1::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            right: 50%;
-            transform: translateX(50%);
-            width: 100px;
-            height: 5px;
-            background: linear-gradient(to left, #00c6ff, #0072ff);
-            border-radius: 3px;
-        }
-
-        /* Posts Container */
-        #posts-container {
+        /* Gradient Background - Darker for industrial feel */
+        .background-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 1200px; /* Wider for desktop */
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 35px;
+            height: 100%;
+            background: linear-gradient(135deg, var(--dark-background-start) 0%, var(--dark-background-end) 100%);
+            z-index: -2;
+            transition: opacity 0.5s ease;
         }
 
-        /* Individual Post Card */
-        .post {
-            background-color: var(--card-background);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px -10px var(--shadow-color);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            display: flex; /* Key for consistent height */
-            flex-direction: column;
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            z-index: 1; /* Ensure content is above background */
         }
 
-        .post:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px -10px var(--shadow-color);
-        }
-
-        /* Virtual Post Cover (Header) - TALLER and DYNAMIC */
-        .post-header {
+        .page-title {
+            font-size: clamp(2.2rem, 5vw, 3rem); /* Slightly larger */
+            font-weight: 700;
+            margin-bottom: 60px; /* More space */
+            text-align: center;
             position: relative;
-            height: 240px; /* Increased height */
+            color: var(--text-primary-light);
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Stronger shadow */
+            letter-spacing: 1px; /* Subtle spacing */
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Slightly smaller min-width */
+            gap: 30px;
+            perspective: 1000px;
+        }
+
+        /* Glassmorphism Post Card - Enhanced */
+        .post-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            backdrop-filter: blur(20px); /* Increased blur */
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 10px 40px 0 var(--glass-shadow); /* More pronounced shadow */
+            transition: none; /* Removed transition for static cards */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Hover effect removed */
+        .post-card:hover {
+            transform: none;
+            box-shadow: 0 10px 40px 0 var(--glass-shadow);
+        }
+
+        .post-header-glass {
+            position: relative;
+            height: 200px; /* Slightly shorter header */
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 20px; /* Reduced padding */
             overflow: hidden;
             text-align: center;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.1); /* Slight dark tint for header background */
         }
-
-        /* Glassmorphism Effect & Pattern */
-        .post-header::before {
-            content: '';
+        
+        .header-overlay {
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-image:
-                radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-                radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
-            background-position: 0 0, 10px 10px;
-            backdrop-filter: blur(4px) saturate(150%); /* Frosted glass effect */
-            -webkit-backdrop-filter: blur(4px) saturate(150%);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.03); /* Very subtle overlay */
+            z-index: 0;
         }
 
-        /* Post Title - High Contrast */
-        .post-title {
+        .post-title-glass {
+            position: relative;
             margin: 0;
-            font-size: clamp(1.5rem, 4vw, 1.8rem);
-            font-weight: 800;
-            color: #ffffff;
+            font-size: clamp(1.5rem, 4vw, 1.8rem); /* Slightly larger title */
+            font-weight: 700;
+            color: var(--text-primary-light);
             z-index: 1;
-            padding: 0 15px;
-            text-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
             line-height: 1.4;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Softer title shadow */
         }
 
-        /* Post Body (Content area below header) */
-        .post-body {
+        /* Light background for post content */
+        .post-body-glass {
             padding: 25px;
             display: flex;
             flex-direction: column;
-            flex-grow: 1; /* This makes the card body expand, ensuring consistent overall size */
+            flex-grow: 1;
+            background: rgba(255, 255, 255, 0.7); /* Light translucent background */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
-        .post-content {
+        .post-content-glass {
             font-size: 1rem;
-            line-height: 1.8;
-            color: var(--text-secondary);
-            flex-grow: 1; /* Pushes meta/tags to the bottom */
+            line-height: 1.7;
+            color: var(--dark-background-start); /* Text color changed for light background */
+            flex-grow: 1;
             margin-bottom: 20px;
         }
-        
-        /* Post Meta (Date) */
-        .post-meta {
-            font-size: 0.9em;
-            color: #a0a0a0;
+
+        .post-meta-glass {
+            font-size: 0.85rem;
+            color: var(--dark-background-end); /* Text color changed for light background */
+            opacity: 0.8; 
             padding-top: 15px;
-            border-top: 1px solid #eef2f5;
+            border-top: 1px solid rgba(0, 0, 0, 0.1); /* Lighter border */
         }
 
-        /* Post Tags */
-        .post-tags {
+        .post-tags-glass {
             margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #eef2f5;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px; /* Increased gap */
         }
 
-        .tag {
+        /* Tags Redesigned: No underline, no solid white background */
+        .tag-glass {
             display: inline-block;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 700;
-            margin-left: 8px;
-            margin-bottom: 8px;
-            transition: transform 0.2s ease;
+            padding: 8px 18px;
+            border-radius: 25px; /* More pill-shaped */
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: none;
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.1); /* Very subtle border */
+            background: rgba(0, 0, 0, 0.05); /* Very slight tint */
+            color: var(--dark-background-end); /* Accent color for tags */
+            backdrop-filter: blur(8px); /* Subtle blur for tags */
+            -webkit-backdrop-filter: blur(8px);
+            text-decoration: none; /* Explicitly remove underline */
         }
-        .tag:hover {
-            transform: translateY(-2px);
+        
+        .tag-glass:hover {
+            background: none; /* Hover effect removed */
+            transform: none;
+            color: var(--dark-background-start);
         }
-
-        /* Status Message */
-        #status {
-            font-size: 1.3em;
+        
+        /* Status Message - Integrated into glassmorphism */
+        .status-message {
+            font-size: 1.2em;
             padding: 20px 30px;
-            background-color: var(--card-background);
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            color: var(--dark-background-start);
+            margin-bottom: 30px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
-    <h1>آخرین مقالات</h1>
-    <div id="status">در حال بارگذاری...</div>
-    <div id="posts-container"></div>
+    <div class="background-gradient"></div>
+    <main class="container">
+        <h1 class="page-title">مقالات و دانش فنی</h1>
+        <div id="status" class="status-message">در حال بارگذاری...</div>
+        <div id="posts-container" class="posts-grid"></div>
+    </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const postsContainer = document.getElementById('posts-container');
             const statusElement = document.getElementById('status');
             
-            // --- DYNAMIC THEMES ARRAY ---
-            const themes = [
-                { gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', tagBg: 'rgba(255,255,255,0.2)', tagColor: '#fff' },
-                { gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)', tagBg: 'rgba(255,255,255,0.3)', tagColor: '#c5393d' },
-                { gradient: 'linear-gradient(135deg, #2af598 0%, #009efd 100%)', tagBg: 'rgba(255,255,255,0.2)', tagColor: '#fff' },
-                { gradient: 'linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%)', tagBg: 'rgba(255,255,255,0.25)', tagColor: '#fff' },
-                { gradient: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)', tagBg: 'rgba(255,255,255,0.3)', tagColor: '#b95c42' },
-                { gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', tagBg: 'rgba(255,255,255,0.2)', tagColor: '#fff' }
-            ];
-
-            const apiUrl = 'https://elkamehr2.chbk.app/api/blog/posts';
+            // Updated API endpoint to fetch latest 5 posts
+            const apiUrl = 'https://elkamehr2.chbk.app/api/blog/posts/latest?limit=5';
             const bearerToken = 'ed88f53d8919ec21425624fad3824bdf08a32284';
 
-            const headers = new Headers({
-                'Authorization': `Bearer ${bearerToken}`,
-                'Accept': 'application/json'
-            });
+            const headers = new Headers({'Authorization': `Bearer ${bearerToken}`, 'Accept': 'application/json'});
 
             fetch(apiUrl, { method: 'GET', headers: headers })
-            .then(response => response.ok ? response.json() : Promise.reject(`HTTP error! Status: ${response.status}`))
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(apiResponse => {
                 if (apiResponse?.items?.length) {
                     statusElement.style.display = 'none';
@@ -211,63 +235,59 @@
             })
             .catch(error => {
                 console.error('Error fetching blog posts:', error);
-                statusElement.textContent = `خطا در بارگذاری پست ها.`;
+                statusElement.textContent = `خطا در بارگذاری پست ها: ${error.message}.`;
             });
 
             function displayPosts(posts) {
                 postsContainer.innerHTML = '';
 
-                posts.forEach((post, index) => {
+                posts.forEach(post => {
                     const postElement = document.createElement('div');
-                    postElement.classList.add('post');
+                    postElement.classList.add('post-card');
 
-                    // --- Apply Dynamic Theme ---
-                    const currentTheme = themes[index % themes.length];
-                    
-                    // --- Virtual Cover ---
                     const postHeader = document.createElement('div');
-                    postHeader.classList.add('post-header');
-                    postHeader.style.background = currentTheme.gradient; // Set dynamic background
+                    postHeader.classList.add('post-header-glass');
+                    
+                    const headerOverlay = document.createElement('div');
+                    headerOverlay.classList.add('header-overlay');
+                    postHeader.appendChild(headerOverlay);
 
                     const titleElement = document.createElement('h2');
-                    titleElement.classList.add('post-title');
+                    titleElement.classList.add('post-title-glass');
                     titleElement.textContent = (post.json_ld?.headline) || post.title || 'بدون عنوان';
                     postHeader.appendChild(titleElement);
-                    postElement.appendChild(postHeader);
 
-                    // --- Post Body ---
                     const postBodyWrapper = document.createElement('div');
-                    postBodyWrapper.classList.add('post-body');
+                    postBodyWrapper.classList.add('post-body-glass');
 
                     const contentElement = document.createElement('div');
-                    contentElement.classList.add('post-content');
+                    contentElement.classList.add('post-content-glass');
                     contentElement.textContent = post.json_ld?.description || 'محتوایی برای نمایش وجود ندارد.';
-                    postBodyWrapper.appendChild(contentElement);
                     
                     const metaElement = document.createElement('div');
-                    metaElement.classList.add('post-meta');
+                    metaElement.classList.add('post-meta-glass');
                     if (post.published_at) {
                         const publishDate = new Date(post.published_at);
                         metaElement.textContent = `تاریخ انتشار: ${publishDate.toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' })}`;
                     }
-                    postBodyWrapper.appendChild(metaElement);
 
-                    // --- Tags with Dynamic Theme ---
+                    postBodyWrapper.appendChild(contentElement);
+                    postBodyWrapper.appendChild(metaElement);
+                    
                     if (post.tags?.length) {
                         const tagsContainer = document.createElement('div');
-                        tagsContainer.classList.add('post-tags');
+                        tagsContainer.classList.add('post-tags-glass');
                         post.tags.forEach(tagData => {
-                            const tagElement = document.createElement('span');
-                            tagElement.classList.add('tag');
+                            const tagElement = document.createElement('a');
+                            tagElement.href = '#'; // Placeholder link
+                            tagElement.classList.add('tag-glass');
                             tagElement.textContent = tagData.name;
-                            // Apply theme to tags
-                            tagElement.style.backgroundColor = currentTheme.tagBg;
-                            tagElement.style.color = currentTheme.tagColor;
                             tagsContainer.appendChild(tagElement);
                         });
                         postBodyWrapper.appendChild(tagsContainer);
                     }
                     
+                    postElement.appendChild(postHeader);
                     postElement.appendChild(postBodyWrapper);
                     postsContainer.appendChild(postElement);
                 });
