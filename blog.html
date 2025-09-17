@@ -4,78 +4,194 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog Posts</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* Base styles */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f4f4f9;
+            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5; /* Lighter background */
             color: #333;
             margin: 0;
-            padding: 20px;
+            padding: 30px 20px; /* More padding */
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
 
+        /* Header */
         h1 {
             color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
+            font-size: 2.8em; /* Larger title */
+            margin-bottom: 40px; /* More spacing */
+            position: relative;
+            padding-bottom: 15px;
         }
 
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px; /* Underline effect */
+            height: 4px;
+            background: linear-gradient(to right, #3498db, #8e44ad); /* Gradient underline */
+            border-radius: 2px;
+        }
+
+        /* Posts Container */
         #posts-container {
-            max-width: 800px;
+            max-width: 900px; /* Wider container */
             width: 100%;
             margin-top: 20px;
+            display: grid; /* Use grid for layout */
+            grid-template-columns: 1fr; /* Single column for now, could be 2 for larger screens */
+            gap: 30px; /* Spacing between posts */
+        }
+        @media (min-width: 768px) {
+            #posts-container {
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); /* Two columns on larger screens */
+            }
         }
 
+
+        /* Individual Post Card */
         .post {
             background-color: #ffffff;
-            border-radius: 8px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-            /* Styling for Right-to-Left text (Persian/Arabic) */
+            border-radius: 12px; /* Softer corners */
+            overflow: hidden; /* Important for border-radius on children */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Stronger, softer shadow */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            border: 1px solid #e0e0e0; /* Subtle border */
+            /* RTL specific */
             direction: rtl;
             text-align: right;
-            border-left: 5px solid #3498db;
+            display: flex;
+            flex-direction: column;
         }
 
-        .post h2 {
-            margin-top: 0;
-            color: #2c3e50;
-            font-size: 1.8em;
+        .post:hover {
+            transform: translateY(-8px); /* Lift effect on hover */
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
         }
-        
-        .post-meta {
-            font-size: 0.9em;
-            color: #7f8c8d;
-            margin-bottom: 20px;
+
+        /* Virtual Post Cover (Header) */
+        .post-header {
+            position: relative;
+            height: 180px; /* Fixed height for the cover area */
+            background-color: #4a69bd; /* Base color for the header */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+            border-bottom: 3px solid #6c5ce7; /* Accent border */
+        }
+
+        /* Abstract background pattern for the virtual cover */
+        .post-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at top left, rgba(255,255,255,0.1) 0%, transparent 40%),
+                radial-gradient(circle at bottom right, rgba(255,255,255,0.1) 0%, transparent 40%),
+                linear-gradient(135deg, rgba(255,255,255,0.05) 25%, transparent 25%),
+                linear-gradient(225deg, rgba(255,255,255,0.05) 25%, transparent 25%) alternate;
+            background-size: 80px 80px;
+            opacity: 0.8;
+            mix-blend-mode: overlay;
+        }
+
+        /* Post Icon (optional, for visual interest) */
+        .post-icon {
+            font-size: 3em;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 10px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            z-index: 1; /* Ensure it's above the ::before content */
+        }
+
+
+        /* Post Title with Gradient Effect */
+        .post-title {
+            margin: 0;
+            font-size: 1.8em; /* Adjusted size for cover */
+            font-weight: 700;
+            text-align: center;
+            z-index: 1;
+            padding: 0 10px;
+            /* Gradient Text Effect */
+            background: linear-gradient(45deg, #FF6B6B, #FFD93D, #6BCB77, #4D8EFF);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent; /* Makes text transparent so background gradient shows */
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Soft shadow for readability */
+            line-height: 1.3;
+        }
+
+        /* Post Body (Content area below header) */
+        .post-body {
+            padding: 25px;
+            flex-grow: 1; /* Allows content area to fill available space */
+            display: flex;
+            flex-direction: column;
         }
 
         .post-content {
             line-height: 1.7;
             color: #555;
             margin-bottom: 20px;
+            flex-grow: 1; /* Allows content to take up space */
         }
         
+        /* Post Meta (Date) */
+        .post-meta {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 10px;
+        }
+
+        /* Post Tags */
         .post-tags {
-            margin-top: 20px;
+            margin-top: 15px; /* Adjust spacing */
+            padding-top: 10px;
+            border-top: 1px dashed #eee;
         }
 
         .tag {
             display: inline-block;
-            background-color: #ecf0f1;
-            color: #34495e;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.85em;
-            margin-left: 8px;
+            background-color: #e6e6fa; /* Lighter, subtle tag color */
+            color: #6a5acd; /* Purple-ish text */
+            padding: 6px 14px;
+            border-radius: 20px; /* More rounded pills */
+            font-size: 0.8em;
+            margin-left: 8px; /* For RTL, margin-left for spacing */
             margin-bottom: 8px;
+            transition: background-color 0.2s ease;
         }
 
+        .tag:hover {
+            background-color: #d1c4e9; /* Slightly darker on hover */
+        }
+
+
+        /* Status Message */
         #status {
-            font-size: 1.2em;
+            font-size: 1.3em;
             color: #7f8c8d;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
         }
     </style>
 </head>
@@ -127,46 +243,69 @@
                     const postElement = document.createElement('div');
                     postElement.classList.add('post');
 
-                    // 1. Get Title
-                    const titleElement = document.createElement('h2');
-                    titleElement.textContent = post.title || 'Untitled Post';
+                    // --- VIRTUAL COVER / HEADER ---
+                    const postHeader = document.createElement('div');
+                    postHeader.classList.add('post-header');
+                    
+                    // Optional: Add a subtle icon (using a simple text char for simplicity)
+                    const postIcon = document.createElement('div');
+                    postIcon.classList.add('post-icon');
+                    postIcon.textContent = '📝'; // A simple pencil icon
+                    postHeader.appendChild(postIcon);
 
-                    // 2. Get and Format Publication Date
+                    // Post Title with Gradient
+                    const titleElement = document.createElement('h2');
+                    titleElement.classList.add('post-title');
+                    // Use json_ld.headline if available, otherwise fallback to title
+                    titleElement.textContent = (post.json_ld && post.json_ld.headline) ? post.json_ld.headline : (post.title || 'Untitled Post');
+                    postHeader.appendChild(titleElement);
+                    postElement.appendChild(postHeader);
+
+                    // --- POST BODY CONTENT ---
+                    const postBodyWrapper = document.createElement('div');
+                    postBodyWrapper.classList.add('post-body');
+
+                    // Publication Date
                     const metaElement = document.createElement('div');
                     metaElement.classList.add('post-meta');
                     if (post.published_at) {
                         const publishDate = new Date(post.published_at);
-                        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
                         metaElement.textContent = `منتشر شده در: ${publishDate.toLocaleDateString('fa-IR', options)}`;
-                    }
-
-                    // 3. Get Content from the nested json_ld object
-                    const bodyElement = document.createElement('div');
-                    bodyElement.classList.add('post-content');
-                    if (post.json_ld && post.json_ld.description) {
-                        bodyElement.textContent = post.json_ld.description;
                     } else {
-                        bodyElement.textContent = 'No content available.';
+                        metaElement.textContent = 'تاریخ انتشار نامشخص';
                     }
+                    postBodyWrapper.appendChild(metaElement);
+
+                    // Content from json_ld.description
+                    const contentElement = document.createElement('div');
+                    contentElement.classList.add('post-content');
+                    if (post.json_ld && post.json_ld.description) {
+                        contentElement.textContent = post.json_ld.description;
+                    } else {
+                        contentElement.textContent = 'No content available.';
+                    }
+                    postBodyWrapper.appendChild(contentElement);
                     
-                    // 4. Create and Display Tags
+                    // Tags
                     const tagsContainer = document.createElement('div');
                     tagsContainer.classList.add('post-tags');
-                    if (post.tags && Array.isArray(post.tags)) {
+                    if (post.tags && Array.isArray(post.tags) && post.tags.length > 0) {
                         post.tags.forEach(tagData => {
                             const tagElement = document.createElement('span');
                             tagElement.classList.add('tag');
                             tagElement.textContent = tagData.name;
                             tagsContainer.appendChild(tagElement);
                         });
+                    } else {
+                         const noTagsElement = document.createElement('span');
+                         noTagsElement.classList.add('tag');
+                         noTagsElement.textContent = 'بدون برچسب'; // "No tags"
+                         tagsContainer.appendChild(noTagsElement);
                     }
+                    postBodyWrapper.appendChild(tagsContainer);
 
-                    // Append all parts to the main post element
-                    postElement.appendChild(titleElement);
-                    postElement.appendChild(metaElement);
-                    postElement.appendChild(bodyElement);
-                    postElement.appendChild(tagsContainer);
-
+                    postElement.appendChild(postBodyWrapper);
                     postsContainer.appendChild(postElement);
                 });
             }
