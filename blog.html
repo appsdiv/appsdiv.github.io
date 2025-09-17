@@ -66,9 +66,10 @@
             const postsContainer = document.getElementById('posts-container');
             const statusElement = document.getElementById('status');
             
-            // API details with the HTTPS fix
+            // API details
             const apiUrl = 'https://elkamehr2.chbk.app/api/blog/posts';
-            const bearerToken = '96097ca61d17bee21bf9d706dcc5fb5fc6576b60';
+            // UPDATED: New bearer token
+            const bearerToken = 'ed88f53d8919ec21425624fad3824bdf08a32284';
 
             const headers = new Headers({
                 'Authorization': `Bearer ${bearerToken}`,
@@ -86,7 +87,6 @@
                 return response.json();
             })
             .then(apiResponse => {
-                // MODIFIED: Check for the 'items' array
                 if (apiResponse && Array.isArray(apiResponse.items) && apiResponse.items.length > 0) {
                     statusElement.style.display = 'none';
                     displayPosts(apiResponse.items);
@@ -111,7 +111,6 @@
                     titleElement.textContent = post.title || 'Untitled Post';
 
                     const bodyElement = document.createElement('div');
-                    // MODIFIED: Use the 'html' property for the body content
                     bodyElement.innerHTML = post.html || 'No content available.';
 
                     postElement.appendChild(titleElement);
