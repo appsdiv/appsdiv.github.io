@@ -9,23 +9,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* Refined CSS Variables for an Industrial Glassmorphic Theme */
+        /* iOS Light Mode Inspired CSS Variables */
         :root {
-            --glass-bg-primary: rgba(255, 255, 255, 0.08);
-            --glass-bg-secondary: rgba(255, 255, 255, 0.75); /* Lighter for content area */
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-shadow: rgba(0, 0, 0, 0.3);
-            --dark-blue-primary: #1e3c72;
-            --dark-blue-secondary: #2a5298;
-            --light-text: #e0e0e0;
-            --dark-text: #1a1a1a;
-            --accent-color: #f7a436; /* A pop of industrial orange/yellow */
+            --background-color: #ffffff;
+            --card-background: #f9f9f9;
+            --card-border: #e0e0e0;
+            --card-shadow: rgba(0, 0, 0, 0.05);
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --accent-blue: #007aff;
+            --tag-background: #e9e9eb;
         }
 
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: var(--dark-blue-primary);
-            color: var(--light-text);
+            background-color: var(--background-color);
+            color: var(--text-primary);
             margin: 0;
             padding: 40px 15px;
             display: flex;
@@ -34,7 +33,6 @@
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
-            background: linear-gradient(135deg, var(--dark-blue-primary) 0%, var(--dark-blue-secondary) 100%);
         }
 
         .container {
@@ -49,11 +47,10 @@
             margin-bottom: 60px;
             text-align: center;
             position: relative;
-            color: var(--light-text);
-            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            color: var(--text-primary);
+            text-shadow: none;
         }
         
-        /* Underline for the title */
         .page-title::after {
             content: '';
             position: absolute;
@@ -62,7 +59,7 @@
             transform: translateX(50%);
             width: 120px;
             height: 4px;
-            background-color: var(--accent-color);
+            background-color: var(--accent-blue);
             border-radius: 2px;
         }
 
@@ -70,26 +67,23 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 30px;
-            perspective: 1000px;
         }
 
-        /* Refined Post Card */
+        /* Post Card (Light Mode) */
         .post-card {
-            background: var(--glass-bg-primary);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 10px 40px 0 var(--glass-shadow);
+            background: var(--card-background);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
-        /* Hover effects are intentionally removed */
         .post-card:hover {
-            transform: none;
-            box-shadow: 0 10px 40px 0 var(--glass-shadow);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px var(--card-shadow);
         }
 
         .post-header {
@@ -101,18 +95,12 @@
             padding: 20px;
             overflow: hidden;
             text-align: center;
-            border-bottom: 1px solid var(--glass-border);
-            background: rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #e9e9eb 0%, #d1d1d6 100%);
+            border-bottom: 1px solid var(--card-border);
         }
         
         .header-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.03);
-            z-index: 0;
+            display: none; /* Not needed for this light style */
         }
 
         .post-title {
@@ -120,108 +108,113 @@
             margin: 0;
             font-size: clamp(1.5rem, 4vw, 1.8rem);
             font-weight: 700;
-            color: var(--light-text);
-            z-index: 1;
+            color: var(--text-primary);
             line-height: 1.4;
-            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            text-shadow: none;
         }
 
-        /* Light, iOS-style background for post body */
+        /* Post Body (White Background) */
         .post-body {
             padding: 25px;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
-            background: var(--glass-bg-secondary);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            color: var(--dark-text); /* Use dark text for light background */
+            background: var(--background-color);
+            color: var(--text-primary);
         }
-        
-        /* New container for the full post HTML */
+
+        /* Styling for content injected from API HTML */
         .post-full-html-content {
             font-size: 1rem;
             line-height: 1.7;
-            color: var(--dark-text);
+            color: var(--text-secondary);
             flex-grow: 1;
         }
-        
-        /* Style adjustments for elements inside the fetched HTML */
+
         .post-full-html-content h3, 
         .post-full-html-content h4 {
-            color: var(--dark-blue-primary);
+            color: var(--text-primary);
             font-weight: 700;
-            margin-top: 2em;
+            margin-top: 1.5em;
             margin-bottom: 0.5em;
         }
         .post-full-html-content p, 
-        .post-full-html-content li, 
-        .post-full-html-content a {
-            color: var(--dark-text);
+        .post-full-html-content li {
+            color: var(--text-secondary);
+            margin-bottom: 1em;
         }
         .post-full-html-content a {
-            color: var(--dark-blue-secondary);
+            color: var(--accent-blue);
             font-weight: 600;
-            text-decoration: underline;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .post-full-html-content a:hover {
+            color: #005bb5;
         }
         .post-full-html-content table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 2em;
+            background-color: var(--card-background);
+            border-radius: 8px;
+            overflow: hidden;
         }
         .post-full-html-content th,
         .post-full-html-content td {
-            border: 1px solid rgba(0,0,0,0.1);
-            padding: 10px;
+            border: 1px solid var(--card-border);
+            padding: 12px;
             text-align: right;
+        }
+        .post-full-html-content thead {
+            background-color: var(--card-border);
+        }
+        .post-full-html-content tr:nth-child(even) {
+            background-color: #f0f0f0;
         }
 
         .post-meta {
             font-size: 0.85rem;
-            color: var(--dark-blue-secondary);
+            color: var(--text-secondary);
             opacity: 0.8;
             padding-top: 15px;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            border-top: 1px solid var(--card-border);
         }
 
         .post-tags {
             margin-top: 15px;
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
         }
 
-        /* Refined Tags */
+        /* Modern Pill-Shaped Tags */
         .tag {
             display: inline-block;
-            padding: 8px 18px;
-            border-radius: 25px;
+            padding: 6px 14px;
+            border-radius: 16px;
             font-size: 0.8rem;
             font-weight: 600;
-            transition: none;
-            cursor: pointer;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            background: rgba(0, 0, 0, 0.05);
-            color: var(--dark-blue-secondary);
+            background: var(--tag-background);
+            color: var(--accent-blue);
             text-decoration: none;
         }
         
+        /* Removed tag hover effects for a static, clean look */
         .tag:hover {
-            background: none;
             transform: none;
-            color: var(--dark-blue-primary);
+            color: var(--accent-blue);
+            background: var(--tag-background);
         }
         
         .status-message {
             font-size: 1.2em;
             padding: 20px 30px;
-            background: var(--glass-bg-secondary);
-            border-radius: 15px;
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            color: var(--dark-text);
+            background: var(--card-background);
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 15px var(--card-shadow);
+            color: var(--text-primary);
             margin-bottom: 30px;
             text-align: center;
         }
@@ -275,10 +268,6 @@
                     const postHeader = document.createElement('div');
                     postHeader.classList.add('post-header');
                     
-                    const headerOverlay = document.createElement('div');
-                    headerOverlay.classList.add('header-overlay');
-                    postHeader.appendChild(headerOverlay);
-
                     const titleElement = document.createElement('h2');
                     titleElement.classList.add('post-title');
                     titleElement.textContent = (post.json_ld?.headline) || post.title || 'بدون عنوان';
