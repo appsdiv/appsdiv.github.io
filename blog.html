@@ -210,7 +210,8 @@
             const postsContainer = document.getElementById('posts-container');
             const statusElement = document.getElementById('status');
             
-            const apiUrl = 'https://elkamehr2.chbk.app/api/blog/posts/latest?limit=5';
+            // Updated API endpoint to fetch all posts
+            const apiUrl = 'https://elkamehr2.chbk.app/api/blog/posts';
             const bearerToken = 'ed88f53d8919ec21425624fad3824bdf08a32284';
 
             const headers = new Headers({'Authorization': `Bearer ${bearerToken}`, 'Accept': 'application/json'});
