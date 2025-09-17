@@ -30,16 +30,13 @@
 
         .post {
             background-color: #ffffff;
-            border: 1px solid #ddd;
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-            transition: box-shadow 0.3s ease-in-out;
-        }
-
-        .post:hover {
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            /* Styling for Right-to-Left text */
+            direction: rtl;
+            text-align: right;
         }
 
         .post h2 {
@@ -69,54 +66,44 @@
             const postsContainer = document.getElementById('posts-container');
             const statusElement = document.getElementById('status');
             
-            // API details
+            // API details with the HTTPS fix
             const apiUrl = 'https://elkamehr2.chbk.app/api/blog/posts';
             const bearerToken = '96097ca61d17bee21bf9d706dcc5fb5fc6576b60';
 
-            // Create headers for the request
             const headers = new Headers({
                 'Authorization': `Bearer ${bearerToken}`,
                 'Accept': 'application/json'
             });
 
-            // Fetch the data from the API
             fetch(apiUrl, {
                 method: 'GET',
                 headers: headers
             })
             .then(response => {
                 if (!response.ok) {
-                    // If the response is not successful, throw an error
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 return response.json();
             })
             .then(apiResponse => {
-                // Check if the expected 'data' array exists and has posts
-                if (apiResponse && Array.isArray(apiResponse.data) && apiResponse.data.length > 0) {
-                    statusElement.style.display = 'none'; // Hide loading message
-                    displayPosts(apiResponse.data);
+                // MODIFIED: Check for the 'items' array
+                if (apiResponse && Array.isArray(apiResponse.items) && apiResponse.items.length > 0) {
+                    statusElement.style.display = 'none';
+                    displayPosts(apiResponse.items);
                 } else {
                     statusElement.textContent = 'No posts found.';
                 }
             })
             .catch(error => {
-                // Handle any errors during the fetch operation
                 console.error('Error fetching blog posts:', error);
                 statusElement.textContent = `Failed to load posts. Please check the console for details.`;
                 statusElement.style.color = 'red';
             });
 
-            /**
-             * Renders the posts into the DOM.
-             * @param {Array<Object>} posts - An array of post objects.
-             */
             function displayPosts(posts) {
-                // Clear any existing content
                 postsContainer.innerHTML = '';
 
                 posts.forEach(post => {
-                    // Create elements for each post
                     const postElement = document.createElement('div');
                     postElement.classList.add('post');
 
@@ -124,15 +111,11 @@
                     titleElement.textContent = post.title || 'Untitled Post';
 
                     const bodyElement = document.createElement('div');
-                    // Use innerHTML to render HTML content from the post body.
-                    // Note: This assumes the source content is trusted.
-                    bodyElement.innerHTML = post.body || 'No content available.';
+                    // MODIFIED: Use the 'html' property for the body content
+                    bodyElement.innerHTML = post.html || 'No content available.';
 
-                    // Append the title and body to the post container
                     postElement.appendChild(titleElement);
                     postElement.appendChild(bodyElement);
-
-                    // Append the complete post to the main container
                     postsContainer.appendChild(postElement);
                 });
             }
