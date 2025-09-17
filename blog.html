@@ -1,204 +1,179 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog Posts</title>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    <title>Blog Posts | Excellent Design</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;800&display=swap" rel="stylesheet">
+    
     <style>
         /* Base styles */
+        :root {
+            --background-color: #f4f6f9;
+            --card-background: #ffffff;
+            --text-primary: #1d2d44;
+            --text-secondary: #5a6a7e;
+            --shadow-color: rgba(67, 86, 100, 0.15);
+        }
+
         body {
-            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f2f5; /* Lighter background */
-            color: #333;
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
             margin: 0;
-            padding: 30px 20px; /* More padding */
+            padding: 40px 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
         }
 
         /* Header */
         h1 {
-            color: #2c3e50;
-            font-size: 2.8em; /* Larger title */
-            margin-bottom: 40px; /* More spacing */
+            font-size: clamp(2rem, 5vw, 2.8rem); /* Responsive font size */
+            font-weight: 800;
+            margin-bottom: 50px;
             position: relative;
             padding-bottom: 15px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
         }
 
         h1::after {
             content: '';
             position: absolute;
             bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px; /* Underline effect */
-            height: 4px;
-            background: linear-gradient(to right, #3498db, #8e44ad); /* Gradient underline */
-            border-radius: 2px;
+            right: 50%;
+            transform: translateX(50%);
+            width: 100px;
+            height: 5px;
+            background: linear-gradient(to left, #00c6ff, #0072ff);
+            border-radius: 3px;
         }
 
         /* Posts Container */
         #posts-container {
-            max-width: 900px; /* Wider container */
             width: 100%;
-            margin-top: 20px;
-            display: grid; /* Use grid for layout */
-            grid-template-columns: 1fr; /* Single column for now, could be 2 for larger screens */
-            gap: 30px; /* Spacing between posts */
+            max-width: 1200px; /* Wider for desktop */
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 35px;
         }
-        @media (min-width: 768px) {
-            #posts-container {
-                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); /* Two columns on larger screens */
-            }
-        }
-
 
         /* Individual Post Card */
         .post {
-            background-color: #ffffff;
-            border-radius: 12px; /* Softer corners */
-            overflow: hidden; /* Important for border-radius on children */
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Stronger, softer shadow */
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            border: 1px solid #e0e0e0; /* Subtle border */
-            /* RTL specific */
-            direction: rtl;
-            text-align: right;
-            display: flex;
+            background-color: var(--card-background);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px -10px var(--shadow-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex; /* Key for consistent height */
             flex-direction: column;
         }
 
         .post:hover {
-            transform: translateY(-8px); /* Lift effect on hover */
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px -10px var(--shadow-color);
         }
 
-        /* Virtual Post Cover (Header) */
+        /* Virtual Post Cover (Header) - TALLER and DYNAMIC */
         .post-header {
             position: relative;
-            height: 180px; /* Fixed height for the cover area */
-            background-color: #4a69bd; /* Base color for the header */
+            height: 240px; /* Increased height */
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px;
             overflow: hidden;
-            border-bottom: 3px solid #6c5ce7; /* Accent border */
+            text-align: center;
         }
 
-        /* Abstract background pattern for the virtual cover */
+        /* Glassmorphism Effect & Pattern */
         .post-header::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at top left, rgba(255,255,255,0.1) 0%, transparent 40%),
-                radial-gradient(circle at bottom right, rgba(255,255,255,0.1) 0%, transparent 40%),
-                linear-gradient(135deg, rgba(255,255,255,0.05) 25%, transparent 25%),
-                linear-gradient(225deg, rgba(255,255,255,0.05) 25%, transparent 25%) alternate;
-            background-size: 80px 80px;
-            opacity: 0.8;
-            mix-blend-mode: overlay;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            backdrop-filter: blur(4px) saturate(150%); /* Frosted glass effect */
+            -webkit-backdrop-filter: blur(4px) saturate(150%);
         }
 
-        /* Post Icon (optional, for visual interest) */
-        .post-icon {
-            font-size: 3em;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 10px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-            z-index: 1; /* Ensure it's above the ::before content */
-        }
-
-
-        /* Post Title with Gradient Effect */
+        /* Post Title - High Contrast */
         .post-title {
             margin: 0;
-            font-size: 1.8em; /* Adjusted size for cover */
-            font-weight: 700;
-            text-align: center;
+            font-size: clamp(1.5rem, 4vw, 1.8rem);
+            font-weight: 800;
+            color: #ffffff;
             z-index: 1;
-            padding: 0 10px;
-            /* Gradient Text Effect */
-            background: linear-gradient(45deg, #FF6B6B, #FFD93D, #6BCB77, #4D8EFF);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent; /* Makes text transparent so background gradient shows */
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Soft shadow for readability */
-            line-height: 1.3;
+            padding: 0 15px;
+            text-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+            line-height: 1.4;
         }
 
         /* Post Body (Content area below header) */
         .post-body {
             padding: 25px;
-            flex-grow: 1; /* Allows content area to fill available space */
             display: flex;
             flex-direction: column;
+            flex-grow: 1; /* This makes the card body expand, ensuring consistent overall size */
         }
 
         .post-content {
-            line-height: 1.7;
-            color: #555;
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            flex-grow: 1; /* Pushes meta/tags to the bottom */
             margin-bottom: 20px;
-            flex-grow: 1; /* Allows content to take up space */
         }
         
         /* Post Meta (Date) */
         .post-meta {
             font-size: 0.9em;
-            color: #7f8c8d;
-            margin-bottom: 15px;
-            border-bottom: 1px dashed #eee;
-            padding-bottom: 10px;
+            color: #a0a0a0;
+            padding-top: 15px;
+            border-top: 1px solid #eef2f5;
         }
 
         /* Post Tags */
         .post-tags {
-            margin-top: 15px; /* Adjust spacing */
-            padding-top: 10px;
-            border-top: 1px dashed #eee;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eef2f5;
         }
 
         .tag {
             display: inline-block;
-            background-color: #e6e6fa; /* Lighter, subtle tag color */
-            color: #6a5acd; /* Purple-ish text */
-            padding: 6px 14px;
-            border-radius: 20px; /* More rounded pills */
+            padding: 6px 16px;
+            border-radius: 20px;
             font-size: 0.8em;
-            margin-left: 8px; /* For RTL, margin-left for spacing */
+            font-weight: 700;
+            margin-left: 8px;
             margin-bottom: 8px;
-            transition: background-color 0.2s ease;
+            transition: transform 0.2s ease;
         }
-
         .tag:hover {
-            background-color: #d1c4e9; /* Slightly darker on hover */
+            transform: translateY(-2px);
         }
-
 
         /* Status Message */
         #status {
             font-size: 1.3em;
-            color: #7f8c8d;
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
+            padding: 20px 30px;
+            background-color: var(--card-background);
+            border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
         }
     </style>
 </head>
 <body>
 
-    <h1>My Blog Feed</h1>
-    <div id="status">Loading posts...</div>
+    <h1>آخرین مقالات</h1>
+    <div id="status">در حال بارگذاری...</div>
     <div id="posts-container"></div>
 
     <script>
@@ -206,7 +181,16 @@
             const postsContainer = document.getElementById('posts-container');
             const statusElement = document.getElementById('status');
             
-            // API details
+            // --- DYNAMIC THEMES ARRAY ---
+            const themes = [
+                { gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', tagBg: 'rgba(255,255,255,0.2)', tagColor: '#fff' },
+                { gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)', tagBg: 'rgba(255,255,255,0.3)', tagColor: '#c5393d' },
+                { gradient: 'linear-gradient(135deg, #2af598 0%, #009efd 100%)', tagBg: 'rgba(255,255,255,0.2)', tagColor: '#fff' },
+                { gradient: 'linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%)', tagBg: 'rgba(255,255,255,0.25)', tagColor: '#fff' },
+                { gradient: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)', tagBg: 'rgba(255,255,255,0.3)', tagColor: '#b95c42' },
+                { gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', tagBg: 'rgba(255,255,255,0.2)', tagColor: '#fff' }
+            ];
+
             const apiUrl = 'https://elkamehr2.chbk.app/api/blog/posts';
             const bearerToken = 'ed88f53d8919ec21425624fad3824bdf08a32284';
 
@@ -216,95 +200,74 @@
             });
 
             fetch(apiUrl, { method: 'GET', headers: headers })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(response => response.ok ? response.json() : Promise.reject(`HTTP error! Status: ${response.status}`))
             .then(apiResponse => {
-                if (apiResponse && Array.isArray(apiResponse.items) && apiResponse.items.length > 0) {
+                if (apiResponse?.items?.length) {
                     statusElement.style.display = 'none';
                     displayPosts(apiResponse.items);
                 } else {
-                    statusElement.textContent = 'No posts found.';
+                    statusElement.textContent = 'هیچ پستی یافت نشد.';
                 }
             })
             .catch(error => {
                 console.error('Error fetching blog posts:', error);
-                statusElement.textContent = `Failed to load posts. See console for details.`;
-                statusElement.style.color = 'red';
+                statusElement.textContent = `خطا در بارگذاری پست ها.`;
             });
 
             function displayPosts(posts) {
                 postsContainer.innerHTML = '';
 
-                posts.forEach(post => {
+                posts.forEach((post, index) => {
                     const postElement = document.createElement('div');
                     postElement.classList.add('post');
 
-                    // --- VIRTUAL COVER / HEADER ---
+                    // --- Apply Dynamic Theme ---
+                    const currentTheme = themes[index % themes.length];
+                    
+                    // --- Virtual Cover ---
                     const postHeader = document.createElement('div');
                     postHeader.classList.add('post-header');
-                    
-                    // Optional: Add a subtle icon (using a simple text char for simplicity)
-                    const postIcon = document.createElement('div');
-                    postIcon.classList.add('post-icon');
-                    postIcon.textContent = '📝'; // A simple pencil icon
-                    postHeader.appendChild(postIcon);
+                    postHeader.style.background = currentTheme.gradient; // Set dynamic background
 
-                    // Post Title with Gradient
                     const titleElement = document.createElement('h2');
                     titleElement.classList.add('post-title');
-                    // Use json_ld.headline if available, otherwise fallback to title
-                    titleElement.textContent = (post.json_ld && post.json_ld.headline) ? post.json_ld.headline : (post.title || 'Untitled Post');
+                    titleElement.textContent = (post.json_ld?.headline) || post.title || 'بدون عنوان';
                     postHeader.appendChild(titleElement);
                     postElement.appendChild(postHeader);
 
-                    // --- POST BODY CONTENT ---
+                    // --- Post Body ---
                     const postBodyWrapper = document.createElement('div');
                     postBodyWrapper.classList.add('post-body');
 
-                    // Publication Date
+                    const contentElement = document.createElement('div');
+                    contentElement.classList.add('post-content');
+                    contentElement.textContent = post.json_ld?.description || 'محتوایی برای نمایش وجود ندارد.';
+                    postBodyWrapper.appendChild(contentElement);
+                    
                     const metaElement = document.createElement('div');
                     metaElement.classList.add('post-meta');
                     if (post.published_at) {
                         const publishDate = new Date(post.published_at);
-                        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-                        metaElement.textContent = `منتشر شده در: ${publishDate.toLocaleDateString('fa-IR', options)}`;
-                    } else {
-                        metaElement.textContent = 'تاریخ انتشار نامشخص';
+                        metaElement.textContent = `تاریخ انتشار: ${publishDate.toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' })}`;
                     }
                     postBodyWrapper.appendChild(metaElement);
 
-                    // Content from json_ld.description
-                    const contentElement = document.createElement('div');
-                    contentElement.classList.add('post-content');
-                    if (post.json_ld && post.json_ld.description) {
-                        contentElement.textContent = post.json_ld.description;
-                    } else {
-                        contentElement.textContent = 'No content available.';
-                    }
-                    postBodyWrapper.appendChild(contentElement);
-                    
-                    // Tags
-                    const tagsContainer = document.createElement('div');
-                    tagsContainer.classList.add('post-tags');
-                    if (post.tags && Array.isArray(post.tags) && post.tags.length > 0) {
+                    // --- Tags with Dynamic Theme ---
+                    if (post.tags?.length) {
+                        const tagsContainer = document.createElement('div');
+                        tagsContainer.classList.add('post-tags');
                         post.tags.forEach(tagData => {
                             const tagElement = document.createElement('span');
                             tagElement.classList.add('tag');
                             tagElement.textContent = tagData.name;
+                            // Apply theme to tags
+                            tagElement.style.backgroundColor = currentTheme.tagBg;
+                            tagElement.style.color = currentTheme.tagColor;
                             tagsContainer.appendChild(tagElement);
                         });
-                    } else {
-                         const noTagsElement = document.createElement('span');
-                         noTagsElement.classList.add('tag');
-                         noTagsElement.textContent = 'بدون برچسب'; // "No tags"
-                         tagsContainer.appendChild(noTagsElement);
+                        postBodyWrapper.appendChild(tagsContainer);
                     }
-                    postBodyWrapper.appendChild(tagsContainer);
-
+                    
                     postElement.appendChild(postBodyWrapper);
                     postsContainer.appendChild(postElement);
                 });
