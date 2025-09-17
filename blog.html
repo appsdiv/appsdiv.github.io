@@ -9,22 +9,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* CSS Variables for a Dark, Industrial Glassmorphic Theme */
+        /* Refined CSS Variables for an Industrial Glassmorphic Theme */
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.08); /* More subtle, darker glass */
-            --glass-border: rgba(255, 255, 255, 0.15); /* Faint border */
-            --glass-shadow: rgba(0, 0, 0, 0.2); /* Deeper shadow for depth */
-            --dark-background-start: #1e3c72; /* Darker blue for industrial feel */
-            --dark-background-end: #2a5298; /* Another dark blue */
-            --text-primary-light: #e0e0e0; /* Light text for dark background */
-            --text-secondary-light: #b0c4de; /* Softer light text */
-            --steel-blue-light: #aabed8; /* Accent color */
+            --glass-bg-primary: rgba(255, 255, 255, 0.08);
+            --glass-bg-secondary: rgba(255, 255, 255, 0.75); /* Lighter for content area */
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: rgba(0, 0, 0, 0.3);
+            --dark-blue-primary: #1e3c72;
+            --dark-blue-secondary: #2a5298;
+            --light-text: #e0e0e0;
+            --dark-text: #1a1a1a;
+            --accent-color: #f7a436; /* A pop of industrial orange/yellow */
         }
 
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: var(--dark-background-start); /* Fallback */
-            color: var(--text-primary-light);
+            background-color: var(--dark-blue-primary);
+            color: var(--light-text);
             margin: 0;
             padding: 40px 15px;
             display: flex;
@@ -32,76 +33,76 @@
             align-items: center;
             min-height: 100vh;
             position: relative;
-            overflow-x: hidden; /* Prevent horizontal scroll */
-        }
-
-        /* Gradient Background - Darker for industrial feel */
-        .background-gradient {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--dark-background-start) 0%, var(--dark-background-end) 100%);
-            z-index: -2;
-            transition: opacity 0.5s ease;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, var(--dark-blue-primary) 0%, var(--dark-blue-secondary) 100%);
         }
 
         .container {
             width: 100%;
             max-width: 1200px;
-            z-index: 1; /* Ensure content is above background */
+            z-index: 1;
         }
 
         .page-title {
-            font-size: clamp(2.2rem, 5vw, 3rem); /* Slightly larger */
+            font-size: clamp(2.2rem, 5vw, 3rem);
             font-weight: 700;
-            margin-bottom: 60px; /* More space */
+            margin-bottom: 60px;
             text-align: center;
             position: relative;
-            color: var(--text-primary-light);
-            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Stronger shadow */
-            letter-spacing: 1px; /* Subtle spacing */
+            color: var(--light-text);
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Underline for the title */
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            right: 50%;
+            transform: translateX(50%);
+            width: 120px;
+            height: 4px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
         }
 
         .posts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Slightly smaller min-width */
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 30px;
             perspective: 1000px;
         }
 
-        /* Glassmorphism Post Card - Enhanced */
+        /* Refined Post Card */
         .post-card {
-            background: var(--glass-bg);
+            background: var(--glass-bg-primary);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
-            backdrop-filter: blur(20px); /* Increased blur */
+            backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 10px 40px 0 var(--glass-shadow); /* More pronounced shadow */
-            transition: none; /* Removed transition for static cards */
+            box-shadow: 0 10px 40px 0 var(--glass-shadow);
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
-        /* Hover effect removed */
+        /* Hover effects are intentionally removed */
         .post-card:hover {
             transform: none;
             box-shadow: 0 10px 40px 0 var(--glass-shadow);
         }
 
-        .post-header-glass {
+        .post-header {
             position: relative;
-            height: 200px; /* Slightly shorter header */
+            height: 200px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px; /* Reduced padding */
+            padding: 20px;
             overflow: hidden;
             text-align: center;
             border-bottom: 1px solid var(--glass-border);
-            background: rgba(0, 0, 0, 0.1); /* Slight dark tint for header background */
+            background: rgba(0, 0, 0, 0.1);
         }
         
         .header-overlay {
@@ -110,89 +111,87 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.03); /* Very subtle overlay */
+            background: rgba(255, 255, 255, 0.03);
             z-index: 0;
         }
 
-        .post-title-glass {
+        .post-title {
             position: relative;
             margin: 0;
-            font-size: clamp(1.5rem, 4vw, 1.8rem); /* Slightly larger title */
+            font-size: clamp(1.5rem, 4vw, 1.8rem);
             font-weight: 700;
-            color: var(--text-primary-light);
+            color: var(--light-text);
             z-index: 1;
             line-height: 1.4;
-            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Softer title shadow */
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
 
-        /* Light background for post content */
-        .post-body-glass {
+        /* Light, iOS-style background for post body */
+        .post-body {
             padding: 25px;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
-            background: rgba(255, 255, 255, 0.7); /* Light translucent background */
+            background: var(--glass-bg-secondary);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+            color: var(--dark-text); /* Use dark text for light background */
         }
 
-        .post-content-glass {
+        .post-content {
             font-size: 1rem;
             line-height: 1.7;
-            color: var(--dark-background-start); /* Text color changed for light background */
+            color: var(--dark-text);
             flex-grow: 1;
             margin-bottom: 20px;
         }
 
-        .post-meta-glass {
+        .post-meta {
             font-size: 0.85rem;
-            color: var(--dark-background-end); /* Text color changed for light background */
-            opacity: 0.8; 
+            color: var(--dark-blue-secondary);
+            opacity: 0.8;
             padding-top: 15px;
-            border-top: 1px solid rgba(0, 0, 0, 0.1); /* Lighter border */
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
         }
 
-        .post-tags-glass {
+        .post-tags {
             margin-top: 15px;
             display: flex;
             flex-wrap: wrap;
-            gap: 10px; /* Increased gap */
+            gap: 10px;
         }
 
-        /* Tags Redesigned: No underline, no solid white background */
-        .tag-glass {
+        /* Refined Tags */
+        .tag {
             display: inline-block;
             padding: 8px 18px;
-            border-radius: 25px; /* More pill-shaped */
+            border-radius: 25px;
             font-size: 0.8rem;
             font-weight: 600;
             transition: none;
             cursor: pointer;
-            border: 1px solid rgba(0, 0, 0, 0.1); /* Very subtle border */
-            background: rgba(0, 0, 0, 0.05); /* Very slight tint */
-            color: var(--dark-background-end); /* Accent color for tags */
-            backdrop-filter: blur(8px); /* Subtle blur for tags */
-            -webkit-backdrop-filter: blur(8px);
-            text-decoration: none; /* Explicitly remove underline */
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--dark-blue-secondary);
+            text-decoration: none;
         }
         
-        .tag-glass:hover {
-            background: none; /* Hover effect removed */
+        .tag:hover {
+            background: none;
             transform: none;
-            color: var(--dark-background-start);
+            color: var(--dark-blue-primary);
         }
         
-        /* Status Message - Integrated into glassmorphism */
         .status-message {
             font-size: 1.2em;
             padding: 20px 30px;
-            background: rgba(255, 255, 255, 0.8);
+            background: var(--glass-bg-secondary);
             border-radius: 15px;
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
+            border: 1px solid rgba(0, 0, 0, 0.1);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            color: var(--dark-background-start);
+            color: var(--dark-text);
             margin-bottom: 30px;
             text-align: center;
         }
@@ -200,7 +199,6 @@
 </head>
 <body>
 
-    <div class="background-gradient"></div>
     <main class="container">
         <h1 class="page-title">مقالات و دانش فنی</h1>
         <div id="status" class="status-message">در حال بارگذاری...</div>
@@ -212,7 +210,6 @@
             const postsContainer = document.getElementById('posts-container');
             const statusElement = document.getElementById('status');
             
-            // Updated API endpoint to fetch latest 5 posts
             const apiUrl = 'https://elkamehr2.chbk.app/api/blog/posts/latest?limit=5';
             const bearerToken = 'ed88f53d8919ec21425624fad3824bdf08a32284';
 
@@ -246,26 +243,26 @@
                     postElement.classList.add('post-card');
 
                     const postHeader = document.createElement('div');
-                    postHeader.classList.add('post-header-glass');
+                    postHeader.classList.add('post-header');
                     
                     const headerOverlay = document.createElement('div');
                     headerOverlay.classList.add('header-overlay');
                     postHeader.appendChild(headerOverlay);
 
                     const titleElement = document.createElement('h2');
-                    titleElement.classList.add('post-title-glass');
+                    titleElement.classList.add('post-title');
                     titleElement.textContent = (post.json_ld?.headline) || post.title || 'بدون عنوان';
                     postHeader.appendChild(titleElement);
 
                     const postBodyWrapper = document.createElement('div');
-                    postBodyWrapper.classList.add('post-body-glass');
+                    postBodyWrapper.classList.add('post-body');
 
                     const contentElement = document.createElement('div');
-                    contentElement.classList.add('post-content-glass');
+                    contentElement.classList.add('post-content');
                     contentElement.textContent = post.json_ld?.description || 'محتوایی برای نمایش وجود ندارد.';
                     
                     const metaElement = document.createElement('div');
-                    metaElement.classList.add('post-meta-glass');
+                    metaElement.classList.add('post-meta');
                     if (post.published_at) {
                         const publishDate = new Date(post.published_at);
                         metaElement.textContent = `تاریخ انتشار: ${publishDate.toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' })}`;
@@ -276,11 +273,11 @@
                     
                     if (post.tags?.length) {
                         const tagsContainer = document.createElement('div');
-                        tagsContainer.classList.add('post-tags-glass');
+                        tagsContainer.classList.add('post-tags');
                         post.tags.forEach(tagData => {
                             const tagElement = document.createElement('a');
-                            tagElement.href = '#'; // Placeholder link
-                            tagElement.classList.add('tag-glass');
+                            tagElement.href = '#';
+                            tagElement.classList.add('tag');
                             tagElement.textContent = tagData.name;
                             tagsContainer.appendChild(tagElement);
                         });
