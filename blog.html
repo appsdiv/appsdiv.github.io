@@ -31,22 +31,46 @@
         .post {
             background-color: #ffffff;
             border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-            /* Styling for Right-to-Left text */
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            /* Styling for Right-to-Left text (Persian/Arabic) */
             direction: rtl;
             text-align: right;
+            border-left: 5px solid #3498db;
         }
 
         .post h2 {
             margin-top: 0;
-            color: #3498db;
+            color: #2c3e50;
+            font-size: 1.8em;
+        }
+        
+        .post-meta {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-bottom: 20px;
         }
 
-        .post p {
-            line-height: 1.6;
+        .post-content {
+            line-height: 1.7;
             color: #555;
+            margin-bottom: 20px;
+        }
+        
+        .post-tags {
+            margin-top: 20px;
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: #ecf0f1;
+            color: #34495e;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            margin-left: 8px;
+            margin-bottom: 8px;
         }
 
         #status {
@@ -68,7 +92,6 @@
             
             // API details
             const apiUrl = 'https://elkamehr2.chbk.app/api/blog/posts';
-            // UPDATED: New bearer token
             const bearerToken = 'ed88f53d8919ec21425624fad3824bdf08a32284';
 
             const headers = new Headers({
@@ -76,10 +99,7 @@
                 'Accept': 'application/json'
             });
 
-            fetch(apiUrl, {
-                method: 'GET',
-                headers: headers
-            })
+            fetch(apiUrl, { method: 'GET', headers: headers })
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -96,7 +116,7 @@
             })
             .catch(error => {
                 console.error('Error fetching blog posts:', error);
-                statusElement.textContent = `Failed to load posts. Please check the console for details.`;
+                statusElement.textContent = `Failed to load posts. See console for details.`;
                 statusElement.style.color = 'red';
             });
 
@@ -107,14 +127,46 @@
                     const postElement = document.createElement('div');
                     postElement.classList.add('post');
 
+                    // 1. Get Title
                     const titleElement = document.createElement('h2');
                     titleElement.textContent = post.title || 'Untitled Post';
 
-                    const bodyElement = document.createElement('div');
-                    bodyElement.innerHTML = post.html || 'No content available.';
+                    // 2. Get and Format Publication Date
+                    const metaElement = document.createElement('div');
+                    metaElement.classList.add('post-meta');
+                    if (post.published_at) {
+                        const publishDate = new Date(post.published_at);
+                        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                        metaElement.textContent = `منتشر شده در: ${publishDate.toLocaleDateString('fa-IR', options)}`;
+                    }
 
+                    // 3. Get Content from the nested json_ld object
+                    const bodyElement = document.createElement('div');
+                    bodyElement.classList.add('post-content');
+                    if (post.json_ld && post.json_ld.description) {
+                        bodyElement.textContent = post.json_ld.description;
+                    } else {
+                        bodyElement.textContent = 'No content available.';
+                    }
+                    
+                    // 4. Create and Display Tags
+                    const tagsContainer = document.createElement('div');
+                    tagsContainer.classList.add('post-tags');
+                    if (post.tags && Array.isArray(post.tags)) {
+                        post.tags.forEach(tagData => {
+                            const tagElement = document.createElement('span');
+                            tagElement.classList.add('tag');
+                            tagElement.textContent = tagData.name;
+                            tagsContainer.appendChild(tagElement);
+                        });
+                    }
+
+                    // Append all parts to the main post element
                     postElement.appendChild(titleElement);
+                    postElement.appendChild(metaElement);
                     postElement.appendChild(bodyElement);
+                    postElement.appendChild(tagsContainer);
+
                     postsContainer.appendChild(postElement);
                 });
             }
