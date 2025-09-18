@@ -7,7 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700&display=swap" rel="stylesheet">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         /* iOS Light Mode Inspired CSS Variables */
         :root {
@@ -40,33 +41,42 @@
             max-width: 1200px;
             z-index: 1;
         }
-
-        .page-title {
-            font-size: clamp(2.2rem, 5vw, 3rem);
-            font-weight: 700;
-            margin-bottom: 60px;
-            text-align: center;
-            position: relative;
-            color: var(--text-primary);
-            text-shadow: none;
+        
+        .minimal-header {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(224, 224, 224, 0.5);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
         
-        .page-title::after {
-            content: '';
-            position: absolute;
-            bottom: -15px;
-            right: 50%;
-            transform: translateX(50%);
-            width: 120px;
-            height: 4px;
-            background-color: var(--accent-blue);
-            border-radius: 2px;
+        .back-button {
+            background: none;
+            border: none;
+            color: var(--accent-blue);
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
         }
-
+        
+        .back-button:focus {
+            outline: none;
+        }
+        
         .posts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 30px;
+            margin-top: 80px; /* Space for the fixed header */
         }
 
         /* Post Card (Light Mode) */
@@ -88,7 +98,7 @@
 
         .post-header {
             position: relative;
-            height: 200px;
+            height: 150px; /* Reduced header height */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -98,22 +108,17 @@
             background: linear-gradient(135deg, #e9e9eb 0%, #d1d1d6 100%);
             border-bottom: 1px solid var(--card-border);
         }
-        
-        .header-overlay {
-            display: none; /* Not needed for this light style */
-        }
 
         .post-title {
             position: relative;
             margin: 0;
-            font-size: clamp(1.5rem, 4vw, 1.8rem);
+            font-size: clamp(1.4rem, 3.5vw, 1.6rem);
             font-weight: 700;
             color: var(--text-primary);
             line-height: 1.4;
             text-shadow: none;
         }
 
-        /* Post Body (White Background) */
         .post-body {
             padding: 25px;
             display: flex;
@@ -122,55 +127,28 @@
             background: var(--background-color);
             color: var(--text-primary);
         }
-
-        /* Styling for content injected from API HTML */
-        .post-full-html-content {
+        
+        .post-content-preview {
             font-size: 1rem;
             line-height: 1.7;
             color: var(--text-secondary);
             flex-grow: 1;
+            overflow: hidden;
+            max-height: 300px; /* Limit height to show preview */
         }
-
-        .post-full-html-content h3, 
-        .post-full-html-content h4 {
-            color: var(--text-primary);
-            font-weight: 700;
-            margin-top: 1.5em;
-            margin-bottom: 0.5em;
-        }
-        .post-full-html-content p, 
-        .post-full-html-content li {
-            color: var(--text-secondary);
-            margin-bottom: 1em;
-        }
-        .post-full-html-content a {
-            color: var(--accent-blue);
+        
+        .read-more-link {
+            display: block;
+            margin-top: 15px;
             font-weight: 600;
+            text-align: left;
+            color: var(--accent-blue);
             text-decoration: none;
             transition: color 0.2s ease;
         }
-        .post-full-html-content a:hover {
+        
+        .read-more-link:hover {
             color: #005bb5;
-        }
-        .post-full-html-content table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 2em;
-            background-color: var(--card-background);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .post-full-html-content th,
-        .post-full-html-content td {
-            border: 1px solid var(--card-border);
-            padding: 12px;
-            text-align: right;
-        }
-        .post-full-html-content thead {
-            background-color: var(--card-border);
-        }
-        .post-full-html-content tr:nth-child(even) {
-            background-color: #f0f0f0;
         }
 
         .post-meta {
@@ -188,7 +166,6 @@
             gap: 8px;
         }
 
-        /* Modern Pill-Shaped Tags */
         .tag {
             display: inline-block;
             padding: 6px 14px;
@@ -198,13 +175,6 @@
             background: var(--tag-background);
             color: var(--accent-blue);
             text-decoration: none;
-        }
-        
-        /* Removed tag hover effects for a static, clean look */
-        .tag:hover {
-            transform: none;
-            color: var(--accent-blue);
-            background: var(--tag-background);
         }
         
         .status-message {
@@ -222,8 +192,14 @@
 </head>
 <body>
 
+    <header class="minimal-header">
+        <button class="back-button" onclick="window.history.back()">
+            <i class="fas fa-chevron-right"></i>
+            <span>بازگشت</span>
+        </button>
+    </header>
+
     <main class="container">
-        <h1 class="page-title">مقالات و دانش فنی</h1>
         <div id="status" class="status-message">در حال بارگذاری...</div>
         <div id="posts-container" class="posts-grid"></div>
     </main>
@@ -276,11 +252,24 @@
                     const postBodyWrapper = document.createElement('div');
                     postBodyWrapper.classList.add('post-body');
 
-                    // Create an element for the full HTML content
-                    const postHtmlContent = document.createElement('div');
-                    postHtmlContent.classList.add('post-full-html-content');
-                    // Set the innerHTML directly to render the HTML from the API
-                    postHtmlContent.innerHTML = post.html;
+                    // Create an element for the preview content
+                    const postPreviewContent = document.createElement('div');
+                    postPreviewContent.classList.add('post-content-preview');
+                    
+                    // A simple way to get 15 rows of content
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = post.html;
+                    const paragraphs = tempDiv.querySelectorAll('p');
+                    let previewHtml = '';
+                    for (let i = 0; i < paragraphs.length && i < 15; i++) {
+                        previewHtml += paragraphs[i].outerHTML;
+                    }
+                    postPreviewContent.innerHTML = previewHtml;
+
+                    const readMoreLink = document.createElement('a');
+                    readMoreLink.href = '#'; // Placeholder, would link to the full post
+                    readMoreLink.classList.add('read-more-link');
+                    readMoreLink.textContent = 'ادامه مطلب...';
 
                     const metaElement = document.createElement('div');
                     metaElement.classList.add('post-meta');
@@ -289,7 +278,8 @@
                         metaElement.textContent = `تاریخ انتشار: ${publishDate.toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' })}`;
                     }
 
-                    postBodyWrapper.appendChild(postHtmlContent);
+                    postBodyWrapper.appendChild(postPreviewContent);
+                    postBodyWrapper.appendChild(readMoreLink);
                     postBodyWrapper.appendChild(metaElement);
                     
                     if (post.tags?.length) {
