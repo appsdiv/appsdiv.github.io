@@ -40,11 +40,7 @@
             padding-top: var(--header-height);
             transition: background-color 0.3s ease, color 0.3s ease;
         }
-        
-        /* --- HEADER & THEME TOGGLE (Polished) --- */
         .page-header{position:fixed;top:0;right:0;width:100%;height:var(--header-height);display:flex;align-items:center;justify-content:center;background:var(--header-bg);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--card-border);z-index:1000;transition:background .3s ease,border-color .3s ease}.header-title{font-size:1.7rem;font-weight:700;letter-spacing:1px}#theme-toggle{position:absolute;left:20px;top:50%;transform:translateY(-50%);background:0 0;border:none;cursor:pointer;padding:5px;display:flex;align-items:center;justify-content:center}#theme-toggle svg{width:24px;height:24px;color:var(--text-primary);transition:transform .3s ease,opacity .3s ease}.sun-icon{position:absolute}.moon-icon{transform:scale(0);opacity:0}body.dark-mode .sun-icon{transform:scale(0);opacity:0}body.dark-mode .moon-icon{transform:scale(1);opacity:1}
-        
-        /* --- MAIN LAYOUT & GRID --- */
         .container{width:100%;max-width:1200px;margin:0 auto;padding:50px 20px}
         #single-post-view{display:none}
         .posts-grid {
@@ -52,30 +48,26 @@
             grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
             gap: 35px;
         }
-
-        /* --- POLISHED POST CARD (Hover Effects Removed) --- */
         .post-card {
             background: var(--card-background);
             border: 1px solid var(--card-border);
-            border-radius: 20px; /* Softer radius */
+            border-radius: 20px;
             box-shadow: 0 4px 12px var(--card-shadow);
             display: flex;
             flex-direction: column;
             overflow: hidden;
             transition: background-color 0.3s ease, border-color 0.3s ease;
         }
-
-        /* --- POLISHED POST COVER (More Content) --- */
         .post-cover {
             height: 320px;
             position: relative;
             display: flex;
-            flex-direction: column; /* To stack content */
-            justify-content: flex-end; /* Align all content to bottom */
+            flex-direction: column;
+            justify-content: flex-end;
             padding: 25px;
             color: #fff;
         }
-        .post-cover::after { /* Scrim for legibility */
+        .post-cover::after {
             content: '';
             position: absolute;
             inset: 0;
@@ -121,35 +113,28 @@
             margin-top: 8px;
             opacity: 0.8;
         }
-        
         .post-card-body {
             padding: 25px;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
         }
-        
-        /* POLISHED Content Preview */
         .post-preview-content {
             flex-grow: 1;
             font-size: 1rem;
             line-height: 1.75;
             color: var(--text-secondary);
-            /* Clean line-clamp truncation */
             display: -webkit-box;
-            -webkit-line-clamp: 5; /* More content visible */
+            -webkit-line-clamp: 5;
             -webkit-box-orient: vertical;  
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .post-preview-content p { margin: 0; }
-        
         .post-card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 25px; margin-top: auto; }
         .post-card-meta { font-size: 0.85rem; font-weight: 600; color: var(--text-meta); }
         .continue-reading-btn { font-size: 0.9rem; padding: 10px 18px; background-color: var(--accent-blue); color: #fff; border-radius: 10px; text-decoration: none; font-weight: 600; transition: background-color 0.2s ease; }
         .continue-reading-btn:hover { background-color: #005bb5; }
-        
-        /* Skeleton and Single Post styles condensed for brevity */
         .skeleton-card{background-color:var(--card-background);border:1px solid var(--card-border);border-radius:20px;overflow:hidden}.skeleton-cover{height:320px;background-color:var(--skeleton-bg);display:flex;flex-direction:column;justify-content:flex-end;padding:25px}.skeleton-cover-tags{display:flex;gap:8px;margin-bottom:12px}.skeleton-tag{height:25px;width:70px;border-radius:30px;background-color:rgba(0,0,0,.1)}.skeleton-title-line{height:28px;border-radius:5px;background-color:rgba(0,0,0,.1);margin-bottom:8px}.skeleton-title-line.short{width:60%}.skeleton-date-line{height:14px;width:120px;border-radius:4px;background-color:rgba(0,0,0,.1)}.skeleton-body{padding:25px}.skeleton-line{height:16px;background-color:var(--skeleton-bg);border-radius:4px;margin-bottom:12px}.skeleton-line:last-child{width:70%}.skeleton-footer{display:flex;justify-content:space-between;align-items:center;margin-top:25px}.skeleton-meta{height:16px;width:80px;background-color:var(--skeleton-bg);border-radius:4px}.skeleton-button{height:40px;width:110px;background-color:var(--skeleton-bg);border-radius:10px}.shimmer{position:relative;overflow:hidden}.shimmer::after{content:'';position:absolute;top:0;right:0;bottom:0;left:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);animation:shimmer 1.5s infinite}body.dark-mode .shimmer::after{background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent)}@keyframes shimmer{100%{transform:translateX(100%)}}.status-message{font-size:1.2em;padding:30px;background:var(--card-background);border-radius:12px;text-align:center;display:none}.full-post-container{max-width:800px;margin:0 auto;background:var(--card-background);padding:clamp(1.5rem,5vw,3rem);border-radius:16px;transition:background .3s ease}.back-button{display:inline-flex;align-items:center;gap:8px;color:var(--accent-blue);font-weight:600;text-decoration:none;margin-bottom:30px;cursor:pointer}.full-post-title{font-size:clamp(2rem,5vw,2.8rem);margin-bottom:15px}.post-meta{font-size:.9rem;color:var(--text-secondary);margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--card-border)}.post-full-html-content p,.post-full-html-content li{line-height:1.8}
     </style>
     <script>
@@ -164,7 +149,6 @@
             <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 004.463-.948a.75.75 0 01.981.632A11.25 11.25 0 0112 21a11.25 11.25 0 01-11.25-11.25c0-4.032 2.11-7.538 5.26-9.472a.75.75 0 01.819.162z" clip-rule="evenodd"/></svg>
         </button>
     </header>
-
     <main class="container">
         <div id="posts-view">
             <div id="status" class="status-message"></div>
@@ -177,10 +161,8 @@
         </div>
         <div id="single-post-view"></div>
     </main>
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- DOM Elements & API Config ---
             const themeToggle = document.getElementById('theme-toggle');
             const postsContainer = document.getElementById('posts-container');
             const skeletonLoader = document.getElementById('skeleton-loader');
@@ -189,23 +171,22 @@
             const bearerToken = 'ed88f53d8919ec21425624fad3824bdf08a32284';
             let allPostsData = [];
 
-            // --- THEME TOGGLE LOGIC ---
             themeToggle.addEventListener('click', () => {
                 document.body.classList.toggle('dark-mode');
                 localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
             });
 
-            // --- HELPER FUNCTIONS ---
-            const generateCoverStyle = (seed) => { /* ... (no change) ... */ const palettes=[['#6e8efb','#a777e3'],['#ff5f6d','#ffc371'],['#00c9ff','#92fe9d'],['#43e97b','#38f9d7'],['#f7971e','#ffd200'],['#11998e','#38ef7d'],['#de6262','#ffb88c']],patterns=[(c1,c2)=>`radial-gradient(circle at 100% 100%, ${c2} 0%, ${c1} 50%, transparent 51%), radial-gradient(circle at 0% 0%, ${c2} 0%, ${c1} 50%, transparent 51%)`,(c1,c2)=>`repeating-linear-gradient(45deg, ${c1}, ${c1} 10px, ${c2} 10px, ${c2} 20px)`,(c1,c2)=>`radial-gradient(at 0% 100%, ${c1} 0px, transparent 50%), radial-gradient(at 80% 0%, ${c2} 0px, transparent 50%)`,(c1,c2)=>`linear-gradient(135deg, ${c1} 25%, transparent 25%), linear-gradient(225deg, ${c1} 25%, transparent 25%), linear-gradient(45deg, ${c1} 25%, transparent 25%), linear-gradient(315deg, ${c1} 25%, ${c2} 25%)`],palette=palettes[seed%palettes.length],pattern=patterns[seed%patterns.length](palette[0],palette[1]),baseGradient=`linear-gradient(120deg, ${palette[0]}, ${palette[1]})`;return{'--pattern':pattern,'--base-gradient':baseGradient}};
-            const calculateReadTime = (html) => { /* ... (no change) ... */ const e=document.createElement("div");e.innerHTML=html;const t=e.textContent||e.innerText||"",n=200,l=t.trim().split(/\s+/).length,d=Math.ceil(l/n);return`${d} دقیقه مطالعه`};
+            const generateCoverStyle = (seed) => { const palettes=[['#6e8efb','#a777e3'],['#ff5f6d','#ffc371'],['#00c9ff','#92fe9d'],['#43e97b','#38f9d7'],['#f7971e','#ffd200'],['#11998e','#38ef7d'],['#de6262','#ffb88c']],patterns=[(c1,c2)=>`radial-gradient(circle at 100% 100%, ${c2} 0%, ${c1} 50%, transparent 51%), radial-gradient(circle at 0% 0%, ${c2} 0%, ${c1} 50%, transparent 51%)`,(c1,c2)=>`repeating-linear-gradient(45deg, ${c1}, ${c1} 10px, ${c2} 10px, ${c2} 20px)`,(c1,c2)=>`radial-gradient(at 0% 100%, ${c1} 0px, transparent 50%), radial-gradient(at 80% 0%, ${c2} 0px, transparent 50%)`,(c1,c2)=>`linear-gradient(135deg, ${c1} 25%, transparent 25%), linear-gradient(225deg, ${c1} 25%, transparent 25%), linear-gradient(45deg, ${c1} 25%, transparent 25%), linear-gradient(315deg, ${c1} 25%, ${c2} 25%)`],palette=palettes[seed%palettes.length],pattern=patterns[seed%patterns.length](palette[0],palette[1]),baseGradient=`linear-gradient(120deg, ${palette[0]}, ${palette[1]})`;return{'--pattern':pattern,'--base-gradient':baseGradient}};
+            const calculateReadTime = (html) => { const e=document.createElement("div");e.innerHTML=html;const t=e.textContent||e.innerText||"",n=200,l=t.trim().split(/\s+/).length,d=Math.ceil(l/n);return`${d} دقیقه مطالعه`};
+            
             const formatDate = (dateString) => {
-                return new Date(dateString).toLocaleDate-string('fa-IR', {
+                // CORRECTED LINE:
+                return new Date(dateString).toLocaleDateString('fa-IR', {
                     year: 'numeric', month: 'long', day: 'numeric'
                 });
             };
 
-            // --- CORE FUNCTIONS ---
-            const fetchAndDisplayPosts = async () => { /* ... (no change) ... */ try{const e=await fetch(apiUrl,{headers:{Authorization:`Bearer ${bearerToken}`}});if(!e.ok)throw new Error(`HTTP error ${e.status}`);const{items:t}=await e.json();t?.length?(allPostsData=t,displayPostPreviews(allPostsData)):(statusElement.textContent="هیچ مقاله‌ای یافت نشد.",statusElement.style.display="block")}catch(e){statusElement.textContent=`خطا در بارگذاری: ${e.message}`,statusElement.style.display="block"}finally{skeletonLoader.style.display="none"}};
+            const fetchAndDisplayPosts = async () => { try{const e=await fetch(apiUrl,{headers:{Authorization:`Bearer ${bearerToken}`}});if(!e.ok)throw new Error(`HTTP error ${e.status}`);const{items:t}=await e.json();t?.length?(allPostsData=t,displayPostPreviews(allPostsData)):(statusElement.textContent="هیچ مقاله‌ای یافت نشد.",statusElement.style.display="block")}catch(e){console.error("Error details:", e); statusElement.textContent=`خطا در بارگذاری: ${e.message}`,statusElement.style.display="block"}finally{skeletonLoader.style.display="none"}};
 
             const displayPostPreviews = (posts) => {
                 postsContainer.innerHTML = '';
