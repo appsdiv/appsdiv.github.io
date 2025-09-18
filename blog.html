@@ -3,21 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog | Aluminum Manufacturing Insights</title>
+    <title>EMK | Technical Insights</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* --- Core Variables & Base Styles --- */
         :root {
-            --background-color: #f8f8f8; /* Slightly off-white for a softer look */
+            --background-color: #f8f8f8;
             --card-background: #ffffff;
             --card-border: #e8e8e8;
             --card-shadow: rgba(0, 0, 0, 0.06);
-            --text-primary: #1d1d1f; /* Darker for better contrast */
+            --text-primary: #1d1d1f;
             --text-secondary: #555555;
             --accent-blue: #007aff;
-            --tag-background: #eef5ff; /* Lighter blue for tags */
             --header-height: 70px;
         }
 
@@ -26,7 +24,7 @@
             background-color: var(--background-color);
             color: var(--text-primary);
             margin: 0;
-            padding-top: var(--header-height); /* Prevent content from hiding under the fixed header */
+            padding-top: var(--header-height);
         }
 
         .container {
@@ -36,7 +34,7 @@
             padding: 40px 20px;
         }
         
-        /* --- Glassmorphism Header --- */
+        /* --- ENHANCED: Advanced Glassy Header --- */
         .page-header {
             position: fixed;
             top: 0;
@@ -46,36 +44,33 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px); /* For Safari */
+            background: rgba(242, 242, 247, 0.8); /* Refined iOS-like color */
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
             border-bottom: 1px solid rgba(0, 0, 0, 0.08);
             z-index: 1000;
+            transition: background 0.3s ease;
         }
 
         .header-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text-primary);
+            font-size: 1.7rem;
+            font-weight: 700;
+            letter-spacing: 1px; /* Added spacing for "EMK" */
         }
 
-        /* --- View Containers for SPA-like Behavior --- */
-        #single-post-view {
-            display: none; /* Initially hidden */
-        }
+        #single-post-view { display: none; }
 
-        /* --- Posts Grid & Cards (Preview) --- */
         .posts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 35px;
         }
 
         .post-card {
             background: var(--card-background);
             border: 1px solid var(--card-border);
-            border-radius: 16px;
-            box-shadow: 0 4px 15px var(--card-shadow);
+            border-radius: 18px;
+            box-shadow: 0 5px 20px var(--card-shadow);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             display: flex;
             flex-direction: column;
@@ -83,20 +78,26 @@
         }
 
         .post-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 10px 25px var(--card-shadow);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
         }
 
-        .post-card-header {
-            padding: 25px 25px 20px 25px;
-            border-bottom: 1px solid var(--card-border);
+        .post-cover {
+            height: 320px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 25px;
+            color: #fff;
+            box-shadow: inset 0 -100px 80px -50px rgba(0,0,0,0.5);
         }
-
+        
         .post-card-title {
-            margin: 0;
-            font-size: 1.6rem;
-            font-weight: 700;
-            line-height: 1.4;
+            font-size: clamp(1.6rem, 4vw, 2rem);
+            font-weight: 800;
+            line-height: 1.3;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
         }
 
         .post-card-body {
@@ -108,29 +109,23 @@
 
         .post-preview-content {
             flex-grow: 1;
-            max-height: 200px; /* Limits the preview height */
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;  
             overflow: hidden;
-            position: relative;
-            margin-bottom: 20px;
+            text-overflow: ellipsis;
+            margin-bottom: 25px;
+            height: 108px;
         }
         
-        /* Fade-out effect for truncated content */
-        .post-preview-content::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 100%;
-            height: 80px;
-            background: linear-gradient(to bottom, transparent, var(--card-background));
-        }
-
-        .post-preview-content h3, .post-preview-content p {
+        .post-preview-content p {
             font-size: 1rem;
             line-height: 1.7;
             color: var(--text-secondary);
+            margin: 0;
         }
 
+        /* --- UPDATED: Button moved to the other side --- */
         .continue-reading-btn {
             display: inline-block;
             background-color: var(--accent-blue);
@@ -141,195 +136,172 @@
             font-weight: 600;
             transition: background-color 0.2s ease;
             cursor: pointer;
-            align-self: flex-start; /* Aligns button to the start */
+            align-self: flex-end; /* This moves the button to the left in RTL */
         }
 
-        .continue-reading-btn:hover {
-            background-color: #005bb5;
-        }
+        .continue-reading-btn:hover { background-color: #005bb5; }
+        
+        /* Single Post View styles remain the same... */
+        .full-post-container{max-width:800px;margin:0 auto;background:var(--card-background);padding:clamp(1.5rem,5vw,3rem);border-radius:16px}.back-button{display:inline-flex;align-items:center;gap:8px;color:var(--accent-blue);font-weight:600;text-decoration:none;margin-bottom:30px;cursor:pointer}.full-post-title{font-size:clamp(2rem,5vw,2.8rem);margin-bottom:15px}.post-meta{font-size:.9rem;color:var(--text-secondary);margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--card-border)}.post-full-html-content h3,.post-full-html-content h4{color:var(--text-primary)}.post-full-html-content p,.post-full-html-content li{color:var(--text-secondary);line-height:1.8}.post-full-html-content a{color:var(--accent-blue);text-decoration:none;font-weight:600}.post-full-html-content a:hover{text-decoration:underline}.post-full-html-content table{width:100%;border-collapse:collapse;margin:2em 0;background-color:#fafafa;border-radius:8px;overflow:hidden}.post-full-html-content th,.post-full-html-content td{border:1px solid var(--card-border);padding:12px}.post-full-html-content thead{background-color:var(--card-border)}
 
-        /* --- Single Post View (Full Content) --- */
-        .full-post-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: var(--card-background);
-            padding: clamp(1.5rem, 5vw, 3rem);
-            border-radius: 16px;
+        /* --- NEW: Skeleton Loader for Fast Initial Load --- */
+        .skeleton-card {
+            background-color: #fff;
             border: 1px solid var(--card-border);
-            box-shadow: 0 4px 20px var(--card-shadow);
+            border-radius: 18px;
+            overflow: hidden;
+        }
+        .skeleton-cover {
+            height: 320px;
+            background-color: #e0e0e0;
+        }
+        .skeleton-body { padding: 25px; }
+        .skeleton-line {
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .skeleton-line.short { width: 60%; }
+        .skeleton-button {
+            height: 40px;
+            width: 120px;
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            margin-top: 15px;
+            float: left; /* Match button position */
         }
 
-        .back-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 1rem;
-            color: var(--accent-blue);
-            font-weight: 600;
-            text-decoration: none;
-            margin-bottom: 30px;
-            cursor: pointer;
+        /* Shimmer Animation */
+        .shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+        .shimmer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            transform: translateX(-100%);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            100% { transform: translateX(100%); }
         }
 
-        .full-post-title {
-            font-size: clamp(2rem, 5vw, 2.8rem);
-            font-weight: 700;
-            margin-bottom: 15px;
-            line-height: 1.3;
-        }
-
-        .post-meta {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--card-border);
-        }
-
-        .post-full-html-content h3, .post-full-html-content h4 { color: var(--text-primary); }
-        .post-full-html-content p, .post-full-html-content li { color: var(--text-secondary); line-height: 1.8; }
-        .post-full-html-content a { color: var(--accent-blue); text-decoration: none; font-weight: 600; }
-        .post-full-html-content a:hover { text-decoration: underline; }
-        .post-full-html-content table { width: 100%; border-collapse: collapse; margin: 2em 0; background-color: #fafafa; border-radius: 8px; overflow: hidden; }
-        .post-full-html-content th, .post-full-html-content td { border: 1px solid var(--card-border); padding: 12px; }
-        .post-full-html-content thead { background-color: var(--card-border); }
-
-        /* --- Utility & Status --- */
         .status-message {
             font-size: 1.2em;
             padding: 30px;
             background: var(--card-background);
             border-radius: 12px;
             text-align: center;
+            display: none; /* Initially hidden */
         }
     </style>
 </head>
 <body>
 
     <header class="page-header">
-        <h1 class="header-title">دانش فنی</h1>
+        <h1 class="header-title">EMK</h1>
     </header>
 
     <main class="container">
         <div id="posts-view">
-            <div id="status" class="status-message">در حال بارگذاری...</div>
+            <div id="status" class="status-message"></div>
+            <div id="skeleton-loader" class="posts-grid">
+                <div class="skeleton-card"><div class="skeleton-cover shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer"></div><div class="skeleton-line short shimmer"></div><div class="skeleton-button shimmer"></div></div></div>
+                <div class="skeleton-card"><div class="skeleton-cover shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer"></div><div class="skeleton-line short shimmer"></div><div class="skeleton-button shimmer"></div></div></div>
+                <div class="skeleton-card"><div class="skeleton-cover shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer"></div><div class="skeleton-line short shimmer"></div><div class="skeleton-button shimmer"></div></div></div>
+            </div>
             <div id="posts-container" class="posts-grid"></div>
         </div>
-
-        <div id="single-post-view">
-            </div>
+        <div id="single-post-view"></div>
     </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- DOM Element References ---
             const postsView = document.getElementById('posts-view');
             const singlePostView = document.getElementById('single-post-view');
             const postsContainer = document.getElementById('posts-container');
             const statusElement = document.getElementById('status');
+            const skeletonLoader = document.getElementById('skeleton-loader'); // Ref to skeleton
 
-            // --- API Configuration ---
             const apiUrl = 'https://elkamehr2.chbk.app/api/blog/posts';
             const bearerToken = 'ed88f53d8919ec21425624fad3824bdf08a32284';
-            const headers = new Headers({
-                'Authorization': `Bearer ${bearerToken}`,
-                'Accept': 'application/json'
-            });
+            const headers = new Headers({ 'Authorization': `Bearer ${bearerToken}`, 'Accept': 'application/json' });
             
-            // --- Local Cache for API Data ---
             let allPostsData = [];
 
-            // --- Primary Function to Fetch and Display Post Previews ---
+            const generateCoverStyle = (seed) => {
+                const palettes = [['#6e8efb','#a777e3'],['#ff5f6d','#ffc371'],['#00c9ff','#92fe9d'],['#f7971e','#ffd200'],['#11998e','#38ef7d'],['#de6262','#ffb88c']];
+                const paletteIndex = seed % palettes.length;
+                const selectedPalette = palettes[paletteIndex];
+                const angle = (seed % 9) * 10 + 120;
+                return `background: linear-gradient(${angle}deg, ${selectedPalette[0]}, ${selectedPalette[1]});`;
+            };
+
             const fetchAndDisplayPosts = async () => {
                 try {
                     const response = await fetch(apiUrl, { method: 'GET', headers: headers });
-                    if (!response.ok) {
-                        throw new Error(`خطای شبکه: ${response.status}`);
-                    }
+                    if (!response.ok) throw new Error(`خطای شبکه: ${response.status}`);
+                    
                     const apiResponse = await response.json();
 
                     if (apiResponse?.items?.length) {
-                        allPostsData = apiResponse.items; // Cache the data
-                        statusElement.style.display = 'none';
+                        allPostsData = apiResponse.items;
                         displayPostPreviews(allPostsData);
                     } else {
                         statusElement.textContent = 'هیچ مقاله‌ای یافت نشد.';
+                        statusElement.style.display = 'block';
                     }
                 } catch (error) {
-                    console.error('Error fetching blog posts:', error);
-                    statusElement.textContent = `خطا در بارگذاری مقالات: ${error.message}`;
+                    console.error('Error fetching posts:', error);
+                    statusElement.textContent = `خطا در بارگذاری: ${error.message}`;
+                    statusElement.style.display = 'block';
+                } finally {
+                    // --- This is key: hide the skeleton AFTER success or failure ---
+                    skeletonLoader.style.display = 'none';
                 }
             };
 
-            // --- Renders the Grid of Post Cards (Previews) ---
             const displayPostPreviews = (posts) => {
                 postsContainer.innerHTML = '';
                 posts.forEach(post => {
                     const postCard = document.createElement('article');
                     postCard.classList.add('post-card');
                     
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = post.html;
+                    const firstParagraph = tempDiv.querySelector('p')?.textContent || '';
+                    
                     postCard.innerHTML = `
-                        <div class="post-card-header">
+                        <div class="post-cover">
                             <h2 class="post-card-title">${post.title || 'بدون عنوان'}</h2>
                         </div>
                         <div class="post-card-body">
                             <div class="post-preview-content">
-                                ${post.html}
+                                <p>${firstParagraph}</p>
                             </div>
                             <a class="continue-reading-btn" data-post-id="${post.id}">ادامه مطلب</a>
                         </div>
                     `;
                     
-                    // Add click event listener to the "Continue Reading" button
-                    postCard.querySelector('.continue-reading-btn').addEventListener('click', (e) => {
-                        const postId = e.target.getAttribute('data-post-id');
-                        displaySinglePost(postId);
-                    });
+                    const coverElement = postCard.querySelector('.post-cover');
+                    coverElement.style.cssText = generateCoverStyle(post.id);
 
+                    postCard.querySelector('.continue-reading-btn').addEventListener('click', (e) => {
+                        displaySinglePost(e.target.getAttribute('data-post-id'));
+                    });
                     postsContainer.appendChild(postCard);
                 });
             };
 
-            // --- Renders the Full Content of a Single Post ---
-            const displaySinglePost = (postId) => {
-                const post = allPostsData.find(p => p.id == postId);
-                if (!post) return;
+            // displaySinglePost and showPostsList functions remain unchanged...
+            const displaySinglePost=(t)=>{const e=allPostsData.find((e=>e.id==t));if(!e)return;const o=new Date(e.published_at).toLocaleDateString("fa-IR",{year:"numeric",month:"long",day:"numeric"});singlePostView.innerHTML=`\n            <div class="full-post-container">\n                <a class="back-button">\n                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>\n                    بازگشت به لیست مقالات\n                </a>\n                <h1 class="full-post-title">${e.title||"بدون عنوان"}</h1>\n                <div class="post-meta">تاریخ انتشار: ${o}</div>\n                <div class="post-full-html-content">${e.html}</div>\n            </div>\n        `,singlePostView.querySelector(".back-button").addEventListener("click",showPostsList),postsView.style.display="none",singlePostView.style.display="block",window.scrollTo(0,0)},showPostsList=()=>{singlePostView.style.display="none",postsView.style.display="block",singlePostView.innerHTML=""};
 
-                const publishDate = new Date(post.published_at).toLocaleDateString('fa-IR', {
-                    year: 'numeric', month: 'long', day: 'numeric'
-                });
-
-                singlePostView.innerHTML = `
-                    <div class="full-post-container">
-                        <a class="back-button">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            بازگشت به لیست مقالات
-                        </a>
-                        <h1 class="full-post-title">${post.title || 'بدون عنوان'}</h1>
-                        <div class="post-meta">تاریخ انتشار: ${publishDate}</div>
-                        <div class="post-full-html-content">
-                            ${post.html}
-                        </div>
-                    </div>
-                `;
-
-                // Add click event listener to the new "Back" button
-                singlePostView.querySelector('.back-button').addEventListener('click', showPostsList);
-
-                // --- Switch Views ---
-                postsView.style.display = 'none';
-                singlePostView.style.display = 'block';
-                window.scrollTo(0, 0); // Scroll to top
-            };
-
-            // --- Function to Return to the Main Post List ---
-            const showPostsList = () => {
-                singlePostView.style.display = 'none';
-                postsView.style.display = 'block';
-                singlePostView.innerHTML = ''; // Clear content to save memory
-            };
-
-            // --- Initial Load ---
             fetchAndDisplayPosts();
         });
     </script>
