@@ -6,30 +6,30 @@
     <title>EMK | Technical Insights</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --background-color: #f4f4f9;
+            --background-color: #f6f6f7;
             --card-background: #ffffff;
-            --card-border: #e8e8e8;
-            --card-shadow: rgba(0, 0, 0, 0.05);
+            --card-border: rgba(0, 0, 0, 0.08);
+            --card-shadow: rgba(0, 0, 0, 0.04);
             --text-primary: #1d1d1f;
-            --text-secondary: #555555;
-            --text-meta: #8a8a8e;
-            --header-bg: rgba(242, 242, 247, 0.8);
-            --skeleton-bg: #e0e0e0;
+            --text-secondary: #3c3c3e;
+            --text-meta: #6e6e73;
+            --header-bg: rgba(246, 246, 247, 0.7);
+            --skeleton-bg: #e5e5e5;
             --accent-blue: #007aff;
             --header-height: 70px;
         }
         body.dark-mode {
             --background-color: #000000;
             --card-background: #1c1c1e;
-            --card-border: #38383a;
+            --card-border: rgba(255, 255, 255, 0.15);
             --card-shadow: rgba(0, 0, 0, 0.2);
             --text-primary: #f5f5f7;
-            --text-secondary: #a9a9b0;
-            --text-meta: #8a8a8e;
-            --header-bg: rgba(28, 28, 30, 0.75);
+            --text-secondary: #d1d1d6;
+            --text-meta: #8d8d93;
+            --header-bg: rgba(28, 28, 30, 0.7);
             --skeleton-bg: #2c2c2e;
         }
         body {
@@ -41,66 +41,87 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
         
-        /* Header, Toggle, and other base styles remain the same... */
-        .page-header{position:fixed;top:0;right:0;width:100%;height:var(--header-height);display:flex;align-items:center;justify-content:center;background:var(--header-bg);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--card-border);z-index:1000;transition:background .3s ease,border-color .3s ease}.header-title{font-size:1.7rem;font-weight:700;letter-spacing:1px}#theme-toggle{position:absolute;left:20px;top:50%;transform:translateY(-50%);background:0 0;border:none;cursor:pointer;padding:5px;display:flex;align-items:center;justify-content:center}#theme-toggle svg{width:24px;height:24px;color:var(--text-primary);transition:transform .3s ease,opacity .3s ease}.sun-icon{position:absolute}.moon-icon{transform:scale(0);opacity:0}body.dark-mode .sun-icon{transform:scale(0);opacity:0}body.dark-mode .moon-icon{transform:scale(1);opacity:1}.container{width:100%;max-width:1200px;margin:0 auto;padding:40px 20px}#single-post-view{display:none}
+        /* --- HEADER & THEME TOGGLE (Polished) --- */
+        .page-header{position:fixed;top:0;right:0;width:100%;height:var(--header-height);display:flex;align-items:center;justify-content:center;background:var(--header-bg);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--card-border);z-index:1000;transition:background .3s ease,border-color .3s ease}.header-title{font-size:1.7rem;font-weight:700;letter-spacing:1px}#theme-toggle{position:absolute;left:20px;top:50%;transform:translateY(-50%);background:0 0;border:none;cursor:pointer;padding:5px;display:flex;align-items:center;justify-content:center}#theme-toggle svg{width:24px;height:24px;color:var(--text-primary);transition:transform .3s ease,opacity .3s ease}.sun-icon{position:absolute}.moon-icon{transform:scale(0);opacity:0}body.dark-mode .sun-icon{transform:scale(0);opacity:0}body.dark-mode .moon-icon{transform:scale(1);opacity:1}
         
+        /* --- MAIN LAYOUT & GRID --- */
+        .container{width:100%;max-width:1200px;margin:0 auto;padding:50px 20px}
+        #single-post-view{display:none}
         .posts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); /* Adjusted width slightly */
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+            gap: 35px;
         }
 
+        /* --- POLISHED POST CARD (Hover Effects Removed) --- */
         .post-card {
             background: var(--card-background);
             border: 1px solid var(--card-border);
-            border-radius: 18px;
-            box-shadow: 0 5px 20px var(--card-shadow);
+            border-radius: 20px; /* Softer radius */
+            box-shadow: 0 4px 12px var(--card-shadow);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
-        .post-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-        }
-        body.dark-mode .post-card:hover { box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3); }
 
-        /* --- ENHANCED: Post Cover Design --- */
-        .post-cover-wrapper { overflow: hidden; }
+        /* --- POLISHED POST COVER (More Content) --- */
         .post-cover {
-            height: 300px;
+            height: 320px;
             position: relative;
             display: flex;
-            align-items: flex-end;
+            flex-direction: column; /* To stack content */
+            justify-content: flex-end; /* Align all content to bottom */
             padding: 25px;
             color: #fff;
-            /* The scrim is now a separate pseudo-element for better layering */
         }
-        .post-cover::after {
+        .post-cover::after { /* Scrim for legibility */
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 50%, transparent 100%);
+            background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.1) 70%, transparent 100%);
             z-index: 1;
         }
-        .post-card:hover .post-cover { transform: scale(1.05); }
         .post-cover-background {
             position: absolute;
             inset: 0;
-            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smoother zoom */
+            background-size: cover, cover;
         }
-        .post-card:hover .post-cover-background { transform: scale(1.05); }
-        
+        .cover-content {
+            position: relative;
+            z-index: 2;
+        }
+        .cover-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .cover-tag {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 5px 12px;
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            color: #fff;
+        }
         .post-card-title {
-            font-size: 1.7rem;
+            font-size: 1.8rem;
             font-weight: 800;
             line-height: 1.35;
-            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.6);
-            position: relative;
-            z-index: 2; /* Ensures title is above the scrim */
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.7);
+            margin: 0;
         }
-
+        .cover-date {
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 8px;
+            opacity: 0.8;
+        }
+        
         .post-card-body {
             padding: 25px;
             display: flex;
@@ -108,37 +129,28 @@
             flex-grow: 1;
         }
         
-        /* --- ENHANCED: More Content Display --- */
+        /* POLISHED Content Preview */
         .post-preview-content {
             flex-grow: 1;
-            font-size: 0.95rem;
-            line-height: 1.7;
+            font-size: 1rem;
+            line-height: 1.75;
             color: var(--text-secondary);
-            max-height: 130px; /* Increased height for ~5-6 lines */
+            /* Clean line-clamp truncation */
+            display: -webkit-box;
+            -webkit-line-clamp: 5; /* More content visible */
+            -webkit-box-orient: vertical;  
             overflow: hidden;
-            position: relative;
+            text-overflow: ellipsis;
         }
-        /* Fade out effect to show there's more content */
-        .post-preview-content::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 100%;
-            height: 40px;
-            background: linear-gradient(to bottom, transparent, var(--card-background));
-        }
-        /* Allow basic formatting in preview */
-        .post-preview-content p { margin: 0 0 1em 0; }
-        .post-preview-content strong { color: var(--text-primary); }
-
-        .post-card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 20px; margin-top: auto; }
-        .post-card-meta { font-size: 0.8rem; font-weight: 600; color: var(--text-meta); }
-        .continue-reading-btn { font-size: 0.9rem; padding: 8px 16px; background-color: var(--accent-blue); color: #fff; border-radius: 8px; text-decoration: none; font-weight: 600; transition: background-color 0.2s ease; }
+        .post-preview-content p { margin: 0; }
+        
+        .post-card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 25px; margin-top: auto; }
+        .post-card-meta { font-size: 0.85rem; font-weight: 600; color: var(--text-meta); }
+        .continue-reading-btn { font-size: 0.9rem; padding: 10px 18px; background-color: var(--accent-blue); color: #fff; border-radius: 10px; text-decoration: none; font-weight: 600; transition: background-color 0.2s ease; }
         .continue-reading-btn:hover { background-color: #005bb5; }
         
         /* Skeleton and Single Post styles condensed for brevity */
-        .skeleton-card{background-color:var(--card-background);border:1px solid var(--card-border);border-radius:18px;overflow:hidden}.skeleton-cover{height:300px;background-color:var(--skeleton-bg)}.skeleton-body{padding:25px}.skeleton-line{height:16px;background-color:var(--skeleton-bg);border-radius:4px;margin-bottom:10px}.skeleton-line.short{width:60%}.skeleton-footer{display:flex;justify-content:space-between;align-items:center;margin-top:15px}.skeleton-meta{height:14px;width:70px;background-color:var(--skeleton-bg);border-radius:4px}.skeleton-button{height:35px;width:100px;background-color:var(--skeleton-bg);border-radius:8px}.shimmer{position:relative;overflow:hidden}.shimmer::after{content:'';position:absolute;top:0;right:0;bottom:0;left:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);animation:shimmer 1.5s infinite}body.dark-mode .shimmer::after{background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent)}@keyframes shimmer{100%{transform:translateX(100%)}}.status-message{font-size:1.2em;padding:30px;background:var(--card-background);border-radius:12px;text-align:center;display:none}.full-post-container{max-width:800px;margin:0 auto;background:var(--card-background);padding:clamp(1.5rem,5vw,3rem);border-radius:16px;transition:background .3s ease}.back-button{display:inline-flex;align-items:center;gap:8px;color:var(--accent-blue);font-weight:600;text-decoration:none;margin-bottom:30px;cursor:pointer}.full-post-title{font-size:clamp(2rem,5vw,2.8rem);margin-bottom:15px}.post-meta{font-size:.9rem;color:var(--text-secondary);margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--card-border)}.post-full-html-content p,.post-full-html-content li{line-height:1.8}
+        .skeleton-card{background-color:var(--card-background);border:1px solid var(--card-border);border-radius:20px;overflow:hidden}.skeleton-cover{height:320px;background-color:var(--skeleton-bg);display:flex;flex-direction:column;justify-content:flex-end;padding:25px}.skeleton-cover-tags{display:flex;gap:8px;margin-bottom:12px}.skeleton-tag{height:25px;width:70px;border-radius:30px;background-color:rgba(0,0,0,.1)}.skeleton-title-line{height:28px;border-radius:5px;background-color:rgba(0,0,0,.1);margin-bottom:8px}.skeleton-title-line.short{width:60%}.skeleton-date-line{height:14px;width:120px;border-radius:4px;background-color:rgba(0,0,0,.1)}.skeleton-body{padding:25px}.skeleton-line{height:16px;background-color:var(--skeleton-bg);border-radius:4px;margin-bottom:12px}.skeleton-line:last-child{width:70%}.skeleton-footer{display:flex;justify-content:space-between;align-items:center;margin-top:25px}.skeleton-meta{height:16px;width:80px;background-color:var(--skeleton-bg);border-radius:4px}.skeleton-button{height:40px;width:110px;background-color:var(--skeleton-bg);border-radius:10px}.shimmer{position:relative;overflow:hidden}.shimmer::after{content:'';position:absolute;top:0;right:0;bottom:0;left:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);animation:shimmer 1.5s infinite}body.dark-mode .shimmer::after{background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent)}@keyframes shimmer{100%{transform:translateX(100%)}}.status-message{font-size:1.2em;padding:30px;background:var(--card-background);border-radius:12px;text-align:center;display:none}.full-post-container{max-width:800px;margin:0 auto;background:var(--card-background);padding:clamp(1.5rem,5vw,3rem);border-radius:16px;transition:background .3s ease}.back-button{display:inline-flex;align-items:center;gap:8px;color:var(--accent-blue);font-weight:600;text-decoration:none;margin-bottom:30px;cursor:pointer}.full-post-title{font-size:clamp(2rem,5vw,2.8rem);margin-bottom:15px}.post-meta{font-size:.9rem;color:var(--text-secondary);margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--card-border)}.post-full-html-content p,.post-full-html-content li{line-height:1.8}
     </style>
     <script>
         (function() { const theme = localStorage.getItem('theme'); if (theme === 'dark') { document.body.classList.add('dark-mode'); } })();
@@ -157,9 +169,9 @@
         <div id="posts-view">
             <div id="status" class="status-message"></div>
             <div id="skeleton-loader" class="posts-grid">
-                <div class="skeleton-card"><div class="skeleton-cover shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer"></div><div class="skeleton-line short shimmer"></div><div class="skeleton-footer"><div class="skeleton-meta shimmer"></div><div class="skeleton-button shimmer"></div></div></div></div>
-                <div class="skeleton-card"><div class="skeleton-cover shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer"></div><div class="skeleton-line short shimmer"></div><div class="skeleton-footer"><div class="skeleton-meta shimmer"></div><div class="skeleton-button shimmer"></div></div></div></div>
-                <div class="skeleton-card"><div class="skeleton-cover shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer"></div><div class="skeleton-line short shimmer"></div><div class="skeleton-footer"><div class="skeleton-meta shimmer"></div><div class="skeleton-button shimmer"></div></div></div></div>
+                <div class="skeleton-card"><div class="skeleton-cover shimmer"><div class="cover-content"><div class="skeleton-cover-tags"><div class="skeleton-tag"></div><div class="skeleton-tag"></div></div><div class="skeleton-title-line"></div><div class="skeleton-title-line short"></div><div class="skeleton-date-line"></div></div></div><div class="skeleton-body"><div class="skeleton-line shimmer"></div><div class="skeleton-line shimmer"></div><div class="skeleton-line shimmer"></div><div class="skeleton-footer"><div class="skeleton-meta shimmer"></div><div class="skeleton-button shimmer"></div></div></div></div>
+                <div class="skeleton-card"><div class="skeleton-cover shimmer"><div class="cover-content"><div class="skeleton-cover-tags"><div class="skeleton-tag"></div></div><div class="skeleton-title-line"></div><div class="skeleton-title-line short"></div><div class="skeleton-date-line"></div></div></div><div class="skeleton-body"><div class="skeleton-line shimmer"></div><div class="skeleton-line shimmer"></div><div class="skeleton-line shimmer"></div><div class="skeleton-footer"><div class="skeleton-meta shimmer"></div><div class="skeleton-button shimmer"></div></div></div></div>
+                <div class="skeleton-card"><div class="skeleton-cover shimmer"><div class="cover-content"><div class="skeleton-cover-tags"><div class="skeleton-tag"></div><div class="skeleton-tag"></div></div><div class="skeleton-title-line"></div><div class="skeleton-title-line short"></div><div class="skeleton-date-line"></div></div></div><div class="skeleton-body"><div class="skeleton-line shimmer"></div><div class="skeleton-line shimmer"></div><div class="skeleton-line shimmer"></div><div class="skeleton-footer"><div class="skeleton-meta shimmer"></div><div class="skeleton-button shimmer"></div></div></div></div>
             </div>
             <div id="posts-container" class="posts-grid"></div>
         </div>
@@ -168,6 +180,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements & API Config ---
             const themeToggle = document.getElementById('theme-toggle');
             const postsContainer = document.getElementById('posts-container');
             const skeletonLoader = document.getElementById('skeleton-loader');
@@ -176,66 +189,22 @@
             const bearerToken = 'ed88f53d8919ec21425624fad3824bdf08a32284';
             let allPostsData = [];
 
+            // --- THEME TOGGLE LOGIC ---
             themeToggle.addEventListener('click', () => {
                 document.body.classList.toggle('dark-mode');
                 localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
             });
 
-            // --- ENHANCED: Cover Style Generator ---
-            const generateCoverStyle = (seed) => {
-                const palettes = [['#6e8efb','#a777e3'], ['#ff5f6d','#ffc371'], ['#00c9ff','#92fe9d'], ['#43e97b','#38f9d7'], ['#f7971e','#ffd200'], ['#11998e','#38ef7d'], ['#de6262','#ffb88c']];
-                const patterns = [
-                    (c1,c2) => `radial-gradient(circle at 100% 100%, ${c2} 0%, ${c1} 50%, transparent 51%), radial-gradient(circle at 0% 0%, ${c2} 0%, ${c1} 50%, transparent 51%)`,
-                    (c1,c2) => `repeating-linear-gradient(45deg, ${c1}, ${c1} 10px, ${c2} 10px, ${c2} 20px)`,
-                    (c1,c2) => `radial-gradient(at 0% 100%, ${c1} 0px, transparent 50%), radial-gradient(at 80% 0%, ${c2} 0px, transparent 50%)`,
-                    (c1,c2) => `linear-gradient(135deg, ${c1} 25%, transparent 25%), linear-gradient(225deg, ${c1} 25%, transparent 25%), linear-gradient(45deg, ${c1} 25%, transparent 25%), linear-gradient(315deg, ${c1} 25%, ${c2} 25%)`
-                ];
-                
-                const palette = palettes[seed % palettes.length];
-                const pattern = patterns[seed % patterns.length](palette[0], palette[1]);
-                const baseGradient = `linear-gradient(120deg, ${palette[0]}, ${palette[1]})`;
-                
-                return {
-                    // Set as CSS variables for easier use in styling
-                    '--base-gradient': baseGradient,
-                    '--pattern': pattern
-                };
+            // --- HELPER FUNCTIONS ---
+            const generateCoverStyle = (seed) => { /* ... (no change) ... */ const palettes=[['#6e8efb','#a777e3'],['#ff5f6d','#ffc371'],['#00c9ff','#92fe9d'],['#43e97b','#38f9d7'],['#f7971e','#ffd200'],['#11998e','#38ef7d'],['#de6262','#ffb88c']],patterns=[(c1,c2)=>`radial-gradient(circle at 100% 100%, ${c2} 0%, ${c1} 50%, transparent 51%), radial-gradient(circle at 0% 0%, ${c2} 0%, ${c1} 50%, transparent 51%)`,(c1,c2)=>`repeating-linear-gradient(45deg, ${c1}, ${c1} 10px, ${c2} 10px, ${c2} 20px)`,(c1,c2)=>`radial-gradient(at 0% 100%, ${c1} 0px, transparent 50%), radial-gradient(at 80% 0%, ${c2} 0px, transparent 50%)`,(c1,c2)=>`linear-gradient(135deg, ${c1} 25%, transparent 25%), linear-gradient(225deg, ${c1} 25%, transparent 25%), linear-gradient(45deg, ${c1} 25%, transparent 25%), linear-gradient(315deg, ${c1} 25%, ${c2} 25%)`],palette=palettes[seed%palettes.length],pattern=patterns[seed%patterns.length](palette[0],palette[1]),baseGradient=`linear-gradient(120deg, ${palette[0]}, ${palette[1]})`;return{'--pattern':pattern,'--base-gradient':baseGradient}};
+            const calculateReadTime = (html) => { /* ... (no change) ... */ const e=document.createElement("div");e.innerHTML=html;const t=e.textContent||e.innerText||"",n=200,l=t.trim().split(/\s+/).length,d=Math.ceil(l/n);return`${d} دقیقه مطالعه`};
+            const formatDate = (dateString) => {
+                return new Date(dateString).toLocaleDate-string('fa-IR', {
+                    year: 'numeric', month: 'long', day: 'numeric'
+                });
             };
 
-            const calculateReadTime = (html) => { /* ... (no change) ... */ const tempDiv=document.createElement("div");tempDiv.innerHTML=html;const text=tempDiv.textContent||tempDiv.innerText||"",wordsPerMinute=200,wordCount=text.trim().split(/\s+/).length,readTime=Math.ceil(wordCount/wordsPerMinute);return`${readTime} دقیقه مطالعه`};
-            
-            // --- ENHANCED: HTML Truncation ---
-            const truncateHtml = (html, charLimit) => {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = html;
-                let truncatedHtml = '';
-                let charCount = 0;
-
-                function traverse(node) {
-                    if (charCount >= charLimit) return;
-                    if (node.nodeType === Node.TEXT_NODE) {
-                        const remaining = charLimit - charCount;
-                        if (node.textContent.length > remaining) {
-                            truncatedHtml += node.textContent.substring(0, remaining) + '...';
-                            charCount = charLimit;
-                        } else {
-                            truncatedHtml += node.textContent;
-                            charCount += node.textContent.length;
-                        }
-                    } else if (node.nodeType === Node.ELEMENT_NODE) {
-                        const openingTag = `<${node.tagName.toLowerCase()}>`;
-                        const closingTag = `</${node.tagName.toLowerCase()}>`;
-                        truncatedHtml += openingTag;
-                        node.childNodes.forEach(child => traverse(child));
-                        if (charCount < charLimit) {
-                            truncatedHtml += closingTag;
-                        }
-                    }
-                }
-                tempDiv.childNodes.forEach(child => traverse(child));
-                return truncatedHtml;
-            };
-
+            // --- CORE FUNCTIONS ---
             const fetchAndDisplayPosts = async () => { /* ... (no change) ... */ try{const e=await fetch(apiUrl,{headers:{Authorization:`Bearer ${bearerToken}`}});if(!e.ok)throw new Error(`HTTP error ${e.status}`);const{items:t}=await e.json();t?.length?(allPostsData=t,displayPostPreviews(allPostsData)):(statusElement.textContent="هیچ مقاله‌ای یافت نشد.",statusElement.style.display="block")}catch(e){statusElement.textContent=`خطا در بارگذاری: ${e.message}`,statusElement.style.display="block"}finally{skeletonLoader.style.display="none"}};
 
             const displayPostPreviews = (posts) => {
@@ -244,18 +213,24 @@
                     const postCard = document.createElement('article');
                     postCard.classList.add('post-card');
                     
-                    const previewHtml = truncateHtml(post.html, 250); // Increased character limit
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = post.html;
+                    const previewText = tempDiv.textContent || '';
                     const readTime = calculateReadTime(post.html);
+                    const formattedDate = formatDate(post.published_at);
+                    const tagsHtml = post.tags?.map(tag => `<span class="cover-tag">${tag.name}</span>`).join('') || '';
                     
                     postCard.innerHTML = `
-                        <div class="post-cover-wrapper">
-                            <div class="post-cover">
-                                <div class="post-cover-background"></div>
+                        <div class="post-cover">
+                            <div class="post-cover-background"></div>
+                            <div class="cover-content">
+                                <div class="cover-tags">${tagsHtml}</div>
                                 <h2 class="post-card-title">${post.title || 'بدون عنوان'}</h2>
+                                <div class="cover-date">${formattedDate}</div>
                             </div>
                         </div>
                         <div class="post-card-body">
-                            <div class="post-preview-content">${previewHtml}</div>
+                            <div class="post-preview-content"><p>${previewText}</p></div>
                             <div class="post-card-footer">
                                 <div class="post-card-meta">${readTime}</div>
                                 <a class="continue-reading-btn" data-post-id="${post.id}">ادامه مطلب</a>
@@ -265,9 +240,7 @@
                     
                     const coverBg = postCard.querySelector('.post-cover-background');
                     const styles = generateCoverStyle(post.id);
-                    // Layering the base gradient and the generated pattern
                     coverBg.style.background = `${styles['--pattern']}, ${styles['--base-gradient']}`;
-                    coverBg.style.backgroundSize = "cover, cover";
 
                     postCard.querySelector('.continue-reading-btn').addEventListener('click', (e) => {
                         displaySinglePost(e.target.getAttribute('data-post-id'));
@@ -276,7 +249,7 @@
                 });
             };
             
-            const displaySinglePost=(t)=>{const e=allPostsData.find((e=>e.id==t));if(!e)return;const o=new Date(e.published_at).toLocaleDateString("fa-IR",{year:"numeric",month:"long",day:"numeric"});singlePostView.innerHTML=`<div class="full-post-container"><a class="back-button"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> بازگشت به لیست</a><h1 class="full-post-title">${e.title||"بدون عنوان"}</h1><div class="post-meta">تاریخ انتشار: ${o}</div><div class="post-full-html-content">${e.html}</div></div>`,singlePostView.querySelector(".back-button").addEventListener("click",showPostsList),postsView.style.display="none",singlePostView.style.display="block",window.scrollTo(0,0)},showPostsList=()=>{singlePostView.style.display="none",postsView.style.display="block",singlePostView.innerHTML=""};
+            const displaySinglePost=(t)=>{const e=allPostsData.find((e=>e.id==t));if(!e)return;const o=formatDate(e.published_at);singlePostView.innerHTML=`<div class="full-post-container"><a class="back-button"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> بازگشت به لیست</a><h1 class="full-post-title">${e.title||"بدون عنوان"}</h1><div class="post-meta">تاریخ انتشار: ${o}</div><div class="post-full-html-content">${e.html}</div></div>`,singlePostView.querySelector(".back-button").addEventListener("click",showPostsList),postsView.style.display="none",singlePostView.style.display="block",window.scrollTo(0,0)},showPostsList=()=>{singlePostView.style.display="none",postsView.style.display="block",singlePostView.innerHTML=""};
             
             fetchAndDisplayPosts();
         });
