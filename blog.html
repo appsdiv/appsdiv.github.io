@@ -13,33 +13,25 @@
             --card-background: #ffffff;
             --card-border: rgba(0, 0, 0, 0.08);
             --card-shadow: rgba(0, 0, 0, 0.04);
-            --card-shadow-hover: rgba(0, 0, 0, 0.1);
             --text-primary: #1d1d1f;
             --text-secondary: #3c3c3e;
             --text-meta: #6e6e73;
             --header-bg: rgba(246, 246, 247, 0.7);
             --skeleton-bg: #e5e5e5;
             --accent-blue: #007aff;
-            --accent-blue-hover: #005bb5;
             --header-height: 70px;
-            --border-radius: 20px;
-            --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         body.dark-mode {
             --background-color: #000000;
             --card-background: #1c1c1e;
             --card-border: rgba(255, 255, 255, 0.15);
             --card-shadow: rgba(0, 0, 0, 0.2);
-            --card-shadow-hover: rgba(0, 0, 0, 0.4);
             --text-primary: #f5f5f7;
             --text-secondary: #d1d1d6;
             --text-meta: #8d8d93;
             --header-bg: rgba(28, 28, 30, 0.7);
             --skeleton-bg: #2c2c2e;
         }
-        /* --- Base & Accessibility --- */
-        *, *::before, *::after { box-sizing: border-box; }
-        html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-height) + 20px); }
         body {
             font-family: 'Vazirmatn', sans-serif;
             background-color: var(--background-color);
@@ -47,90 +39,103 @@
             margin: 0;
             padding-top: var(--header-height);
             transition: background-color 0.3s ease, color 0.3s ease;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
-        /* Style for keyboard-only focus, enhancing accessibility */
-        :focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; border-radius: 5px; }
-
-        /* --- Header --- */
-        .page-header{position:fixed;top:0;right:0;width:100%;height:var(--header-height);display:flex;align-items:center;justify-content:center;background:var(--header-bg);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--card-border);z-index:1000;transition: background .3s ease,border-color .3s ease}
-        .header-title{font-size:1.7rem;font-weight:700;letter-spacing:1px}
-        #theme-toggle{position:absolute;left:20px;top:50%;transform:translateY(-50%);background:0 0;border:none;cursor:pointer;padding:5px;display:flex;align-items:center;justify-content:center}#theme-toggle svg{width:24px;height:24px;color:var(--text-primary);transition:transform .3s ease,opacity .3s ease}
-        .sun-icon{position:absolute}.moon-icon{transform:scale(0);opacity:0}body.dark-mode .sun-icon{transform:scale(0);opacity:0}body.dark-mode .moon-icon{transform:scale(1);opacity:1}
-        #scroll-progress{position:absolute;bottom:-1px;left:0;height:2px;background:var(--accent-blue);width:0;transition:width .1s linear}
-        
-        /* --- Main Layout --- */
+        .page-header{position:fixed;top:0;right:0;width:100%;height:var(--header-height);display:flex;align-items:center;justify-content:center;background:var(--header-bg);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--card-border);z-index:1000;transition:background .3s ease,border-color .3s ease}.header-title{font-size:1.7rem;font-weight:700;letter-spacing:1px}#theme-toggle{position:absolute;left:20px;top:50%;transform:translateY(-50%);background:0 0;border:none;cursor:pointer;padding:5px;display:flex;align-items:center;justify-content:center}#theme-toggle svg{width:24px;height:24px;color:var(--text-primary);transition:transform .3s ease,opacity .3s ease}.sun-icon{position:absolute}.moon-icon{transform:scale(0);opacity:0}body.dark-mode .sun-icon{transform:scale(0);opacity:0}body.dark-mode .moon-icon{transform:scale(1);opacity:1}
         .container{width:100%;max-width:1200px;margin:0 auto;padding:50px 20px}
-        #posts-view { display: block; }
-        #single-post-view{ display: none; }
-        
-        /* --- Posts Grid & Cards --- */
-        .posts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 35px; }
+        #single-post-view{display:none}
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+            gap: 35px;
+        }
         .post-card {
             background: var(--card-background);
             border: 1px solid var(--card-border);
-            border-radius: var(--border-radius);
+            border-radius: 20px;
             box-shadow: 0 4px 12px var(--card-shadow);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transition: var(--transition-smooth);
-            cursor: pointer;
-            opacity: 0; /* For entry animation */
-            transform: translateY(20px); /* For entry animation */
-            animation: card-fade-in 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
-        .post-card:hover { transform: translateY(-8px); box-shadow: 0 12px 24px var(--card-shadow-hover); }
-        .post-cover { height: 320px; position: relative; display: flex; flex-direction: column; justify-content: flex-end; padding: 25px; color: #fff; }
-        .post-cover::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.45) 40%, rgba(0,0,0,0.1) 70%, transparent 100%); z-index: 1; transition: var(--transition-smooth); }
-        .post-card:hover .post-cover::after { background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%); }
-        .post-cover-background { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
-        .post-card:hover .post-cover-background { transform: scale(1.05); }
-        .cover-content { position: relative; z-index: 2; }
-        .cover-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-        .cover-tag { font-size: 0.75rem; font-weight: 600; padding: 5px 12px; background-color: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 30px; color: #fff; }
-        .post-card-title { font-size: 1.8rem; font-weight: 800; line-height: 1.35; text-shadow: 0 2px 20px rgba(0, 0, 0, 0.7); margin: 0; }
-        .cover-date { font-size: 0.8rem; font-weight: 500; margin-top: 8px; opacity: 0.8; }
-        .post-card-body { padding: 25px; display: flex; flex-direction: column; flex-grow: 1; }
-        .post-preview-content { flex-grow: 1; font-size: 1rem; line-height: 1.75; color: var(--text-secondary); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
+        .post-cover {
+            height: 320px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 25px;
+            color: #fff;
+        }
+        .post-cover::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.1) 70%, transparent 100%);
+            z-index: 1;
+        }
+        .post-cover-background {
+            position: absolute;
+            inset: 0;
+            background-size: cover, cover;
+        }
+        .cover-content {
+            position: relative;
+            z-index: 2;
+        }
+        .cover-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .cover-tag {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 5px 12px;
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            color: #fff;
+        }
+        .post-card-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            line-height: 1.35;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.7);
+            margin: 0;
+        }
+        .cover-date {
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 8px;
+            opacity: 0.8;
+        }
+        .post-card-body {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .post-preview-content {
+            flex-grow: 1;
+            font-size: 1rem;
+            line-height: 1.75;
+            color: var(--text-secondary);
+            display: -webkit-box;
+            -webkit-line-clamp: 5;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
         .post-preview-content p { margin: 0; }
         .post-card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 25px; margin-top: auto; }
         .post-card-meta { font-size: 0.85rem; font-weight: 600; color: var(--text-meta); }
-        .continue-reading-btn { font-size: 0.9rem; padding: 10px 18px; background-color: var(--accent-blue); color: #fff; border-radius: 10px; text-decoration: none; font-weight: 600; transition: background-color 0.2s ease; pointer-events: none; /* Let card handle click */ }
-        .post-card:hover .continue-reading-btn { background-color: var(--accent-blue-hover); }
-        @keyframes card-fade-in { to { opacity: 1; transform: translateY(0); } }
-
-        /* --- Skeleton Loader --- */
-        .skeleton-card{background-color:var(--card-background);border:1px solid var(--card-border);border-radius:20px;overflow:hidden}.skeleton-cover{height:320px;background-color:var(--skeleton-bg);display:flex;flex-direction:column;justify-content:flex-end;padding:25px}.skeleton-cover-tags{display:flex;gap:8px;margin-bottom:12px}.skeleton-tag{height:25px;width:70px;border-radius:30px;background-color:rgba(0,0,0,.1)}.skeleton-title-line{height:28px;border-radius:5px;background-color:rgba(0,0,0,.1);margin-bottom:8px}.skeleton-title-line.short{width:60%}.skeleton-date-line{height:14px;width:120px;border-radius:4px;background-color:rgba(0,0,0,.1)}.skeleton-body{padding:25px}.skeleton-line{height:16px;background-color:var(--skeleton-bg);border-radius:4px;margin-bottom:12px}.skeleton-line:last-child{width:70%}.skeleton-footer{display:flex;justify-content:space-between;align-items:center;margin-top:25px}.skeleton-meta{height:16px;width:80px;background-color:var(--skeleton-bg);border-radius:4px}.skeleton-button{height:40px;width:110px;background-color:var(--skeleton-bg);border-radius:10px}.shimmer{position:relative;overflow:hidden}.shimmer::after{content:'';position:absolute;top:0;right:0;bottom:0;left:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);animation:shimmer 1.5s infinite}body.dark-mode .shimmer::after{background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent)}@keyframes shimmer{100%{transform:translateX(100%)}}
-
-        /* --- Single Post View --- */
-        .status-message{font-size:1.2em;padding:30px;background:var(--card-background);border-radius:12px;text-align:center;display:none}
-        .full-post-container{max-width:800px;margin:0 auto;background:var(--card-background);padding:clamp(1.5rem,5vw,3rem);border-radius:16px;transition:background .3s ease; opacity: 0; animation: post-fade-in 0.5s 0.2s forwards; }
-        @keyframes post-fade-in { to { opacity: 1; } }
-        .back-button{display:inline-flex;align-items:center;gap:8px;color:var(--accent-blue);font-weight:600;text-decoration:none;margin-bottom:30px;cursor:pointer}
-        .full-post-title{font-size:clamp(2rem,5vw,2.8rem);margin-bottom:15px;line-height:1.2;}
-        .post-meta{font-size:.9rem;color:var(--text-secondary);margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--card-border)}
-        .post-full-html-content { font-size: 1.1rem; }
-        .post-full-html-content p,.post-full-html-content li{line-height:1.9;color:var(--text-secondary);margin-bottom:1.5em;}
-        .post-full-html-content h1, .post-full-html-content h2, .post-full-html-content h3 { line-height: 1.3; margin-top: 2.5em; margin-bottom: 1em; color: var(--text-primary); }
-        .post-full-html-content h2 { font-size: 1.8em; }
-        .post-full-html-content h3 { font-size: 1.4em; }
-        .post-full-html-content a { color: var(--accent-blue); text-decoration: none; border-bottom: 2px solid transparent; transition: border-color 0.3s ease; }
-        .post-full-html-content a:hover { border-color: var(--accent-blue); }
-        .post-full-html-content blockquote { border-right: 4px solid var(--accent-blue); margin-right: 0; padding-right: 1.5em; font-style: italic; color: var(--text-meta); }
-        .post-full-html-content img { max-width: 100%; height: auto; border-radius: 10px; }
-
-        /* --- View Transition API Styles --- */
-        /* Assign a transition name to the elements we want to animate */
-        .post-card-title, .full-post-title { view-transition-name: post-title; }
-        .post-cover, #single-post-view { view-transition-name: post-cover; }
-        
-        @keyframes slide-from-right { from { transform: translateX(30px); opacity: 0; } }
-        @keyframes slide-to-left { to { transform: translateX(-30px); opacity: 0; } }
-
-        ::view-transition-old(root) { animation: 300ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-left; }
-        ::view-transition-new(root) { animation: 300ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right; }
+        .continue-reading-btn { font-size: 0.9rem; padding: 10px 18px; background-color: var(--accent-blue); color: #fff; border-radius: 10px; text-decoration: none; font-weight: 600; transition: background-color 0.2s ease; }
+        .continue-reading-btn:hover { background-color: #005bb5; }
+        .skeleton-card{background-color:var(--card-background);border:1px solid var(--card-border);border-radius:20px;overflow:hidden}.skeleton-cover{height:320px;background-color:var(--skeleton-bg);display:flex;flex-direction:column;justify-content:flex-end;padding:25px}.skeleton-cover-tags{display:flex;gap:8px;margin-bottom:12px}.skeleton-tag{height:25px;width:70px;border-radius:30px;background-color:rgba(0,0,0,.1)}.skeleton-title-line{height:28px;border-radius:5px;background-color:rgba(0,0,0,.1);margin-bottom:8px}.skeleton-title-line.short{width:60%}.skeleton-date-line{height:14px;width:120px;border-radius:4px;background-color:rgba(0,0,0,.1)}.skeleton-body{padding:25px}.skeleton-line{height:16px;background-color:var(--skeleton-bg);border-radius:4px;margin-bottom:12px}.skeleton-line:last-child{width:70%}.skeleton-footer{display:flex;justify-content:space-between;align-items:center;margin-top:25px}.skeleton-meta{height:16px;width:80px;background-color:var(--skeleton-bg);border-radius:4px}.skeleton-button{height:40px;width:110px;background-color:var(--skeleton-bg);border-radius:10px}.shimmer{position:relative;overflow:hidden}.shimmer::after{content:'';position:absolute;top:0;right:0;bottom:0;left:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);animation:shimmer 1.5s infinite}body.dark-mode .shimmer::after{background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent)}@keyframes shimmer{100%{transform:translateX(100%)}}.status-message{font-size:1.2em;padding:30px;background:var(--card-background);border-radius:12px;text-align:center;display:none}.full-post-container{max-width:800px;margin:0 auto;background:var(--card-background);padding:clamp(1.5rem,5vw,3rem);border-radius:16px;transition:background .3s ease}.back-button{display:inline-flex;align-items:center;gap:8px;color:var(--accent-blue);font-weight:600;text-decoration:none;margin-bottom:30px;cursor:pointer}.full-post-title{font-size:clamp(2rem,5vw,2.8rem);margin-bottom:15px}.post-meta{font-size:.9rem;color:var(--text-secondary);margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--card-border)}.post-full-html-content p,.post-full-html-content li{line-height:1.8}
     </style>
     <script>
         (function() { const theme = localStorage.getItem('theme'); if (theme === 'dark') { document.body.classList.add('dark-mode'); } })();
@@ -138,7 +143,6 @@
 </head>
 <body>
     <header class="page-header">
-        <div id="scroll-progress"></div>
         <h1 class="header-title">EMK</h1>
         <button id="theme-toggle" aria-label="Toggle light and dark mode">
             <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 010 1.06l-1.591 1.59a.75.75 0 11-1.06-1.06l1.59-1.59a.75.75 0 011.06 0zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5h2.25a.75.75 0 01.75.75zM17.836 17.836a.75.75 0 01-1.06 0l-1.59-1.591a.75.75 0 111.06-1.06l1.591 1.59a.75.75 0 010 1.061zM12 18a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.894 17.836a.75.75 0 010-1.06l1.591-1.59a.75.75 0 111.06 1.06l-1.59 1.59a.75.75 0 01-1.06 0zM4.25 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H5a.75.75 0 01-.75-.75zM6.106 6.106a.75.75 0 011.06 0l1.59 1.591a.75.75 0 11-1.06 1.06l-1.591-1.59a.75.75 0 010-1.06z"/></svg>
@@ -162,70 +166,47 @@
             const themeToggle = document.getElementById('theme-toggle');
             const postsContainer = document.getElementById('posts-container');
             const skeletonLoader = document.getElementById('skeleton-loader');
-            const postsView = document.getElementById('posts-view');
-            const singlePostView = document.getElementById('single-post-view');
-            const statusElement = document.getElementById('status');
-            const scrollProgress = document.getElementById('scroll-progress');
-
+            const postsView = document.getElementById('posts-view'), singlePostView = document.getElementById('single-post-view'), statusElement = document.getElementById('status');
             const apiUrl = 'https://elkamehr2.chbk.app/api/blog/posts';
             const bearerToken = 'ed88f53d8919ec21425624fad3824bdf08a32284';
             let allPostsData = [];
 
-            // --- Theme Toggling ---
             themeToggle.addEventListener('click', () => {
                 document.body.classList.toggle('dark-mode');
                 localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
             });
 
-            // --- Utility Functions ---
-            const generateCoverStyle = (seed) => {const p=[['#6e8efb','#a777e3'],['#ff5f6d','#ffc371'],['#00c9ff','#92fe9d'],['#43e97b','#38f9d7'],['#f7971e','#ffd200'],['#11998e','#38ef7d'],['#de6262','#ffb88c']],t=[(c,e)=>`radial-gradient(circle at 100% 100%,${e} 0%,${c} 50%,transparent 51%),radial-gradient(circle at 0% 0%,${e} 0%,${c} 50%,transparent 51%)`,(c,e)=>`repeating-linear-gradient(45deg,${c},${c} 10px,${e} 10px,${e} 20px)`,(c,e)=>`radial-gradient(at 0% 100%,${c} 0px,transparent 50%),radial-gradient(at 80% 0%,${e} 0px,transparent 50%)`,(c,e)=>`linear-gradient(135deg,${c} 25%,transparent 25%),linear-gradient(225deg,${c} 25%,transparent 25%),linear-gradient(45deg,${c} 25%,transparent 25%),linear-gradient(315deg,${c} 25%,${e} 25%)`],a=p[seed%p.length],n=t[seed%t.length](a[0],a[1]),s=`linear-gradient(120deg, ${a[0]}, ${a[1]})`;return{'--pattern':n,'--base-gradient':s}};
-            const calculateReadTime = (html) => {const e=document.createElement("div");e.innerHTML=html;const t=e.textContent||e.innerText||"",n=200,l=t.trim().split(/\s+/).length,d=Math.ceil(l/n);return`${d} دقیقه مطالعه`};
-            const formatDate = (dateString) => new Date(dateString).toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' });
-
-            // --- Data Fetching & Initial Display ---
-            const fetchAndDisplayPosts = async () => {
-                try {
-                    const response = await fetch(apiUrl, { headers: { Authorization: `Bearer ${bearerToken}` } });
-                    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-                    const { items } = await response.json();
-                    
-                    if (items?.length) {
-                        allPostsData = items;
-                        displayPostPreviews(allPostsData);
-                    } else {
-                        statusElement.textContent = "هیچ مقاله‌ای یافت نشد.";
-                        statusElement.style.display = "block";
-                    }
-                } catch (error) {
-                    console.error("Error details:", error);
-                    statusElement.textContent = `خطا در بارگذاری: ${error.message}`;
-                    statusElement.style.display = "block";
-                } finally {
-                    skeletonLoader.style.display = "none";
-                }
+            const generateCoverStyle = (seed) => { const palettes=[['#6e8efb','#a777e3'],['#ff5f6d','#ffc371'],['#00c9ff','#92fe9d'],['#43e97b','#38f9d7'],['#f7971e','#ffd200'],['#11998e','#38ef7d'],['#de6262','#ffb88c']],patterns=[(c1,c2)=>`radial-gradient(circle at 100% 100%, ${c2} 0%, ${c1} 50%, transparent 51%), radial-gradient(circle at 0% 0%, ${c2} 0%, ${c1} 50%, transparent 51%)`,(c1,c2)=>`repeating-linear-gradient(45deg, ${c1}, ${c1} 10px, ${c2} 10px, ${c2} 20px)`,(c1,c2)=>`radial-gradient(at 0% 100%, ${c1} 0px, transparent 50%), radial-gradient(at 80% 0%, ${c2} 0px, transparent 50%)`,(c1,c2)=>`linear-gradient(135deg, ${c1} 25%, transparent 25%), linear-gradient(225deg, ${c1} 25%, transparent 25%), linear-gradient(45deg, ${c1} 25%, transparent 25%), linear-gradient(315deg, ${c1} 25%, ${c2} 25%)`],palette=palettes[seed%palettes.length],pattern=patterns[seed%patterns.length](palette[0],palette[1]),baseGradient=`linear-gradient(120deg, ${palette[0]}, ${palette[1]})`;return{'--pattern':pattern,'--base-gradient':baseGradient}};
+            const calculateReadTime = (html) => { const e=document.createElement("div");e.innerHTML=html;const t=e.textContent||e.innerText||"",n=200,l=t.trim().split(/\s+/).length,d=Math.ceil(l/n);return`${d} دقیقه مطالعه`};
+            
+            const formatDate = (dateString) => {
+                // CORRECTED LINE:
+                return new Date(dateString).toLocaleDateString('fa-IR', {
+                    year: 'numeric', month: 'long', day: 'numeric'
+                });
             };
+
+            const fetchAndDisplayPosts = async () => { try{const e=await fetch(apiUrl,{headers:{Authorization:`Bearer ${bearerToken}`}});if(!e.ok)throw new Error(`HTTP error ${e.status}`);const{items:t}=await e.json();t?.length?(allPostsData=t,displayPostPreviews(allPostsData)):(statusElement.textContent="هیچ مقاله‌ای یافت نشد.",statusElement.style.display="block")}catch(e){console.error("Error details:", e); statusElement.textContent=`خطا در بارگذاری: ${e.message}`,statusElement.style.display="block"}finally{skeletonLoader.style.display="none"}};
 
             const displayPostPreviews = (posts) => {
                 postsContainer.innerHTML = '';
-                posts.forEach((post, index) => {
+                posts.forEach(post => {
                     const postCard = document.createElement('article');
                     postCard.classList.add('post-card');
-                    postCard.style.animationDelay = `${index * 100}ms`; // Staggered animation
-                    postCard.dataset.postId = post.id; // Use dataset for clean access
-
+                    
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = post.html;
                     const previewText = tempDiv.textContent || '';
                     const readTime = calculateReadTime(post.html);
                     const formattedDate = formatDate(post.published_at);
                     const tagsHtml = post.tags?.map(tag => `<span class="cover-tag">${tag.name}</span>`).join('') || '';
-
+                    
                     postCard.innerHTML = `
-                        <div class="post-cover" style="view-transition-name: post-cover-${post.id};">
+                        <div class="post-cover">
                             <div class="post-cover-background"></div>
                             <div class="cover-content">
                                 <div class="cover-tags">${tagsHtml}</div>
-                                <h2 class="post-card-title" style="view-transition-name: post-title-${post.id};">${post.title || 'بدون عنوان'}</h2>
+                                <h2 class="post-card-title">${post.title || 'بدون عنوان'}</h2>
                                 <div class="cover-date">${formattedDate}</div>
                             </div>
                         </div>
@@ -233,87 +214,24 @@
                             <div class="post-preview-content"><p>${previewText}</p></div>
                             <div class="post-card-footer">
                                 <div class="post-card-meta">${readTime}</div>
-                                <span class="continue-reading-btn">ادامه مطلب</span>
+                                <a class="continue-reading-btn" data-post-id="${post.id}">ادامه مطلب</a>
                             </div>
                         </div>
                     `;
-
+                    
                     const coverBg = postCard.querySelector('.post-cover-background');
                     const styles = generateCoverStyle(post.id);
                     coverBg.style.background = `${styles['--pattern']}, ${styles['--base-gradient']}`;
-                    
-                    // Click listener for the entire card
-                    postCard.addEventListener('click', (e) => {
-                        displaySinglePost(e.currentTarget.dataset.postId);
-                    });
 
+                    postCard.querySelector('.continue-reading-btn').addEventListener('click', (e) => {
+                        displaySinglePost(e.target.getAttribute('data-post-id'));
+                    });
                     postsContainer.appendChild(postCard);
                 });
             };
             
-            // --- View Switching Logic with View Transitions API ---
-            const displaySinglePost = (postId) => {
-                const post = allPostsData.find(p => p.id == postId);
-                if (!post) return;
-
-                const transition = document.startViewTransition(() => {
-                    const formattedDate = formatDate(post.published_at);
-                    singlePostView.innerHTML = `
-                        <div class="full-post-container">
-                            <a class="back-button">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-                                بازگشت به لیست
-                            </a>
-                            <h1 class="full-post-title" style="view-transition-name: post-title-${post.id};">${post.title || "بدون عنوان"}</h1>
-                            <div class="post-meta">تاریخ انتشار: ${formattedDate}</div>
-                            <div class="post-full-html-content">${post.html}</div>
-                        </div>
-                    `;
-                    
-                    // Add unique transition names to the cover background
-                    const coverPlaceholder = document.createElement('div');
-                    coverPlaceholder.classList.add('post-cover');
-                    coverPlaceholder.style.viewTransitionName = `post-cover-${post.id}`;
-                    singlePostView.prepend(coverPlaceholder);
-
-                    singlePostView.querySelector(".back-button").addEventListener("click", showPostsList);
-                    postsView.style.display = "none";
-                    singlePostView.style.display = "block";
-                    window.addEventListener('scroll', updateScrollProgress);
-                    updateScrollProgress(); // Initial call
-                });
-
-                transition.finished.then(() => {
-                    window.scrollTo(0, 0);
-                    // Clean up the placeholder after transition
-                    const placeholder = singlePostView.querySelector('.post-cover');
-                    if(placeholder) placeholder.remove();
-                });
-            };
-
-            const showPostsList = () => {
-                 const transition = document.startViewTransition(() => {
-                    singlePostView.style.display = "none";
-                    postsView.style.display = "block";
-                    singlePostView.innerHTML = "";
-                    window.removeEventListener('scroll', updateScrollProgress);
-                    scrollProgress.style.width = '0%';
-                });
-            };
+            const displaySinglePost=(t)=>{const e=allPostsData.find((e=>e.id==t));if(!e)return;const o=formatDate(e.published_at);singlePostView.innerHTML=`<div class="full-post-container"><a class="back-button"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> بازگشت به لیست</a><h1 class="full-post-title">${e.title||"بدون عنوان"}</h1><div class="post-meta">تاریخ انتشار: ${o}</div><div class="post-full-html-content">${e.html}</div></div>`,singlePostView.querySelector(".back-button").addEventListener("click",showPostsList),postsView.style.display="none",singlePostView.style.display="block",window.scrollTo(0,0)},showPostsList=()=>{singlePostView.style.display="none",postsView.style.display="block",singlePostView.innerHTML=""};
             
-            // --- Scroll Progress Bar Logic ---
-            const updateScrollProgress = () => {
-                const postContent = document.querySelector('.post-full-html-content');
-                if (!postContent) return;
-
-                const element = document.documentElement;
-                const scrollableHeight = element.scrollHeight - element.clientHeight;
-                const scrolled = (window.scrollY / scrollableHeight) * 100;
-                
-                scrollProgress.style.width = scrollableHeight > 0 ? `${scrolled}%` : '0%';
-            };
-            
-            // --- Initial Fetch ---
             fetchAndDisplayPosts();
         });
     </script>
