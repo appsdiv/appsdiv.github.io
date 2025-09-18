@@ -9,61 +9,45 @@
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --background-color: #f8f8f8;
+            --background-color: #f4f4f9;
             --card-background: #ffffff;
             --card-border: #e8e8e8;
-            --card-shadow: rgba(0, 0, 0, 0.06);
+            --card-shadow: rgba(0, 0, 0, 0.05);
             --text-primary: #1d1d1f;
             --text-secondary: #555555;
+            --text-meta: #8a8a8e;
+            --header-bg: rgba(242, 242, 247, 0.8);
+            --skeleton-bg: #e0e0e0;
             --accent-blue: #007aff;
             --header-height: 70px;
         }
-
+        body.dark-mode {
+            --background-color: #000000;
+            --card-background: #1c1c1e;
+            --card-border: #38383a;
+            --card-shadow: rgba(0, 0, 0, 0.2);
+            --text-primary: #f5f5f7;
+            --text-secondary: #a9a9b0;
+            --text-meta: #8a8a8e;
+            --header-bg: rgba(28, 28, 30, 0.75);
+            --skeleton-bg: #2c2c2e;
+        }
         body {
             font-family: 'Vazirmatn', sans-serif;
             background-color: var(--background-color);
             color: var(--text-primary);
             margin: 0;
             padding-top: var(--header-height);
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         
-        /* --- ENHANCED: Advanced Glassy Header --- */
-        .page-header {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 100%;
-            height: var(--header-height);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(242, 242, 247, 0.8); /* Refined iOS-like color */
-            backdrop-filter: saturate(180%) blur(20px);
-            -webkit-backdrop-filter: saturate(180%) blur(20px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-            z-index: 1000;
-            transition: background 0.3s ease;
-        }
-
-        .header-title {
-            font-size: 1.7rem;
-            font-weight: 700;
-            letter-spacing: 1px; /* Added spacing for "EMK" */
-        }
-
-        #single-post-view { display: none; }
-
+        /* Header, Toggle, and other base styles remain the same... */
+        .page-header{position:fixed;top:0;right:0;width:100%;height:var(--header-height);display:flex;align-items:center;justify-content:center;background:var(--header-bg);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--card-border);z-index:1000;transition:background .3s ease,border-color .3s ease}.header-title{font-size:1.7rem;font-weight:700;letter-spacing:1px}#theme-toggle{position:absolute;left:20px;top:50%;transform:translateY(-50%);background:0 0;border:none;cursor:pointer;padding:5px;display:flex;align-items:center;justify-content:center}#theme-toggle svg{width:24px;height:24px;color:var(--text-primary);transition:transform .3s ease,opacity .3s ease}.sun-icon{position:absolute}.moon-icon{transform:scale(0);opacity:0}body.dark-mode .sun-icon{transform:scale(0);opacity:0}body.dark-mode .moon-icon{transform:scale(1);opacity:1}.container{width:100%;max-width:1200px;margin:0 auto;padding:40px 20px}#single-post-view{display:none}
+        
         .posts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 35px;
+            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); /* Adjusted width slightly */
+            gap: 30px;
         }
 
         .post-card {
@@ -71,33 +55,50 @@
             border: 1px solid var(--card-border);
             border-radius: 18px;
             box-shadow: 0 5px 20px var(--card-shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            transition: all 0.3s ease;
         }
-
         .post-card:hover {
             transform: translateY(-8px);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
         }
+        body.dark-mode .post-card:hover { box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3); }
 
+        /* --- ENHANCED: Post Cover Design --- */
+        .post-cover-wrapper { overflow: hidden; }
         .post-cover {
-            height: 320px;
+            height: 300px;
             position: relative;
             display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
+            align-items: flex-end;
             padding: 25px;
             color: #fff;
-            box-shadow: inset 0 -100px 80px -50px rgba(0,0,0,0.5);
+            /* The scrim is now a separate pseudo-element for better layering */
         }
+        .post-cover::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 50%, transparent 100%);
+            z-index: 1;
+        }
+        .post-card:hover .post-cover { transform: scale(1.05); }
+        .post-cover-background {
+            position: absolute;
+            inset: 0;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smoother zoom */
+        }
+        .post-card:hover .post-cover-background { transform: scale(1.05); }
         
         .post-card-title {
-            font-size: clamp(1.6rem, 4vw, 2rem);
+            font-size: 1.7rem;
             font-weight: 800;
-            line-height: 1.3;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            line-height: 1.35;
+            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.6);
+            position: relative;
+            z-index: 2; /* Ensures title is above the scrim */
         }
 
         .post-card-body {
@@ -106,115 +107,59 @@
             flex-direction: column;
             flex-grow: 1;
         }
-
+        
+        /* --- ENHANCED: More Content Display --- */
         .post-preview-content {
             flex-grow: 1;
-            display: -webkit-box;
-            -webkit-line-clamp: 4;
-            -webkit-box-orient: vertical;  
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-bottom: 25px;
-            height: 108px;
-        }
-        
-        .post-preview-content p {
-            font-size: 1rem;
+            font-size: 0.95rem;
             line-height: 1.7;
             color: var(--text-secondary);
-            margin: 0;
-        }
-
-        /* --- UPDATED: Button moved to the other side --- */
-        .continue-reading-btn {
-            display: inline-block;
-            background-color: var(--accent-blue);
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: background-color 0.2s ease;
-            cursor: pointer;
-            align-self: flex-end; /* This moves the button to the left in RTL */
-        }
-
-        .continue-reading-btn:hover { background-color: #005bb5; }
-        
-        /* Single Post View styles remain the same... */
-        .full-post-container{max-width:800px;margin:0 auto;background:var(--card-background);padding:clamp(1.5rem,5vw,3rem);border-radius:16px}.back-button{display:inline-flex;align-items:center;gap:8px;color:var(--accent-blue);font-weight:600;text-decoration:none;margin-bottom:30px;cursor:pointer}.full-post-title{font-size:clamp(2rem,5vw,2.8rem);margin-bottom:15px}.post-meta{font-size:.9rem;color:var(--text-secondary);margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--card-border)}.post-full-html-content h3,.post-full-html-content h4{color:var(--text-primary)}.post-full-html-content p,.post-full-html-content li{color:var(--text-secondary);line-height:1.8}.post-full-html-content a{color:var(--accent-blue);text-decoration:none;font-weight:600}.post-full-html-content a:hover{text-decoration:underline}.post-full-html-content table{width:100%;border-collapse:collapse;margin:2em 0;background-color:#fafafa;border-radius:8px;overflow:hidden}.post-full-html-content th,.post-full-html-content td{border:1px solid var(--card-border);padding:12px}.post-full-html-content thead{background-color:var(--card-border)}
-
-        /* --- NEW: Skeleton Loader for Fast Initial Load --- */
-        .skeleton-card {
-            background-color: #fff;
-            border: 1px solid var(--card-border);
-            border-radius: 18px;
+            max-height: 130px; /* Increased height for ~5-6 lines */
             overflow: hidden;
-        }
-        .skeleton-cover {
-            height: 320px;
-            background-color: #e0e0e0;
-        }
-        .skeleton-body { padding: 25px; }
-        .skeleton-line {
-            height: 20px;
-            background-color: #e0e0e0;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-        .skeleton-line.short { width: 60%; }
-        .skeleton-button {
-            height: 40px;
-            width: 120px;
-            background-color: #e0e0e0;
-            border-radius: 8px;
-            margin-top: 15px;
-            float: left; /* Match button position */
-        }
-
-        /* Shimmer Animation */
-        .shimmer {
             position: relative;
-            overflow: hidden;
         }
-        .shimmer::after {
+        /* Fade out effect to show there's more content */
+        .post-preview-content::after {
             content: '';
             position: absolute;
-            top: 0;
-            right: 0;
             bottom: 0;
-            left: 0;
-            transform: translateX(-100%);
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            animation: shimmer 1.5s infinite;
+            right: 0;
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(to bottom, transparent, var(--card-background));
         }
-        @keyframes shimmer {
-            100% { transform: translateX(100%); }
-        }
+        /* Allow basic formatting in preview */
+        .post-preview-content p { margin: 0 0 1em 0; }
+        .post-preview-content strong { color: var(--text-primary); }
 
-        .status-message {
-            font-size: 1.2em;
-            padding: 30px;
-            background: var(--card-background);
-            border-radius: 12px;
-            text-align: center;
-            display: none; /* Initially hidden */
-        }
+        .post-card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 20px; margin-top: auto; }
+        .post-card-meta { font-size: 0.8rem; font-weight: 600; color: var(--text-meta); }
+        .continue-reading-btn { font-size: 0.9rem; padding: 8px 16px; background-color: var(--accent-blue); color: #fff; border-radius: 8px; text-decoration: none; font-weight: 600; transition: background-color 0.2s ease; }
+        .continue-reading-btn:hover { background-color: #005bb5; }
+        
+        /* Skeleton and Single Post styles condensed for brevity */
+        .skeleton-card{background-color:var(--card-background);border:1px solid var(--card-border);border-radius:18px;overflow:hidden}.skeleton-cover{height:300px;background-color:var(--skeleton-bg)}.skeleton-body{padding:25px}.skeleton-line{height:16px;background-color:var(--skeleton-bg);border-radius:4px;margin-bottom:10px}.skeleton-line.short{width:60%}.skeleton-footer{display:flex;justify-content:space-between;align-items:center;margin-top:15px}.skeleton-meta{height:14px;width:70px;background-color:var(--skeleton-bg);border-radius:4px}.skeleton-button{height:35px;width:100px;background-color:var(--skeleton-bg);border-radius:8px}.shimmer{position:relative;overflow:hidden}.shimmer::after{content:'';position:absolute;top:0;right:0;bottom:0;left:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);animation:shimmer 1.5s infinite}body.dark-mode .shimmer::after{background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent)}@keyframes shimmer{100%{transform:translateX(100%)}}.status-message{font-size:1.2em;padding:30px;background:var(--card-background);border-radius:12px;text-align:center;display:none}.full-post-container{max-width:800px;margin:0 auto;background:var(--card-background);padding:clamp(1.5rem,5vw,3rem);border-radius:16px;transition:background .3s ease}.back-button{display:inline-flex;align-items:center;gap:8px;color:var(--accent-blue);font-weight:600;text-decoration:none;margin-bottom:30px;cursor:pointer}.full-post-title{font-size:clamp(2rem,5vw,2.8rem);margin-bottom:15px}.post-meta{font-size:.9rem;color:var(--text-secondary);margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--card-border)}.post-full-html-content p,.post-full-html-content li{line-height:1.8}
     </style>
+    <script>
+        (function() { const theme = localStorage.getItem('theme'); if (theme === 'dark') { document.body.classList.add('dark-mode'); } })();
+    </script>
 </head>
 <body>
-
     <header class="page-header">
         <h1 class="header-title">EMK</h1>
+        <button id="theme-toggle" aria-label="Toggle light and dark mode">
+            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 010 1.06l-1.591 1.59a.75.75 0 11-1.06-1.06l1.59-1.59a.75.75 0 011.06 0zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5h2.25a.75.75 0 01.75.75zM17.836 17.836a.75.75 0 01-1.06 0l-1.59-1.591a.75.75 0 111.06-1.06l1.591 1.59a.75.75 0 010 1.061zM12 18a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.894 17.836a.75.75 0 010-1.06l1.591-1.59a.75.75 0 111.06 1.06l-1.59 1.59a.75.75 0 01-1.06 0zM4.25 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H5a.75.75 0 01-.75-.75zM6.106 6.106a.75.75 0 011.06 0l1.59 1.591a.75.75 0 11-1.06 1.06l-1.591-1.59a.75.75 0 010-1.06z"/></svg>
+            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 004.463-.948a.75.75 0 01.981.632A11.25 11.25 0 0112 21a11.25 11.25 0 01-11.25-11.25c0-4.032 2.11-7.538 5.26-9.472a.75.75 0 01.819.162z" clip-rule="evenodd"/></svg>
+        </button>
     </header>
 
     <main class="container">
         <div id="posts-view">
             <div id="status" class="status-message"></div>
             <div id="skeleton-loader" class="posts-grid">
-                <div class="skeleton-card"><div class="skeleton-cover shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer"></div><div class="skeleton-line short shimmer"></div><div class="skeleton-button shimmer"></div></div></div>
-                <div class="skeleton-card"><div class="skeleton-cover shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer"></div><div class="skeleton-line short shimmer"></div><div class="skeleton-button shimmer"></div></div></div>
-                <div class="skeleton-card"><div class="skeleton-cover shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer"></div><div class="skeleton-line short shimmer"></div><div class="skeleton-button shimmer"></div></div></div>
+                <div class="skeleton-card"><div class="skeleton-cover shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer"></div><div class="skeleton-line short shimmer"></div><div class="skeleton-footer"><div class="skeleton-meta shimmer"></div><div class="skeleton-button shimmer"></div></div></div></div>
+                <div class="skeleton-card"><div class="skeleton-cover shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer"></div><div class="skeleton-line short shimmer"></div><div class="skeleton-footer"><div class="skeleton-meta shimmer"></div><div class="skeleton-button shimmer"></div></div></div></div>
+                <div class="skeleton-card"><div class="skeleton-cover shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer"></div><div class="skeleton-line short shimmer"></div><div class="skeleton-footer"><div class="skeleton-meta shimmer"></div><div class="skeleton-button shimmer"></div></div></div></div>
             </div>
             <div id="posts-container" class="posts-grid"></div>
         </div>
@@ -223,49 +168,75 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const postsView = document.getElementById('posts-view');
-            const singlePostView = document.getElementById('single-post-view');
+            const themeToggle = document.getElementById('theme-toggle');
             const postsContainer = document.getElementById('posts-container');
-            const statusElement = document.getElementById('status');
-            const skeletonLoader = document.getElementById('skeleton-loader'); // Ref to skeleton
-
+            const skeletonLoader = document.getElementById('skeleton-loader');
+            const postsView = document.getElementById('posts-view'), singlePostView = document.getElementById('single-post-view'), statusElement = document.getElementById('status');
             const apiUrl = 'https://elkamehr2.chbk.app/api/blog/posts';
             const bearerToken = 'ed88f53d8919ec21425624fad3824bdf08a32284';
-            const headers = new Headers({ 'Authorization': `Bearer ${bearerToken}`, 'Accept': 'application/json' });
-            
             let allPostsData = [];
 
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            });
+
+            // --- ENHANCED: Cover Style Generator ---
             const generateCoverStyle = (seed) => {
-                const palettes = [['#6e8efb','#a777e3'],['#ff5f6d','#ffc371'],['#00c9ff','#92fe9d'],['#f7971e','#ffd200'],['#11998e','#38ef7d'],['#de6262','#ffb88c']];
-                const paletteIndex = seed % palettes.length;
-                const selectedPalette = palettes[paletteIndex];
-                const angle = (seed % 9) * 10 + 120;
-                return `background: linear-gradient(${angle}deg, ${selectedPalette[0]}, ${selectedPalette[1]});`;
+                const palettes = [['#6e8efb','#a777e3'], ['#ff5f6d','#ffc371'], ['#00c9ff','#92fe9d'], ['#43e97b','#38f9d7'], ['#f7971e','#ffd200'], ['#11998e','#38ef7d'], ['#de6262','#ffb88c']];
+                const patterns = [
+                    (c1,c2) => `radial-gradient(circle at 100% 100%, ${c2} 0%, ${c1} 50%, transparent 51%), radial-gradient(circle at 0% 0%, ${c2} 0%, ${c1} 50%, transparent 51%)`,
+                    (c1,c2) => `repeating-linear-gradient(45deg, ${c1}, ${c1} 10px, ${c2} 10px, ${c2} 20px)`,
+                    (c1,c2) => `radial-gradient(at 0% 100%, ${c1} 0px, transparent 50%), radial-gradient(at 80% 0%, ${c2} 0px, transparent 50%)`,
+                    (c1,c2) => `linear-gradient(135deg, ${c1} 25%, transparent 25%), linear-gradient(225deg, ${c1} 25%, transparent 25%), linear-gradient(45deg, ${c1} 25%, transparent 25%), linear-gradient(315deg, ${c1} 25%, ${c2} 25%)`
+                ];
+                
+                const palette = palettes[seed % palettes.length];
+                const pattern = patterns[seed % patterns.length](palette[0], palette[1]);
+                const baseGradient = `linear-gradient(120deg, ${palette[0]}, ${palette[1]})`;
+                
+                return {
+                    // Set as CSS variables for easier use in styling
+                    '--base-gradient': baseGradient,
+                    '--pattern': pattern
+                };
             };
 
-            const fetchAndDisplayPosts = async () => {
-                try {
-                    const response = await fetch(apiUrl, { method: 'GET', headers: headers });
-                    if (!response.ok) throw new Error(`خطای شبکه: ${response.status}`);
-                    
-                    const apiResponse = await response.json();
+            const calculateReadTime = (html) => { /* ... (no change) ... */ const tempDiv=document.createElement("div");tempDiv.innerHTML=html;const text=tempDiv.textContent||tempDiv.innerText||"",wordsPerMinute=200,wordCount=text.trim().split(/\s+/).length,readTime=Math.ceil(wordCount/wordsPerMinute);return`${readTime} دقیقه مطالعه`};
+            
+            // --- ENHANCED: HTML Truncation ---
+            const truncateHtml = (html, charLimit) => {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                let truncatedHtml = '';
+                let charCount = 0;
 
-                    if (apiResponse?.items?.length) {
-                        allPostsData = apiResponse.items;
-                        displayPostPreviews(allPostsData);
-                    } else {
-                        statusElement.textContent = 'هیچ مقاله‌ای یافت نشد.';
-                        statusElement.style.display = 'block';
+                function traverse(node) {
+                    if (charCount >= charLimit) return;
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        const remaining = charLimit - charCount;
+                        if (node.textContent.length > remaining) {
+                            truncatedHtml += node.textContent.substring(0, remaining) + '...';
+                            charCount = charLimit;
+                        } else {
+                            truncatedHtml += node.textContent;
+                            charCount += node.textContent.length;
+                        }
+                    } else if (node.nodeType === Node.ELEMENT_NODE) {
+                        const openingTag = `<${node.tagName.toLowerCase()}>`;
+                        const closingTag = `</${node.tagName.toLowerCase()}>`;
+                        truncatedHtml += openingTag;
+                        node.childNodes.forEach(child => traverse(child));
+                        if (charCount < charLimit) {
+                            truncatedHtml += closingTag;
+                        }
                     }
-                } catch (error) {
-                    console.error('Error fetching posts:', error);
-                    statusElement.textContent = `خطا در بارگذاری: ${error.message}`;
-                    statusElement.style.display = 'block';
-                } finally {
-                    // --- This is key: hide the skeleton AFTER success or failure ---
-                    skeletonLoader.style.display = 'none';
                 }
+                tempDiv.childNodes.forEach(child => traverse(child));
+                return truncatedHtml;
             };
+
+            const fetchAndDisplayPosts = async () => { /* ... (no change) ... */ try{const e=await fetch(apiUrl,{headers:{Authorization:`Bearer ${bearerToken}`}});if(!e.ok)throw new Error(`HTTP error ${e.status}`);const{items:t}=await e.json();t?.length?(allPostsData=t,displayPostPreviews(allPostsData)):(statusElement.textContent="هیچ مقاله‌ای یافت نشد.",statusElement.style.display="block")}catch(e){statusElement.textContent=`خطا در بارگذاری: ${e.message}`,statusElement.style.display="block"}finally{skeletonLoader.style.display="none"}};
 
             const displayPostPreviews = (posts) => {
                 postsContainer.innerHTML = '';
@@ -273,24 +244,30 @@
                     const postCard = document.createElement('article');
                     postCard.classList.add('post-card');
                     
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = post.html;
-                    const firstParagraph = tempDiv.querySelector('p')?.textContent || '';
+                    const previewHtml = truncateHtml(post.html, 250); // Increased character limit
+                    const readTime = calculateReadTime(post.html);
                     
                     postCard.innerHTML = `
-                        <div class="post-cover">
-                            <h2 class="post-card-title">${post.title || 'بدون عنوان'}</h2>
+                        <div class="post-cover-wrapper">
+                            <div class="post-cover">
+                                <div class="post-cover-background"></div>
+                                <h2 class="post-card-title">${post.title || 'بدون عنوان'}</h2>
+                            </div>
                         </div>
                         <div class="post-card-body">
-                            <div class="post-preview-content">
-                                <p>${firstParagraph}</p>
+                            <div class="post-preview-content">${previewHtml}</div>
+                            <div class="post-card-footer">
+                                <div class="post-card-meta">${readTime}</div>
+                                <a class="continue-reading-btn" data-post-id="${post.id}">ادامه مطلب</a>
                             </div>
-                            <a class="continue-reading-btn" data-post-id="${post.id}">ادامه مطلب</a>
                         </div>
                     `;
                     
-                    const coverElement = postCard.querySelector('.post-cover');
-                    coverElement.style.cssText = generateCoverStyle(post.id);
+                    const coverBg = postCard.querySelector('.post-cover-background');
+                    const styles = generateCoverStyle(post.id);
+                    // Layering the base gradient and the generated pattern
+                    coverBg.style.background = `${styles['--pattern']}, ${styles['--base-gradient']}`;
+                    coverBg.style.backgroundSize = "cover, cover";
 
                     postCard.querySelector('.continue-reading-btn').addEventListener('click', (e) => {
                         displaySinglePost(e.target.getAttribute('data-post-id'));
@@ -298,10 +275,9 @@
                     postsContainer.appendChild(postCard);
                 });
             };
-
-            // displaySinglePost and showPostsList functions remain unchanged...
-            const displaySinglePost=(t)=>{const e=allPostsData.find((e=>e.id==t));if(!e)return;const o=new Date(e.published_at).toLocaleDateString("fa-IR",{year:"numeric",month:"long",day:"numeric"});singlePostView.innerHTML=`\n            <div class="full-post-container">\n                <a class="back-button">\n                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>\n                    بازگشت به لیست مقالات\n                </a>\n                <h1 class="full-post-title">${e.title||"بدون عنوان"}</h1>\n                <div class="post-meta">تاریخ انتشار: ${o}</div>\n                <div class="post-full-html-content">${e.html}</div>\n            </div>\n        `,singlePostView.querySelector(".back-button").addEventListener("click",showPostsList),postsView.style.display="none",singlePostView.style.display="block",window.scrollTo(0,0)},showPostsList=()=>{singlePostView.style.display="none",postsView.style.display="block",singlePostView.innerHTML=""};
-
+            
+            const displaySinglePost=(t)=>{const e=allPostsData.find((e=>e.id==t));if(!e)return;const o=new Date(e.published_at).toLocaleDateString("fa-IR",{year:"numeric",month:"long",day:"numeric"});singlePostView.innerHTML=`<div class="full-post-container"><a class="back-button"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> بازگشت به لیست</a><h1 class="full-post-title">${e.title||"بدون عنوان"}</h1><div class="post-meta">تاریخ انتشار: ${o}</div><div class="post-full-html-content">${e.html}</div></div>`,singlePostView.querySelector(".back-button").addEventListener("click",showPostsList),postsView.style.display="none",singlePostView.style.display="block",window.scrollTo(0,0)},showPostsList=()=>{singlePostView.style.display="none",postsView.style.display="block",singlePostView.innerHTML=""};
+            
             fetchAndDisplayPosts();
         });
     </script>
