@@ -1,0 +1,7 @@
+[
+  { "t": "LME AL 3M", "v": 2535, "ch": 0.6 },
+  { "t": "LME AL Cash", "v": 2522, "ch": -0.2 },
+  { "t": "LME Alloy", "v": 2140, "ch": 0.3 },
+  { "t": "Premium MJP", "v": 115, "ch": 0.1 },
+  { "t": "USD/IRR (ref)", "v": 600000, "ch": 0.0 }
+]

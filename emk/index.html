@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="fa" dir="rtl" translate="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <title>الکامهرکیمیا — نسخه حرفه‌ای</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icons/6.6.6/css/flag-icons.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body class="font-sans text-ink/90 dark:text-white/90 antialiased selection:bg-cyan-200/60 dark:selection:bg-cyan-500/40">
+
+  <header class="backdrop-blur-2xl bg-white/65 dark:bg-neutral-900/65 border-b border-black/5 dark:border-white/10">
+    <div class="max-w-6xl mx-auto px-4 py-2.5">
+      <div class="md:hidden flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2 min-w-0">
+          <img src="https://elkamehr.com/wp-content/uploads/2024/03/emk-logo3-1.png" class="w-12 h-12 rounded-xl object-contain" alt="EMK">
+          <div class="leading-5 min-w-0">
+            <div class="font-extrabold tracking-tight truncate">الکامهرکیمیا</div>
+            <div class="text-[11px] text-ink/60 dark:text-white/60 truncate">مرکز تخصصی محصولات آلومینیومی</div>
+          </div>
+        </div>
+        <button id="menuBtn" class="px-3 py-2 rounded-full glass focusable" aria-label="منو"><i class="fa-solid fa-bars"></i></button>
+      </div>
+      <div class="hidden md:flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <img src="https://elkamehr.com/wp-content/uploads/2024/03/emk-logo3-1.png" class="w-20 h-auto" alt="EMK">
+          <div>
+            <div class="font-extrabold tracking-tight leading-5">الکامهرکیمیا</div>
+            <div class="text-xs text-ink/60 dark:text-white/60 leading-5">مرکز تخصصی محصولات آلومینیومی</div>
+          </div>
+        </div>
+        <nav class="flex items-center gap-1">
+          <a href="#products" class="nav-link focusable">محصولات</a>
+          <a href="#contact"  class="nav-link focusable">تماس باما</a>
+          <a href="#about"    class="nav-link focusable">درباره ما</a>
+          <a href="#certs"    class="nav-link focusable">گواهینامه‌ها</a>
+        </nav>
+        <div class="flex items-center gap-2">
+          <div class="relative" id="langMenu">
+            <button class="px-3 py-1.5 rounded-full glass transition flex items-center gap-2 focusable" aria-haspopup="menu" aria-expanded="false">
+              <span id="langIcon" class="fi fis fi-ir text-[18px]" aria-hidden="true"></span>
+              <span class="sr-only" id="langLabel">FA</span>
+              <i class="fa-solid fa-chevron-down opacity-60 text-xs"></i>
+            </button>
+            <div class="hidden absolute left-0 mt-2 w-56 rounded-xl glass shadow-card overflow-hidden p-1" data-menu role="menu">
+              <button data-lang="fa" class="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10"><span class="flex items-center gap-2"><span class="fi fis fi-ir text-[18px]"></span> فارسی</span><span class="text-xs">FA</span></button>
+              <button data-lang="en" class="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10"><span class="flex items-center gap-2"><span class="fi fis fi-us text-[18px]"></span> English</span><span class="text-xs">EN</span></button>
+              <button data-lang="tr" class="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10"><span class="flex items-center gap-2"><span class="fi fis fi-tr text-[18px]"></span> Türkçe</span><span class="text-xs">TR</span></button>
+              <button data-lang="ar" class="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10"><span class="flex items-center gap-2"><span class="fi fis fi-ae text-[18px]"></span> العربية</span><span class="text-xs">AR</span></button>
+            </div>
+          </div>
+          <button id="themeBtn" class="px-3 py-1.5 rounded-full glass transition focusable" aria-label="تغییر تم"><i class="fa-solid fa-moon"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-black/5 dark:border-white/10">
+      <div class="max-w-6xl mx-auto px-4 py-1 ticker"><div class="ticker-rail"><div id="tickerTrack" class="ticker-track"></div></div></div>
+    </div>
+  </header>
+
+  <main>
+    <section id="hero" class="max-w-6xl mx-auto px-4 mt-6" aria-label="ویترین">
+      <div class="relative overflow-hidden rounded-2xl glass">
+        <div id="hero-track" class="flex transition-transform duration-500 will-change-transform" data-track></div>
+        <div class="absolute inset-x-0 bottom-0 h-[2px] bg-black/10 dark:bg-white/10"><div class="h-full bg-ink dark:bg-white" style="width:0%" data-progress></div></div>
+        <div class="absolute inset-x-0 bottom-3 flex items-center justify-center gap-1.5" data-dots></div>
+        <div class="absolute inset-y-0 left-2 flex items-center"><button class="hero-arrow glass focusable" data-prev aria-label="قبلی"><i class="fa-solid fa-angle-left"></i></button></div>
+        <div class="absolute inset-y-0 right-2 flex items-center"><button class="hero-arrow glass focusable" data-next aria-label="بعدی"><i class="fa-solid fa-angle-right"></i></button></div>
+      </div>
+    </section>
+
+    <section id="about" class="max-w-6xl mx-auto px-4 mt-10">
+      <div class="section-head">
+        <div class="eyebrow">درباره الکامهرکیمیا</div>
+        <h2 class="h2">کیفیت صنعتی با استاندارد جهانی</h2>
+        <div class="hairline"></div>
+      </div>
+      <div class="grid md:grid-cols-12 gap-4 items-stretch">
+        <figure class="md:col-span-5 order-2 md:order-1 rounded-2xl overflow-hidden glass">
+          <img class="w-full h-full object-cover aspect-[4/3]" src="https://placehold.co/800x600/png?text=Factory+Photo" alt="کارخانه الکامهرکیمیا" loading="lazy"/>
+        </figure>
+        <div class="md:col-span-7 order-1 md:order-2 rounded-2xl glass p-6 md:p-8">
+          <p class="leading-8 text-ink/80 dark:text-white/70">یکی از بزرگ‌ترین و به‌روزترین تولیدکنندگان راد آلومینیوم 9.5 و 12 خالص و آلیاژی، مفتول خالص و آلیاژی، هادی های AAC ، AAAC و ACSR ، فویل، ظروف آلومینیومی و گرانول اکسیژن زدا، و شمش های آلیاژی در شمال‌غرب کشور است.</p>
+          <p class="mt-3 leading-8 text-ink/80 dark:text-white/70">محصولات با پایداری، رسانایی و دوام عالی؛ مناسب صنایع فولاد، برق، بسته‌بندی و خودرو.</p>
+          <div class="mt-5 flex flex-wrap gap-2">
+            <span class="px-3 py-1.5 rounded-full glass text-sm">ISO 9001</span>
+            <span class="px-3 py-1.5 rounded-full glass text-sm">ISO 14001</span>
+            <span class="px-3 py-1.5 rounded-full glass text-sm">AAAC · AAC · ABC</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="products" class="max-w-6xl mx-auto px-4 mt-10">
+      <div class="section-head">
+        <div class="eyebrow">محصولات</div>
+        <h2 class="h2">منتخب امروز</h2>
+        <div class="hairline"></div>
+      </div>
+      <div id="products-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4"></div>
+    </section>
+    
+    <section id="certs" class="max-w-6xl mx-auto px-4 mt-12">
+      <div class="section-head">
+        <div class="eyebrow">گواهی‌نامه‌ها</div>
+        <h2 class="h2">استانداردها و تاییدیه‌ها</h2>
+        <div class="hairline"></div>
+      </div>
+      <div class="rounded-2xl glass p-4"><div id="certs-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 items-start"></div></div>
+    </section>
+
+    <section id="blog" class="max-w-6xl mx-auto px-4 mt-12">
+      <div class="section-head flex items-center justify-between">
+        <div>
+          <div class="eyebrow">از وبلاگ</div>
+          <h2 class="h2">آخرین نوشته‌ها</h2>
+        </div>
+        <a href="#" class="px-3 py-1.5 rounded-full glass text-[13px] font-bold inline-flex items-center gap-2 shrink-0">مشاهده همه <i class="fa-solid fa-arrow-left-long text-[11px]"></i></a>
+      </div>
+      <div class="hairline mb-4"></div>
+      <div id="blog-grid" class="grid md:grid-cols-3 gap-4"></div>
+    </section>
+  </main>
+
+  <footer class="max-w-6xl mx-auto px-4 my-10">
+    <div class="rounded-2xl glass p-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div>
+          <div class="font-black">در ارتباط بمانیم</div>
+          <p class="text-ink/70 dark:text-white/60">ایمیل: <a class="text-brand" href="mailto:info@elkamehr.com">info@elkamehr.com</a></p>
+        </div>
+        <a href="#contact" class="px-4 py-2 rounded-full bg-ink text-white font-bold focusable">تماس و مسیر</a>
+      </div>
+    </div>
+    <p class="text-center text-sm text-ink/60 dark:text-white/50 mt-4">© 2025 الکامهرکیمیا — طراحی شیشه‌ای مینیمال</p>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
