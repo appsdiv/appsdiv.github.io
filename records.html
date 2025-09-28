@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa" data-theme="cupcake">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تالار افتخارات ورزشی باشگاه اسدی</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
+  <script src="https://unpkg.com/jalaali-moment/dist/jalaali-moment.browser.js"></script>
+
+  <style>
+    body { 
+      font-family: 'Vazirmatn', sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: hsl(var(--b2));
+    }
+    .main-content {
+      flex: 1;
+    }
+    
+    /* Podium Card Gradients */
+    .gold-card {
+      background-image: linear-gradient(135deg, #fde047, #facc15, #eab308); color: #422006; border: 1px solid #fde047;
+      box-shadow: 0 10px 15px -3px rgba(253, 224, 71, 0.4), 0 4px 6px -2px rgba(253, 224, 71, 0.2);
+    }
+    .silver-card {
+      background-image: linear-gradient(135deg, #f3f4f6, #e5e7eb, #d1d5db); color: #1f2937; border: 1px solid #f3f4f6;
+      box-shadow: 0 4px 6px -1px rgba(209, 213, 219, 0.3), 0 2px 4px -2px rgba(209, 213, 219, 0.2);
+    }
+    .bronze-card {
+      background-image: linear-gradient(135deg, #ffedd5, #fdba74, #f97316); color: #422006; border: 1px solid #ffedd5;
+      box-shadow: 0 4px 6px -1px rgba(251, 191, 36, 0.3), 0 2px 4px -2px rgba(251, 191, 36, 0.2);
+    }
+
+    /* Text readability on gradients */
+    .gold-card .opacity-60, .bronze-card .opacity-60 { color: hsla(28, 87%, 15%, 0.7); }
+    .silver-card .opacity-60 { color: hsla(215, 25%, 27%, 0.7); }
+    .gold-card .text-secondary, .bronze-card .text-secondary { color: #854d0e; }
+    .silver-card .text-secondary { color: #111827; }
+    .gold-card .divider, .bronze-card .divider { border-top-color: hsla(28, 87%, 15%, 0.2); }
+    .silver-card .divider { border-top-color: hsla(215, 25%, 27%, 0.2); }
+
+    /* General Card Styling */
+    .card { transition: transform 0.3s ease, box-shadow 0.3s ease; border-radius: 1rem; }
+    .card:not(.gold-card):not(.silver-card):not(.bronze-card):hover { transform: translateY(-5px); }
+    .card.gold-card, .card.silver-card, .card.bronze-card { transform-origin: center center; }
+    .card.gold-card:hover, .card.silver-card:hover, .card.bronze-card:hover {
+        transform: scale(var(--scale-factor, 1.05));
+        z-index: 11;
+    }
+
+    .tabs .tab { font-size: 1.1rem; font-weight: 700; padding: 0 1.5rem; height: 3.5rem; }
+    .tab-content.active { display: grid; }
+  </style>
+</head>
+
+<body class="p-4 sm:p-6 lg:p-8 transition-colors duration-300">
+
+  <div class="main-content container mx-auto max-w-7xl">
+    <header class="navbar sticky top-4 z-50 bg-base-100/80 backdrop-blur-md rounded-2xl shadow-lg mb-8">
+      <div class="navbar-start">
+        <h1 class="btn btn-ghost text-2xl sm:text-3xl font-black">
+          <i class="fa-solid fa-trophy text-primary"></i>
+          تالار افتخارات باشگاه اسدی
+        </h1>
+      </div>
+      <div class="navbar-end">
+        <label class="flex cursor-pointer gap-2 items-center">
+          <i class="fa-solid fa-sun text-lg"></i>
+          <input type="checkbox" class="toggle toggle-primary theme-controller" id="theme-toggle"/>
+          <i class="fa-solid fa-moon text-lg"></i>
+        </label>
+      </div>
+    </header>
+
+    <main>
+      <div id="tabs-container" role="tablist" class="tabs tabs-lifted"></div>
+      <div id="tab-panels-container" class="bg-base-100 rounded-b-2xl rounded-tr-2xl p-4 sm:p-6 shadow-xl"></div>
+    </main>
+  </div>
+  
+  <div class="w-full mt-16 bg-base-200 py-6 sm:py-8 border-t border-base-300 shadow-inner">
+    <footer class="footer footer-center p-4 container mx-auto text-base-content">
+      <aside><p class="text-lg">ساخته شده با ❤️ توسط پیمان</p></aside>
+    </footer>
+  </div>
+
+  <dialog id="new_exercise_modal" class="modal">
+    <div class="modal-box">
+        <h3 class="font-bold text-2xl sm:text-3xl">تعریف تمرین جدید</h3>
+        <p class="py-4">نام و نوع ثبت رکورد را برای دسته بندی جدید مشخص کنید.</p>
+        <form id="new-exercise-form" class="space-y-4">
+            <label class="input input-bordered flex items-center gap-2">
+                <i class="fa-solid fa-plus opacity-70"></i>
+                <input type="text" id="new-exercise-name-input" class="grow" placeholder="مثلا: پرس سینه" required />
+            </label>
+            <div class="p-2 rounded-lg bg-base-200 text-center">
+                <p class="font-semibold mb-2">نوع ثبت رکورد:</p>
+                <div class="join">
+                    <input class="join-item btn text-xs" type="radio" name="new-exercise-type" value="reps" aria-label="تکرار (بیشتر بهتر است)" checked />
+                    <input class="join-item btn text-xs" type="radio" name="new-exercise-type" value="time_asc" aria-label="زمان (کمتر بهتر است)" />
+                    <input class="join-item btn text-xs" type="radio" name="new-exercise-type" value="time_desc" aria-label="زمان (بیشتر بهتر است)" />
+                </div>
+            </div>
+            <div class="modal-action">
+                <button type="button" class="btn btn-ghost" onclick="new_exercise_modal.close()">انصراف</button>
+                <button type="submit" class="btn btn-primary">ثبت تمرین</button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>بستن</button></form>
+  </dialog>
+
+  <dialog id="record_modal" class="modal">
+    <div class="modal-box">
+      <h3 id="modal-title" class="font-bold text-2xl sm:text-3xl">افزودن رکورد جدید</h3>
+      <form id="record-form" class="mt-4 space-y-4">
+        <input type="hidden" id="record-id">
+        <label class="input input-bordered flex items-center gap-2 bg-base-200"><i class="fa-solid fa-dumbbell opacity-70"></i><input type="text" id="exercise-name" class="grow" readonly /></label>
+        <label class="input input-bordered flex items-center gap-2"><i class="fa-solid fa-user opacity-70"></i><input type="text" id="holder-name" class="grow" placeholder="نام رکورددار" required /></label>
+        <label class="input input-bordered flex items-center gap-2"><i class="fa-solid fa-star opacity-70"></i><input type="number" id="record-value" class="grow" placeholder="مقدار رکورد" required step="any" min="0" /></label>
+        <div class="modal-action">
+          <button type="button" class="btn btn-ghost" onclick="record_modal.close()">انصراف</button>
+          <button type="submit" class="btn btn-primary">ذخیره رکورد</button>
+        </div>
+      </form>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>بستن</button></form>
+  </dialog>
+
+  <dialog id="manage_exercise_modal" class="modal">
+    <div class="modal-box">
+      <h3 id="manage-modal-title" class="font-bold text-2xl sm:text-3xl">مدیریت تمرین</h3>
+      <div class="divider mt-2 mb-4">ویرایش تمرین</div>
+      <form id="edit-exercise-form" class="space-y-4">
+        <input type="hidden" id="original-exercise-name">
+        <label class="input input-bordered flex items-center gap-2">
+          <i class="fa-solid fa-pencil opacity-70"></i>
+          <input type="text" id="edit-exercise-name-input" class="grow" placeholder="نام جدید تمرین" required />
+        </label>
+        <div class="p-2 rounded-lg bg-base-200 text-center">
+          <p class="font-semibold mb-2">نوع ثبت رکورد:</p>
+          <div class="join" id="edit-exercise-type-join">
+            <input class="join-item btn text-xs" type="radio" name="edit-exercise-type" value="reps" aria-label="تکرار (بیشتر بهتر است)" />
+            <input class="join-item btn text-xs" type="radio" name="edit-exercise-type" value="time_asc" aria-label="زمان (کمتر بهتر است)" />
+            <input class="join-item btn text-xs" type="radio" name="edit-exercise-type" value="time_desc" aria-label="زمان (بیشتر بهتر است)" />
+          </div>
+        </div>
+        <div class="modal-action justify-start">
+          <button type="submit" class="btn btn-success">ذخیره تغییرات</button>
+        </div>
+      </form>
+      <div class="divider my-6">حذف تمرین</div>
+      <div class="p-4 rounded-lg bg-error/20 text-error-content">
+        <p class="font-bold">منطقه خطر!</p>
+        <p class="text-sm">با حذف این تمرین، تمام رکوردهای ثبت شده برای آن نیز برای همیشه پاک خواهند شد. این عمل غیرقابل بازگشت است.</p>
+        <button id="delete-exercise-btn" class="btn btn-error mt-4">حذف تمرین و تمام رکوردهایش</button>
+      </div>
+      <div class="modal-action mt-8">
+        <button type="button" class="btn" onclick="manage_exercise_modal.close()">بستن</button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>بستن</button></form>
+  </dialog>
+
+
+<script>
+  // --- DATA STRUCTURE & LOCAL STORAGE ---
+  const defaultExerciseTypes = { 'کشش بارفیکس': 'time_desc', 'پلانک': 'time_desc', 'ددلیفت': 'reps' };
+  const defaultRecords = [
+
+    { id: 3, exercise: 'کشش بارفیکس', holder: 'پیمان', record: 60, date: '2024-09-24T12:00:19Z' },
+
+  ];
+  
+  let exerciseTypes = JSON.parse(localStorage.getItem('sportsExerciseTypes')) || defaultExerciseTypes;
+  let records = JSON.parse(localStorage.getItem('sportsRecords')) || defaultRecords;
+  
+  const saveDataToLocalStorage = () => {
+      localStorage.setItem('sportsExerciseTypes', JSON.stringify(exerciseTypes));
+      localStorage.setItem('sportsRecords', JSON.stringify(records));
+  };
+  
+  // --- DOM REFERENCES ---
+  const tabsContainer = document.getElementById('tabs-container');
+  const panelsContainer = document.getElementById('tab-panels-container');
+  const recordModal = document.getElementById('record_modal');
+  const newExerciseModal = document.getElementById('new_exercise_modal');
+  const manageExerciseModal = document.getElementById('manage_exercise_modal');
+  const recordForm = document.getElementById('record-form');
+  const newExerciseForm = document.getElementById('new-exercise-form');
+  const editExerciseForm = document.getElementById('edit-exercise-form');
+  const modalTitle = document.getElementById('modal-title');
+  const themeToggle = document.getElementById('theme-toggle');
+
+  // --- HELPER FUNCTIONS ---
+  const getCurrentISODate = () => moment().toISOString();
+  const formatToJalali = (isoDate) => moment(isoDate).locale('fa').format('YYYY/MM/DD HH:mm');
+  const getMedal = (rank) => ['🥇', '🥈', '🥉'][rank] || `<span class="text-2xl opacity-75">${rank + 1}</span>`;
+  const groupRecords = () => records.reduce((acc, record) => { (acc[record.exercise] = acc[record.exercise] || []).push(record); return acc; }, {});
+  const getRecordTypeLabel = (type) => {
+    switch (type) {
+      case 'reps': return 'تکرار';
+      case 'time_asc': case 'time_desc': return 'زمان';
+      default: return 'رکورد';
+    }
+  };
+
+  // --- THEME CONTROLLER ---
+  const applyTheme = (theme) => {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      themeToggle.checked = theme === 'night';
+  };
+  
+  // --- CORE RENDERING LOGIC ---
+  function renderBoard(activeExerciseName = null) {
+      const grouped = groupRecords();
+      const exercises = Object.keys(exerciseTypes);
+      tabsContainer.innerHTML = '';
+      panelsContainer.innerHTML = '';
+      
+      if (exercises.length === 0) {
+           panelsContainer.innerHTML = `<div class="text-center py-10"><p class="text-xl">هنوز هیچ تمرینی ثبت نشده است!</p><p class="opacity-70">برای شروع، یک دسته بندی تمرین جدید از طریق تب '+' بسازید.</p></div>`;
+           return;
+      }
+      
+      // Determine which tab should be active. If the provided name is invalid, default to the first exercise.
+      const effectiveActiveExercise = activeExerciseName && exercises.includes(activeExerciseName) 
+        ? activeExerciseName 
+        : exercises[0];
+
+      exercises.forEach((exercise) => {
+          const isActive = (exercise === effectiveActiveExercise);
+          tabsContainer.innerHTML += `<a role="tab" class="tab ${isActive ? 'tab-active' : ''}" data-tab-target="${exercise.replace(/\s+/g, '-')}">${exercise}</a>`;
+
+          const exerciseRecords = grouped[exercise] || [];
+          const exerciseType = exerciseTypes[exercise];
+          exerciseRecords.sort((a, b) => {
+              switch (exerciseType) {
+                case 'time_asc': return a.record - b.record;
+                case 'time_desc': return b.record - a.record;
+                case 'reps': default: return b.record - a.record;
+              }
+          });
+
+          let panelContentHTML = '';
+          exerciseRecords.forEach((record, rank) => {
+              const recordTypeLabel = getRecordTypeLabel(exerciseType);
+              const isTimeBased = exerciseType.startsWith('time');
+              const crownIcon = (rank === 0) ? '<i class="fa-solid fa-crown text-amber-900/70 -ms-1"></i>' : '';
+              
+              let cardClasses = '';
+              switch (rank) {
+                case 0: cardClasses = 'gold-card'; break;
+                case 1: cardClasses = 'silver-card'; break;
+                case 2: cardClasses = 'bronze-card'; break;
+                default: cardClasses = 'bg-base-200 shadow'; break;
+              }
+
+              let podiumClass = '';
+              if (exerciseRecords.length >= 3) {
+                  switch (rank) {
+                      case 0: podiumClass = 'md:order-2 md:-mt-8 scale-105'; break;
+                      case 1: podiumClass = 'md:order-3'; break;
+                      case 2: podiumClass = 'md:order-1'; break;
+                      default: podiumClass = `md:order-${rank + 1}`; break;
+                  }
+              } else { podiumClass = `md:order-${rank + 1}`; }
+
+              panelContentHTML += `
+              <div class="card ${cardClasses} ${podiumClass}" style="--scale-factor: 1.08; z-index:${10-rank}; grid-column: span 1;">
+                <div class="card-body p-5 sm:p-6">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <h3 class="card-title text-xl font-bold">${record.holder}</h3>
+                      <p class="text-xs opacity-60 mt-1"><i class="fa-solid fa-clock fa-sm"></i> بروزرسانی: ${formatToJalali(record.date)}</p>
+                    </div>
+                    <div class="text-4xl sm:text-5xl flex items-center gap-2">${crownIcon}${getMedal(rank)}</div>
+                  </div>
+                  <div class="divider my-2"></div>
+                  <div class="text-center">
+                    <p class="text-base uppercase tracking-wider opacity-60">${recordTypeLabel}</p>
+                    <p class="text-5xl sm:text-6xl font-mono font-extrabold text-secondary">${record.record}${isTimeBased ? '<span class="text-2xl ms-1">ثانیه</span>' : ''}</p>
+                  </div>
+                  <div class="card-actions justify-end mt-3">
+                    <button class="btn btn-square btn-sm btn-outline btn-info edit-btn" data-id="${record.id}"><i class="fa-solid fa-pencil"></i></button>
+                    <button class="btn btn-square btn-sm btn-outline btn-error delete-btn" data-id="${record.id}"><i class="fa-solid fa-trash-can"></i></button>
+                  </div>
+                </div>
+              </div>`;
+          });
+          
+          panelsContainer.innerHTML += `
+            <div id="${exercise.replace(/\s+/g, '-')}" role="tabpanel" class="tab-content ${isActive ? 'active' : 'hidden'} grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 md:pt-4">
+                <div class="md:col-span-full md:order-0 flex justify-between items-center border-b border-base-300 pb-4 mb-4">
+                  <h2 class="text-xl font-bold">رکوردهای ${exercise}</h2>
+                  <button class="btn btn-sm btn-outline manage-exercise-btn" data-exercise="${exercise}"><i class="fa-solid fa-gear"></i> مدیریت تمرین</button>
+                </div>
+                <div class="card bg-base-200/50 shadow-none border-2 border-dashed border-base-300 md:col-span-full md:order-last hover:border-primary transition-colors">
+                    <div class="card-body items-center text-center py-8">
+                        <h2 class="card-title text-xl">ثبت رکورد جدید برای ${exercise}</h2>
+                        <button class="btn btn-primary mt-2 add-btn" data-exercise="${exercise}"><i class="fa-solid fa-plus"></i> افزودن رکورد</button>
+                    </div>
+                </div>
+                ${panelContentHTML}
+            </div>`;
+      });
+      
+      tabsContainer.innerHTML += `<a role="tab" id="add-exercise-tab" class="tab !font-black text-2xl">+</a>`;
+  }
+
+  // --- MODAL & FORM FUNCTIONS ---
+  function openAddModal(exerciseName) {
+    recordForm.reset();
+    document.getElementById('record-id').value = '';
+    modalTitle.textContent = `افزودن رکورد برای ${exerciseName}`;
+    document.getElementById('exercise-name').value = exerciseName;
+    const exerciseType = exerciseTypes[exerciseName];
+    document.getElementById('record-value').placeholder = exerciseType.startsWith('time') ? 'زمان به ثانیه' : 'تعداد تکرار';
+    recordModal.showModal();
+  }
+
+  function openEditModal(id) {
+      const record = records.find(r => r.id === id); if (!record) return;
+      recordForm.reset();
+      modalTitle.textContent = `ویرایش رکورد ${record.holder}`;
+      document.getElementById('record-id').value = record.id;
+      document.getElementById('exercise-name').value = record.exercise;
+      document.getElementById('holder-name').value = record.holder;
+      document.getElementById('record-value').value = record.record;
+      const exerciseType = exerciseTypes[record.exercise];
+      document.getElementById('record-value').placeholder = exerciseType.startsWith('time') ? 'زمان به ثانیه' : 'تعداد تکرار';
+      recordModal.showModal();
+  }
+  
+  function openManageExerciseModal(exerciseName) {
+    editExerciseForm.reset();
+    document.getElementById('manage-modal-title').textContent = `مدیریت تمرین: ${exerciseName}`;
+    document.getElementById('original-exercise-name').value = exerciseName;
+    document.getElementById('edit-exercise-name-input').value = exerciseName;
+    const currentType = exerciseTypes[exerciseName];
+    document.querySelector(`input[name="edit-exercise-type"][value="${currentType}"]`).checked = true;
+    manageExerciseModal.showModal();
+  }
+
+  // --- FORM SUBMISSION LISTENERS ---
+  recordForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const id = parseInt(document.getElementById('record-id').value);
+    const exerciseName = document.getElementById('exercise-name').value.trim();
+    const recordData = {
+      exercise: exerciseName,
+      holder: document.getElementById('holder-name').value.trim(),
+      record: parseFloat(document.getElementById('record-value').value),
+      date: getCurrentISODate()
+    };
+    if (id) {
+      const index = records.findIndex(r => r.id === id);
+      if (index !== -1) records[index] = { ...records[index], ...recordData };
+    } else { recordData.id = Date.now(); records.push(recordData); }
+    saveDataToLocalStorage(); 
+    recordModal.close(); 
+    renderBoard(exerciseName); // Stay on the current tab
+  });
+
+  newExerciseForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const newName = document.getElementById('new-exercise-name-input').value.trim();
+    const newType = document.querySelector('input[name="new-exercise-type"]:checked').value;
+    if (!newName) return;
+    if (exerciseTypes.hasOwnProperty(newName)) { alert('این نام تمرین از قبل وجود دارد!'); return; }
+    exerciseTypes[newName] = newType;
+    saveDataToLocalStorage(); 
+    newExerciseModal.close(); 
+    renderBoard(newName); // Switch to the new tab
+    openAddModal(newName);
+  });
+  
+  editExerciseForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const oldName = document.getElementById('original-exercise-name').value;
+    const newName = document.getElementById('edit-exercise-name-input').value.trim();
+    const newType = document.querySelector('input[name="edit-exercise-type"]:checked').value;
+    if (!newName) { alert('نام تمرین نمی‌تواند خالی باشد.'); return; }
+    if (newName !== oldName && exerciseTypes.hasOwnProperty(newName)) { alert('این نام تمرین از قبل وجود دارد!'); return; }
+    if (newName !== oldName) {
+      Object.defineProperty(exerciseTypes, newName, Object.getOwnPropertyDescriptor(exerciseTypes, oldName));
+      delete exerciseTypes[oldName];
+    }
+    exerciseTypes[newName] = newType;
+    records.forEach(record => { if (record.exercise === oldName) record.exercise = newName; });
+    saveDataToLocalStorage(); 
+    manageExerciseModal.close(); 
+    renderBoard(newName); // Switch to the renamed tab
+  });
+
+  document.getElementById('delete-exercise-btn').addEventListener('click', () => {
+    const exerciseName = document.getElementById('original-exercise-name').value;
+    const recordsToDeleteCount = records.filter(r => r.exercise === exerciseName).length;
+    if (confirm(`آیا مطمئن هستید که می‌خواهید تمرین "${exerciseName}" و تمام ${recordsToDeleteCount} رکورد مرتبط با آن را حذف کنید؟ این عمل غیرقابل بازگشت است.`)) {
+      delete exerciseTypes[exerciseName];
+      records = records.filter(r => r.exercise !== exerciseName);
+      saveDataToLocalStorage(); 
+      manageExerciseModal.close(); 
+      renderBoard(); // Go back to the first tab by default
+    }
+  });
+
+
+  // --- MAIN EVENT DELEGATION FOR CLICKS ---
+  document.body.addEventListener('click', (e) => {
+      const tabTarget = e.target.closest('[role="tab"]');
+      if (tabTarget) {
+          if (tabTarget.id === 'add-exercise-tab') { 
+              newExerciseForm.reset();
+              newExerciseModal.showModal(); 
+              return; 
+          }
+          document.querySelectorAll('[role="tab"]').forEach(tab => tab.classList.remove('tab-active'));
+          tabTarget.classList.add('tab-active');
+          document.querySelectorAll('.tab-content').forEach(panel => panel.classList.replace('active', 'hidden'));
+          const targetPanel = document.getElementById(tabTarget.dataset.tabTarget);
+          if (targetPanel) { 
+              targetPanel.classList.replace('hidden', 'active'); 
+          }
+          return;
+      }
+      
+      const addBtn = e.target.closest('.add-btn'); if(addBtn) openAddModal(addBtn.dataset.exercise);
+      const editBtn = e.target.closest('.edit-btn'); if(editBtn) openEditModal(parseInt(editBtn.dataset.id));
+      const manageBtn = e.target.closest('.manage-exercise-btn'); if(manageBtn) openManageExerciseModal(manageBtn.dataset.exercise);
+      
+      const deleteBtn = e.target.closest('.delete-btn');
+      if(deleteBtn) {
+          const id = parseInt(deleteBtn.dataset.id);
+          const recordToDelete = records.find(r => r.id === id);
+          if (recordToDelete && confirm('آیا از حذف این رکورد مطمئن هستید؟')) {
+              records = records.filter(r => r.id !== id);
+              saveDataToLocalStorage(); 
+              renderBoard(recordToDelete.exercise); // Stay on the current tab
+          }
+      }
+  });
+
+  // --- INITIALIZATION ---
+  document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme') || 'cupcake';
+      applyTheme(savedTheme);
+      themeToggle.addEventListener('change', (e) => applyTheme(e.target.checked ? 'night' : 'cupcake'));
+      renderBoard();
+  });
+</script>
+
+</body>
+</html>
