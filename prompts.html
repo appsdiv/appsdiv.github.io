@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PromptVault</title>
+
+    <!-- PWA & Icon Manifest -->
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#111827" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PromptVault">
+    <meta name="application-name" content="PromptVault">
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/4ybV6mXC/App-Icon-2x.png">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/4ybV6mXC/App-Icon-2x.png">
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIlByb21wdFZhdWx0IiwKICAic2hvcnRfbmFtZSI6ICJQcm9tcHRWYXVsdCIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMTExODI3IiwKICAidGhlbWVfY29sb3IiOiAiIzExMTgyNyIsCiAgImRlc2NyaXB0aW9uIjogIkEgcGVyc29uYWwgbGlicmFyeSB0byBzYXZlLCBzZWFyY2gsIGFuZCBzaGFyZSB5b3VyIEFJIGltYWdlIGdlbmVyYXRpb24gcHJvbXB0cy4iLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2kucG9zdGltZy5jYy80eWJWNm1YQy9BcHAtSWNvbi0yeC5wbmciLAogICAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIKICAgIH0sCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9pLnBvc3RpbWcuY2MvNHliVjZtWEMvQXBwLUljb24tMngucG5nIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9CiAgXQp9Cg==">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Light Mode Variables (Default) */
+            --bg-color: #f3f4f6;
+            --text-color: #1f2937;
+            --text-muted-color: #6b7280;
+            --card-bg: rgba(255, 255, 255, 0.6);
+            --input-bg: rgba(229, 231, 235, 0.7);
+            --border-color: rgba(0, 0, 0, 0.1);
+            --primary-accent: #0ea5e9;
+            --secondary-accent: #6366f1;
+            --modal-bg-color: #ffffff;
+            --modal-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.2);
+        }
+
+        html.dark {
+            /* Dark Mode Variables */
+            --bg-color: #111827;
+            --text-color: #f3f4f6;
+            --text-muted-color: #9ca3af;
+            --card-bg: rgba(31, 41, 55, 0.5);
+            --input-bg: rgba(55, 65, 81, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --primary-accent: #38bdf8;
+            --secondary-accent: #818cf8;
+            --modal-bg-color: #1f2937;
+            --modal-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-accent); border-radius: 3px; }
+
+        body {
+            font-family: 'Vazirmatn', 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overscroll-behavior-y: contain;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .glassmorphism {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .modal-card {
+            background-color: var(--modal-bg-color);
+            box-shadow: var(--modal-shadow);
+            transition: background-color 0.3s ease;
+        }
+
+        /* Animations */
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        .fade-out { animation: fadeOut 0.3s ease-in forwards; }
+        .slide-up { animation: slideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .slide-down { animation: slideDown 0.3s cubic-bezier(0.64, 0, 0.78, 0) forwards; }
+        .card-pop-in { animation: popIn 0.4s ease-out forwards; opacity: 0; transform: scale(0.95); }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0.8; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideDown { from { transform: translateY(0); opacity: 1; } to { transform: translateY(100%); opacity: 0.8; } }
+        @keyframes popIn { to { opacity: 1; transform: scale(1); } }
+
+        /* UI Element Styling */
+        .form-input {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            transition: border-color 0.2s, box-shadow 0.2s, background-color 0.3s ease;
+        }
+        .form-input::placeholder { color: var(--text-muted-color); }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-accent) 30%, transparent);
+        }
+        
+        .tab-btn.active { background-color: var(--primary-accent); color: white; }
+        .tab-btn:not(.active) { background-color: var(--input-bg); color: var(--text-color); }
+
+        .tag-filter { transition: background-color 0.2s, color 0.2s; }
+        .tag-filter.active { background-color: var(--primary-accent); color: white; }
+        
+        .pin-icon.pinned { color: var(--primary-accent); }
+        .header-icon { color: var(--primary-accent); }
+        .header-text-gradient { background-image: linear-gradient(to right, var(--primary-accent), var(--secondary-accent)); }
+        .muted-text { color: var(--text-muted-color); }
+        
+        .interactive-scale { transition: transform 0.1s ease-out; }
+        .interactive-scale:active { transform: scale(0.95); }
+
+        * { -webkit-tap-highlight-color: transparent; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Main App Container -->
+    <div class="min-h-screen max-w-lg mx-auto p-4 pb-28">
+        
+        <header class="flex items-center justify-between py-4">
+            <div class="flex items-center gap-2">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 header-icon" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                </svg>
+                <h1 class="text-2xl font-bold header-text-gradient bg-clip-text text-transparent">PromptVault</h1>
+            </div>
+            <button id="settings-btn" class="p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/20 dark:active:bg-white/20 interactive-scale">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </button>
+        </header>
+
+        <div class="flex items-center gap-2 mt-4 mb-2">
+            <div class="relative flex-grow">
+                <input id="search-input" type="text" placeholder="Search prompts..." class="w-full form-input pl-10 pr-4 py-3 rounded-full">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 muted-text" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
+            </div>
+            <button id="view-toggle-btn" class="p-3 rounded-full glassmorphism interactive-scale"></button>
+        </div>
+        
+        <div id="tag-filters-container" class="py-2 mb-4 whitespace-nowrap overflow-x-auto"></div>
+
+        <main id="prompt-library" class="space-y-4"></main>
+
+        <div id="empty-state" class="hidden text-center py-20">
+            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 muted-text" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4M4 7l8 5 8-5m-8 5v10m0-10L4 7" /></svg>
+            <p class="mt-4 text-lg font-semibold">Your Vault is Empty</p>
+            <p class="muted-text mt-1">Tap the '+' button to add your first prompt.</p>
+        </div>
+    </div>
+
+    <button id="fab-add" class="fixed bottom-6 right-6 h-16 w-16 rounded-full bg-gradient-to-br from-sky-500 to-indigo-600 text-white flex items-center justify-center shadow-lg transform transition-transform hover:scale-110 active:scale-95">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+    </button>
+    
+    <!-- Modals below -->
+    <div id="prompt-form-modal" class="fixed inset-0 z-40 hidden items-end bg-black bg-opacity-50"><div id="prompt-form-container" class="w-full modal-card rounded-t-2xl p-4 transform translate-y-full"><h2 id="form-title" class="text-xl font-bold mb-4 text-center">Add New Prompt</h2><div class="p-1 bg-gray-700/50 dark:bg-black/20 rounded-lg flex mb-4"><button id="tab-prompt" class="tab-btn flex-1 py-2 rounded-md font-semibold interactive-scale">Prompt</button><button id="tab-details" class="tab-btn flex-1 py-2 rounded-md font-semibold interactive-scale">Details</button></div><form id="prompt-form"><input type="hidden" id="prompt-id"><div id="tab-content-prompt"><textarea id="prompt-text" rows="6" class="w-full form-input rounded-lg p-3 text-base" placeholder="Paste your prompt here..."></textarea><button type="button" id="paste-btn" class="w-full mt-3 py-3 rounded-lg bg-indigo-500 font-semibold text-white flex items-center justify-center gap-2 interactive-scale"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8 2a1 1 0 00-1 1v1H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2h-2V3a1 1 0 10-2 0v1H8V3a1 1 0 00-1-1z" /><path d="M6 12a2 2 0 114 0 2 2 0 01-4 0z" /></svg>Paste from Clipboard</button></div><div id="tab-content-details" class="hidden space-y-4"><input id="prompt-name" type="text" class="w-full form-input rounded-lg p-3 text-base" placeholder="Name (e.g., 'Cyberpunk Cat')"><div class="flex items-center gap-3"><img id="image-preview" src="https://placehold.co/100x100/1f2937/4b5563?text=Image" class="w-16 h-16 rounded-lg object-cover"><label for="prompt-image-upload" class="flex-grow text-center py-3 rounded-lg bg-gray-500 font-semibold cursor-pointer text-white interactive-scale">Upload Image</label><input id="prompt-image-upload" type="file" class="hidden" accept="image/*"><input id="prompt-image-data" type="hidden"></div><input id="prompt-tags" type="text" class="w-full form-input rounded-lg p-3 text-base" placeholder="Tags (comma, separated)"></div><div class="grid grid-cols-2 gap-3 pt-4"><button type="button" id="cancel-btn" class="py-3 rounded-lg bg-gray-500 font-semibold text-white interactive-scale">Cancel</button><button type="submit" class="py-3 rounded-lg bg-sky-500 font-semibold text-white interactive-scale">Save Prompt</button></div></form></div></div>
+    <div id="details-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-70 p-4"><div id="details-container" class="w-full max-w-md modal-card rounded-2xl overflow-hidden transform scale-95 opacity-0"><div class="relative"><img id="details-image" src="" class="w-full h-64 object-cover" onerror="this.src='https://placehold.co/600x400/111827/38bdf8?text=No+Image'; this.classList.add('object-contain', 'p-4');"><button id="details-pin-btn" class="absolute top-3 right-3 p-2 rounded-full bg-black/40 backdrop-blur-sm interactive-scale"></button></div><div class="p-4"><h3 id="details-name" class="text-xl font-bold"></h3><div id="details-tags" class="flex flex-wrap gap-2 my-3"></div><div class="max-h-32 overflow-y-auto my-4 p-3 bg-black/10 dark:bg-black/20 rounded-lg"><p id="details-prompt" class="text-sm whitespace-pre-wrap muted-text"></p></div><div class="flex gap-3 mt-4"><button id="copy-btn" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg bg-sky-500 font-semibold text-white interactive-scale"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2H6z" /></svg>Copy</button><button id="share-btn" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg bg-indigo-500 font-semibold text-white interactive-scale"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" /></svg>Share</button></div><div class="flex gap-3 mt-3"><button id="delete-btn" class="flex-1 py-2 text-sm text-red-400 rounded-lg hover:bg-red-500/10 interactive-scale">Delete</button><button id="edit-btn" class="flex-1 py-2 text-sm text-sky-500 rounded-lg hover:bg-sky-500/10 interactive-scale">Edit</button><button id="close-details-btn" class="flex-1 py-2 text-sm muted-text rounded-lg hover:bg-black/5 dark:hover:bg-white/5 interactive-scale">Close</button></div></div></div></div>
+    <div id="generic-modal-overlay" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-70 p-4">
+        <div id="settings-modal" class="hidden w-full max-w-sm modal-card rounded-2xl p-4 transform scale-95 opacity-0">
+            <h3 class="text-xl font-bold text-center mb-4">Settings</h3>
+            <div id="theme-toggle" class="w-full p-2 mb-3 rounded-lg bg-black/5 dark:bg-white/5 flex items-center justify-center gap-2 cursor-pointer interactive-scale"></div>
+            <div class="space-y-3">
+                <button id="backup-btn" class="w-full py-3 rounded-lg bg-sky-500 font-semibold text-white interactive-scale">Backup Library</button>
+                <button id="restore-btn" class="w-full py-3 rounded-lg bg-indigo-500 font-semibold text-white interactive-scale">Restore Library</button>
+                <input type="file" id="restore-input" class="hidden" accept=".json">
+                <button id="about-btn" class="w-full py-3 rounded-lg bg-gray-600 font-semibold text-white interactive-scale">About</button>
+            </div>
+            <button id="close-settings-btn" class="w-full mt-4 py-2 text-sm muted-text rounded-lg hover:bg-black/5 dark:hover:bg-white/5 interactive-scale">Close</button>
+        </div>
+        <div id="about-modal" class="hidden w-full max-w-sm modal-card rounded-2xl p-6 text-center transform scale-95 opacity-0"><h3 class="text-xl font-bold">PromptVault</h3><p class="muted-text mt-2">Created by Peyman</p><button id="close-about-btn" class="w-full mt-6 py-3 rounded-lg bg-gray-600 font-semibold text-white interactive-scale">Close</button></div>
+        <div id="confirm-modal" class="hidden w-full max-w-sm modal-card rounded-2xl p-6 transform scale-95 opacity-0"><h3 class="text-lg font-bold text-center">Are you sure?</h3><p id="confirm-message" class="muted-text text-center my-3"></p><div class="grid grid-cols-2 gap-3 mt-4"><button id="confirm-cancel-btn" class="py-3 rounded-lg bg-gray-600 font-semibold text-white interactive-scale">Cancel</button><button id="confirm-ok-btn" class="py-3 rounded-lg bg-red-500 font-semibold text-white interactive-scale">Confirm</button></div></div>
+    </div>
+    <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full text-white text-sm opacity-0 transform translate-y-4 pointer-events-none" style="background: #27272a; color: white;"></div>
+
+    <!-- Context Menu -->
+    <div id="context-menu-modal" class="fixed inset-0 z-50 hidden items-end bg-black/50" >
+        <div id="context-menu-container" class="w-full max-w-lg mx-auto modal-card rounded-t-2xl p-2.5">
+            <div id="context-menu-options" class="space-y-1.5">
+                <!-- Options will be injected here by JS -->
+            </div>
+            <button id="context-menu-cancel" class="w-full mt-2 py-3 rounded-lg bg-gray-200 dark:bg-gray-700 font-semibold interactive-scale">Cancel</button>
+        </div>
+    </div>
+
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DOM Elements ---
+        const library = document.getElementById('prompt-library'), searchInput = document.getElementById('search-input'), emptyState = document.getElementById('empty-state'), fab = document.getElementById('fab-add'), toast = document.getElementById('toast'), toastMessage = document.getElementById('toast').appendChild(document.createElement('span')), viewToggleBtn = document.getElementById('view-toggle-btn'), tagFiltersContainer = document.getElementById('tag-filters-container'), themeToggleBtn = document.getElementById('theme-toggle');
+        const formModal = document.getElementById('prompt-form-modal'), formContainer = document.getElementById('prompt-form-container'), promptForm = document.getElementById('prompt-form'), cancelBtn = document.getElementById('cancel-btn'), formTitle = document.getElementById('form-title'), pasteBtn = document.getElementById('paste-btn'), imageUploadInput = document.getElementById('prompt-image-upload'), imagePreview = document.getElementById('image-preview'), imageDataInput = document.getElementById('prompt-image-data');
+        const tabPrompt = document.getElementById('tab-prompt'), tabDetails = document.getElementById('tab-details'), tabContentPrompt = document.getElementById('tab-content-prompt'), tabContentDetails = document.getElementById('tab-content-details');
+        const detailsModal = document.getElementById('details-modal'), detailsContainer = document.getElementById('details-container'), closeDetailsBtn = document.getElementById('close-details-btn'), copyBtn = document.getElementById('copy-btn'), shareBtn = document.getElementById('share-btn'), deleteBtn = document.getElementById('delete-btn'), editBtn = document.getElementById('edit-btn'), detailsPinBtn = document.getElementById('details-pin-btn');
+        const genericModalOverlay = document.getElementById('generic-modal-overlay'), settingsBtn = document.getElementById('settings-btn'), settingsModal = document.getElementById('settings-modal'), closeSettingsBtn = document.getElementById('close-settings-btn'), aboutBtn = document.getElementById('about-btn'), aboutModal = document.getElementById('about-modal'), closeAboutBtn = document.getElementById('close-about-btn'), confirmModal = document.getElementById('confirm-modal'), confirmMessage = document.getElementById('confirm-message'), confirmOkBtn = document.getElementById('confirm-ok-btn'), confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+        const backupBtn = document.getElementById('backup-btn'), restoreBtn = document.getElementById('restore-btn'), restoreInput = document.getElementById('restore-input');
+        const contextMenuModal = document.getElementById('context-menu-modal'), contextMenuContainer = document.getElementById('context-menu-container'), contextMenuCancel = document.getElementById('context-menu-cancel');
+
+        // --- STATE MANAGEMENT ---
+        let prompts = [], currentEditingId = null, confirmCallback = null, currentView = localStorage.getItem('promptView') || 'grid', activeTagFilter = null, longPressTimer, wasLongPress = false;
+
+        const getPrompts = () => JSON.parse(localStorage.getItem('prompts') || '[]');
+        const savePrompts = (data) => localStorage.setItem('prompts', JSON.stringify(data));
+
+        // --- THEME MANAGEMENT ---
+        const applyTheme = (theme) => {
+            localStorage.setItem('theme', theme);
+            themeToggleBtn.innerHTML = theme === 'dark'
+                ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg><span>Dark Mode</span>`
+                : `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" /></svg><span>Light Mode</span>`;
+            document.documentElement.className = theme;
+        };
+        const toggleTheme = () => applyTheme(localStorage.getItem('theme') === 'dark' ? 'light' : 'dark');
+
+        // --- UI RENDERING ---
+        const renderAll = () => { renderPrompts(searchInput.value); renderTags(); };
+
+        const renderPrompts = (textFilter = '') => {
+            library.innerHTML = '';
+            const lowerTextFilter = textFilter.toLowerCase();
+            const filteredPrompts = prompts.filter(p => (p.name.toLowerCase().includes(lowerTextFilter) || p.prompt.toLowerCase().includes(lowerTextFilter)) && (activeTagFilter ? p.tags.includes(activeTagFilter) : true));
+            library.className = currentView === 'grid' ? 'grid grid-cols-2 sm:grid-cols-3 gap-4' : 'space-y-3';
+            emptyState.classList.toggle('hidden', prompts.length > 0);
+
+            filteredPrompts.sort((a, b) => (b.pinned || 0) - (a.pinned || 0) || b.id - a.id).forEach((prompt, index) => {
+                const card = document.createElement('div');
+                card.dataset.id = prompt.id;
+                card.style.animationDelay = `${index * 40}ms`;
+
+                if (currentView === 'grid') {
+                    card.className = 'glassmorphism rounded-lg overflow-hidden relative group aspect-square flex flex-col justify-end p-3 text-white cursor-pointer card-pop-in';
+                    const imageUrl = prompt.image || `https://placehold.co/400x400/${document.documentElement.classList.contains('dark') ? '111827/818cf8' : 'e5e7eb/6366f1'}?text=${encodeURIComponent(prompt.name.charAt(0))}`;
+                    card.innerHTML = `<img src="${imageUrl}" class="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-110" loading="lazy" onerror="this.src='https://placehold.co/400x400/111827/38bdf8?text=Error';"><div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>${prompt.pinned ? `<svg xmlns="http://www.w3.org/2000/svg" class="absolute top-2 left-2 h-5 w-5 text-sky-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 3.636a1 1 0 011.414 0L10 7.172l3.536-3.536a1 1 0 111.414 1.414L11.414 8.586l3.536 3.536a1 1 0 11-1.414 1.414L10 9.999l-3.536 3.536a1 1 0 01-1.414-1.414L8.586 8.586 5.05 5.05a1 1 0 010-1.414z" clip-rule="evenodd" transform="rotate(-45 10 10)" /></svg>` : ''}<h3 class="relative z-10 font-bold truncate">${prompt.name}</h3><p class="relative z-10 text-xs text-gray-300 truncate">${prompt.tags.join(', ')}</p>`;
+                } else {
+                    card.className = 'glassmorphism rounded-lg p-3 flex items-center gap-4 cursor-pointer card-pop-in';
+                    const imageUrl = prompt.image || `https://placehold.co/100x100/${document.documentElement.classList.contains('dark') ? '1f2937/818cf8' : 'd1d5db/6366f1'}?text=${encodeURIComponent(prompt.name.charAt(0))}`;
+                    card.innerHTML = `<img src="${imageUrl}" class="w-16 h-16 rounded-md object-cover flex-shrink-0" loading="lazy" onerror="this.src='https://placehold.co/100x100/111827/38bdf8?text=Error';"><div class="flex-grow overflow-hidden"><h3 class="font-bold truncate">${prompt.name}</h3><p class="text-xs muted-text truncate">${prompt.tags.join(', ')}</p><p class="text-sm truncate mt-1">${prompt.prompt}</p></div>${prompt.pinned ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-400 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 3.636a1 1 0 011.414 0L10 7.172l3.536-3.536a1 1 0 111.414 1.414L11.414 8.586l3.536 3.536a1 1 0 11-1.414 1.414L10 9.999l-3.536 3.536a1 1 0 01-1.414-1.414L8.586 8.586 5.05 5.05a1 1 0 010-1.414z" clip-rule="evenodd" transform="rotate(-45 10 10)" /></svg>` : ''}`;
+                }
+                card.addEventListener('click', () => { if (!wasLongPress) showDetails(prompt.id); wasLongPress = false; });
+                card.addEventListener('touchstart', () => handleLongPressStart(prompt.id), { passive: true });
+                card.addEventListener('touchend', handleLongPressEnd);
+                card.addEventListener('touchmove', handleLongPressEnd);
+                library.appendChild(card);
+            });
+        };
+
+        const renderTags = () => {
+            const allTags = [...new Set(prompts.flatMap(p => p.tags))];
+            tagFiltersContainer.innerHTML = '';
+            allTags.forEach(tag => { const tagEl = document.createElement('button'); tagEl.className = `tag-filter px-3 py-1 rounded-full text-sm font-medium mr-2 whitespace-nowrap interactive-scale ${activeTagFilter === tag ? 'active' : 'bg-black/5 dark:bg-white/5 '}`; tagEl.textContent = tag; tagEl.onclick = () => { activeTagFilter = activeTagFilter === tag ? null : tag; renderAll(); }; tagFiltersContainer.appendChild(tagEl); });
+        };
+        
+        const setView = (view) => {
+            currentView = view; localStorage.setItem('promptView', view);
+            viewToggleBtn.innerHTML = view === 'grid' ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>` : `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>`;
+            renderPrompts(searchInput.value);
+        };
+
+        const showToast = (message) => { toastMessage.textContent = message; toast.classList.remove('opacity-0', 'translate-y-4'); setTimeout(() => toast.classList.add('opacity-0', 'translate-y-4'), 2000); };
+        
+        const handleLongPressStart = (id) => { wasLongPress = false; longPressTimer = setTimeout(() => { wasLongPress = true; openContextMenu(id); if (navigator.vibrate) navigator.vibrate(50); }, 500); };
+        const handleLongPressEnd = () => clearTimeout(longPressTimer);
+
+        const showGenericModal = (modal) => { genericModalOverlay.classList.remove('hidden'); genericModalOverlay.classList.add('flex', 'fade-in'); modal.classList.remove('hidden'); setTimeout(() => modal.classList.remove('scale-95', 'opacity-0'), 10); };
+        const hideGenericModal = (modal) => { modal.classList.add('scale-95', 'opacity-0'); genericModalOverlay.classList.add('fade-out'); setTimeout(() => { genericModalOverlay.classList.add('hidden'); modal.classList.add('hidden'); genericModalOverlay.classList.remove('fade-out'); }, 300); };
+        const openConfirmationModal = (message, onConfirm) => { confirmMessage.textContent = message; confirmCallback = onConfirm; showGenericModal(confirmModal); };
+        const setActiveTab = (tabName) => { if (tabName === 'prompt') { tabPrompt.classList.add('active'); tabDetails.classList.remove('active'); tabContentPrompt.classList.remove('hidden'); tabContentDetails.classList.add('hidden'); } else { tabDetails.classList.add('active'); tabPrompt.classList.remove('active'); tabContentDetails.classList.remove('hidden'); tabContentPrompt.classList.add('hidden'); } };
+
+        const openFormModal = (promptToEdit = null) => {
+            formModal.classList.remove('hidden'); formModal.classList.add('flex', 'fade-in'); formContainer.classList.add('slide-up');
+            setActiveTab('prompt'); promptForm.reset(); imagePreview.src = 'https://placehold.co/100x100/1f2937/4b5563?text=Image'; imageDataInput.value = '';
+            if (promptToEdit) { formTitle.textContent = 'Edit Prompt'; document.getElementById('prompt-id').value = promptToEdit.id; document.getElementById('prompt-text').value = promptToEdit.prompt; document.getElementById('prompt-name').value = promptToEdit.name; document.getElementById('prompt-tags').value = promptToEdit.tags.join(', '); if (promptToEdit.image) { imageDataInput.value = promptToEdit.image; imagePreview.src = promptToEdit.image; } } else { formTitle.textContent = 'Add New Prompt'; }
+        };
+        const closeFormModal = () => { formContainer.classList.add('slide-down'); formModal.classList.add('fade-out'); setTimeout(() => { formModal.classList.add('hidden'); formModal.classList.remove('flex', 'fade-in', 'fade-out'); formContainer.classList.remove('slide-down'); promptForm.reset(); }, 300); };
+        
+        const showDetails = (id) => {
+            const prompt = prompts.find(p => p.id === id); if (!prompt) return; currentEditingId = id;
+            document.getElementById('details-image').src = prompt.image || 'https://placehold.co/600x400/111827/38bdf8?text=No+Image';
+            document.getElementById('details-name').textContent = prompt.name; document.getElementById('details-prompt').textContent = prompt.prompt;
+            const tagsContainer = document.getElementById('details-tags'); tagsContainer.innerHTML = '';
+            prompt.tags.forEach(tag => { if (!tag.trim()) return; const tagEl = document.createElement('span'); tagEl.className = 'px-2 py-1 bg-sky-500/20 text-sky-400 text-xs font-medium rounded'; tagEl.textContent = tag; tagsContainer.appendChild(tagEl); });
+            copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2H6z" /></svg>Copy';
+            detailsPinBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 pin-icon ${prompt.pinned ? 'pinned' : 'text-white'}" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 3.636a1 1 0 011.414 0L10 7.172l3.536-3.536a1 1 0 111.414 1.414L11.414 8.586l3.536 3.536a1 1 0 11-1.414 1.414L10 9.999l-3.536 3.536a1 1 0 01-1.414-1.414L8.586 8.586 5.05 5.05a1 1 0 010-1.414z" clip-rule="evenodd" transform="rotate(-45 10 10)" /></svg>`;
+            detailsModal.classList.remove('hidden'); detailsModal.classList.add('flex', 'fade-in'); detailsContainer.classList.remove('scale-95', 'opacity-0');
+        };
+        const closeDetailsModal = () => { detailsContainer.classList.add('scale-95', 'opacity-0'); detailsModal.classList.add('fade-out'); setTimeout(() => { detailsModal.classList.add('hidden'); detailsModal.classList.remove('flex', 'fade-in', 'fade-out'); }, 300); };
+        
+        // --- CONTEXT MENU ---
+        const openContextMenu = (id) => {
+            const prompt = prompts.find(p => p.id === id);
+            if (!prompt) return;
+
+            const optionsContainer = document.getElementById('context-menu-options');
+            optionsContainer.innerHTML = ''; 
+
+            const actions = [
+                { text: 'Copy Prompt', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2H6z" /></svg>`, action: () => { navigator.clipboard.writeText(prompt.prompt).then(() => showToast('Prompt copied!')); }},
+                { text: prompt.pinned ? 'Unpin Prompt' : 'Pin Prompt', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 3.636a1 1 0 011.414 0L10 7.172l3.536-3.536a1 1 0 111.414 1.414L11.414 8.586l3.536 3.536a1 1 0 11-1.414 1.414L10 9.999l-3.536 3.536a1 1 0 01-1.414-1.414L8.586 8.586 5.05 5.05a1 1 0 010-1.414z" clip-rule="evenodd" transform="rotate(-45 10 10)" /></svg>`, action: () => { const idx = prompts.findIndex(p => p.id === id); if (idx > -1) { prompts[idx].pinned = !prompts[idx].pinned; savePrompts(prompts); renderAll(); showToast(prompts[idx].pinned ? 'Prompt pinned!' : 'Prompt unpinned!'); } }},
+                { text: 'Duplicate Prompt', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M7 9a2 2 0 012-2h6a2 2 0 012 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2V9z" /><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2H4z" /></svg>`, action: () => { const newPrompt = {...prompt, id: Date.now(), name: `${prompt.name} (copy)`, pinned: false}; prompts.push(newPrompt); savePrompts(prompts); renderAll(); showToast('Prompt duplicated!'); }},
+                { text: 'Edit Prompt', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>`, action: () => openFormModal(prompt)},
+                { text: 'Delete Prompt', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>`, action: () => { openConfirmationModal('This prompt will be permanently deleted.', () => { prompts = prompts.filter(p => p.id !== id); savePrompts(prompts); renderAll(); showToast('Prompt deleted.'); }); }, isDestructive: true }
+            ];
+
+            actions.forEach(action => {
+                const button = document.createElement('button');
+                button.className = `w-full text-left p-3 rounded-lg font-semibold flex items-center gap-3 interactive-scale ${action.isDestructive ? 'text-red-500 bg-red-500/10 hover:bg-red-500/20' : 'hover:bg-black/5 dark:hover:bg-white/10'}`;
+                button.innerHTML = `${action.icon} ${action.text}`;
+                button.onclick = () => { action.action(); closeContextMenu(); };
+                optionsContainer.appendChild(button);
+            });
+
+            contextMenuModal.classList.remove('hidden');
+            contextMenuModal.classList.remove('fade-out');
+            contextMenuModal.classList.add('fade-in');
+            contextMenuContainer.classList.remove('slide-down');
+            contextMenuContainer.classList.add('slide-up');
+        };
+
+        const closeContextMenu = () => {
+            contextMenuModal.classList.add('fade-out');
+            contextMenuContainer.classList.add('slide-down');
+            setTimeout(() => {
+                contextMenuModal.classList.add('hidden');
+            }, 300);
+        };
+
+        const backupData = () => { const dataStr = JSON.stringify(prompts, null, 2); const blob = new Blob([dataStr], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `promptvault_backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); showToast('Backup downloaded!'); };
+        const restoreData = (event) => { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { try { const restored = JSON.parse(e.target.result); if (Array.isArray(restored)) { openConfirmationModal('This will overwrite all current prompts. Continue?', () => { prompts = restored; savePrompts(prompts); renderAll(); showToast('Library restored!'); hideGenericModal(confirmModal); }); } else { showToast('Invalid backup file.'); } } catch (error) { showToast('Could not read backup file.'); } finally { restoreInput.value = ''; } }; reader.readAsText(file); };
+        
+        // --- EVENT LISTENERS ---
+        fab.addEventListener('click', () => openFormModal());
+        cancelBtn.addEventListener('click', closeFormModal);
+        formModal.addEventListener('click', e => e.target === formModal && closeFormModal());
+        tabPrompt.addEventListener('click', () => setActiveTab('prompt'));
+        tabDetails.addEventListener('click', () => setActiveTab('details'));
+        pasteBtn.addEventListener('click', async () => { try { const text = await navigator.clipboard.readText(); document.getElementById('prompt-text').value = text; showToast('Pasted from clipboard!'); setActiveTab('details'); } catch (err) { showToast('Failed to paste. Check permissions.'); } });
+        imageUploadInput.addEventListener('change', (e) => { const file = e.target.files[0]; if(file) { const reader = new FileReader(); reader.onload = (event) => { imageDataInput.value = event.target.result; imagePreview.src = event.target.result; }; reader.readAsDataURL(file); } });
+        closeDetailsBtn.addEventListener('click', closeDetailsModal);
+        detailsModal.addEventListener('click', e => e.target === detailsModal && closeDetailsModal());
+        promptForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('prompt-id').value;
+            const promptData = { prompt: document.getElementById('prompt-text').value.trim(), name: document.getElementById('prompt-name').value.trim() || 'Untitled Prompt', image: imageDataInput.value.trim(), tags: document.getElementById('prompt-tags').value.split(',').map(t => t.trim()).filter(Boolean), pinned: false };
+            if (!promptData.prompt) return showToast('Prompt text cannot be empty!');
+            if (id) { const index = prompts.findIndex(p => p.id == id); if (index > -1) { promptData.pinned = prompts[index].pinned || false; prompts[index] = { ...prompts[index], ...promptData }; } showToast('Prompt Updated!'); } else { promptData.id = Date.now(); prompts.push(promptData); showToast('Prompt Saved!'); }
+            savePrompts(prompts); renderAll(); closeFormModal();
+        });
+        searchInput.addEventListener('input', e => renderPrompts(e.target.value));
+        copyBtn.addEventListener('click', () => { navigator.clipboard.writeText(document.getElementById('details-prompt').textContent).then(() => { copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>Copied!'; showToast('Prompt copied!'); }, () => showToast('Failed to copy!')); });
+        shareBtn.addEventListener('click', async () => { try { if (navigator.share) await navigator.share({ title: `AI Prompt: ${document.getElementById('details-name').textContent}`, text: document.getElementById('details-prompt').textContent }); else showToast('Share API not supported.'); } catch (err) { showToast('Error sharing prompt.'); } });
+        deleteBtn.addEventListener('click', () => { openConfirmationModal('This prompt will be permanently deleted.', () => { if (currentEditingId) { prompts = prompts.filter(p => p.id !== currentEditingId); savePrompts(prompts); renderAll(); closeDetailsModal(); showToast('Prompt deleted.'); } hideGenericModal(confirmModal); }); });
+        editBtn.addEventListener('click', () => { const promptToEdit = prompts.find(p => p.id === currentEditingId); if(promptToEdit) { closeDetailsModal(); setTimeout(() => openFormModal(promptToEdit), 150); } });
+        detailsPinBtn.addEventListener('click', () => { const index = prompts.findIndex(p => p.id === currentEditingId); if (index > -1) { prompts[index].pinned = !prompts[index].pinned; savePrompts(prompts); showDetails(currentEditingId); renderAll(); showToast(prompts[index].pinned ? 'Prompt pinned!' : 'Prompt unpinned!'); } });
+        settingsBtn.addEventListener('click', () => showGenericModal(settingsModal));
+        closeSettingsBtn.addEventListener('click', () => hideGenericModal(settingsModal));
+        aboutBtn.addEventListener('click', () => { hideGenericModal(settingsModal); setTimeout(() => showGenericModal(aboutModal), 300); });
+        closeAboutBtn.addEventListener('click', () => hideGenericModal(aboutModal));
+        genericModalOverlay.addEventListener('click', e => { if (e.target === genericModalOverlay) { hideGenericModal(settingsModal); hideGenericModal(aboutModal); hideGenericModal(confirmModal); } });
+        confirmCancelBtn.addEventListener('click', () => hideGenericModal(confirmModal));
+        confirmOkBtn.addEventListener('click', () => { if (typeof confirmCallback === 'function') confirmCallback(); });
+        backupBtn.addEventListener('click', backupData);
+        restoreBtn.addEventListener('click', () => restoreInput.click());
+        restoreInput.addEventListener('change', restoreData);
+        viewToggleBtn.addEventListener('click', () => setView(currentView === 'grid' ? 'list' : 'grid'));
+        themeToggleBtn.addEventListener('click', toggleTheme);
+        contextMenuCancel.addEventListener('click', closeContextMenu);
+        contextMenuModal.addEventListener('click', (e) => { if(e.target === contextMenuModal) closeContextMenu(); });
+
+        // --- INITIALIZATION ---
+        const initialTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        applyTheme(initialTheme);
+        prompts = getPrompts();
+        setView(currentView);
+        renderAll();
+
+    });
+    </script>
+</body>
+</html>
+
