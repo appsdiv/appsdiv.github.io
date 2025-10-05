@@ -77,11 +77,11 @@
         }
 
         /* Animations */
-        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
-        .fade-out { animation: fadeOut 0.3s ease-in forwards; }
-        .slide-up { animation: slideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-        .slide-down { animation: slideDown 0.3s cubic-bezier(0.64, 0, 0.78, 0) forwards; }
-        .card-pop-in { animation: popIn 0.4s ease-out forwards; opacity: 0; transform: scale(0.95); }
+        .fade-in { animation: fadeIn 0.25s ease-out forwards; }
+        .fade-out { animation: fadeOut 0.25s ease-in forwards; }
+        .slide-up { animation: slideUp 0.25s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .slide-down { animation: slideDown 0.25s cubic-bezier(0.64, 0, 0.78, 0) forwards; }
+        .card-pop-in { animation: popIn 0.3s ease-out forwards; opacity: 0; transform: scale(0.95); }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
@@ -114,7 +114,7 @@
         .header-text-gradient { background-image: linear-gradient(to right, var(--primary-accent), var(--secondary-accent)); }
         .muted-text { color: var(--text-muted-color); }
         
-        .interactive-scale { transition: transform 0.1s ease-out; }
+        .interactive-scale { transition: transform 0.1s ease-out; touch-action: manipulation; }
         .interactive-scale:active { transform: scale(0.95); }
 
         * { -webkit-tap-highlight-color: transparent; }
@@ -156,7 +156,7 @@
         </div>
     </div>
 
-    <button id="fab-add" class="fixed bottom-6 right-6 h-16 w-16 rounded-full bg-gradient-to-br from-sky-500 to-indigo-600 text-white flex items-center justify-center shadow-lg transform transition-transform hover:scale-110 active:scale-95">
+    <button id="fab-add" class="fixed bottom-6 right-6 h-16 w-16 rounded-full bg-gradient-to-br from-sky-500 to-indigo-600 text-white flex items-center justify-center shadow-lg transform transition-transform hover:scale-110 active:scale-95 interactive-scale">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
     </button>
     
@@ -268,7 +268,7 @@
         const handleLongPressEnd = () => clearTimeout(longPressTimer);
 
         const showGenericModal = (modal) => { genericModalOverlay.classList.remove('hidden'); genericModalOverlay.classList.add('flex', 'fade-in'); modal.classList.remove('hidden'); setTimeout(() => modal.classList.remove('scale-95', 'opacity-0'), 10); };
-        const hideGenericModal = (modal) => { modal.classList.add('scale-95', 'opacity-0'); genericModalOverlay.classList.add('fade-out'); setTimeout(() => { genericModalOverlay.classList.add('hidden'); modal.classList.add('hidden'); genericModalOverlay.classList.remove('fade-out'); }, 300); };
+        const hideGenericModal = (modal) => { modal.classList.add('scale-95', 'opacity-0'); genericModalOverlay.classList.add('fade-out'); setTimeout(() => { genericModalOverlay.classList.add('hidden'); modal.classList.add('hidden'); genericModalOverlay.classList.remove('fade-out'); }, 250); };
         const openConfirmationModal = (message, onConfirm) => { confirmMessage.textContent = message; confirmCallback = onConfirm; showGenericModal(confirmModal); };
         const setActiveTab = (tabName) => { if (tabName === 'prompt') { tabPrompt.classList.add('active'); tabDetails.classList.remove('active'); tabContentPrompt.classList.remove('hidden'); tabContentDetails.classList.add('hidden'); } else { tabDetails.classList.add('active'); tabPrompt.classList.remove('active'); tabContentDetails.classList.remove('hidden'); tabContentPrompt.classList.add('hidden'); } };
 
@@ -277,7 +277,7 @@
             setActiveTab('prompt'); promptForm.reset(); imagePreview.src = 'https://placehold.co/100x100/1f2937/4b5563?text=Image'; imageDataInput.value = '';
             if (promptToEdit) { formTitle.textContent = 'Edit Prompt'; document.getElementById('prompt-id').value = promptToEdit.id; document.getElementById('prompt-text').value = promptToEdit.prompt; document.getElementById('prompt-name').value = promptToEdit.name; document.getElementById('prompt-tags').value = promptToEdit.tags.join(', '); if (promptToEdit.image) { imageDataInput.value = promptToEdit.image; imagePreview.src = promptToEdit.image; } } else { formTitle.textContent = 'Add New Prompt'; }
         };
-        const closeFormModal = () => { formContainer.classList.add('slide-down'); formModal.classList.add('fade-out'); setTimeout(() => { formModal.classList.add('hidden'); formModal.classList.remove('flex', 'fade-in', 'fade-out'); formContainer.classList.remove('slide-down'); promptForm.reset(); }, 300); };
+        const closeFormModal = () => { formContainer.classList.add('slide-down'); formModal.classList.add('fade-out'); setTimeout(() => { formModal.classList.add('hidden'); formModal.classList.remove('flex', 'fade-in', 'fade-out'); formContainer.classList.remove('slide-down'); promptForm.reset(); }, 250); };
         
         const showDetails = (id) => {
             const prompt = prompts.find(p => p.id === id); if (!prompt) return; currentEditingId = id;
@@ -289,7 +289,7 @@
             detailsPinBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 pin-icon ${prompt.pinned ? 'pinned' : 'text-white'}" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 3.636a1 1 0 011.414 0L10 7.172l3.536-3.536a1 1 0 111.414 1.414L11.414 8.586l3.536 3.536a1 1 0 11-1.414 1.414L10 9.999l-3.536 3.536a1 1 0 01-1.414-1.414L8.586 8.586 5.05 5.05a1 1 0 010-1.414z" clip-rule="evenodd" transform="rotate(-45 10 10)" /></svg>`;
             detailsModal.classList.remove('hidden'); detailsModal.classList.add('flex', 'fade-in'); detailsContainer.classList.remove('scale-95', 'opacity-0');
         };
-        const closeDetailsModal = () => { detailsContainer.classList.add('scale-95', 'opacity-0'); detailsModal.classList.add('fade-out'); setTimeout(() => { detailsModal.classList.add('hidden'); detailsModal.classList.remove('flex', 'fade-in', 'fade-out'); }, 300); };
+        const closeDetailsModal = () => { detailsContainer.classList.add('scale-95', 'opacity-0'); detailsModal.classList.add('fade-out'); setTimeout(() => { detailsModal.classList.add('hidden'); detailsModal.classList.remove('flex', 'fade-in', 'fade-out'); }, 250); };
         
         // --- CONTEXT MENU ---
         const openContextMenu = (id) => {
@@ -327,7 +327,7 @@
             contextMenuContainer.classList.add('slide-down');
             setTimeout(() => {
                 contextMenuModal.classList.add('hidden');
-            }, 300);
+            }, 250);
         };
 
         const backupData = () => { const dataStr = JSON.stringify(prompts, null, 2); const blob = new Blob([dataStr], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `promptvault_backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); showToast('Backup downloaded!'); };
