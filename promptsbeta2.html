@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en" translate="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+  <title>PromptVault</title>
+
+  <!-- iOS-ish look & feel -->
+  <meta name="theme-color" content="#f8f9fb" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b0c10" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PromptVault">
+  <meta name="application-name" content="PromptVault">
+
+  <link rel="icon" type="image/png" href="https://i.postimg.cc/4ybV6mXC/App-Icon-2x.png" />
+  <link rel="apple-touch-icon" href="https://i.postimg.cc/4ybV6mXC/App-Icon-2x.png" />
+  <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIlByb21wdFZhdWx0IiwKICAic2hvcnRfbmFtZSI6ICJQcm9tcHRWYXVsdCIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMTExODI3IiwKICAidGhlbWVfY29sdCI6ICIjMTExODI3IiwKICAiZGVzY3JpcHRpb24iOiAiQSBwZXJzb25hbCBsaWJyYXJ5IHRvIHNhdmUsIHNlYXJjaCwgYW5kIHNoYXJlIHlvdXIgQUkgaW1hZ2UgZ2VuZXJhdGlvbiBwcm9tcHRzLiIsCiAgImljb25zIjogW3sic3JjIjoiaHR0cHM6Ly9pLnBvc3RpbWcuY2MvNHliVjZtWEMvQXBwLUljb24tMngucG5nIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3BuZyJ9LHsic3JjIjoiaHR0cHM6Ly9pLnBvc3RpbWcuY2MvNHliVjZtWEMvQXBwLUljb24tMngucG5nIiwic2l6ZXMiOiI1MTJ4NTEyIiwidHlwZSI6ImltYWdlL3BuZyJ9XX0K">
+
+  <!-- Tailwind + Icons + Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root{
+      --bg:#f8f9fb; --text:#0b1220; --text-muted:#6b7280;
+      --glass:rgba(255,255,255,.7); --glass-dark:rgba(17,24,39,.55);
+      --input:rgba(243,244,246,.9); --border:rgba(0,0,0,.08);
+      --accent:#0ea5e9; --accent-2:#818cf8;
+      --sheet:#ffffff; --sheet-dark:#111827;
+      --ring: 0 0 0 3px color-mix(in srgb, var(--accent) 28%, transparent);
+    }
+    html.dark{
+      --bg:#0b0c10; --text:#eef2f8; --text-muted:#a3a3ad;
+      --glass:rgba(31,41,55,.55); --input:rgba(31,41,55,.65); --border:rgba(255,255,255,.08);
+      --sheet:#141922;
+    }
+    body{ background:var(--bg); color:var(--text); font-family:'Vazirmatn','Inter',system-ui,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif }
+    /* iOS-style large nav */
+    .ios-nav{
+      position:sticky; top:0; z-index:30;
+      backdrop-filter:saturate(1.4) blur(18px);
+      -webkit-backdrop-filter:saturate(1.4) blur(18px);
+      background:linear-gradient(180deg, color-mix(in srgb, var(--glass) 92%, transparent), transparent);
+      border-bottom:1px solid var(--border);
+    }
+    .ios-title{ letter-spacing:-.01em }
+    .glass{ background:var(--glass); border:1px solid var(--border); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px) }
+    .sheet{ background:var(--sheet); box-shadow:0 10px 40px rgba(0,0,0,.10) }
+    .btn{ transition:transform .08s ease, box-shadow .15s ease }
+    .btn:active{ transform:scale(.98) }
+    .segmented{ display:inline-flex; padding:4px; gap:4px; border-radius:9999px; background:color-mix(in srgb, var(--bg) 70%, white); border:1px solid var(--border) }
+    .segmented button{ padding:.45rem .8rem; border-radius:9999px }
+    .segmented .on{ background:var(--text); color:var(--bg) }
+    .input{ background:var(--input); border:1px solid var(--border)}
+    .input:focus{ outline:none; box-shadow:var(--ring); border-color:color-mix(in srgb, var(--accent) 60%, var(--border)) }
+    .muted{ color:var(--text-muted) }
+
+    /* Cards / Anim */
+    .card{ transition:transform .12s ease, box-shadow .2s ease }
+    .card:hover{ transform:translateY(-1px) }
+    .pop{ animation:pop .22s ease-out both; transform:translateY(2px); opacity:0 }
+    @keyframes pop{ to{ transform:translateY(0); opacity:1 } }
+
+    /* Drag handle */
+    .drag-handle{ cursor:grab }
+    .dragging{ opacity:.6; transform:scale(.98) }
+    .drop-target{ outline:2px dashed color-mix(in srgb, var(--accent) 70%, transparent); outline-offset: -8px }
+
+    /* Scrollbar tiny */
+    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:color-mix(in srgb, var(--accent) 70%, #999); border-radius:4px}
+  </style>
+</head>
+<body class="antialiased">
+  <!-- iOS-style nav -->
+  <header class="ios-nav">
+    <div class="max-w-2xl mx-auto px-4 pt-4 pb-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-bolt-lightning text-xl text-sky-500"></i>
+          <div>
+            <div class="text-xs muted">Library</div>
+            <h1 class="ios-title text-2xl font-extrabold">PromptVault</h1>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="settings-btn" aria-label="Settings" class="btn p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10">
+            <i class="fa-solid fa-gear text-lg"></i>
+          </button>
+          <button id="view-toggle-btn" aria-label="Toggle view" class="btn p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10">
+            <i class="fa-solid fa-grip text-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- NEW: iOS segmented controls -->
+      <div class="mt-3 flex flex-wrap items-center gap-2">
+        <div class="relative flex-1">
+          <input id="search-input" type="search" placeholder="Search…" class="w-full input rounded-full pl-10 pr-4 py-2.5" aria-label="Search prompts">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 muted"></i>
+        </div>
+
+        <div class="segmented" role="group" aria-label="Sort">
+          <button data-sort="date_desc" class="btn text-sm on">Newest</button>
+          <button data-sort="date_asc" class="btn text-sm">Oldest</button>
+          <button data-sort="name_asc" class="btn text-sm">A–Z</button>
+          <button data-sort="name_desc" class="btn text-sm">Z–A</button>
+        </div>
+
+        <div class="segmented" role="group" aria-label="Group">
+          <button data-group="none" class="btn text-sm on">All</button>
+          <button data-group="tag" class="btn text-sm">By Tag</button>
+        </div>
+
+        <button id="tags-modal-btn" class="btn px-3 py-2 rounded-full glass">
+          <i class="fa-solid fa-tags"></i>
+          <span class="ml-2 text-sm">Filter</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-2xl mx-auto px-4 pb-28 pt-4">
+    <div id="active-filter-display" class="hidden my-2"></div>
+    <section id="prompt-library" class="space-y-6"></section>
+
+    <div id="empty-state" class="hidden text-center py-16">
+      <div id="empty-state-icon" class="text-5xl muted"></div>
+      <p id="empty-state-title" class="mt-4 text-lg font-semibold"></p>
+      <p id="empty-state-subtitle" class="muted mt-1"></p>
+    </div>
+  </main>
+
+  <!-- FAB -->
+  <button id="fab-add" aria-label="Add new prompt" class="fixed bottom-6 right-6 h-16 w-16 rounded-full text-white bg-gradient-to-br from-sky-500 to-indigo-600 shadow-lg btn">
+    <i class="fa-solid fa-plus text-2xl"></i>
+  </button>
+
+  <!-- Modals (sheets style) -->
+  <div id="prompt-form-modal" class="fixed inset-0 z-40 hidden items-end bg-black/50">
+    <div id="prompt-form-container" class="w-full max-w-xl mx-auto sheet rounded-t-2xl p-4 translate-y-full">
+      <h2 id="form-title" class="text-lg font-bold text-center">Add New Prompt</h2>
+
+      <div class="mt-3 grid grid-cols-2 gap-2 p-1 rounded-xl bg-black/5 dark:bg-white/10">
+        <button id="tab-prompt" class="btn py-2 rounded-lg bg-white/60 dark:bg-white/5 font-semibold">Prompt</button>
+        <button id="tab-details" class="btn py-2 rounded-lg font-semibold">Details</button>
+      </div>
+
+      <form id="prompt-form" class="mt-3">
+        <input type="hidden" id="prompt-id"/>
+        <div id="tab-content-prompt">
+          <textarea id="prompt-text" rows="6" class="w-full input rounded-lg p-3" placeholder="Paste your prompt here…"></textarea>
+          <div class="grid grid-cols-2 gap-2 mt-2">
+            <button type="button" id="paste-btn" class="btn py-2 rounded-lg bg-indigo-500 text-white">
+              <i class="fa-solid fa-paste mr-2"></i> Paste
+            </button>
+            <!-- NEW: import JSON from clipboard -->
+            <button type="button" id="import-clipboard-btn" class="btn py-2 rounded-lg bg-zinc-700 text-white">
+              <i class="fa-solid fa-clipboard-list mr-2"></i> Import JSON
+            </button>
+          </div>
+        </div>
+
+        <div id="tab-content-details" class="hidden space-y-3">
+          <input id="prompt-name" type="text" class="w-full input rounded-lg p-3" placeholder="Name (e.g., Cyberpunk Cat)">
+          <div class="flex items-center gap-3">
+            <img id="image-preview" src="https://placehold.co/100x100/1f2937/4b5563?text=Image" class="w-16 h-16 rounded-lg object-cover" alt="Preview">
+            <label for="prompt-image-upload" class="btn flex-1 py-2 rounded-lg bg-gray-500 text-white text-center cursor-pointer">Upload Image</label>
+            <input id="prompt-image-upload" type="file" class="hidden" accept="image/*">
+            <input id="prompt-image-data" type="hidden">
+          </div>
+          <div>
+            <p class="text-sm muted font-medium mb-1">Tags</p>
+            <div id="tag-pills-container" class="flex flex-wrap gap-2"></div>
+            <input id="prompt-tags-input" type="text" class="w-full input rounded-lg p-3 mt-2" placeholder="Add a tag and press Enter…">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 pt-3">
+          <button type="button" id="cancel-btn" class="btn py-2 rounded-lg bg-gray-500 text-white">Cancel</button>
+          <button type="submit" class="btn py-2 rounded-lg bg-sky-500 text-white">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Details modal -->
+  <div id="details-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 p-4">
+    <div id="details-container" class="w-full max-w-md sheet rounded-2xl overflow-hidden scale-95 opacity-0">
+      <div class="relative">
+        <img id="details-image" src="" class="w-full h-64 object-cover" alt="">
+        <button id="details-pin-btn" class="btn absolute top-3 right-3 p-2 rounded-full bg-black/40 text-white">
+          <i class="fa-solid fa-thumbtack"></i>
+        </button>
+        <button id="close-details-btn" class="btn absolute top-3 left-3 p-2 w-8 h-8 rounded-full bg-black/40 text-white">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="p-4 space-y-4">
+        <div class="flex items-center justify-between gap-3">
+          <h3 id="details-name" class="text-xl font-bold truncate">Name</h3>
+          <!-- NEW: export single prompt -->
+          <button id="export-one-btn" class="btn px-3 py-2 rounded-lg bg-emerald-500 text-white text-sm">
+            <i class="fa-solid fa-arrow-down mr-1"></i> Export
+          </button>
+        </div>
+        <div id="details-tags" class="flex flex-wrap gap-2"></div>
+        <div class="max-h-40 overflow-y-auto p-3 rounded-lg input">
+          <p id="details-prompt" class="text-sm whitespace-pre-wrap muted"></p>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="copy-btn" class="btn py-3 rounded-lg bg-sky-500 text-white"><i class="fa-solid fa-copy mr-2"></i>Copy</button>
+          <button id="share-btn" class="btn py-3 rounded-lg bg-indigo-500 text-white"><i class="fa-solid fa-share-nodes mr-2"></i>Share</button>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <button id="edit-btn" class="btn py-2 rounded-lg text-sky-600 bg-sky-50 dark:bg-sky-900/20">Edit</button>
+          <button id="duplicate-btn" class="btn py-2 rounded-lg text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20">Duplicate</button>
+          <button id="delete-btn" class="btn py-2 rounded-lg text-red-600 bg-red-50 dark:bg-red-900/20">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay modals -->
+  <div id="generic-modal-overlay" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 p-4">
+    <div id="settings-modal" class="hidden w-full max-w-sm sheet rounded-2xl p-4 scale-95 opacity-0">
+      <h3 class="text-xl font-bold text-center mb-3">Settings</h3>
+      <div id="settings-stats" class="p-3 mb-3 rounded-lg input space-y-2 text-sm"></div>
+      <button id="theme-toggle" class="btn w-full p-2 rounded-lg input mb-2"></button>
+      <div class="grid grid-cols-2 gap-2">
+        <button id="backup-btn" class="btn py-3 rounded-lg bg-sky-500 text-white">Backup</button>
+        <button id="restore-btn" class="btn py-3 rounded-lg bg-indigo-500 text-white">Restore</button>
+      </div>
+      <input type="file" id="restore-input" class="hidden" accept=".json">
+      <!-- NEW: import JSON from clipboard here too -->
+      <button id="import-clipboard-global" class="btn w-full mt-2 py-2 rounded-lg bg-zinc-700 text-white">
+        <i class="fa-solid fa-clipboard-list mr-2"></i> Import JSON from Clipboard
+      </button>
+      <button id="about-btn" class="btn w-full mt-2 py-2 rounded-lg bg-gray-600 text-white">About</button>
+      <button id="close-settings-btn" class="btn w-full mt-3 py-2 rounded-lg input">Close</button>
+    </div>
+
+    <div id="about-modal" class="hidden w-full max-w-sm sheet rounded-2xl p-6 text-center scale-95 opacity-0">
+      <h3 class="text-xl font-bold">PromptVault</h3>
+      <p class="muted mt-2">iOS-style edition · v0.9</p>
+      <button id="close-about-btn" class="btn w-full mt-6 py-3 rounded-lg bg-gray-600 text-white">Close</button>
+    </div>
+
+    <div id="confirm-modal" class="hidden w-full max-w-sm sheet rounded-2xl p-6 scale-95 opacity-0">
+      <h3 id="confirm-title" class="text-lg font-bold text-center">Are you sure?</h3>
+      <p id="confirm-message" class="muted text-center my-3"></p>
+      <div class="grid grid-cols-2 gap-2 mt-2">
+        <button id="confirm-cancel-btn" class="btn py-3 rounded-lg bg-gray-600 text-white">Cancel</button>
+        <button id="confirm-ok-btn" class="btn py-3 rounded-lg bg-red-500 text-white">Confirm</button>
+      </div>
+    </div>
+
+    <div id="tags-modal" class="hidden w-full max-w-sm sheet rounded-2xl p-4 scale-95 opacity-0">
+      <h3 class="text-xl font-bold text-center mb-3">Filter by Tag</h3>
+      <div id="modal-tags-container" class="flex flex-wrap justify-center gap-2 max-h-64 overflow-y-auto"></div>
+      <button id="close-tags-btn" class="btn w-full mt-3 py-2 rounded-lg input">Close</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full text-white text-sm opacity-0 translate-y-2 pointer-events-none" style="background:#27272a"></div>
+
+  <!-- Context menu -->
+  <div id="context-menu-modal" class="fixed inset-0 z-50 hidden items-end bg-black/50">
+    <div id="context-menu-container" class="w-full max-w-lg mx-auto sheet rounded-t-2xl p-2 pb-4 touch-none translate-y-full">
+      <div class="w-10 h-1 rounded-full mx-auto my-2 bg-white/20"></div>
+      <div id="context-menu-header" class="px-2 text-center mb-1">
+        <h4 id="context-menu-title" class="font-bold truncate"></h4>
+        <p id="context-menu-subtitle" class="text-xs muted truncate"></p>
+      </div>
+      <div id="context-menu-options" class="space-y-1.5 px-2"></div>
+      <button id="context-menu-cancel" class="btn w-full mt-4 mx-auto block max-w-[calc(100%-1rem)] py-3 rounded-lg input">Cancel</button>
+    </div>
+  </div>
+
+  <!-- IndexedDB + App -->
+  <script type="module">
+    // --- Imports ---
+    import { get as idbGet, set as idbSet } from 'https://cdn.jsdelivr.net/npm/idb-keyval@6/+esm'; // NEW: IndexedDB
+
+    // --- Utilities ---
+    const $ = (id) => document.getElementById(id);
+    const qs = (sel, root=document) => root.querySelector(sel);
+    const qsa = (sel, root=document) => [...root.querySelectorAll(sel)];
+    const escapeHTML = (s='') => s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]);
+    const debounce = (fn, ms=150) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; };
+    const prefersDark = () => window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+
+    // --- DOM ---
+    const library = $('prompt-library'), emptyState = $('empty-state'), emptyStateIcon = $('empty-state-icon'), emptyStateTitle = $('empty-state-title'), emptyStateSubtitle = $('empty-state-subtitle');
+    const searchInput = $('search-input'), viewToggleBtn = $('view-toggle-btn'), fab = $('fab-add'), toast = $('toast');
+    const promptFormModal = $('prompt-form-modal'), promptFormContainer = $('prompt-form-container'), promptForm = $('prompt-form'), formTitle = $('form-title');
+    const tabPrompt = $('tab-prompt'), tabDetails = $('tab-details'), tabContentPrompt = $('tab-content-prompt'), tabContentDetails = $('tab-content-details');
+    const pasteBtn = $('paste-btn'), importClipBtn = $('import-clipboard-btn'), importClipGlobal = $('import-clipboard-global');
+    const imageUploadInput = $('prompt-image-upload'), imagePreview = $('image-preview'), imageDataInput = $('prompt-image-data');
+    const promptTagsInput = $('prompt-tags-input'), tagPillsContainer = $('tag-pills-container');
+    const cancelBtn = $('cancel-btn'), settingsBtn = $('settings-btn'), settingsModal = $('settings-modal'), closeSettingsBtn = $('close-settings-btn'), themeToggleBtn = $('theme-toggle'), settingsStats = $('settings-stats');
+    const backupBtn = $('backup-btn'), restoreBtn = $('restore-btn'), restoreInput = $('restore-input'), aboutBtn = $('about-btn'), aboutModal = $('about-modal'), closeAboutBtn = $('close-about-btn');
+    const tagsModalBtn = $('tags-modal-btn'), tagsModal = $('tags-modal'), modalTagsContainer = $('modal-tags-container'), closeTagsBtn = $('close-tags-btn'), activeFilterDisplay = $('active-filter-display');
+    const genericOverlay = $('generic-modal-overlay'), confirmModal = $('confirm-modal'), confirmTitle = $('confirm-title'), confirmMessage = $('confirm-message'), confirmOkBtn = $('confirm-ok-btn'), confirmCancelBtn = $('confirm-cancel-btn');
+    const detailsModal = $('details-modal'), detailsContainer = $('details-container'), detailsImage = $('details-image'), detailsName = $('details-name'), detailsTags = $('details-tags'), detailsPrompt = $('details-prompt'), detailsPinBtn = $('details-pin-btn'), closeDetailsBtn = $('close-details-btn'), copyBtn = $('copy-btn'), shareBtn = $('share-btn'), deleteBtn = $('delete-btn'), editBtn = $('edit-btn'), duplicateBtn = $('duplicate-btn'), exportOneBtn = $('export-one-btn');
+    const contextMenuModal = $('context-menu-modal'), contextMenuContainer = $('context-menu-container'), contextMenuOptions = $('context-menu-options'), contextMenuCancel = $('context-menu-cancel'), contextMenuTitle = $('context-menu-title'), contextMenuSubtitle = $('context-menu-subtitle');
+
+    // NEW: Sort & Group segmented buttons
+    const sortButtons = qsa('[data-sort]');
+    const groupButtons = qsa('[data-group]');
+
+    // --- State ---
+    const SCHEMA_VERSION = 2;
+    let prompts = [];                   // array of prompt objects
+    let currentView = localStorage.getItem('promptView') || 'grid';
+    let activeTagFilter = null;
+    let currentTags = [];
+    let currentEditingId = null;
+    let confirmCallback = null;
+    let sortMode = localStorage.getItem('pv_sort') || 'date_desc';
+    let groupMode = localStorage.getItem('pv_group') || 'none';
+
+    // --- IndexedDB wrappers (storing whole array for simplicity) ---
+    const DBKEY = 'prompts';
+    const getPrompts = async () => (await idbGet(DBKEY)) || [];
+    const savePrompts = async (arr) => { await idbSet(DBKEY, arr); };
+
+    // --- Theme ---
+    const applyTheme = (theme) => {
+      localStorage.setItem('theme', theme);
+      document.documentElement.classList.toggle('dark', theme === 'dark');
+      themeToggleBtn.innerHTML = theme === 'dark'
+        ? `<i class="fa-solid fa-moon mr-2"></i>Dark Mode`
+        : `<i class="fa-solid fa-sun mr-2"></i>Light Mode`;
+    };
+    const toggleTheme = () => applyTheme(localStorage.getItem('theme') === 'dark' ? 'light' : 'dark');
+
+    // --- Toast ---
+    const showToast = (()=>{ let t=null; return (msg)=>{ toast.textContent=msg; toast.classList.remove('opacity-0','translate-y-2'); clearTimeout(t); t=setTimeout(()=>toast.classList.add('opacity-0','translate-y-2'), 1800); };})();
+
+    // --- Tags helper ---
+    const renderTagPills = () => {
+      tagPillsContainer.innerHTML='';
+      currentTags.forEach(tag=>{
+        const pill=document.createElement('div'); pill.className='inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-600 text-white text-sm';
+        const s=document.createElement('span'); s.textContent=tag;
+        const b=document.createElement('button'); b.className='drag-handle text-white/90'; b.innerHTML='&times;'; b.onclick=()=>{ currentTags=currentTags.filter(t=>t!==tag); renderTagPills(); };
+        pill.append(s,b); tagPillsContainer.appendChild(pill);
+      });
+    };
+
+    // --- Sorting & Grouping ---
+    const sortFns = {
+      date_desc: (a,b)=>(b.pinned===true)-(a.pinned===true) || (a.pinOrder??0)-(b.pinOrder??0) || (b.id||0)-(a.id||0),
+      date_asc:  (a,b)=>(b.pinned===true)-(a.pinned===true) || (a.pinOrder??0)-(b.pinOrder??0) || (a.id||0)-(b.id||0),
+      name_asc:  (a,b)=>(b.pinned===true)-(a.pinned===true) || (a.pinOrder??0)-(b.pinOrder??0) || (a.name||'').localeCompare(b.name||''),
+      name_desc: (a,b)=>(b.pinned===true)-(a.pinned===true) || (a.pinOrder??0)-(b.pinOrder??0) || (b.name||'').localeCompare(a.name||'')
+    };
+
+    function groupByTag(list){
+      const map = new Map();
+      list.forEach(p=>{
+        const tags = (p.tags && p.tags.length) ? p.tags : ['(untagged)'];
+        tags.forEach(t=>{
+          if(!map.has(t)) map.set(t, []);
+          map.get(t).push(p);
+        });
+      });
+      // sort group labels A–Z
+      return [...map.entries()].sort((a,b)=>a[0].localeCompare(b[0]));
+    }
+
+    // --- Rendering ---
+    function setEmpty(type){
+      const cfg = type==='empty' ? ['cubes','Your Vault is Empty',"Tap '+' to add your first prompt."] : ['magnifying-glass','No Results',"Try a different search or clear your filter."];
+      emptyStateIcon.innerHTML = `<i class="fa-solid fa-${cfg[0]}"></i>`;
+      emptyStateTitle.textContent = cfg[1]; emptyStateSubtitle.textContent = cfg[2];
+      emptyState.classList.remove('hidden');
+    }
+
+    function setView(v){
+      currentView = v; localStorage.setItem('promptView', v);
+      viewToggleBtn.innerHTML = v==='grid' ? `<i class="fa-solid fa-list"></i>` : `<i class="fa-solid fa-grip"></i>`;
+      renderAll();
+    }
+
+    function setSort(mode){
+      sortMode = mode; localStorage.setItem('pv_sort', mode);
+      sortButtons.forEach(b=>b.classList.toggle('on', b.dataset.sort===mode));
+      renderAll();
+    }
+    function setGroup(mode){
+      groupMode = mode; localStorage.setItem('pv_group', mode);
+      groupButtons.forEach(b=>b.classList.toggle('on', b.dataset.group===mode));
+      renderAll();
+    }
+
+    function updateActiveFilterDisplay(){
+      if(!activeTagFilter){ activeFilterDisplay.classList.add('hidden'); activeFilterDisplay.innerHTML=''; return; }
+      activeFilterDisplay.classList.remove('hidden');
+      activeFilterDisplay.innerHTML = `
+        <div class="p-2 text-sm rounded-lg bg-sky-500/10 text-sky-700 dark:text-sky-300 flex justify-between items-center">
+          <span><i class="fa-solid fa-tag mr-2"></i>Filtering by: <b>${escapeHTML(activeTagFilter)}</b></span>
+          <button id="clear-filter-btn" class="px-2 py-1 rounded-lg hover:bg-sky-500/20">Clear</button>
+        </div>`;
+      $('clear-filter-btn').onclick=()=>{ activeTagFilter=null; renderAll(); };
+    }
+
+    function cardHTML(p, idx){
+      const dark = document.documentElement.classList.contains('dark');
+      const img = p.image || `https://placehold.co/400x400/${dark?'111827/818cf8':'e5e7eb/6366f1'}?text=${encodeURIComponent((p.name||'U')[0])}`;
+      const tagStr = escapeHTML((p.tags||[]).join(', '));
+      const name = escapeHTML(p.name||'Untitled');
+      const classes = currentView==='grid'
+        ? 'glass rounded-xl overflow-hidden relative group aspect-square flex flex-col justify-end p-3 text-white card pop'
+        : 'glass rounded-xl p-3 flex items-center gap-4 card pop relative';
+      const imgTag = currentView==='grid'
+        ? `<img src="${img}" class="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105" loading="lazy"> <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent"></div>`
+        : `<img src="${img}" class="w-16 h-16 rounded-md object-cover flex-shrink-0" loading="lazy">`;
+      const pinBadge = p.pinned ? `<div class="absolute top-2 left-2 text-sky-400"><i class="fa-solid fa-thumbtack"></i></div>` : '';
+
+      return `
+        <div class="${classes}" data-id="${p.id}" draggable="${p.pinned}" ${p.pinned?'data-draggable="1"':''} style="animation-delay:${idx*35}ms">
+          ${currentView==='grid'? imgTag : ''}
+          ${pinBadge}
+          ${currentView==='grid'
+            ? `<h3 class="relative z-10 font-bold truncate">${name}</h3><p class="relative z-10 text-xs text-gray-300 truncate">${tagStr}</p>`
+            : `${imgTag}<div class="flex-grow overflow-hidden"><h3 class="font-bold truncate">${name}</h3><p class="text-xs muted truncate">${tagStr}</p><p class="text-sm truncate mt-1">${escapeHTML(p.prompt||'')}</p></div>`
+          }
+          <button class="menu-btn absolute top-2 right-2 w-9 h-9 rounded-full flex items-center justify-center ${currentView==='grid'?'bg-black/30 text-white/90 hover:bg-black/50':'hover:bg-black/10 dark:hover:bg-white/10'}">
+            <i class="fa-solid fa-ellipsis-vertical"></i>
+          </button>
+          ${p.pinned ? `<div class="drag-handle ${currentView==='grid'?'absolute bottom-2 right-2':'ml-2'} px-2 py-1 rounded bg-black/10 dark:bg-white/10 text-xs">Drag</div>`:''}
+        </div>`;
+    }
+
+    function renderTagsModal(){
+      const all = [...new Set(prompts.flatMap(p=>p.tags||[]))];
+      modalTagsContainer.innerHTML='';
+      const make=(label, isAll=false)=>{
+        const b=document.createElement('button');
+        b.className='px-3 py-1 rounded-full text-sm font-medium btn input';
+        b.textContent = label || 'Show All';
+        if ((isAll && activeTagFilter===null) || activeTagFilter===label) b.classList.add('bg-sky-500','text-white');
+        b.onclick=()=>{ activeTagFilter=isAll?null:label; hideModal(tagsModal); renderAll(); };
+        modalTagsContainer.appendChild(b);
+      };
+      make(null,true);
+      all.sort().forEach(t=>make(t));
+    }
+
+    function renderAll(){
+      updateActiveFilterDisplay();
+      const q = (searchInput.value||'').toLowerCase().trim();
+      const filtered = prompts.filter(p=>{
+        const textMatch = (p.name||'').toLowerCase().includes(q) || (p.prompt||'').toLowerCase().includes(q);
+        const tagMatch = activeTagFilter ? (p.tags||[]).includes(activeTagFilter) : true;
+        return textMatch && tagMatch;
+      });
+
+      if(prompts.length===0) { library.innerHTML=''; setEmpty('empty'); return; }
+      if(filtered.length===0) { library.innerHTML=''; setEmpty('noresults'); return; }
+      emptyState.classList.add('hidden');
+
+      filtered.sort(sortFns[sortMode] || sortFns.date_desc);
+
+      // Grouping
+      library.innerHTML='';
+      if (groupMode==='tag'){
+        const groups = groupByTag(filtered);
+        groups.forEach(([tag,items])=>{
+          const section = document.createElement('section'); section.className='space-y-3';
+          section.innerHTML = `<h4 class="text-sm muted font-semibold">${escapeHTML(tag)}</h4><div class="${currentView==='grid'?'grid grid-cols-2 sm:grid-cols-3 gap-3':'space-y-3'}"></div>`;
+          const wrap = qs('div', section);
+          items.forEach((p,i)=> wrap.insertAdjacentHTML('beforeend', cardHTML(p,i)));
+          library.appendChild(section);
+        });
+      } else {
+        const wrap = document.createElement('div'); wrap.className = currentView==='grid'?'grid grid-cols-2 sm:grid-cols-3 gap-3':'space-y-3';
+        filtered.forEach((p,i)=> wrap.insertAdjacentHTML('beforeend', cardHTML(p,i)));
+        library.appendChild(wrap);
+      }
+
+      // Wire actions + drag
+      wireCards();
+    }
+
+    function wireCards(){
+      qsa('.menu-btn', library).forEach(btn=>{
+        btn.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          const id = btn.closest('[data-id]').dataset.id; openContextMenu(id);
+        });
+      });
+      qsa('[data-id]', library).forEach(card=>{
+        card.addEventListener('click', (e)=>{
+          if (e.target.closest('.menu-btn')) return;
+          showDetails(card.dataset.id);
+        });
+      });
+      // Drag only for pinned
+      qsa('[data-draggable="1"]', library).forEach(el=>{
+        el.addEventListener('dragstart', onDragStart);
+        el.addEventListener('dragover', onDragOver);
+        el.addEventListener('drop', onDrop);
+        el.addEventListener('dragend', onDragEnd);
+      });
+    }
+
+    // --- Drag reorder for pinned ---
+    let dragSrc=null;
+    function onDragStart(e){
+      dragSrc = this;
+      this.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', this.dataset.id);
+    }
+    function onDragOver(e){
+      e.preventDefault();
+      const over = this;
+      if (!over.classList.contains('drop-target')) over.classList.add('drop-target');
+    }
+    async function onDrop(e){
+      e.preventDefault();
+      qsa('.drop-target', library).forEach(x=>x.classList.remove('drop-target'));
+      const fromId = e.dataTransfer.getData('text/plain');
+      const toId = this.dataset.id;
+      if (!fromId || !toId || fromId===toId) return;
+
+      const pinned = prompts.filter(p=>p.pinned);
+      // ensure pinOrder present
+      pinned.forEach((p,i)=>{ if (typeof p.pinOrder!=='number') p.pinOrder=i; });
+
+      const fromIdx = pinned.findIndex(p=>String(p.id)===String(fromId));
+      const toIdx = pinned.findIndex(p=>String(p.id)===String(toId));
+      if (fromIdx<0 || toIdx<0) return;
+
+      const [moved] = pinned.splice(fromIdx,1);
+      pinned.splice(toIdx,0,moved);
+      // write back new pinOrder
+      pinned.forEach((p,i)=> p.pinOrder = i);
+
+      // merge into prompts
+      prompts = prompts.map(p=>{
+        const updated = pinned.find(x=>x.id===p.id);
+        return updated ? {...p, pinOrder: updated.pinOrder} : p;
+      });
+      await savePrompts(prompts);
+      renderAll();
+      showToast('Pinned order updated');
+    }
+    function onDragEnd(){ this.classList.remove('dragging'); qsa('.drop-target', library).forEach(x=>x.classList.remove('drop-target')); }
+
+    // --- Modals helpers ---
+    function showModal(el){ genericOverlay.classList.add('hidden'); }
+    function showSheet(modal, container){
+      modal.classList.remove('hidden'); modal.classList.add('flex');
+      container.classList.remove('translate-y-full'); container.classList.add('pop');
+    }
+    function hideSheet(modal, container){
+      container.classList.add('translate-y-full');
+      setTimeout(()=>{ modal.classList.add('hidden'); modal.classList.remove('flex'); container.classList.remove('pop','translate-y-full'); }, 200);
+    }
+    function showDialog(modal){
+      genericOverlay.classList.remove('hidden'); genericOverlay.classList.add('flex');
+      modal.classList.remove('hidden'); setTimeout(()=> modal.classList.remove('scale-95','opacity-0'), 10);
+    }
+    function hideModal(modal){
+      modal.classList.add('scale-95','opacity-0');
+      setTimeout(()=>{ modal.classList.add('hidden'); genericOverlay.classList.add('hidden'); genericOverlay.classList.remove('flex'); }, 180);
+    }
+
+    function openConfirmation(title,msg,onOk){
+      confirmTitle.textContent=title; confirmMessage.textContent=msg; confirmCallback=onOk; showDialog(confirmModal);
+    }
+
+    // --- Details / Context ---
+    function showDetails(id){
+      const p = prompts.find(x=>String(x.id)===String(id)); if(!p) return; currentEditingId=id;
+      detailsImage.src = p.image || 'https://placehold.co/600x400/111827/38bdf8?text=No+Image';
+      detailsName.textContent = p.name || 'Untitled';
+      detailsPrompt.textContent = p.prompt || '';
+      detailsTags.innerHTML=''; (p.tags||[]).forEach(t=>{
+        const s=document.createElement('span'); s.className='px-2 py-1 bg-sky-500/20 text-sky-400 text-xs font-medium rounded'; s.textContent=t; detailsTags.appendChild(s);
+      });
+      detailsPinBtn.classList.toggle('text-sky-400', !!p.pinned);
+      detailsModal.classList.remove('hidden'); detailsModal.classList.add('flex');
+      detailsContainer.classList.remove('scale-95','opacity-0');
+    }
+    function closeDetails(){
+      detailsContainer.classList.add('scale-95','opacity-0');
+      setTimeout(()=>{ detailsModal.classList.add('hidden'); detailsModal.classList.remove('flex'); }, 160);
+    }
+
+    function openContextMenu(id){
+      const p = prompts.find(x=>String(x.id)===String(id)); if(!p) return; currentEditingId=id;
+      contextMenuTitle.textContent=p.name||'Untitled'; contextMenuSubtitle.textContent=p.prompt||'';
+      contextMenuOptions.innerHTML='';
+      const add = (text, icon, fn, danger=false)=>{
+        const b=document.createElement('button');
+        b.className=`w-full text-left p-3 rounded-lg font-semibold flex items-center gap-3 btn ${danger?'text-red-500 bg-red-500/10 hover:bg-red-500/20':'hover:bg-black/5 dark:hover:bg-white/10'}`;
+        b.innerHTML=`<div class="w-5 text-center"><i class="fa-solid fa-${icon}"></i></div><span>${text}</span>`;
+        b.onclick=()=>{ fn(); closeContext(); };
+        contextMenuOptions.appendChild(b);
+      };
+      add('Copy Prompt', 'copy', ()=> navigator.clipboard.writeText(p.prompt||'').then(()=>showToast('Copied'),()=>showToast('Clipboard blocked')));
+      add(p.pinned?'Unpin':'Pin to top','thumbtack', async ()=>{
+        const idx = prompts.findIndex(x=>x.id===p.id);
+        if(idx>-1){
+          prompts[idx].pinned = !prompts[idx].pinned;
+          // assign pinOrder if pinning
+          if (prompts[idx].pinned){
+            const max = Math.max(-1, ...prompts.filter(x=>x.pinned && typeof x.pinOrder==='number').map(x=>x.pinOrder));
+            prompts[idx].pinOrder = max + 1;
+          } else {
+            delete prompts[idx].pinOrder;
+          }
+          await savePrompts(prompts); renderAll(); showToast(prompts[idx].pinned?'Pinned':'Unpinned');
+        }
+      });
+      add('Duplicate','clone', async ()=>{
+        const copy = {...p, id: crypto.randomUUID?.() || Date.now(), name: `${p.name||'Untitled'} (Copy)`, pinned:false, pinOrder: undefined};
+        prompts.push(copy); await savePrompts(prompts); renderAll(); showToast('Duplicated');
+      });
+      add('Edit','pencil', ()=> openForm(p));
+      add('Delete','trash-can', ()=> openConfirmation(`Delete "${p.name||'Untitled'}"?`,'This cannot be undone.', async ()=>{
+        prompts = prompts.filter(x=>x.id!==p.id); await savePrompts(prompts); renderAll(); showToast('Deleted');
+      }), true);
+
+      contextMenuModal.classList.remove('hidden'); contextMenuModal.classList.add('flex');
+      contextMenuContainer.classList.remove('translate-y-full');
+    }
+    function closeContext(){
+      contextMenuContainer.classList.add('translate-y-full');
+      setTimeout(()=>{ contextMenuModal.classList.add('hidden'); contextMenuModal.classList.remove('flex'); }, 160);
+    }
+
+    // --- Form ---
+    function setTab(name){
+      const isPrompt = name==='prompt';
+      tabPrompt.classList.toggle('bg-white/60', isPrompt);
+      tabDetails.classList.toggle('bg-white/60', !isPrompt);
+      tabContentPrompt.classList.toggle('hidden', !isPrompt);
+      tabContentDetails.classList.toggle('hidden', isPrompt);
+    }
+    function openForm(toEdit=null){
+      setTab('prompt'); promptForm.reset(); imagePreview.src='https://placehold.co/100x100/1f2937/4b5563?text=Image'; imageDataInput.value=''; promptTagsInput.value='';
+      if(toEdit){
+        formTitle.textContent='Edit Prompt'; $('prompt-id').value=toEdit.id; $('prompt-text').value=toEdit.prompt||''; $('prompt-name').value=toEdit.name||''; currentTags=[...(toEdit.tags||[])];
+        if(toEdit.image){ imageDataInput.value=toEdit.image; imagePreview.src=toEdit.image; }
+      } else { formTitle.textContent='Add New Prompt'; $('prompt-id').value=''; currentTags=[]; }
+      renderTagPills();
+      showSheet(promptFormModal, promptFormContainer);
+    }
+    function closeForm(){ hideSheet(promptFormModal, promptFormContainer); }
+
+    // --- Image downscale (optional) ---
+    async function downscaleImage(file, max=900){
+      return new Promise((resolve,reject)=>{
+        const img = new Image(); const url = URL.createObjectURL(file);
+        img.onload=()=>{
+          const s = Math.min(1, max/Math.max(img.width,img.height));
+          const w=Math.round(img.width*s), h=Math.round(img.height*s);
+          const c=document.createElement('canvas'); c.width=w; c.height=h;
+          c.getContext('2d').drawImage(img,0,0,w,h);
+          c.toBlob(b=>{
+            const r=new FileReader(); r.onload=()=>resolve(r.result); r.onerror=reject; r.readAsDataURL(b||file);
+            URL.revokeObjectURL(url);
+          }, 'image/jpeg', .82);
+        };
+        img.onerror=()=>{ URL.revokeObjectURL(url); reject(); };
+        img.src=url;
+      });
+    }
+
+    // --- Backup / Restore / Import JSON ---
+    function download(filename, text){
+      const blob = new Blob([text], {type:'application/json'}); const url = URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
+
+    function exportOnePrompt(id){
+      const p = prompts.find(x=>String(x.id)===String(id)); if(!p) return;
+      download(`prompt_${(p.name||'Untitled').replace(/\s+/g,'_')}.json`, JSON.stringify(p,null,2));
+    }
+
+    async function importJSONFromClipboard(){
+      try{
+        const text = await navigator.clipboard.readText();
+        const data = JSON.parse(text);
+        const items = Array.isArray(data) ? data : (Array.isArray(data.items) ? data.items : [data]);
+        if (!items || !items.length) return showToast('No valid JSON items found');
+        // normalize & add ids
+        const norm = items.map(x=>({ id: x.id || crypto.randomUUID?.() || Date.now()+Math.random(), name: x.name || 'Untitled', prompt: x.prompt || '', image: x.image || '', tags: Array.isArray(x.tags)? x.tags : [], pinned: !!x.pinned, pinOrder: typeof x.pinOrder==='number'? x.pinOrder : undefined }));
+        prompts.push(...norm);
+        await savePrompts(prompts);
+        renderAll();
+        showToast(`Imported ${norm.length} item(s)`);
+      } catch { showToast('Clipboard read failed'); }
+    }
+
+    // --- Event wiring ---
+    // View & theme
+    viewToggleBtn.addEventListener('click', ()=> setView(currentView==='grid'?'list':'grid'));
+    themeToggleBtn.addEventListener('click', toggleTheme);
+
+    // Segmented groups
+    sortButtons.forEach(b=> b.addEventListener('click', ()=> setSort(b.dataset.sort)));
+    groupButtons.forEach(b=> b.addEventListener('click', ()=> setGroup(b.dataset.group)));
+
+    // Search
+    searchInput.addEventListener('input', debounce(()=> renderAll(), 140));
+
+    // FAB / Form
+    fab.addEventListener('click', ()=> openForm());
+    cancelBtn.addEventListener('click', closeForm);
+    promptFormModal.addEventListener('click', e=>{ if(e.target===promptFormModal) closeForm(); });
+    tabPrompt.addEventListener('click', ()=> setTab('prompt'));
+    tabDetails.addEventListener('click', ()=> setTab('details'));
+
+    pasteBtn.addEventListener('click', async ()=>{
+      try{ const t = await navigator.clipboard.readText(); $('prompt-text').value = t; showToast('Pasted'); setTab('details'); }
+      catch{ showToast('Clipboard blocked'); }
+    });
+    importClipBtn.addEventListener('click', importJSONFromClipboard);
+    importClipGlobal.addEventListener('click', importJSONFromClipboard);
+
+    imageUploadInput.addEventListener('change', async (e)=>{
+      const f = e.target.files?.[0]; if(!f) return;
+      try{ const dataURL = await downscaleImage(f, 900); imageDataInput.value=dataURL; imagePreview.src=dataURL; }
+      catch{
+        const r=new FileReader(); r.onload=(ev)=>{ imageDataInput.value=ev.target.result; imagePreview.src=ev.target.result; }; r.readAsDataURL(f);
+      }
+    });
+
+    promptTagsInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); const t=e.target.value.trim(); if(t && !currentTags.includes(t)){ currentTags.push(t); renderTagPills(); } e.target.value=''; } });
+    promptTagsInput.addEventListener('paste', (e)=>{ e.preventDefault(); const list=e.clipboardData.getData('text').split(/[,;\n]/).map(s=>s.trim()).filter(Boolean); list.forEach(t=>{ if(!currentTags.includes(t)) currentTags.push(t); }); renderTagPills(); });
+
+    promptForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const id = $('prompt-id').value || null;
+      const data = {
+        name: $('prompt-name').value.trim() || 'Untitled Prompt',
+        prompt: $('prompt-text').value.trim(),
+        image: imageDataInput.value.trim(),
+        tags: currentTags.slice()
+      };
+      if(!data.prompt) return showToast('Prompt text cannot be empty!');
+      if(id){
+        const i = prompts.findIndex(p=>String(p.id)===String(id));
+        if(i>-1){
+          const keepPin = { pinned: !!prompts[i].pinned, pinOrder: prompts[i].pinOrder };
+          prompts[i] = { ...prompts[i], ...data, ...keepPin };
+          await savePrompts(prompts);
+          showToast('Updated');
+        }
+      } else {
+        const newP = { id: crypto.randomUUID?.() || Date.now(), ...data, pinned:false };
+        prompts.push(newP); await savePrompts(prompts); showToast('Saved');
+      }
+      closeForm(); renderAll();
+    });
+
+    // Settings / overlay modals
+    settingsBtn.addEventListener('click', ()=>{
+      const promptCount = prompts.length;
+      const tagCount = [...new Set(prompts.flatMap(p=>p.tags||[]))].length;
+      settingsStats.innerHTML = `
+        <div class="flex justify-between"><span class="muted">Total Prompts</span><b>${promptCount}</b></div>
+        <div class="flex justify-between"><span class="muted">Unique Tags</span><b>${tagCount}</b></div>
+        <div class="text-xs muted pt-1">Schema v${SCHEMA_VERSION} · IndexedDB</div>`;
+      showDialog(settingsModal);
+    });
+    closeSettingsBtn.addEventListener('click', ()=> hideModal(settingsModal));
+    aboutBtn.addEventListener('click', ()=>{ hideModal(settingsModal); setTimeout(()=> showDialog(aboutModal), 180); });
+    closeAboutBtn.addEventListener('click', ()=> hideModal(aboutModal));
+
+    backupBtn.addEventListener('click', ()=> download(`promptvault_backup_${new Date().toISOString().slice(0,10)}.json`, JSON.stringify({version:SCHEMA_VERSION, items:prompts}, null, 2)));
+    restoreBtn.addEventListener('click', ()=> restoreInput.click());
+    restoreInput.addEventListener('change', async (e)=>{
+      const f=e.target.files?.[0]; if(!f) return;
+      const r=new FileReader();
+      r.onload=async(ev)=>{
+        try{
+          const json=JSON.parse(ev.target.result);
+          const arr = Array.isArray(json) ? json : (Array.isArray(json.items) ? json.items : null);
+          if(!arr) return showToast('Invalid file');
+          openConfirmation('Restore Backup?', 'This will replace your current library.', async ()=>{
+            prompts = arr; await savePrompts(prompts); renderAll(); showToast('Restored');
+          });
+        } catch { showToast('Invalid JSON'); }
+        finally{ restoreInput.value=''; }
+      };
+      r.readAsText(f);
+    });
+
+    // Tags modal
+    tagsModalBtn.addEventListener('click', ()=>{ renderTagsModal(); showDialog(tagsModal); });
+    closeTagsBtn.addEventListener('click', ()=> hideModal(tagsModal));
+    genericOverlay.addEventListener('click', (e)=>{ if(e.target===genericOverlay){ hideModal(settingsModal); hideModal(aboutModal); hideModal(confirmModal); hideModal(tagsModal); } });
+
+    confirmCancelBtn.addEventListener('click', ()=> hideModal(confirmModal));
+    confirmOkBtn.addEventListener('click', ()=>{ if(typeof confirmCallback==='function') confirmCallback(); hideModal(confirmModal); });
+
+    // Details events
+    closeDetailsBtn.addEventListener('click', closeDetails);
+    detailsModal.addEventListener('click', (e)=>{ if(e.target===detailsModal) closeDetails(); });
+    copyBtn.addEventListener('click', ()=> navigator.clipboard.writeText(detailsPrompt.textContent||'').then(()=>{ showToast('Copied'); },()=>showToast('Clipboard blocked')));
+    shareBtn.addEventListener('click', async ()=>{
+      try{ if(navigator.share) await navigator.share({ title:`AI Prompt: ${detailsName.textContent}`, text:detailsPrompt.textContent }); else showToast('Share not supported'); }
+      catch{ showToast('Share failed'); }
+    });
+    exportOneBtn.addEventListener('click', ()=> exportOnePrompt(currentEditingId));
+    deleteBtn.addEventListener('click', ()=>{
+      const p = prompts.find(x=>String(x.id)===String(currentEditingId)); if(!p) return;
+      openConfirmation(`Delete "${p.name||'Untitled'}"?`, 'This cannot be undone.', async ()=>{
+        prompts = prompts.filter(x=>x.id!==p.id); await savePrompts(prompts); renderAll(); closeDetails(); showToast('Deleted');
+      });
+    });
+    editBtn.addEventListener('click', ()=>{
+      const p = prompts.find(x=>String(x.id)===String(currentEditingId)); if(!p) return;
+      closeDetails(); setTimeout(()=> openForm(p), 120);
+    });
+    detailsPinBtn.addEventListener('click', async ()=>{
+      const i = prompts.findIndex(x=>String(x.id)===String(currentEditingId)); if(i<0) return;
+      const nowPinned = !prompts[i].pinned;
+      prompts[i].pinned = nowPinned;
+      if(nowPinned){
+        const max = Math.max(-1, ...prompts.filter(x=>x.pinned && typeof x.pinOrder==='number').map(x=>x.pinOrder));
+        prompts[i].pinOrder = max + 1;
+      } else delete prompts[i].pinOrder;
+      await savePrompts(prompts); showDetails(currentEditingId); renderAll(); showToast(nowPinned?'Pinned':'Unpinned');
+    });
+
+    // Context menu
+    contextMenuCancel.addEventListener('click', closeContext);
+    contextMenuModal.addEventListener('click', (e)=>{ if(e.target===contextMenuModal) closeContext(); });
+
+    // Global keys
+    document.addEventListener('keydown', (e)=>{
+      const meta = e.ctrlKey || e.metaKey;
+      if(meta && e.key.toLowerCase()==='k'){ e.preventDefault(); searchInput.focus(); searchInput.select(); }
+      if(meta && e.key.toLowerCase()==='n'){ e.preventDefault(); openForm(); }
+      if(e.key==='Escape'){ closeForm(); closeDetails(); closeContext(); [settingsModal, aboutModal, confirmModal, tagsModal].forEach(m=>!m.classList.contains('hidden') && hideModal(m)); }
+    });
+
+    // --- INIT ---
+    const initialTheme = localStorage.getItem('theme') || (prefersDark()? 'dark':'light'); applyTheme(initialTheme);
+    // Load from IndexedDB
+    prompts = await getPrompts();
+    // ensure pinOrder continuity for already pinned items
+    let order=0; prompts.filter(p=>p.pinned).sort((a,b)=>(a.pinOrder??0)-(b.pinOrder??0)).forEach(p=>{ if(typeof p.pinOrder!=='number') p.pinOrder = order; order+=1; });
+    await savePrompts(prompts);
+
+    setView(currentView);
+    setSort(sortMode);
+    setGroup(groupMode);
+    renderAll();
+  </script>
+</body>
+</html>
