@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en" translate="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+  <title>PromptVault</title>
+
+  <!-- Icons / Fonts / Tailwind -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- PWA meta -->
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111827" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PromptVault">
+  <meta name="application-name" content="PromptVault">
+  <link rel="icon" type="image/png" href="https://i.postimg.cc/4ybV6mXC/App-Icon-2x.png" />
+  <link rel="apple-touch-icon" href="https://i.postimg.cc/4ybV6mXC/App-Icon-2x.png" />
+  <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIlByb21wdFZhdWx0IiwKICAic2hvcnRfbmFtZSI6ICJQcm9tcHRWYXVsdCIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMTExODI3IiwKICAidGhlbWVfY29sdCI6ICIjMTExODI3IiwKICAiZGVzY3JpcHRpb24iOiAiQSBwZXJzb25hbCBsaWJyYXJ5IHRvIHNhdmUsIHNlYXJjaCwgYW5kIHNoYXJlIHlvdXIgQUkgaW1hZ2UgZ2VuZXJhdGlvbiBwcm9tcHRzLiIsCiAgImljb25zIjogW3sic3JjIjoiaHR0cHM6Ly9pLnBvc3RpbWcuY2MvNHliVjZtWEMvQXBwLUljb24tMngucG5nIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3BuZyJ9LHsic3JjIjoiaHR0cHM6Ly9pLnBvc3RpbWcuY2MvNHliVjZtWEMvQXBwLUljb24tMngucG5nIiwic2l6ZXMiOiI1MTJ4NTEyIiwidHlwZSI6ImltYWdlL3BuZyJ9XX0K">
+
+  <style>
+    :root{
+      --bg-color:#f3f4f6; --text-color:#1f2937; --text-muted-color:#52525b;
+      --card-bg:rgba(255,255,255,.75); --input-bg:rgba(229,231,235,.7);
+      --border-color:rgba(0,0,0,.1); --primary-accent:#0ea5e9; --secondary-accent:#6366f1;
+      --modal-bg-color:#fff; --modal-shadow:0 25px 50px -12px rgb(0 0 0 / .2);
+    }
+    html.dark{
+      --bg-color:#111827; --text-color:#f3f4f6; --text-muted-color:#a1a1aa;
+      --card-bg:rgba(31,41,55,.65); --input-bg:rgba(55,65,81,.7);
+      --border-color:rgba(255,255,255,.1); --primary-accent:#38bdf8; --secondary-accent:#818cf8;
+      --modal-bg-color:#1f2937; --modal-shadow:0 25px 50px -12px rgb(0 0 0 / .4);
+    }
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      *{ animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important;}
+    }
+
+    ::-webkit-scrollbar{ width:6px } ::-webkit-scrollbar-track{ background:transparent } ::-webkit-scrollbar-thumb{ background:var(--primary-accent); border-radius:3px }
+    body{ font-family:'Vazirmatn','Inter',system-ui,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif; background:var(--bg-color); color:var(--text-color); overscroll-behavior-y:contain; transition:background-color .3s ease,color .3s ease }
+    .glassmorphism{ background:var(--card-bg); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid var(--border-color); transition:background-color .3s,border-color .3s }
+    .modal-card{ background:var(--modal-bg-color); box-shadow:var(--modal-shadow); transition:background-color .3s }
+    .form-input{ background:var(--input-bg); border:1px solid var(--border-color); color:var(--text-color); transition:border-color .2s, box-shadow .2s, background-color .3s }
+    .form-input::placeholder{ color:var(--text-muted-color) }
+    .form-input:focus{ outline:none; border-color:var(--primary-accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--primary-accent) 30%, transparent) }
+    .tab-btn.active{ background:var(--primary-accent); color:#fff }
+    .tab-btn:not(.active){ background:var(--input-bg); color:var(--text-color) }
+    .pin-icon.pinned{ color:var(--primary-accent) }
+    .header-icon{ color:var(--primary-accent) }
+    .header-text-gradient{ background-image:linear-gradient(to right, var(--primary-accent), var(--secondary-accent)) }
+    .muted-text{ color:var(--text-muted-color) }
+    .interactive-scale{ transition:transform .1s ease-out; touch-action:manipulation } .interactive-scale:active{ transform:scale(.95) }
+    .no-select{ -webkit-user-select:none; user-select:none } *{ -webkit-tap-highlight-color:transparent }
+
+    .tag-pill{ display:inline-flex; align-items:center; background:color-mix(in srgb, var(--primary-accent) 90%, black); color:#fff; padding:4px 10px; border-radius:9999px; font-size:.875rem; font-weight:500 }
+    .tag-pill-remove{ margin-left:6px; width:18px; height:18px; background:rgba(0,0,0,.2); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; line-height:1 }
+    .tag-pill-remove:hover{ background:rgba(0,0,0,.4) }
+
+    .context-menu-grabber{ width:40px; height:5px; background:rgba(0,0,0,.15); border-radius:2.5px; margin:4px auto 10px }
+    html.dark .context-menu-grabber{ background:rgba(255,255,255,.15) }
+
+    /* Micro animations */
+    .fade-in{ animation:fadeIn .2s ease-out forwards } .fade-out{ animation:fadeOut .2s ease-in forwards }
+    .slide-up{ animation:slideUp .25s cubic-bezier(.22,1,.36,1) forwards } .slide-down{ animation:slideDown .25s cubic-bezier(.64,0,.78,0) forwards }
+    .card-pop-in{ animation:popIn .25s ease-out forwards; opacity:0; transform:scale(.98) }
+    @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+    @keyframes fadeOut{ from{opacity:1} to{opacity:0} }
+    @keyframes slideUp{ from{ transform:translateY(100%); opacity:.8 } to{ transform:translateY(0); opacity:1 } }
+    @keyframes slideDown{ from{ transform:translateY(0); opacity:1 } to{ transform:translateY(100%); opacity:.8 } }
+    @keyframes popIn{ to{ opacity:1; transform:scale(1) } }
+
+    /* Prevent background interaction when a modal is open */
+    .is-modal-open body, body.is-inert { overflow:hidden }
+    [inert]{ pointer-events:none; user-select:none }
+  </style>
+</head>
+<body class="antialiased">
+  <div class="min-h-screen max-w-lg mx-auto p-4 pb-28">
+    <header class="flex items-center justify-between py-4">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-bolt-lightning h-7 w-7 header-icon" aria-hidden="true"></i>
+        <h1 class="text-2xl font-bold header-text-gradient bg-clip-text text-transparent">PromptVault</h1>
+      </div>
+      <button id="settings-btn" aria-label="Open settings" class="p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/20 dark:active:bg-white/20 interactive-scale">
+        <i class="fa-solid fa-gear h-6 w-6" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <div class="flex items-center gap-2 mt-4 mb-2">
+      <div class="relative flex-grow">
+        <input id="search-input" type="search" placeholder="Search prompts…" autocomplete="off" class="w-full form-input pl-10 pr-4 py-3 rounded-full" aria-label="Search prompts"/>
+        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 muted-text" aria-hidden="true"></i>
+      </div>
+      <button id="tags-modal-btn" aria-label="Filter by tag" class="p-3 w-12 h-12 rounded-full glassmorphism interactive-scale flex items-center justify-center">
+        <i class="fa-solid fa-tags text-xl" aria-hidden="true"></i>
+      </button>
+      <button id="view-toggle-btn" aria-label="Toggle view" class="p-3 w-12 h-12 rounded-full glassmorphism interactive-scale flex items-center justify-center"></button>
+    </div>
+
+    <div id="active-filter-display" class="hidden my-2"></div>
+
+    <main id="prompt-library" class="space-y-4" aria-live="polite"></main>
+
+    <div id="empty-state" class="hidden text-center py-20" role="status" aria-live="polite">
+      <div id="empty-state-icon" class="mx-auto h-12 w-12 muted-text text-5xl"></div>
+      <p id="empty-state-title" class="mt-4 text-lg font-semibold"></p>
+      <p id="empty-state-subtitle" class="muted-text mt-1"></p>
+    </div>
+  </div>
+
+  <!-- FAB -->
+  <button id="fab-add" aria-label="Add new prompt" class="fixed bottom-6 right-6 h-16 w-16 rounded-full bg-gradient-to-br from-sky-500 to-indigo-600 text-white flex items-center justify-center shadow-lg transform transition-transform hover:scale-110 active:scale-95 interactive-scale">
+    <i class="fa-solid fa-plus h-8 w-8 text-3xl" aria-hidden="true"></i>
+  </button>
+
+  <!-- Prompt Form Modal -->
+  <div id="prompt-form-modal" class="fixed inset-0 z-40 hidden items-end bg-black/50" aria-hidden="true">
+    <div id="prompt-form-container" class="w-full modal-card rounded-t-2xl p-4 transform translate-y-full" role="dialog" aria-modal="true" aria-labelledby="form-title">
+      <h2 id="form-title" class="text-xl font-bold mb-4 text-center">Add New Prompt</h2>
+      <div class="p-1 bg-gray-700/50 dark:bg-black/20 rounded-lg flex mb-4" role="tablist" aria-label="Prompt editor tabs">
+        <button id="tab-prompt" role="tab" aria-selected="true" class="tab-btn flex-1 py-2 rounded-md font-semibold interactive-scale">Prompt</button>
+        <button id="tab-details" role="tab" aria-selected="false" class="tab-btn flex-1 py-2 rounded-md font-semibold interactive-scale">Details</button>
+      </div>
+
+      <form id="prompt-form" novalidate>
+        <input type="hidden" id="prompt-id" />
+        <div id="tab-content-prompt">
+          <textarea id="prompt-text" rows="6" class="w-full form-input rounded-lg p-3 text-base" placeholder="Paste your prompt here..." aria-label="Prompt text"></textarea>
+          <button type="button" id="paste-btn" class="w-full mt-3 py-3 rounded-lg bg-indigo-500 font-semibold text-white flex items-center justify-center gap-2 interactive-scale">
+            <i class="fa-solid fa-paste" aria-hidden="true"></i> Paste from Clipboard
+          </button>
+        </div>
+
+        <div id="tab-content-details" class="hidden space-y-4">
+          <input id="prompt-name" type="text" class="w-full form-input rounded-lg p-3 text-base" placeholder="Name (e.g., 'Cyberpunk Cat')" aria-label="Prompt name">
+          <div class="flex items-center gap-3">
+            <img id="image-preview" src="https://placehold.co/100x100/1f2937/4b5563?text=Image" class="w-16 h-16 rounded-lg object-cover" alt="Prompt image preview">
+            <label for="prompt-image-upload" class="flex-grow text-center py-3 rounded-lg bg-gray-500 font-semibold cursor-pointer text-white interactive-scale">Upload Image</label>
+            <input id="prompt-image-upload" type="file" class="hidden" accept="image/*">
+            <input id="prompt-image-data" type="hidden">
+          </div>
+
+          <div class="space-y-2">
+            <p class="text-sm font-medium muted-text">Tags</p>
+            <div id="tag-pills-container" class="flex flex-wrap gap-2 empty:mb-2"></div>
+            <input id="prompt-tags-input" type="text" class="w-full form-input rounded-lg p-3 text-base" placeholder="Add a tag and press Enter..." aria-label="Add tag">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-4">
+          <button type="button" id="cancel-btn" class="py-3 rounded-lg bg-gray-500 font-semibold text-white interactive-scale">Cancel</button>
+          <button type="submit" class="py-3 rounded-lg bg-sky-500 font-semibold text-white interactive-scale">Save Prompt</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Details Modal -->
+  <div id="details-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 p-4" aria-hidden="true">
+    <div id="details-container" class="w-full max-w-md modal-card rounded-2xl overflow-hidden transform scale-95 opacity-0" role="dialog" aria-modal="true" aria-labelledby="details-name">
+      <div class="relative">
+        <img id="details-image" src="" class="w-full h-64 object-cover" alt="Prompt image">
+        <button id="details-pin-btn" aria-label="Pin prompt" class="absolute top-3 right-3 p-2 rounded-full bg-black/40 backdrop-blur-sm interactive-scale"></button>
+        <button id="close-details-btn" aria-label="Close details" class="absolute top-3 left-3 p-2 w-8 h-8 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm interactive-scale text-white">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="p-4 space-y-4">
+        <h3 id="details-name" class="text-xl font-bold"></h3>
+        <div id="details-tags" class="flex flex-wrap gap-2"></div>
+        <div class="max-h-32 overflow-y-auto p-3 bg-black/10 dark:bg-black/20 rounded-lg">
+          <p id="details-prompt" class="text-sm whitespace-pre-wrap muted-text"></p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <button id="copy-btn" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg bg-sky-500 font-semibold text-white interactive-scale">
+            <i class="fa-solid fa-copy" aria-hidden="true"></i> Copy
+          </button>
+          <button id="share-btn" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg bg-indigo-500 font-semibold text-white interactive-scale">
+            <i class="fa-solid fa-share-nodes" aria-hidden="true"></i> Share
+          </button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <button id="edit-btn" class="flex-1 py-2 text-sm text-sky-500 rounded-lg hover:bg-sky-500/10 interactive-scale">Edit</button>
+          <button id="duplicate-btn" class="flex-1 py-2 text-sm text-indigo-400 rounded-lg hover:bg-indigo-500/10 interactive-scale">Duplicate</button>
+          <button id="delete-btn" class="flex-1 py-2 text-sm text-red-400 rounded-lg hover:bg-red-500/10 interactive-scale">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generic overlay modals -->
+  <div id="generic-modal-overlay" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 p-4" aria-hidden="true">
+    <!-- Settings -->
+    <div id="settings-modal" class="hidden w-full max-w-sm modal-card rounded-2xl p-4 transform scale-95 opacity-0" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <h3 id="settings-title" class="text-xl font-bold text-center mb-4">Settings</h3>
+      <div id="settings-stats" class="p-3 mb-3 rounded-lg bg-black/5 dark:bg-white/5 space-y-2 text-sm"></div>
+      <button id="theme-toggle" type="button" class="w-full p-2 mb-3 rounded-lg bg-black/5 dark:bg-white/5 flex items-center justify-center gap-3 cursor-pointer interactive-scale" aria-label="Toggle theme"></button>
+      <div class="space-y-3">
+        <button id="backup-btn" class="w-full py-3 rounded-lg bg-sky-500 font-semibold text-white interactive-scale">Backup Library</button>
+        <button id="restore-btn" class="w-full py-3 rounded-lg bg-indigo-500 font-semibold text-white interactive-scale">Restore Library</button>
+        <input type="file" id="restore-input" class="hidden" accept=".json">
+        <button id="about-btn" class="w-full py-3 rounded-lg bg-gray-600 font-semibold text-white interactive-scale">About</button>
+      </div>
+      <button id="close-settings-btn" class="w-full mt-4 py-2 text-sm muted-text rounded-lg hover:bg-black/5 dark:hover:bg-white/5 interactive-scale">Close</button>
+    </div>
+
+    <!-- About -->
+    <div id="about-modal" class="hidden w-full max-w-sm modal-card rounded-2xl p-6 text-center transform scale-95 opacity-0" role="dialog" aria-modal="true" aria-labelledby="about-title">
+      <h3 id="about-title" class="text-xl font-bold">PromptVault</h3>
+      <p class="muted-text mt-2">Created by Peymaan abedinpour · v0.8</p>
+      <button id="close-about-btn" class="w-full mt-6 py-3 rounded-lg bg-gray-600 font-semibold text-white interactive-scale">Close</button>
+    </div>
+
+    <!-- Confirm -->
+    <div id="confirm-modal" class="hidden w-full max-w-sm modal-card rounded-2xl p-6 transform scale-95 opacity-0" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <h3 id="confirm-title" class="text-lg font-bold text-center">Are you sure?</h3>
+      <p id="confirm-message" class="muted-text text-center my-3"></p>
+      <div class="grid grid-cols-2 gap-3 mt-4">
+        <button id="confirm-cancel-btn" class="py-3 rounded-lg bg-gray-600 font-semibold text-white interactive-scale">Cancel</button>
+        <button id="confirm-ok-btn" class="py-3 rounded-lg bg-red-500 font-semibold text-white interactive-scale">Confirm</button>
+      </div>
+    </div>
+
+    <!-- Tags filter -->
+    <div id="tags-modal" class="hidden w-full max-w-sm modal-card rounded-2xl p-4 transform scale-95 opacity-0" role="dialog" aria-modal="true" aria-labelledby="tags-title">
+      <h3 id="tags-title" class="text-xl font-bold text-center mb-4">Filter by Tag</h3>
+      <div id="modal-tags-container" class="flex flex-wrap justify-center gap-2 max-h-64 overflow-y-auto"></div>
+      <button id="close-tags-btn" class="w-full mt-4 py-2 text-sm muted-text rounded-lg hover:bg-black/5 dark:hover:bg-white/5 interactive-scale">Close</button>
+    </div>
+  </div>
+
+  <!-- Context menu -->
+  <div id="context-menu-modal" class="fixed inset-0 z-50 hidden items-end bg-black/50" aria-hidden="true">
+    <div id="context-menu-container" class="w-full max-w-lg mx-auto modal-card rounded-t-2xl p-2 pb-4 touch-none" role="dialog" aria-modal="true" aria-labelledby="context-menu-title">
+      <div class="context-menu-grabber" aria-hidden="true"></div>
+      <div id="context-menu-header" class="p-2 text-center mb-2">
+        <h4 id="context-menu-title" class="font-bold truncate"></h4>
+        <p id="context-menu-subtitle" class="text-xs muted-text truncate"></p>
+      </div>
+      <div id="context-menu-options" class="space-y-1.5 px-2"></div>
+      <button id="context-menu-cancel" class="w-full mt-4 mx-auto block max-w-[calc(100%-1rem)] py-3 rounded-lg bg-gray-200 dark:bg-gray-700 font-semibold text-gray-800 dark:text-gray-200 interactive-scale">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full text-white text-sm opacity-0 transform translate-y-4 pointer-events-none" style="background:#27272a;color:white"></div>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // ---------- Helpers ----------
+    const $ = (id) => document.getElementById(id);
+    const qs = (sel, root=document) => root.querySelector(sel);
+    const qsa = (sel, root=document) => [...root.querySelectorAll(sel)];
+
+    // NEW: escape HTML for safe injection
+    const escapeHTML = (s='') => s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    const debounce = (fn, ms=150) => { let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), ms); }; };
+    const prefersDark = () => window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+
+    // ---------- DOM refs ----------
+    const library = $('prompt-library'), searchInput = $('search-input'), emptyState = $('empty-state'), fab = $('fab-add'), toast = $('toast');
+    const viewToggleBtn = $('view-toggle-btn'), themeToggleBtn = $('theme-toggle');
+    const emptyStateIcon = $('empty-state-icon'), emptyStateTitle = $('empty-state-title'), emptyStateSubtitle = $('empty-state-subtitle');
+    const formModal = $('prompt-form-modal'), formContainer = $('prompt-form-container'), promptForm = $('prompt-form'), cancelBtn = $('cancel-btn'), formTitle = $('form-title');
+    const pasteBtn = $('paste-btn'), imageUploadInput = $('prompt-image-upload'), imagePreview = $('image-preview'), imageDataInput = $('prompt-image-data');
+    const tabPrompt = $('tab-prompt'), tabDetails = $('tab-details'), tabContentPrompt = $('tab-content-prompt'), tabContentDetails = $('tab-content-details');
+    const detailsModal = $('details-modal'), detailsContainer = $('details-container'), closeDetailsBtn = $('close-details-btn'), copyBtn = $('copy-btn'), shareBtn = $('share-btn'), deleteBtn = $('delete-btn'), editBtn = $('edit-btn'), duplicateBtn = $('duplicate-btn'), detailsPinBtn = $('details-pin-btn');
+    const genericModalOverlay = $('generic-modal-overlay'), settingsBtn = $('settings-btn'), settingsModal = $('settings-modal'), closeSettingsBtn = $('close-settings-btn'), settingsStats = $('settings-stats'), aboutBtn = $('about-btn'), aboutModal = $('about-modal'), closeAboutBtn = $('close-about-btn'), confirmModal = $('confirm-modal'), confirmTitle = $('confirm-title'), confirmMessage = $('confirm-message'), confirmOkBtn = $('confirm-ok-btn'), confirmCancelBtn = $('confirm-cancel-btn');
+    const backupBtn = $('backup-btn'), restoreBtn = $('restore-btn'), restoreInput = $('restore-input');
+    const contextMenuModal = $('context-menu-modal'), contextMenuContainer = $('context-menu-container'), contextMenuCancel = $('context-menu-cancel');
+    const promptTagsInput = $('prompt-tags-input'), tagPillsContainer = $('tag-pills-container');
+    const tagsModalBtn = $('tags-modal-btn'), tagsModal = $('tags-modal'), modalTagsContainer = $('modal-tags-container'), closeTagsBtn = $('close-tags-btn'), activeFilterDisplay = $('active-filter-display');
+
+    // ---------- State ----------
+    const SCHEMA_VERSION = 1; // bump if you change shape
+    let prompts = [];
+    let currentEditingId = null, confirmCallback = null;
+    let currentView = localStorage.getItem('promptView') || 'grid';
+    let activeTagFilter = null;
+    let currentTags = [];
+
+    // ---------- Storage ----------
+    const safeParse = (text, fallback) => { try { return JSON.parse(text); } catch { return fallback; } };
+    const savePrompts = (data) => localStorage.setItem('prompts', JSON.stringify(data));
+    const getPrompts = () => safeParse(localStorage.getItem('prompts') || '[]', []);
+
+    // optional migration hook
+    const migrateIfNeeded = (arr) => {
+      // future migrations go here
+      return arr;
+    };
+
+    const pinIconHTML = `<i class="fa-solid fa-thumbtack" aria-hidden="true"></i>`;
+
+    // ---------- Tags ----------
+    const removeTag = (t) => { currentTags = currentTags.filter(x => x !== t); renderTagPills(); };
+    const addTag = (t) => { const cleaned = t.trim(); if (cleaned && !currentTags.includes(cleaned)) currentTags.push(cleaned); };
+    const renderTagPills = () => {
+      tagPillsContainer.innerHTML = '';
+      currentTags.forEach(tag => {
+        const pill = document.createElement('div');
+        pill.className = 'tag-pill';
+        const span = document.createElement('span'); span.textContent = tag;
+        const btn = document.createElement('button'); btn.type='button'; btn.className='tag-pill-remove interactive-scale'; btn.setAttribute('aria-label','Remove tag'); btn.textContent='×';
+        btn.addEventListener('click', () => removeTag(tag));
+        pill.append(span, btn);
+        tagPillsContainer.appendChild(pill);
+      });
+    };
+
+    // ---------- Theme ----------
+    const applyTheme = (theme) => {
+      localStorage.setItem('theme', theme);
+      document.documentElement.classList.toggle('dark', theme === 'dark'); // NEW: don’t clobber className
+      themeToggleBtn.innerHTML = theme === 'dark'
+        ? `<i class="fa-solid fa-moon" aria-hidden="true"></i><span>Dark Mode</span>`
+        : `<i class="fa-solid fa-sun" aria-hidden="true"></i><span>Light Mode</span>`;
+    };
+    const toggleTheme = () => applyTheme(localStorage.getItem('theme') === 'dark' ? 'light' : 'dark');
+
+    // ---------- Rendering ----------
+    const setView = (view) => {
+      currentView = view; localStorage.setItem('promptView', view);
+      viewToggleBtn.innerHTML = view === 'grid'
+        ? `<i class="fa-solid fa-list text-xl" aria-hidden="true"></i>`
+        : `<i class="fa-solid fa-grip text-xl" aria-hidden="true"></i>`;
+      renderPrompts(searchInput.value);
+    };
+
+    const setEmptyState = (type) => {
+      const map = {
+        empty: { icon:'cubes', title:'Your Vault is Empty', sub:"Tap the '+' button to add your first prompt." },
+        noresults: { icon:'magnifying-glass', title:'No Results Found', sub:'Try a different search or clear your filter.' }
+      };
+      const m = map[type];
+      if (!m){ emptyState.classList.add('hidden'); return; }
+      emptyStateIcon.innerHTML = `<i class="fa-solid fa-${m.icon}"></i>`;
+      emptyStateTitle.textContent = m.title;
+      emptyStateSubtitle.textContent = m.sub;
+      emptyState.classList.remove('hidden');
+    };
+
+    const renderAll = () => { renderPrompts(searchInput.value || ''); updateActiveFilterDisplay(); };
+
+    const renderPrompts = (textFilter='') => {
+      library.innerHTML = '';
+      const lower = textFilter.toLowerCase();
+      const filtered = prompts.filter(p => {
+        const matchesText = (p.name || '').toLowerCase().includes(lower) || (p.prompt || '').toLowerCase().includes(lower);
+        const matchesTag = activeTagFilter ? (p.tags || []).includes(activeTagFilter) : true;
+        return matchesText && matchesTag;
+      });
+
+      if (prompts.length === 0) { setEmptyState('empty'); }
+      else if (filtered.length === 0) { setEmptyState('noresults'); }
+      else { emptyState.classList.add('hidden'); }
+
+      library.className = currentView === 'grid' ? 'grid grid-cols-2 sm:grid-cols-3 gap-4' : 'space-y-3';
+
+      // sort pinned first, then newest
+      filtered.sort((a,b) => (b.pinned === true) - (a.pinned === true) || (b.id||0) - (a.id||0));
+
+      filtered.forEach((p, idx) => {
+        const card = document.createElement('div');
+        const menuBtn = document.createElement('button');
+        menuBtn.className = 'absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center interactive-scale z-20';
+        menuBtn.setAttribute('aria-label', 'Open actions');
+        menuBtn.innerHTML = `<i class="fa-solid fa-ellipsis-vertical"></i>`;
+        menuBtn.addEventListener('click', (e) => { e.stopPropagation(); openContextMenu(p.id); });
+
+        const pinnedBadge = p.pinned ? `<div class="absolute top-2 left-2 text-sky-400 no-select">${pinIconHTML}</div>` : '';
+
+        if (currentView === 'grid') {
+          card.className = 'glassmorphism rounded-lg overflow-hidden relative group aspect-square flex flex-col justify-end p-3 text-white cursor-pointer card-pop-in no-select';
+          const url = p.image || `https://placehold.co/400x400/${document.documentElement.classList.contains('dark') ? '111827/818cf8' : 'e5e7eb/6366f1'}?text=${encodeURIComponent((p.name||'U')[0])}`;
+          card.innerHTML = `
+            <img src="${url}" class="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-110" loading="lazy"
+                 onerror="this.src='https://placehold.co/400x400/111827/38bdf8?text=Error'">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent"></div>
+            ${pinnedBadge}
+            <h3 class="relative z-10 font-bold truncate">${escapeHTML(p.name || 'Untitled')}</h3>
+            <p class="relative z-10 text-xs text-gray-300 truncate">${escapeHTML((p.tags || []).join(', '))}</p>
+          `;
+          menuBtn.classList.add('bg-black/30','text-white/80','hover:bg-black/50');
+        } else {
+          card.className = 'glassmorphism rounded-lg p-3 flex items-center gap-4 cursor-pointer card-pop-in no-select relative';
+          const url = p.image || `https://placehold.co/100x100/${document.documentElement.classList.contains('dark') ? '1f2937/818cf8' : 'd1d5db/6366f1'}?text=${encodeURIComponent((p.name||'U')[0])}`;
+          const pinLeft = p.pinned ? `<div class="text-sky-400 flex-shrink-0" aria-hidden="true">${pinIconHTML}</div>` : '';
+          card.innerHTML = `
+            <img src="${url}" class="w-16 h-16 rounded-md object-cover flex-shrink-0" loading="lazy"
+                 onerror="this.src='https://placehold.co/100x100/111827/38bdf8?text=Error'">
+            <div class="flex-grow overflow-hidden">
+              <h3 class="font-bold truncate">${escapeHTML(p.name || 'Untitled')}</h3>
+              <p class="text-xs muted-text truncate">${escapeHTML((p.tags || []).join(', '))}</p>
+              <p class="text-sm truncate mt-1">${escapeHTML(p.prompt || '')}</p>
+            </div>
+            ${pinLeft}
+          `;
+          menuBtn.classList.add('hover:bg-black/10','dark:hover:bg-white/10');
+        }
+
+        card.appendChild(menuBtn);
+        card.addEventListener('click', () => showDetails(p.id));
+        card.style.animationDelay = `${idx * 40}ms`;
+        library.appendChild(card);
+      });
+    };
+
+    const renderTags = () => {
+      const all = [...new Set(prompts.flatMap(p => p.tags || []))];
+      modalTagsContainer.innerHTML = '';
+
+      const addBtn = (label, isAll=false) => {
+        const btn = document.createElement('button');
+        btn.className = 'px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap interactive-scale border';
+        btn.textContent = label || 'Show All';
+        const isActive = (isAll && activeTagFilter === null) || activeTagFilter === label;
+        if (isActive) btn.classList.add('bg-sky-500','text-white','border-sky-500');
+        else btn.classList.add('bg-black/5','dark:bg-white/5','border-transparent');
+        btn.onclick = () => { activeTagFilter = isAll ? null : label; renderAll(); hideGenericModal(tagsModal); };
+        modalTagsContainer.appendChild(btn);
+      };
+
+      addBtn(null, true);
+      all.sort().forEach(t => addBtn(t));
+    };
+
+    const updateActiveFilterDisplay = () => {
+      if (!activeTagFilter) { activeFilterDisplay.classList.add('hidden'); activeFilterDisplay.innerHTML=''; return; }
+      activeFilterDisplay.innerHTML = `
+        <div class="p-2 text-sm rounded-lg bg-sky-500/10 text-sky-700 dark:text-sky-300 flex justify-between items-center">
+          <span><i class="fa-solid fa-tag mr-2" aria-hidden="true"></i>Filtering by: <strong class="font-semibold">${escapeHTML(activeTagFilter)}</strong></span>
+          <button id="clear-filter-btn" class="p-1 rounded-full hover:bg-sky-500/20 interactive-scale" aria-label="Clear filter">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          </button>
+        </div>
+      `;
+      activeFilterDisplay.classList.remove('hidden');
+      $('clear-filter-btn').onclick = () => { activeTagFilter = null; renderAll(); };
+    };
+
+    const renderSettingsStats = () => {
+      const promptCount = prompts.length;
+      const tagCount = [...new Set(prompts.flatMap(p => p.tags || []))].length;
+      settingsStats.innerHTML = `
+        <div class="flex justify-between items-center"><span class="muted-text">Total Prompts</span><strong class="text-base">${promptCount}</strong></div>
+        <div class="flex justify-between items-center"><span class="muted-text">Unique Tags</span><strong class="text-base">${tagCount}</strong></div>
+        <div class="text-xs muted-text pt-1">Schema v${SCHEMA_VERSION}</div>
+      `;
+    };
+
+    const showToast = ((() => {
+      let hideT=null;
+      return (msg) => {
+        toast.textContent = msg;
+        toast.classList.remove('opacity-0','translate-y-4');
+        clearTimeout(hideT);
+        hideT = setTimeout(() => toast.classList.add('opacity-0','translate-y-4'), 1800);
+      };
+    })());
+
+    // ---------- Modals ----------
+    const setInertBackground = (on) => {
+      const modalOpen = on;
+      (modalOpen ? document.body.classList.add : document.body.classList.remove)('is-inert');
+    };
+
+    const showGenericModal = (modal) => {
+      genericModalOverlay.classList.remove('hidden'); genericModalOverlay.classList.add('flex','fade-in');
+      modal.classList.remove('hidden'); setTimeout(()=> modal.classList.remove('scale-95','opacity-0'), 10);
+      setInertBackground(true);
+    };
+    const hideGenericModal = (modal) => {
+      modal.classList.add('scale-95','opacity-0'); genericModalOverlay.classList.add('fade-out');
+      setTimeout(() => {
+        genericModalOverlay.classList.add('hidden'); modal.classList.add('hidden');
+        genericModalOverlay.classList.remove('fade-out'); setInertBackground(false);
+      }, 220);
+    };
+
+    const openConfirmationModal = (title, message, onConfirm) => {
+      confirmTitle.textContent = title; confirmMessage.textContent = message; confirmCallback = onConfirm;
+      showGenericModal(confirmModal);
+    };
+
+    const setActiveTab = (name) => {
+      const isPrompt = name === 'prompt';
+      tabPrompt.classList.toggle('active', isPrompt);
+      tabDetails.classList.toggle('active', !isPrompt);
+      tabPrompt.setAttribute('aria-selected', String(isPrompt));
+      tabDetails.setAttribute('aria-selected', String(!isPrompt));
+      tabContentPrompt.classList.toggle('hidden', !isPrompt);
+      tabContentDetails.classList.toggle('hidden', isPrompt);
+    };
+
+    const openFormModal = (toEdit=null) => {
+      formModal.classList.remove('hidden'); formModal.classList.add('flex','fade-in');
+      formContainer.classList.remove('slide-down'); formContainer.classList.add('slide-up');
+      setActiveTab('prompt'); promptForm.reset();
+      imagePreview.src='https://placehold.co/100x100/1f2937/4b5563?text=Image'; imageDataInput.value=''; promptTagsInput.value='';
+      if (toEdit){
+        formTitle.textContent='Edit Prompt';
+        $('prompt-id').value = toEdit.id;
+        $('prompt-text').value = toEdit.prompt || '';
+        $('prompt-name').value = toEdit.name || '';
+        currentTags = [...(toEdit.tags||[])];
+        if (toEdit.image){ imageDataInput.value = toEdit.image; imagePreview.src = toEdit.image; }
+      } else {
+        formTitle.textContent='Add New Prompt'; $('prompt-id').value=''; currentTags=[];
+      }
+      renderTagPills();
+      setInertBackground(true);
+    };
+
+    const closeFormModal = () => {
+      formContainer.classList.remove('slide-up'); formContainer.classList.add('slide-down'); formModal.classList.add('fade-out');
+      setTimeout(()=>{ formModal.classList.add('hidden'); formModal.classList.remove('flex','fade-in','fade-out'); formContainer.classList.remove('slide-down'); promptForm.reset(); setInertBackground(false); }, 260);
+    };
+
+    const showDetails = (id) => {
+      const p = prompts.find(x => x.id === id); if (!p) return; currentEditingId = id;
+      $('details-image').src = p.image || 'https://placehold.co/600x400/111827/38bdf8?text=No+Image';
+      $('details-name').textContent = p.name || 'Untitled';
+      $('details-prompt').textContent = p.prompt || '';
+      const wrap = $('details-tags'); wrap.innerHTML='';
+      (p.tags||[]).forEach(t => {
+        if (!t.trim()) return;
+        const tag = document.createElement('span'); tag.className='px-2 py-1 bg-sky-500/20 text-sky-400 text-xs font-medium rounded';
+        tag.textContent = t; wrap.appendChild(tag);
+      });
+      copyBtn.innerHTML = '<i class="fa-solid fa-copy" aria-hidden="true"></i> Copy';
+      detailsPinBtn.innerHTML = `<div class="w-6 h-6 text-xl flex items-center justify-center pin-icon ${p.pinned ? 'pinned' : 'text-white'}">${pinIconHTML}</div>`;
+      detailsModal.classList.remove('hidden'); detailsModal.classList.add('flex','fade-in');
+      detailsContainer.classList.remove('scale-95','opacity-0');
+      setInertBackground(true);
+    };
+
+    const closeDetailsModal = () => {
+      detailsContainer.classList.add('scale-95','opacity-0'); detailsModal.classList.add('fade-out');
+      setTimeout(()=>{ detailsModal.classList.add('hidden'); detailsModal.classList.remove('flex','fade-in','fade-out'); setInertBackground(false); }, 220);
+    };
+
+    // ---------- Context menu ----------
+    let isDragging=false, dragStartY=0, currentDragY=0;
+    const openContextMenu = (id) => {
+      const p = prompts.find(x => x.id === id); if (!p) return;
+      $('context-menu-title').textContent = p.name || 'Untitled';
+      $('context-menu-subtitle').textContent = p.prompt || '';
+      const box = $('context-menu-options'); box.innerHTML='';
+      const actions = [
+        { text:'Copy Prompt', icon:'copy', run:()=> { navigator.clipboard.writeText(p.prompt || '').then(()=>showToast('Prompt copied!'),()=>showToast('Clipboard blocked.')); } },
+        { text: p.pinned ? 'Unpin' : 'Pin to top', icon:'thumbtack', run:()=> { const i=prompts.findIndex(x=>x.id===id); if(i>-1){ prompts[i].pinned = !prompts[i].pinned; savePrompts(prompts); renderAll(); showToast(prompts[i].pinned?'Prompt pinned!':'Prompt unpinned!'); } } },
+        { text:'Duplicate', icon:'clone', run:()=> { const copy = {...p, id: (crypto.randomUUID?.() || Date.now()), name: `${p.name||'Untitled'} (Copy)`, pinned:false}; prompts.push(copy); savePrompts(prompts); renderAll(); showToast('Prompt duplicated!'); } },
+        { text:'Edit', icon:'pencil', run:()=> openFormModal(p) },
+        { text:'Delete', icon:'trash-can', run:()=> openConfirmationModal(`Delete "${p.name||'Untitled'}"?`, 'This action cannot be undone.', () => { prompts = prompts.filter(x=>x.id!==id); savePrompts(prompts); renderAll(); showToast('Prompt deleted.'); }) , danger:true }
+      ];
+      actions.forEach(a => {
+        const btn = document.createElement('button');
+        btn.className = `w-full text-left p-3 rounded-lg font-semibold flex items-center gap-3 interactive-scale ${a.danger ? 'text-red-500 bg-red-500/10 hover:bg-red-500/20' : 'hover:bg-black/5 dark:hover:bg-white/10'}`;
+        btn.innerHTML = `<div class="w-5 text-center"><i class="fa-solid fa-${a.icon}" aria-hidden="true"></i></div><span>${a.text}</span>`;
+        btn.onclick = () => { a.run(); closeContextMenu(); };
+        box.appendChild(btn);
+      });
+      contextMenuModal.classList.remove('hidden'); contextMenuModal.classList.add('fade-in');
+      contextMenuContainer.style.transform=''; contextMenuContainer.classList.remove('slide-down'); contextMenuContainer.classList.add('slide-up');
+    };
+
+    const closeContextMenu = () => {
+      contextMenuContainer.classList.remove('slide-up'); contextMenuContainer.classList.add('slide-down'); contextMenuModal.classList.add('fade-out');
+      setTimeout(()=>{ contextMenuModal.classList.add('hidden'); contextMenuModal.classList.remove('fade-out'); contextMenuContainer.style.transform=''; }, 240);
+    };
+
+    const dragStart = (e) => { isDragging=true; dragStartY = (e.touches?.[0]?.clientY)||0; contextMenuContainer.style.transition='none'; };
+    const dragMove = (e) => { if(!isDragging) return; currentDragY = (e.touches?.[0]?.clientY||0) - dragStartY; if(currentDragY>0) contextMenuContainer.style.transform = `translateY(${currentDragY}px)`; };
+    const dragEnd = () => { if(!isDragging) return; isDragging=false; contextMenuContainer.style.transition='transform .2s ease-out';
+      if(currentDragY > contextMenuContainer.offsetHeight * .4) closeContextMenu(); else contextMenuContainer.style.transform='translateY(0)';
+    };
+    contextMenuContainer.addEventListener('touchstart',dragStart);
+    contextMenuContainer.addEventListener('touchmove',dragMove);
+    contextMenuContainer.addEventListener('touchend',dragEnd);
+
+    // ---------- Backup / Restore ----------
+    const backupData = () => {
+      const payload = { version: SCHEMA_VERSION, exportedAt: new Date().toISOString(), items: prompts };
+      const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob); const a = document.createElement('a');
+      a.href = url; a.download = `promptvault_backup_${new Date().toISOString().slice(0,10)}.json`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+      showToast('Backup downloaded!');
+    };
+
+    const restoreData = (event) => {
+      const file = event.target.files?.[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          const arr = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.items) ? parsed.items : null);
+          if (!arr) { showToast('Invalid backup file.'); return; }
+          openConfirmationModal('Restore Backup?', 'This will overwrite all current prompts.', () => {
+            prompts = migrateIfNeeded(arr);
+            savePrompts(prompts); renderAll(); showToast('Library restored!'); hideGenericModal(confirmModal);
+          });
+        } catch { showToast('Could not read backup file.'); }
+        finally { restoreInput.value = ''; }
+      };
+      reader.readAsText(file);
+    };
+
+    // ---------- Image handling (optional downscale) ----------
+    async function downscaleImage(file, max=800){ // NEW: shrink big images for localStorage
+      return new Promise((resolve,reject)=>{
+        const img = new Image(); const url = URL.createObjectURL(file);
+        img.onload = () => {
+          const scale = Math.min(1, max / Math.max(img.width, img.height));
+          const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+          const canvas = document.createElement('canvas'); canvas.width=w; canvas.height=h;
+          const ctx = canvas.getContext('2d', { alpha: true }); ctx.drawImage(img, 0, 0, w, h);
+          canvas.toBlob(blob => {
+            const fr = new FileReader();
+            fr.onload = () => resolve(fr.result);
+            fr.onerror = reject;
+            fr.readAsDataURL(blob || file);
+            URL.revokeObjectURL(url);
+          }, 'image/jpeg', 0.82);
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Image load failed')); };
+        img.src = url;
+      });
+    }
+
+    // ---------- Event listeners ----------
+    fab.addEventListener('click', () => openFormModal());
+    cancelBtn.addEventListener('click', closeFormModal);
+    formModal.addEventListener('click', (e)=> e.target === formModal && closeFormModal());
+
+    tabPrompt.addEventListener('click', () => setActiveTab('prompt'));
+    tabDetails.addEventListener('click', () => setActiveTab('details'));
+
+    pasteBtn.addEventListener('click', async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        $('prompt-text').value = text;
+        showToast('Pasted from clipboard!');
+        setActiveTab('details');
+      } catch { showToast('Failed to paste. Check permissions.'); }
+    });
+
+    imageUploadInput.addEventListener('change', async (e) => {
+      const f = e.target.files?.[0]; if(!f) return;
+      try {
+        const dataURL = await downscaleImage(f, 900); // NEW
+        imageDataInput.value = dataURL; imagePreview.src = dataURL;
+      } catch {
+        const reader = new FileReader();
+        reader.onload = (ev)=>{ imageDataInput.value = ev.target.result; imagePreview.src = ev.target.result; };
+        reader.readAsDataURL(f);
+      }
+    });
+
+    const debouncedSearch = debounce((v)=> renderPrompts(v), 160);
+    searchInput.addEventListener('input', (e)=> debouncedSearch(e.target.value));
+
+    const formSubmit = (e) => {
+      e.preventDefault();
+      const id = $('prompt-id').value;
+      const data = {
+        prompt: $('prompt-text').value.trim(),
+        name: $('prompt-name').value.trim() || 'Untitled Prompt',
+        image: imageDataInput.value.trim(),
+        tags: currentTags.slice(),
+      };
+      if (!data.prompt) return showToast('Prompt text cannot be empty!');
+      if (id){
+        const i = prompts.findIndex(p => String(p.id) === String(id));
+        if (i>-1){ data.pinned = prompts[i].pinned || false; prompts[i] = { ...prompts[i], ...data }; }
+        showToast('Prompt updated!');
+      } else {
+        data.id = crypto.randomUUID?.() || Date.now(); data.pinned = false;
+        prompts.push(data);
+        showToast('Prompt saved!');
+      }
+      savePrompts(prompts); renderAll(); closeFormModal();
+    };
+    promptForm.addEventListener('submit', formSubmit);
+
+    // Details modal actions
+    closeDetailsBtn.addEventListener('click', closeDetailsModal);
+    detailsModal.addEventListener('click', (e)=> e.target === detailsModal && closeDetailsModal());
+
+    copyBtn.addEventListener('click', () => {
+      const text = $('details-prompt').textContent || '';
+      navigator.clipboard.writeText(text).then(()=>{
+        copyBtn.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i> Copied!';
+        showToast('Prompt copied!');
+      }, ()=> showToast('Failed to copy!'));
+    });
+
+    shareBtn.addEventListener('click', async () => {
+      try {
+        const title = `AI Prompt: ${$('details-name').textContent}`;
+        const text = $('details-prompt').textContent;
+        if (navigator.share) await navigator.share({ title, text });
+        else showToast('Share API not supported.');
+      } catch { showToast('Error sharing prompt.'); }
+    });
+
+    deleteBtn.addEventListener('click', () => {
+      const p = prompts.find(x => x.id === currentEditingId); if (!p) return;
+      openConfirmationModal(`Delete "${p.name||'Untitled'}"?`, 'This action cannot be undone.', () => {
+        prompts = prompts.filter(x => x.id !== currentEditingId);
+        savePrompts(prompts); renderAll(); closeDetailsModal(); showToast('Prompt deleted.');
+      });
+    });
+
+    editBtn.addEventListener('click', () => {
+      const p = prompts.find(x => x.id === currentEditingId); if(!p) return;
+      closeDetailsModal(); setTimeout(()=> openFormModal(p), 120);
+    });
+
+    duplicateBtn.addEventListener('click', () => {
+      const p = prompts.find(x => x.id === currentEditingId); if(!p) return;
+      const copy = { ...p, id: crypto.randomUUID?.() || Date.now(), name: `${p.name||'Untitled'} (Copy)`, pinned:false };
+      prompts.push(copy); savePrompts(prompts); renderAll(); closeDetailsModal(); showToast('Prompt duplicated!');
+    });
+
+    detailsPinBtn.addEventListener('click', () => {
+      const i = prompts.findIndex(x => x.id === currentEditingId); if(i<0) return;
+      prompts[i].pinned = !prompts[i].pinned; savePrompts(prompts);
+      showDetails(currentEditingId); renderAll();
+      showToast(prompts[i].pinned ? 'Prompt pinned!' : 'Prompt unpinned!');
+    });
+
+    // Settings
+    settingsBtn.addEventListener('click', () => { renderSettingsStats(); showGenericModal(settingsModal); });
+    closeSettingsBtn.addEventListener('click', () => hideGenericModal(settingsModal));
+    aboutBtn.addEventListener('click', () => { hideGenericModal(settingsModal); setTimeout(()=> showGenericModal(aboutModal), 200); });
+    closeAboutBtn.addEventListener('click', () => hideGenericModal(aboutModal));
+
+    // Backup/Restore
+    backupBtn.addEventListener('click', backupData);
+    restoreBtn.addEventListener('click', () => restoreInput.click());
+    restoreInput.addEventListener('change', restoreData);
+
+    // Tags modal
+    tagsModalBtn.addEventListener('click', () => { renderTags(); showGenericModal(tagsModal); });
+    closeTagsBtn.addEventListener('click', () => hideGenericModal(tagsModal));
+    genericModalOverlay.addEventListener('click', (e)=> { if (e.target === genericModalOverlay){ hideGenericModal(settingsModal); hideGenericModal(aboutModal); hideGenericModal(confirmModal); hideGenericModal(tagsModal); } });
+    confirmCancelBtn.addEventListener('click', () => hideGenericModal(confirmModal));
+    confirmOkBtn.addEventListener('click', () => { if (typeof confirmCallback === 'function'){ confirmCallback(); } });
+
+    // View + Theme
+    viewToggleBtn.addEventListener('click', () => setView(currentView === 'grid' ? 'list' : 'grid'));
+    themeToggleBtn.addEventListener('click', toggleTheme);
+
+    // Context menu
+    contextMenuCancel.addEventListener('click', closeContextMenu);
+    contextMenuModal.addEventListener('click', (e)=> { if (e.target === contextMenuModal) closeContextMenu(); });
+
+    // Tag input
+    promptTagsInput.addEventListener('keydown', (e)=> {
+      if (e.key === 'Enter'){ e.preventDefault(); addTag(promptTagsInput.value); renderTagPills(); promptTagsInput.value=''; }
+    });
+    promptTagsInput.addEventListener('paste', (e)=> {
+      e.preventDefault(); const pasted = e.clipboardData.getData('text');
+      pasted.split(/[,;\n]/).map(t=>t.trim()).filter(Boolean).forEach(addTag);
+      renderTagPills(); promptTagsInput.value='';
+    });
+
+    // Global keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      const meta = e.ctrlKey || e.metaKey;
+      if (meta && e.key.toLowerCase() === 'k'){ e.preventDefault(); searchInput.focus(); searchInput.select(); }
+      if (meta && e.key.toLowerCase() === 'n'){ e.preventDefault(); openFormModal(); }
+      if (e.key === 'Escape'){ // close anything open
+        if (!formModal.classList.contains('hidden')) closeFormModal();
+        if (!detailsModal.classList.contains('hidden')) closeDetailsModal();
+        if (!contextMenuModal.classList.contains('hidden')) closeContextMenu();
+        [settingsModal, aboutModal, confirmModal, tagsModal].forEach(m=>{
+          if (!m.classList.contains('hidden')) hideGenericModal(m);
+        });
+      }
+    });
+
+    // ---------- Init ----------
+    const initialTheme = localStorage.getItem('theme') || (prefersDark() ? 'dark' : 'light');
+    applyTheme(initialTheme);
+
+    prompts = migrateIfNeeded(getPrompts());
+    savePrompts(prompts); // ensure normalized
+    setView(currentView);
+    renderAll();
+
+  });
+  </script>
+</body>
+</html>
