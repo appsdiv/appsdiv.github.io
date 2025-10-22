@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Face Similarity Comparison</title>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.21.0/dist/tf.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f4f4f9; color: #333; }
+        h1 { text-align: center; }
+        input[type="file"] { margin: 20px 0; }
+        .drop { margin: 20px 0; padding: 20px; border: 2px dashed #ccc; text-align: center; cursor: pointer; }
+        .drop.drag { border-color: #22d3ee; }
+        #results { margin-top: 30px; }
+        .result { background: #fff; border-radius: 8px; padding: 10px; margin-bottom: 15px; display: flex; }
+        .result img { max-width: 200px; border-radius: 8px; }
+        .score { margin-left: 20px; }
+        .score span { font-size: 20px; font-weight: bold; }
+        .btn { padding: 10px 15px; background: #22d3ee; border: none; border-radius: 8px; color: #fff; cursor: pointer; }
+        .btn:hover { background: #0ea5e9; }
+        .slider { width: 100%; margin: 10px 0; }
+        .slider-label { font-size: 12px; color: #666; }
+        .results { margin-top: 20px; }
+        .result-meta { display: flex; justify-content: space-between; align-items: center; }
+        .result-meta .button { font-size: 12px; padding: 5px; background: #ccc; border-radius: 8px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h1>Ultimate Face Similarity Comparison</h1>
+
+    <div class="controls">
+        <h3>1. Load Models</h3>
+        <button id="loadModelsBtn" class="btn">Load Models (SSD)</button>
+        <button id="loadModelsTinyBtn" class="btn">Load Tiny Models</button>
+        <br>
+
+        <h3>2. Set Reference Image</h3>
+        <input type="file" id="referenceImage" accept="image/*">
+        <div id="refDrop" class="drop">Drop reference image here</div>
+        
+        <div id="referenceDisplay" class="result" style="display: none;">
+            <img id="refImg" src="" alt="Reference">
+            <div class="score"><span id="refScore">No score yet</span></div>
+        </div>
+
+        <h3>3. Upload Candidate Images</h3>
+        <input type="file" id="candidateImages" accept="image/*" multiple>
+        <div id="candDrop" class="drop">Drop candidate images here</div>
+
+        <h3>4. Adjust Similarity Settings</h3>
+        <label for="blend">Global vs. Structure blend</label>
+        <input type="range" id="blend" class="slider" min="0" max="100" value="60">
+        <div class="slider-label">Blend: <span id="blendValue">60%</span></div>
+
+        <label for="threshold">Similarity Threshold</label>
+        <input type="range" id="threshold" class="slider" min="30" max="100" value="60">
+        <div class="slider-label">Threshold: <span id="thresholdValue">60%</span></div>
+
+        <button id="exportCsvBtn" class="btn">Export Results as CSV</button>
+    </div>
+
+    <div id="results" class="results"></div>
+
+    <script>
+        // Configuration & Constants
+        const modelsURL = "/models"; // Path to the models
+        const maxConcurrency = 2; // Max number of concurrent candidate face detections
+        let refData = null;
+        let candidates = [];
+        let running = 0;
+        let pending = [];
+
+        // Load Models
+        async function loadModels(type = 'ssd') {
+            await Promise.all([
+                faceapi.nets.faceLandmark68Net.loadFromUri(modelsURL),
+                faceapi.nets.faceRecognitionNet.loadFromUri(modelsURL),
+                type === 'tiny' 
+                    ? faceapi.nets.tinyFaceDetector.loadFromUri(modelsURL) 
+                    : faceapi.nets.ssdMobilenetv1.loadFromUri(modelsURL)
+            ]);
+            console.log("Models loaded successfully");
+        }
+
+        // Handle reference image
+        async function handleReferenceImage(file) {
+            const img = await faceapi.bufferToImage(file);
+            const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
+            if (!detections) {
+                alert("No face detected in reference image.");
+                return;
+            }
+            refData = {
+                img,
+                descriptor: detections.descriptor,
+                landmarks: detections.landmarks
+            };
+            document.getElementById("refImg").src = URL.createObjectURL(file);
+            document.getElementById("referenceDisplay").style.display = "flex";
+            updateReferenceScore(detections);
+        }
+
+        // Update reference score
+        function updateReferenceScore(detections) {
+            const score = Math.round(detections.detection.score * 100);
+            document.getElementById("refScore").textContent = `Confidence: ${score}%`;
+        }
+
+        // Detect faces and calculate similarity
+        async function handleCandidateImages(files) {
+            const imgs = [...files].map(f => ({
+                id: crypto.randomUUID(),
+                file: f,
+                url: URL.createObjectURL(f)
+            }));
+            candidates.push(...imgs);
+            processCandidatesQueue();
+        }
+
+        async function processCandidatesQueue() {
+            pending = candidates.filter(c => !c.descriptor && !c._processing);
+            while (pending.length > 0 && running < maxConcurrency) {
+                const item = pending.shift();
+                item._processing = true;
+                running++;
+                await detectAndScoreCandidate(item);
+                item._processing = false;
+                running--;
+                processCandidatesQueue();
+            }
+        }
+
+        async function detectAndScoreCandidate(item) {
+            try {
+                const img = await faceapi.bufferToImage(item.file);
+                const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
+                if (!detections) {
+                    item.error = "No face detected";
+                    return;
+                }
+                item.img = img;
+                item.landmarks = detections.landmarks;
+                item.descriptor = detections.descriptor;
+                const similarityScore = calculateSimilarity(refData.descriptor, item.descriptor);
+                item.similarityScore = similarityScore;
+            } catch (error) {
+                item.error = "Error processing image";
+            }
+            renderResults();
+        }
+
+        // Calculate similarity using Euclidean distance
+        function calculateSimilarity(refDescriptor, candDescriptor) {
+            const distance = faceapi.euclideanDistance(refDescriptor, candDescriptor);
+            const similarity = Math.max(0, Math.min(100, (1 - distance) * 100));
+            return similarity;
+        }
+
+        // Render results on the page
+        function renderResults() {
+            const resultContainer = document.getElementById("results");
+            resultContainer.innerHTML = "";
+            candidates.forEach(candidate => {
+                const div = document.createElement('div');
+                div.classList.add('result');
+                
+                const img = document.createElement('img');
+                img.src = candidate.url;
+                div.appendChild(img);
+
+                const score = document.createElement('div');
+                score.classList.add('score');
+                score.innerHTML = `Similarity: <span>${candidate.similarityScore ? candidate.similarityScore.toFixed(2) : "—"}%</span>`;
+                div.appendChild(score);
+
+                if (candidate.error) {
+                    score.innerHTML = `Error: ${candidate.error}`;
+                }
+
+                resultContainer.appendChild(div);
+            });
+        }
+
+        // Set up sliders for blend and threshold values
+        function setSliderValues() {
+            const blend = parseInt(document.getElementById("blend").value);
+            const threshold = parseInt(document.getElementById("threshold").value);
+            document.getElementById("blendValue").textContent = `${blend}%`;
+            document.getElementById("thresholdValue").textContent = `${threshold}%`;
+        }
+
+        document.getElementById("blend").addEventListener("input", setSliderValues);
+        document.getElementById("threshold").addEventListener("input", setSliderValues);
+        setSliderValues();
+
+        // Event listeners for file uploads
+        document.getElementById("referenceImage").addEventListener("change", (e) => {
+            handleReferenceImage(e.target.files[0]);
+        });
+        document.getElementById("candidateImages").addEventListener("change", (e) => {
+            handleCandidateImages(e.target.files);
+        });
+
+        document.getElementById("loadModelsBtn").addEventListener("click", () => {
+            loadModels('ssd');
+        });
+
+        document.getElementById("loadModelsTinyBtn").addEventListener("click", () => {
+            loadModels('tiny');
+        });
+
+        document.getElementById("exportCsvBtn").addEventListener("click", () => {
+            const csvRows = [
+                ["ID", "Filename", "Similarity"]
+            ];
+            candidates.forEach(candidate => {
+                csvRows.push([candidate.id, candidate.file.name, candidate.similarityScore]);
+            });
+            const csv = csvRows.map(row => row.join(",")).join("\n");
+            const blob = new Blob([csv], { type: "text/csv" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "face_similarity_results.csv";
+            link.click();
+        });
+
+        // Set up drag-and-drop functionality
+        function setupDropZone(element, handler) {
+            let depth = 0;
+            element.addEventListener("dragenter", (e) => {
+                e.preventDefault();
+                depth++;
+                element.classList.add("drag");
+            });
+            element.addEventListener("dragleave", (e) => {
+                e.preventDefault();
+                depth = Math.max(0, depth - 1);
+                if (depth === 0) element.classList.remove("drag");
+            });
+            element.addEventListener("dragover", (e) => {
+                e.preventDefault();
+            });
+            element.addEventListener("drop", (e) => {
+                e.preventDefault();
+                element.classList.remove("drag");
+                handler(e.dataTransfer.files);
+            });
+        }
+
+        setupDropZone(document.getElementById("refDrop"), (files) => {
+            if (files.length > 0) handleReferenceImage(files[0]);
+        });
+
+        setupDropZone(document.getElementById("candDrop"), (files) => {
+            handleCandidateImages(files);
+        });
+
+    </script>
+
+</body>
+</html>
