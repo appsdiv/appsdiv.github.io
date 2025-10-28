@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en" translate="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Prompt Gallery — Offline</title>
+  <meta name="color-scheme" content="light dark">
+  <style>
+    :root{
+      --bg:#0b0f1a; --fg:#e6e8ee; --muted:#9aa0a6; --card:#121826; --chip:#1a2235; --accent:#60a5fa;
+      --ring:#263049; --rad:16px; --pad:14px; --shadow:0 12px 30px rgba(0,0,0,.28);
+      --pill:#0f172a; --good:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+      /* NEW: cap image height, allow full image without cropping */
+      --thumb-max-h: 360px;
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#f6f7fb; --fg:#0f172a; --muted:#6b7280; --card:#ffffff; --chip:#eef2f7; --ring:#d7deea; --pill:#f3f4f6; }
+    }
+    *{ box-sizing:border-box }
+    html,body{ margin:0; background:var(--bg); color:var(--fg); font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif }
+    a{ color:var(--accent); text-decoration:none }
+    /* Header (non-sticky) */
+    header{
+      background:linear-gradient(180deg, color-mix(in oklab, var(--accent) 16%, transparent 92%) 0%, transparent 55%);
+      padding:22px 16px 10px;
+      border-bottom:1px solid var(--ring);
+    }
+    .wrap{ max-width:1200px; margin:auto }
+    .title-row{ display:flex; gap:12px; align-items:end; flex-wrap:wrap }
+    .title-row h1{ margin:0; font-size:22px; letter-spacing:.2px }
+    .count{ color:var(--muted); font-weight:600 }
+    .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px }
+    .tab{
+      padding:10px 14px; border-radius:999px; border:1px solid var(--ring); background:var(--pill); color:var(--fg);
+      cursor:pointer; user-select:none; font-weight:600;
+    }
+    .tab.active{ outline:2px solid var(--accent); outline-offset:2px }
+    .bar{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px }
+    input[type="search"]{
+      flex:1 1 320px; padding:12px 14px; border-radius:12px; border:1px solid var(--ring); background:var(--card); color:var(--fg);
+      outline:none; box-shadow:none;
+    }
+    .chips{ display:flex; gap:8px; flex-wrap:wrap }
+    .chip{
+      padding:8px 10px; border-radius:999px; background:var(--chip); color:var(--fg); border:1px solid var(--ring);
+      cursor:pointer; user-select:none; transition:.15s transform;
+    }
+    .chip:hover{ transform: translateY(-1px) }
+    .chip.active{ outline:2px solid var(--accent); outline-offset:2px }
+
+    /* Grid & cards */
+    main{ padding:18px 16px }
+    .grid{
+      display:grid; gap:18px; grid-template-columns: repeat(auto-fill, minmax(270px,1fr));
+      max-width:1200px; margin:0 auto;
+    }
+    .card{
+      background:var(--card); border:1px solid var(--ring); border-radius:var(--rad); box-shadow:var(--shadow);
+      overflow:hidden; display:flex; flex-direction:column; min-height:100%; transition:.15s transform, .15s box-shadow;
+    }
+    .card:hover{ transform: translateY(-2px); box-shadow:0 16px 36px rgba(0,0,0,.32) }
+
+    /* Image: fully contained, no crop. Container grows with image up to --thumb-max-h. */
+    .thumb{
+      position:relative; display:flex; align-items:center; justify-content:center;
+      background:#0b0b0b; border-bottom:1px solid var(--ring);
+    }
+    .thumb a{
+      display:flex; align-items:center; justify-content:center; width:100%; padding:8px;
+    }
+    .thumb img{
+      max-width:100%; height:auto; width:auto; max-height:var(--thumb-max-h); object-fit:contain; display:block;
+    }
+    .fav-btn{
+      position:absolute; top:10px; right:10px; border:none; background:rgba(0,0,0,.35);
+      backdrop-filter: blur(6px); color:#fff; border-radius:999px; padding:8px 10px; cursor:pointer;
+      display:flex; align-items:center; gap:6px; font-weight:600;
+    }
+    .fav-btn[aria-pressed="true"]{ background:rgba(255,0,80,.55) }
+    .fav-btn svg{ width:18px; height:18px; display:block }
+
+    .meta{ padding:var(--pad); display:flex; flex-direction:column; gap:10px; position:relative; z-index:0 }
+    h3{ margin:0; font-size:16px; line-height:1.4 }
+    .tags{ display:flex; gap:6px; flex-wrap:wrap }
+    .tag{ background:var(--chip); border:1px solid var(--ring); padding:6px 8px; border-radius:999px; font-size:12px; color:var(--muted) }
+
+    /* prompt tools row */
+    .tools{ display:flex; gap:8px; flex-wrap:wrap }
+    .btn{
+      padding:8px 10px; border-radius:10px; border:1px solid var(--ring); background:var(--chip); color:var(--fg); cursor:pointer;
+      font-size:13px; font-weight:600; display:flex; align-items:center; gap:8px;
+    }
+    .btn:hover{ filter:brightness(1.06) }
+    .btn.good{ border-color: color-mix(in oklab, var(--good), var(--ring) 60%); }
+    .btn.warn{ border-color: color-mix(in oklab, var(--warn), var(--ring) 60%); }
+
+    details{
+      background: color-mix(in oklab, var(--card), black 4%);
+      border:1px dashed var(--ring); border-radius:12px; padding:10px; transition:.2s;
+    }
+    details[open]{ border-style:solid }
+    summary{ cursor:pointer; color:var(--accent); font-weight:700; outline:none }
+    .prompt{
+      position:relative; margin:10px 0; background:#0b0b0b10; border:1px solid var(--ring); border-radius:10px; padding:10px;
+      max-height:220px; overflow:auto; white-space:pre-wrap; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12.6px;
+    }
+    .copy{
+      position:absolute; top:8px; right:8px; font-size:12px; padding:6px 8px; border-radius:8px; border:1px solid var(--ring);
+      background:var(--chip); cursor:pointer;
+    }
+
+    /* empty/help */
+    .empty{
+      border:1px dashed var(--ring); border-radius:12px; padding:22px; text-align:center; color:var(--muted);
+      max-width:900px; margin:22px auto;
+    }
+    .controls{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:12px }
+    .file-btn{ padding:10px 14px; border-radius:10px; border:1px dashed var(--ring); background:var(--chip); color:var(--fg); cursor:pointer }
+    .foot{ text-align:center; color:var(--muted); padding:26px 16px }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="title-row">
+        <h1>Prompt Gallery</h1>
+        <div class="count" id="count"></div>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="View">
+        <button class="tab active" id="tab-all" role="tab" aria-selected="true">All</button>
+        <!-- NEW: favorites count will be injected, e.g., "Favorites (3)" -->
+        <button class="tab" id="tab-fav" role="tab" aria-selected="false">Favorites (0)</button>
+      </div>
+
+      <div class="bar">
+        <input id="q" type="search" placeholder="Search title or tags…" autocomplete="off" aria-label="Search">
+        <div class="chips" id="chipbox" aria-label="Tags"></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div id="empty" class="empty" style="display:none">
+      <div><strong>No data loaded.</strong></div>
+      <div>Paste JSON into the inline block in this file, or open a <code>gallery-local.json</code>.</div>
+      <div class="controls">
+        <input id="file" type="file" accept=".json,application/json" class="file-btn">
+        <button id="paste" class="file-btn" type="button">How to paste inline JSON</button>
+      </div>
+    </div>
+
+    <section class="grid" id="grid" aria-live="polite"></section>
+    <div class="foot">
+      Offline. Place this HTML next to your <code>images/</code> folder. Images must use relative paths like <code>images/xxx.jpg</code>.
+    </div>
+  </main>
+
+  <!-- Offline inline JSON. Paste your gallery JSON between these tags. Keep it VALID JSON. -->
+  <script id="inline-data" type="application/json">
+  </script>
+
+  <script>
+    // ---------- helpers ----------
+    const $  = s => document.querySelector(s);
+    const $$ = s => [...document.querySelectorAll(s)];
+    const uniq = arr => [...new Set(arr.flat().filter(Boolean))];
+    const lsKey = 'prompt-gallery:favorites';
+
+    function loadFavorites(){
+      try{
+        const raw = localStorage.getItem(lsKey);
+        return new Set(raw ? JSON.parse(raw) : []);
+      }catch{ return new Set(); }
+    }
+    function saveFavorites(set){
+      try{ localStorage.setItem(lsKey, JSON.stringify([...set])); }catch{}
+    }
+    function isFav(favs, id){ return favs.has(String(id)); }
+    function toggleFav(favs, id){ const sid = String(id); favs.has(sid) ? favs.delete(sid) : favs.add(sid); saveFavorites(favs); }
+
+    function getInlineJSON(){
+      const el = $('#inline-data');
+      if (!el) return null;
+      const raw = el.textContent.trim();
+      if (!raw) return null;
+      try { return JSON.parse(raw); } catch(e){ alert('Inline JSON is not valid.\\n' + e.message); return null; }
+    }
+
+    function copy(text, btn){
+      navigator.clipboard.writeText(text).then(()=>{
+        if (!btn) return;
+        const old = btn.textContent; btn.textContent = 'Copied';
+        setTimeout(()=>btn.textContent = old, 900);
+      });
+    }
+
+    function heartIcon(filled){
+      return filled
+        ? `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-6.716-4.27-9.193-7.32C.46 11.085 1.305 7.5 4.5 6.3 6.43 5.54 8.66 6.1 10 7.6c1.34-1.5 3.57-2.06 5.5-1.3 3.195 1.2 4.04 4.785 1.693 7.38C18.716 16.73 12 21 12 21z"/></svg>`
+        : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M12 21s-6.716-4.27-9.193-7.32C.46 11.085 1.305 7.5 4.5 6.3 6.43 5.54 8.66 6.1 10 7.6c1.34-1.5 3.57-2.06 5.5-1.3 3.195 1.2 4.04 4.785 1.693 7.38C18.716 16.73 12 21 12 21z" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    }
+
+    // ---------- state & UI ----------
+    const state = {
+      data: null,
+      items: [],
+      favs: loadFavorites(),
+      tab: 'all', // 'all' | 'fav'
+      term: '',
+      tag: null
+    };
+
+    function updateFavBadge(){
+      const n = state.favs.size;
+      const btn = $('#tab-fav');
+      btn.textContent = `Favorites (${n})`;
+    }
+
+    function setTab(tab){
+      state.tab = tab;
+      $('#tab-all').classList.toggle('active', tab==='all');
+      $('#tab-all').setAttribute('aria-selected', tab==='all');
+      $('#tab-fav').classList.toggle('active', tab==='fav');
+      $('#tab-fav').setAttribute('aria-selected', tab==='fav');
+      draw();
+    }
+
+    function buildChips(items){
+      const chipbox = $('#chipbox');
+      const allTags = uniq(items.map(it => it.tags || [])).sort((a,b)=>a.localeCompare(b));
+      chipbox.innerHTML = '';
+      if (!allTags.length) return;
+
+      const mk = (label) => {
+        const c = document.createElement('div');
+        c.className = 'chip';
+        c.textContent = label;
+        c.onclick = () => {
+          if (label === 'All tags'){ state.tag = null; [...chipbox.children].forEach(x => x.classList.remove('active')); c.classList.add('active'); draw(); return; }
+          if (state.tag === label){ state.tag = null; c.classList.remove('active'); }
+          else { state.tag = label; [...chipbox.children].forEach(x => x.classList.remove('active')); c.classList.add('active'); }
+          draw();
+        };
+        return c;
+      };
+      const all = mk('All tags'); all.classList.add('active'); chipbox.appendChild(all);
+      allTags.forEach(t => chipbox.appendChild(mk(t)));
+    }
+
+    function filteredItems(){
+      const favs = state.favs;
+      return state.items.filter(it=>{
+        if (state.tab === 'fav'){
+          const id = it.id ?? it.slug ?? it.title;
+          if (!isFav(favs, id)) return false;
+        }
+        const term = state.term;
+        const matchesTerm = !term ||
+          (it.title && it.title.toLowerCase().includes(term)) ||
+          (Array.isArray(it.tags) && it.tags.join(' ').toLowerCase().includes(term));
+        const matchesTag = !state.tag || (Array.isArray(it.tags) && it.tags.includes(state.tag));
+        return matchesTerm && matchesTag;
+      });
+    }
+
+    function updateCount(){
+      const vis = filteredItems().length;
+      $('#count').textContent = `${vis} / ${state.items.length} items`;
+      updateFavBadge(); // keep badge current
+    }
+
+    function buildCard(it, favs){
+      const id = it.id ?? it.slug ?? it.title ?? Math.random().toString(36).slice(2);
+      const fav = isFav(favs, id);
+
+      const card = document.createElement('article');
+      card.className = 'card';
+
+      const thumb = document.createElement('div');
+      thumb.className = 'thumb';
+
+      const imgLink = document.createElement('a');
+      imgLink.href = it.coverImage || '';
+      imgLink.target = '_blank';
+      imgLink.rel = 'noopener';
+
+      const img = document.createElement('img');
+      img.alt = it.title || '';
+      img.loading = 'lazy';
+      img.src = it.coverImage || '';
+
+      imgLink.appendChild(img);
+      thumb.appendChild(imgLink);
+
+      // Favorite button
+      const favBtn = document.createElement('button');
+      favBtn.className = 'fav-btn';
+      favBtn.type = 'button';
+      favBtn.setAttribute('aria-label', 'Add to favorites');
+      favBtn.setAttribute('aria-pressed', fav ? 'true' : 'false');
+      favBtn.innerHTML = heartIcon(fav) + (fav ? 'Favorited' : 'Favorite');
+      favBtn.onclick = () => {
+        toggleFav(favs, id);
+        const now = isFav(favs, id);
+        favBtn.setAttribute('aria-pressed', now ? 'true' : 'false');
+        favBtn.innerHTML = heartIcon(now) + (now ? 'Favorited' : 'Favorite');
+        // If on Favorites tab and unfavorited, remove the card
+        if (state.tab === 'fav' && !now) {
+          card.remove();
+        }
+        updateCount();
+      };
+      thumb.appendChild(favBtn);
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+
+      const h3 = document.createElement('h3');
+      h3.textContent = it.title || it.slug || ('Item #' + (it.id ?? ''));
+      meta.appendChild(h3);
+
+      if (Array.isArray(it.tags) && it.tags.length){
+        const tags = document.createElement('div');
+        tags.className = 'tags';
+        it.tags.forEach(t=>{
+          const s = document.createElement('span');
+          s.className = 'tag';
+          s.textContent = t;
+          tags.appendChild(s);
+        });
+        meta.appendChild(tags);
+      }
+
+      // prompt quick tools
+      if (Array.isArray(it.prompts) && it.prompts.length){
+        const tools = document.createElement('div');
+        tools.className = 'tools';
+
+        const btn1 = document.createElement('button');
+        btn1.className = 'btn good';
+        btn1.type = 'button';
+        btn1.textContent = 'Copy 1st Prompt';
+        btn1.onclick = ()=> copy(typeof it.prompts[0]==='string' ? it.prompts[0] : JSON.stringify(it.prompts[0],null,2), btn1);
+
+        const btnAll = document.createElement('button');
+        btnAll.className = 'btn warn';
+        btnAll.type = 'button';
+        btnAll.textContent = 'Copy All Prompts';
+        btnAll.onclick = ()=>{
+          const joined = it.prompts.map(p => typeof p==='string' ? p : JSON.stringify(p,null,2)).join('\\n\\n');
+          copy(joined, btnAll);
+        };
+
+        tools.append(btn1, btnAll);
+        meta.appendChild(tools);
+
+        // collapsible full prompts with per-prompt copy
+        const details = document.createElement('details');
+        const summary = document.createElement('summary');
+        summary.textContent = `Show Prompts (${it.prompts.length})`;
+        details.appendChild(summary);
+
+        it.prompts.forEach((p)=>{
+          const box = document.createElement('div'); box.className = 'prompt';
+          const smallBtn = document.createElement('button'); smallBtn.className='copy'; smallBtn.type='button'; smallBtn.textContent='Copy';
+          smallBtn.onclick = ()=> copy(typeof p==='string' ? p : JSON.stringify(p,null,2), smallBtn);
+          const pre = document.createElement('pre'); pre.textContent = typeof p==='string' ? p : JSON.stringify(p,null,2);
+          box.append(smallBtn, pre);
+          details.appendChild(box);
+        });
+
+        meta.appendChild(details);
+      }
+
+      card.append(thumb, meta);
+      return card;
+    }
+
+    function draw(){
+      const grid = $('#grid');
+      grid.innerHTML = '';
+      const favs = state.favs;
+      const visible = filteredItems();
+      visible.forEach(it => grid.appendChild(buildCard(it, favs)));
+      updateCount();
+    }
+
+    // ---------- boot & loaders ----------
+    function render(data){
+      if (!data || !Array.isArray(data.items)) { showEmpty(); return; }
+      $('#empty').style.display = 'none';
+      state.data  = data;
+      state.items = data.items;
+      updateFavBadge();
+      buildChips(state.items);
+      $('#q').oninput = (e)=>{ state.term = e.target.value.trim().toLowerCase(); draw(); };
+      $('#tab-all').onclick = ()=> setTab('all');
+      $('#tab-fav').onclick = ()=> setTab('fav');
+      draw();
+    }
+
+    function showEmpty(){
+      $('#empty').style.display = 'block';
+      $('#grid').innerHTML = '';
+      $('#count').textContent = '';
+      $('#chipbox').innerHTML = '';
+      updateFavBadge();
+
+      // File input
+      $('#file').addEventListener('change', (e)=>{
+        const f = e.target.files?.[0]; if (!f) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try { const json = JSON.parse(reader.result); render(json); }
+          catch(e){ alert('Invalid JSON: ' + e.message); }
+        };
+        reader.readAsText(f);
+      });
+      // Drag & drop
+      document.addEventListener('dragover', e=>{ e.preventDefault(); });
+      document.addEventListener('drop', e=>{
+        e.preventDefault();
+        const f = [...(e.dataTransfer?.files||[])].find(x => x.type === 'application/json' || x.name.endsWith('.json'));
+        if (!f) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try { const json = JSON.parse(reader.result); render(json); }
+          catch(e){ alert('Invalid JSON: ' + e.message); }
+        };
+        reader.readAsText(f);
+      });
+      // Helper
+      $('#paste').onclick = ()=>{
+        alert('Open this HTML in a text editor.\\nFind <script id="inline-data" type="application/json"> and paste your JSON between the tags.\\nSave, then reopen the file.');
+      };
+    }
+
+    function boot(){
+      const inline = getInlineJSON();
+      if (inline){ render(inline); }
+      else { showEmpty(); }
+    }
+
+    document.addEventListener('DOMContentLoaded', boot);
+  </script>
+</body>
+</html>
