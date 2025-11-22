@@ -100,9 +100,8 @@
              </div>
         </div>
 
-        <!-- UPLOAD SCREEN (Redesigned) -->
+        <!-- UPLOAD SCREEN -->
         <div id="upload-screen" class="absolute inset-0 bg-black flex flex-col items-center justify-center p-6 z-50">
-            <!-- Ambient Background -->
             <div class="absolute top-[-20%] left-[-20%] w-[80vw] h-[80vw] bg-blue-600/30 rounded-full blur-[120px]"></div>
             <div class="absolute bottom-[-20%] right-[-20%] w-[80vw] h-[80vw] bg-purple-600/30 rounded-full blur-[120px]"></div>
             
@@ -132,8 +131,6 @@
 
     <!-- PROCESS CONTROLS -->
     <div id="process-controls" class="hidden bg-black/80 backdrop-blur-xl border-t border-white/10 p-5 pb-10 flex flex-col gap-6 slide-up z-30 shadow-2xl rounded-t-3xl">
-        
-        <!-- Header Row -->
         <div class="flex justify-between items-center px-2">
             <span id="selection-label" class="text-xs font-bold text-white/60 uppercase tracking-widest">
                 Global Settings
@@ -148,12 +145,9 @@
             </div>
         </div>
 
-        <!-- Effect Buttons -->
         <div class="flex justify-between items-center gap-4 overflow-x-auto scrollbar-hide py-2" id="effect-buttons"></div>
         
-        <!-- Sliders -->
         <div class="space-y-6 px-2">
-            <!-- Intensity -->
             <div class="flex flex-col gap-3">
                 <div class="flex justify-between text-xs font-medium text-white/80">
                     <span>Intensity</span>
@@ -162,7 +156,6 @@
                 <input type="range" id="slider-intensity" min="0" max="100" value="50">
             </div>
 
-            <!-- Opacity -->
             <div class="flex flex-col gap-3">
                 <div class="flex justify-between text-xs font-medium text-white/80">
                     <span>Opacity</span>
@@ -171,7 +164,6 @@
                 <input type="range" id="slider-opacity" min="0" max="100" value="100">
             </div>
             
-            <!-- Pixel Size -->
             <div id="container-pixel-size" class="flex flex-col gap-3 hidden">
                 <div class="flex justify-between text-xs font-medium text-white/80">
                     <span>Block Size</span>
@@ -197,8 +189,8 @@
             
             // Global Settings
             globalEffect: 'blur',
-            globalIntensity: 60, // Higher default for pro look
-            globalPixelSize: 15, // Finer pixels by default
+            globalIntensity: 60,
+            globalPixelSize: 15,
             globalOpacity: 100,
             
             selectedShapeId: null,
@@ -207,9 +199,12 @@
             // Interaction
             draggedVertex: null,
             isDraggingShape: false,
-            lastPointer: null,
-            pointerStartPos: null,
-            isPointerDown: false
+            // New Multi-Touch State
+            activePointers: new Map(), // Track ID -> {x,y}
+            lastPinchDist: null,
+            wasZooming: false, // To prevent accidental clicks after zoom
+            
+            pointerStartPos: null
         };
 
         const canvas = document.getElementById('main-canvas');
@@ -349,8 +344,6 @@
             // 3. UI Overlays
             state.shapes.forEach(s => {
                 const isSel = s.id === state.selectedShapeId;
-                
-                // Skip drawing outline in process mode if not selected
                 if (state.mode === 'process' && !isSel) return;
 
                 ctx.beginPath();
@@ -407,18 +400,24 @@
                 ctx.fill();
                 ctx.stroke();
                 
-                if (state.lastPointer && state.tool === 'draw') {
-                     const r = canvas.getBoundingClientRect();
-                     const lx = (state.lastPointer.x - r.left - state.offset.x) / state.scale;
-                     const ly = (state.lastPointer.y - r.top - state.offset.y) / state.scale;
-                     const lastP = state.currentPath[state.currentPath.length-1];
-                     ctx.beginPath();
-                     ctx.moveTo(lastP.x * state.image.width, lastP.y * state.image.height);
-                     ctx.lineTo(lx, ly);
-                     ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
-                     ctx.setLineDash([5/state.scale, 5/state.scale]);
-                     ctx.stroke();
-                     ctx.setLineDash([]);
+                // Rubber Banding - Only show if single pointer (drawing)
+                if (state.activePointers.size === 1 && state.tool === 'draw' && !state.wasZooming) {
+                     // Get the only pointer
+                     const pt = state.activePointers.values().next().value;
+                     if (pt) {
+                         const r = canvas.getBoundingClientRect();
+                         const lx = (pt.x - r.left - state.offset.x) / state.scale;
+                         const ly = (pt.y - r.top - state.offset.y) / state.scale;
+                         
+                         const lastP = state.currentPath[state.currentPath.length-1];
+                         ctx.beginPath();
+                         ctx.moveTo(lastP.x * state.image.width, lastP.y * state.image.height);
+                         ctx.lineTo(lx, ly);
+                         ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
+                         ctx.setLineDash([5/state.scale, 5/state.scale]);
+                         ctx.stroke();
+                         ctx.setLineDash([]);
+                     }
                 }
             }
             ctx.restore();
@@ -441,51 +440,38 @@
             });
             ctx.closePath();
             
-            if (effect === 'focus') {
-                 ctx.rect(0, 0, w, h);
-            }
-            
+            if (effect === 'focus') ctx.rect(0, 0, w, h);
             ctx.clip('evenodd');
-
             ctx.globalAlpha = opacity / 100;
 
             if (effect === 'blur' || effect === 'focus') {
-                // ENHANCED BLUR: Increased range and added saturation for vibrancy
-                const blur = Math.max(1, (intensity/100) * (Math.max(w,h)*0.1)); // More professional falloff
-                ctx.filter = `blur(${blur}px) saturate(120%)`; // Subtle vibrance boost
+                const blur = Math.max(1, (intensity/100) * (Math.max(w,h)*0.1));
+                ctx.filter = `blur(${blur}px) saturate(120%)`;
                 ctx.drawImage(state.image,0,0);
                 ctx.filter = 'none';
             } 
             else if (effect === 'pixelate') {
-                 // PROFESSIONAL PIXELATE with CONTRAST BOOST
-                 // Intuitive slider: Low value = Small blocks (Fine), High value = Big blocks
-                 const factor = Math.max(0.005, (pixelSize / 100) * 0.15); // Range 0.5% to 15% of width
+                 const factor = Math.max(0.005, (pixelSize / 100) * 0.15);
                  const blockSize = Math.max(4, w * factor);
-                 
                  const sw = Math.ceil(w/blockSize);
                  const sh = Math.ceil(h/blockSize);
-                 
                  const tc = document.createElement('canvas');
                  tc.width = sw; tc.height = sh;
                  const tCtx = tc.getContext('2d');
-                 
                  tCtx.imageSmoothingEnabled = true; 
                  tCtx.imageSmoothingQuality = 'high';
                  tCtx.drawImage(state.image, 0, 0, w, h, 0, 0, sw, sh);
                  
-                 // Contrast Boost
                  const imgData = tCtx.getImageData(0, 0, sw, sh);
                  const d = imgData.data;
-                 const contrast = 60; // Professional contrast level
+                 const contrast = 60; 
                  const contrastFactor = (259 * (contrast + 255)) / (255 * (259 - contrast));
-
                  for (let i = 0; i < d.length; i += 4) {
                      d[i] = contrastFactor * (d[i] - 128) + 128;
                      d[i+1] = contrastFactor * (d[i+1] - 128) + 128;
                      d[i+2] = contrastFactor * (d[i+2] - 128) + 128;
                  }
                  tCtx.putImageData(imgData, 0, 0);
-
                  ctx.imageSmoothingEnabled = false;
                  ctx.drawImage(tc, 0, 0, sw, sh, 0, 0, w, h);
                  ctx.imageSmoothingEnabled = true;
@@ -504,19 +490,16 @@
                 ctx.filter = `blur(${blur}px) saturate(160%) brightness(1.1)`;
                 ctx.drawImage(state.image, 0, 0);
                 ctx.filter = 'none';
-
                 ctx.fillStyle = `rgba(255,255,255,0.15)`;
                 ctx.fill(); 
-                
                 ctx.lineWidth = Math.max(1, w * 0.001);
                 ctx.strokeStyle = 'rgba(255,255,255,0.3)';
                 ctx.stroke();
             }
-
             ctx.globalAlpha = 1.0;
         }
 
-        // --- INPUT ---
+        // --- INPUT HANDLING (MULTI-TOUCH) ---
         function getCoords(e) {
             const cx = e.touches ? e.touches[0].clientX : e.clientX;
             const cy = e.touches ? e.touches[0].clientY : e.clientY;
@@ -539,17 +522,29 @@
             return inside;
         }
 
+        // POINTER DOWN
         container.addEventListener('pointerdown', (e) => {
             if (!state.image) return;
             if (e.target !== canvas) return;
+            
+            // Track pointer
+            state.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
             try { container.setPointerCapture(e.pointerId); } catch(err){}
-            state.isPointerDown = true;
-            const pt = getCoords(e);
-            state.lastPointer = pt;
-            state.pointerStartPos = pt; 
-            const imgPt = toImageCoords(pt.x, pt.y);
 
-            if (state.mode === 'edit') {
+            // If multiple touches, we are zooming/panning - reset simple start pos
+            if (state.activePointers.size >= 2) {
+                state.wasZooming = true;
+                state.pointerStartPos = null;
+                return; 
+            }
+
+            state.wasZooming = false;
+            state.pointerStartPos = { x: e.clientX, y: e.clientY };
+            
+            const imgPt = toImageCoords(e.clientX, e.clientY);
+
+            // Single Finger Logic (Edit/Draw)
+            if (state.mode === 'edit' && state.activePointers.size === 1) {
                 if (state.tool === 'select') {
                      if (state.selectedShapeId) {
                         const shape = state.shapes.find(s => s.id === state.selectedShapeId);
@@ -572,8 +567,7 @@
                         updateUI();
                     }
                 }
-            } 
-            else if (state.mode === 'process') {
+            } else if (state.mode === 'process' && state.activePointers.size === 1) {
                  const hitShape = state.shapes.slice().reverse().find(s => isPointInPoly(imgPt, s.points));
                  if (hitShape) {
                      state.selectedShapeId = hitShape.id;
@@ -582,60 +576,125 @@
             }
         });
 
+        // POINTER MOVE
         container.addEventListener('pointermove', (e) => {
-            const pt = getCoords(e);
-            if (!state.isPointerDown) { 
-                if (state.tool === 'draw') state.lastPointer = pt; 
-                return; 
+            if (state.activePointers.has(e.pointerId)) {
+                state.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
             }
-            if (!state.lastPointer) { state.lastPointer = pt; return; }
+
+            // PINCH ZOOM & PAN (2 fingers)
+            if (state.activePointers.size === 2) {
+                state.wasZooming = true;
+                state.draggedVertex = null; // Cancel drag if zooming starts
+                state.isDraggingShape = null;
+
+                const points = Array.from(state.activePointers.values());
+                const p1 = points[0];
+                const p2 = points[1];
+                const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+                const center = { x: (p1.x + p2.x)/2, y: (p1.y + p2.y)/2 };
+
+                if (state.lastPinchDist) {
+                    const ratio = dist / state.lastPinchDist;
+                    const newScale = Math.max(0.1, Math.min(10, state.scale * ratio));
+                    
+                    // Zoom towards center
+                    const rect = canvas.getBoundingClientRect();
+                    const cx = center.x - rect.left;
+                    const cy = center.y - rect.top;
+                    
+                    state.offset.x = cx - (cx - state.offset.x) * (newScale / state.scale);
+                    state.offset.y = cy - (cy - state.offset.y) * (newScale / state.scale);
+                    state.scale = newScale;
+                }
+                state.lastPinchDist = dist;
+                return; // Skip other logic
+            }
+
+            // PAN ONLY (If 1 finger in Draw mode? No, conventionally 1 finger draws. 2 fingers pan.)
+            // But user requested "pinch zoom to draw section". We handled that above.
+            // If just moving 1 finger, draw/edit logic applies below.
+
+            // Logic for 1 Finger
+            if (state.activePointers.size === 1) {
+                // If dragging a vertex/shape (Edit Mode)
+                if (state.draggedVertex && state.mode === 'edit') {
+                    const shape = state.shapes.find(s => s.id === state.draggedVertex.shapeId);
+                    const imgPt = toImageCoords(e.clientX, e.clientY);
+                    shape.points[state.draggedVertex.index] = {
+                        x: Math.max(0, Math.min(1, imgPt.x)),
+                        y: Math.max(0, Math.min(1, imgPt.y))
+                    };
+                    return;
+                }
+
+                if (state.isDraggingShape && state.selectedShapeId && state.mode === 'edit') {
+                    const shape = state.shapes.find(s => s.id === state.selectedShapeId);
+                    // Calc delta
+                    // We need prev pos. Since we track raw coords in activePointers, we can't easily get delta here 
+                    // without last frame. Let's use a global lastPointer for 1-finger deltas.
+                }
+            }
             
-            const dx = pt.x - state.lastPointer.x;
-            const dy = pt.y - state.lastPointer.y;
-            state.lastPointer = pt;
+            // We still need a 'lastPointer' for 1-finger pan/drag deltas
+            if (!state.lastPointer) { state.lastPointer = {x: e.clientX, y: e.clientY}; return; }
+            const dx = e.clientX - state.lastPointer.x;
+            const dy = e.clientY - state.lastPointer.y;
+            state.lastPointer = {x: e.clientX, y: e.clientY};
 
-            if (state.draggedVertex && state.mode === 'edit') {
-                const shape = state.shapes.find(s => s.id === state.draggedVertex.shapeId);
-                const imgPt = toImageCoords(pt.x, pt.y);
-                shape.points[state.draggedVertex.index] = {
-                    x: Math.max(0, Math.min(1, imgPt.x)),
-                    y: Math.max(0, Math.min(1, imgPt.y))
-                };
-                return;
+            // Handle Shape Drag Delta
+            if (state.isDraggingShape && state.selectedShapeId && state.mode === 'edit' && state.activePointers.size === 1) {
+                 const shape = state.shapes.find(s => s.id === state.selectedShapeId);
+                 const normDx = dx / state.scale / state.image.width;
+                 const normDy = dy / state.scale / state.image.height;
+                 shape.points = shape.points.map(p => ({ x: p.x + normDx, y: p.y + normDy }));
             }
-
-            if (state.isDraggingShape && state.selectedShapeId && state.mode === 'edit') {
-                const shape = state.shapes.find(s => s.id === state.selectedShapeId);
-                const normDx = dx / state.scale / state.image.width;
-                const normDy = dy / state.scale / state.image.height;
-                shape.points = shape.points.map(p => ({ x: p.x + normDx, y: p.y + normDy }));
-                return;
-            }
-
-            if (!state.draggedVertex && !state.isDraggingShape && (state.tool === 'select' || state.mode === 'process')) {
-                state.offset.x += dx;
-                state.offset.y += dy;
+            
+            // General Pan (in Process mode or Select mode background)
+            if (!state.draggedVertex && !state.isDraggingShape && state.activePointers.size === 1) {
+                // If drawing, we DON'T pan with 1 finger.
+                if (state.tool === 'select' || state.mode === 'process') {
+                    state.offset.x += dx;
+                    state.offset.y += dy;
+                }
             }
         });
 
+        // POINTER UP
         const handlePointerUp = (e) => {
-            if (!state.isPointerDown) return;
-            if (state.draggedVertex || state.isDraggingShape) saveToHistory();
+            state.activePointers.delete(e.pointerId);
             
-            const pt = getCoords(e);
-            if (state.pointerStartPos) {
-                const dist = Math.hypot(pt.x - state.pointerStartPos.x, pt.y - state.pointerStartPos.y);
-                if (dist < 10) handleTapAction(pt);
+            if (state.activePointers.size < 2) {
+                state.lastPinchDist = null;
+            }
+            
+            // If we were pinching/zooming, don't trigger tap actions
+            if (state.wasZooming) {
+                // Reset flags if all fingers lifted
+                if (state.activePointers.size === 0) {
+                    setTimeout(() => { state.wasZooming = false; }, 100); 
+                }
+                try { container.releasePointerCapture(e.pointerId); } catch(err){}
+                return;
             }
 
-            state.isPointerDown = false;
+            if (state.draggedVertex || state.isDraggingShape) saveToHistory();
+            
+            // Tap Detection logic for Draw
+            if (state.pointerStartPos && state.activePointers.size === 0) {
+                const dist = Math.hypot(e.clientX - state.pointerStartPos.x, e.clientY - state.pointerStartPos.y);
+                if (dist < 10) handleTapAction({x: e.clientX, y: e.clientY});
+            }
+
             state.draggedVertex = null;
             state.isDraggingShape = false;
             state.lastPointer = null; 
             state.pointerStartPos = null;
             try { container.releasePointerCapture(e.pointerId); } catch(err){}
         };
+        
         window.addEventListener('pointerup', handlePointerUp);
+        window.addEventListener('pointercancel', handlePointerUp);
 
         function handleTapAction(pt) {
             if (state.mode !== 'edit' || state.tool !== 'draw') return;
@@ -852,7 +911,6 @@
         };
         
         document.getElementById('btn-upload').onclick = () => document.getElementById('file-input').click();
-        // UPDATED AUTO ADJUST: Defaults to small pixels (15%) and 60% intensity
         document.getElementById('btn-auto').onclick = () => { 
             updateSettings('intensity', 60); 
             updateSettings('pixelSize', 15);
