@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,10 +21,9 @@
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/context-filter-polyfill/dist/index.min.js"></script>
-
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
         /* iOS-like Font Stack */
         body { 
@@ -246,6 +244,18 @@
     </div>
 
     <script>
+        // --- FEATURE DETECTION: iOS & canvas filter ---
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                      (navigator.userAgent.includes('Mac') && 'ontouchend' in document);
+
+        const supportsCanvasFilter = (() => {
+            const c = document.createElement('canvas');
+            const x = c.getContext('2d');
+            if (!x || typeof x.filter !== 'string') return false;
+            // Force fallback on iOS (Safari filter is unstable / inconsistent)
+            return !isIOS;
+        })();
+
         // --- STATE ---
         const state = {
             image: null,
@@ -277,11 +287,10 @@
         };
 
         const canvas = document.getElementById('main-canvas');
-        // Use willReadFrequently for better readback performance on mobile
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
         const container = document.getElementById('canvas-container');
         
-        // Helper Canvas for Offscreen Rendering (Critical for iOS Blur)
+        // Helper Canvas for Offscreen Rendering
         const helperCanvas = document.createElement('canvas');
         const helperCtx = helperCanvas.getContext('2d', { willReadFrequently: true });
 
@@ -417,7 +426,7 @@
             state.offset = { x: (cw - w*s)/2, y: (ch - h*s)/2 };
         }
 
-        // --- RENDER ---
+        // --- RENDER LOOP ---
         function renderLoop() {
             render();
             requestAnimationFrame(renderLoop);
@@ -429,10 +438,14 @@
             const cw = container.clientWidth;
             const ch = container.clientHeight;
             if (canvas.width !== cw || canvas.height !== ch) {
-                canvas.width = cw; canvas.height = ch;
+                canvas.width = cw;
+                canvas.height = ch;
             }
 
-            ctx.clearRect(0,0,cw,ch);
+            // ✅ HARD RESET TRANSFORM EACH FRAME (fix nested image on iOS)
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, cw, ch);
+
             ctx.save();
             ctx.translate(state.offset.x, state.offset.y);
             ctx.scale(state.scale, state.scale);
@@ -451,6 +464,7 @@
                 });
             }
 
+            // Draw shapes / handles
             state.shapes.forEach(s => {
                 const isSel = s.id === state.selectedShapeId;
                 if (state.mode === 'process' && !isSel) return;
@@ -490,6 +504,7 @@
                 }
             });
 
+            // Poly drawing preview
             if (state.tool === 'poly' && state.currentPath.length > 0 && state.mode === 'edit') {
                 ctx.beginPath();
                 state.currentPath.forEach((p,i) => {
@@ -526,6 +541,7 @@
                 }
             }
 
+            // Rect / circle preview
             if ((state.tool === 'rect' || state.tool === 'circle') && state.dragStartPos && state.activePointers.size === 1) {
                 const pt = state.activePointers.values().next().value;
                 const r = canvas.getBoundingClientRect();
@@ -555,7 +571,29 @@
             ctx.restore();
         }
 
-        function drawEffectPath(ctx, shape) {
+        // --- BLUR FALLBACK (for iOS / no filter) ---
+        function drawBlurFallback(srcImage, destCtx, w, h, strength01) {
+            // strength01: 0..1
+            const tmp = document.createElement('canvas');
+            const tctx = tmp.getContext('2d');
+            const minScale = 0.1;  // max blur
+            const maxScale = 1.0;  // no blur
+            const scale = maxScale - (maxScale - minScale) * strength01;
+            const sw = Math.max(1, (w * scale) | 0);
+            const sh = Math.max(1, (h * scale) | 0);
+            tmp.width = sw;
+            tmp.height = sh;
+
+            tctx.imageSmoothingEnabled = true;
+            tctx.drawImage(srcImage, 0, 0, w, h, 0, 0, sw, sh);
+
+            destCtx.imageSmoothingEnabled = true;
+            destCtx.clearRect(0, 0, w, h);
+            destCtx.drawImage(tmp, 0, 0, sw, sh, 0, 0, w, h);
+        }
+
+        // --- EFFECT RENDERING ---
+        function drawEffectPath(ctxLocal, shape) {
             const w = state.image.width;
             const h = state.image.height;
             const points = shape.points;
@@ -566,38 +604,38 @@
             const opacity = shape.opacity !== undefined ? shape.opacity : state.globalOpacity;
 
             // Define Shape Path
-            ctx.beginPath();
+            ctxLocal.beginPath();
             points.forEach((p,i) => {
                 const x=p.x*w, y=p.y*h;
-                if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                if(i===0) ctxLocal.moveTo(x,y); else ctxLocal.lineTo(x,y);
             });
-            ctx.closePath();
+            ctxLocal.closePath();
             
-            // --- ROBUST iOS FOCUS FIX (Non-Zero Winding Rule) ---
+            // Focus: invert mask (blur outside)
             if (effect === 'focus') {
-                 // Draw the full screen rect in Counter-Clockwise direction.
-                 // Combined with the shape (likely Clockwise or arbitrary), this forces
-                 // the "Non-Zero" winding rule to treat the shape as a hole.
-                 ctx.rect(w, 0, -w, h); 
+                 ctxLocal.rect(w, 0, -w, h); 
             }
             
-            ctx.clip(); // Default clip is non-zero, which works better than even-odd on mobile
-            ctx.globalAlpha = opacity / 100;
+            ctxLocal.clip();
+            ctxLocal.globalAlpha = opacity / 100;
 
-            // --- OFFSCREEN RENDERING PIPELINE (iOS Fix) ---
-            // Clear helper
-            helperCtx.clearRect(0,0,w,h);
+            // Reset helper transform each time for safety
+            helperCtx.setTransform(1, 0, 0, 1, 0, 0);
+            helperCtx.clearRect(0, 0, w, h);
             helperCtx.save();
 
             if (effect === 'blur' || effect === 'focus') {
-                const maxRad = Math.max(2, Math.max(w,h)*0.02); 
-                const blur = Math.max(1, (intensity/100) * maxRad); 
-                
-                helperCtx.filter = `blur(${blur}px)`;
-                helperCtx.drawImage(state.image, 0, 0);
-                helperCtx.filter = 'none';
-                
-                ctx.drawImage(helperCanvas, 0, 0);
+                const intensity01 = intensity / 100;
+                if (supportsCanvasFilter) {
+                    const maxRad = Math.max(2, Math.max(w,h)*0.02); 
+                    const blur = Math.max(1, intensity01 * maxRad); 
+                    helperCtx.filter = `blur(${blur}px)`;
+                    helperCtx.drawImage(state.image, 0, 0, w, h);
+                    helperCtx.filter = 'none';
+                } else {
+                    drawBlurFallback(state.image, helperCtx, w, h, intensity01);
+                }
+                ctxLocal.drawImage(helperCanvas, 0, 0);
             } 
             else if (effect === 'pixelate') {
                  const factor = Math.max(0.005, (pixelSize / 100) * 0.15);
@@ -621,35 +659,50 @@
                      d[i+2] = contrastFactor * (d[i+2] - 128) + 128;
                  }
                  tCtx.putImageData(imgData, 0, 0);
-                 ctx.imageSmoothingEnabled = false;
-                 ctx.drawImage(tc, 0, 0, sw, sh, 0, 0, w, h);
-                 ctx.imageSmoothingEnabled = true;
+                 ctxLocal.imageSmoothingEnabled = false;
+                 ctxLocal.drawImage(tc, 0, 0, sw, sh, 0, 0, w, h);
+                 ctxLocal.imageSmoothingEnabled = true;
             } 
             else if (effect === 'frost') {
-                 helperCtx.filter = `blur(${w*0.005}px)`;
-                 helperCtx.drawImage(state.image,0,0);
-                 helperCtx.filter = 'none';
+                 const intensity01 = intensity / 100;
+                 if (supportsCanvasFilter) {
+                     const blurRadius = w * 0.005;
+                     helperCtx.filter = `blur(${blurRadius}px)`;
+                     helperCtx.drawImage(state.image,0,0,w,h);
+                     helperCtx.filter = 'none';
+                 } else {
+                     drawBlurFallback(state.image, helperCtx, w, h, Math.min(1, 0.4 + 0.6*intensity01));
+                 }
                  helperCtx.globalCompositeOperation = 'overlay';
                  helperCtx.fillStyle = `rgba(255,255,255,${intensity/200 + 0.15})`;
                  helperCtx.fillRect(0,0,w,h);
                  helperCtx.globalCompositeOperation = 'source-over';
-                 ctx.drawImage(helperCanvas, 0, 0);
+                 ctxLocal.drawImage(helperCanvas, 0, 0);
             }
             else if (effect === 'glass') { 
-                const blur = Math.max(10, (intensity/100) * 50); 
-                helperCtx.filter = `blur(${blur}px) saturate(200%) brightness(1.15)`;
-                helperCtx.drawImage(state.image, 0, 0);
-                helperCtx.filter = 'none';
-                ctx.drawImage(helperCanvas, 0, 0);
-                ctx.fillStyle = `rgba(255, 255, 255, ${0.1 + (intensity / 250)})`;
-                ctx.fill(); 
-                ctx.lineWidth = Math.max(1, w * 0.0015);
-                ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-                ctx.stroke();
+                const intensity01 = intensity / 100;
+                if (supportsCanvasFilter) {
+                    const blurVal = Math.max(10, intensity01 * 50); 
+                    helperCtx.filter = `blur(${blurVal}px) saturate(200%) brightness(1.15)`;
+                    helperCtx.drawImage(state.image, 0, 0, w, h);
+                    helperCtx.filter = 'none';
+                } else {
+                    drawBlurFallback(state.image, helperCtx, w, h, Math.min(1, 0.5 + 0.5*intensity01));
+                    helperCtx.globalCompositeOperation = 'screen';
+                    helperCtx.fillStyle = `rgba(255,255,255,${0.08 + intensity/500})`;
+                    helperCtx.fillRect(0,0,w,h);
+                    helperCtx.globalCompositeOperation = 'source-over';
+                }
+                ctxLocal.drawImage(helperCanvas, 0, 0);
+                ctxLocal.fillStyle = `rgba(255, 255, 255, ${0.1 + (intensity / 250)})`;
+                ctxLocal.fill(); 
+                ctxLocal.lineWidth = Math.max(1, w * 0.0015);
+                ctxLocal.strokeStyle = 'rgba(255,255,255,0.4)';
+                ctxLocal.stroke();
             }
             
             helperCtx.restore();
-            ctx.globalAlpha = 1.0;
+            ctxLocal.globalAlpha = 1.0;
         }
 
         function getCoords(e) {
@@ -659,9 +712,10 @@
         }
 
         function toImageCoords(screenX, screenY) {
+            const rect = canvas.getBoundingClientRect();
             return {
-                x: ((screenX - canvas.getBoundingClientRect().left - state.offset.x) / state.scale) / state.image.width,
-                y: ((screenY - canvas.getBoundingClientRect().top - state.offset.y) / state.scale) / state.image.height
+                x: ((screenX - rect.left - state.offset.x) / state.scale) / state.image.width,
+                y: ((screenY - rect.top - state.offset.y) / state.scale) / state.image.height
             };
         }
 
@@ -674,6 +728,7 @@
             return inside;
         }
 
+        // --- POINTER HANDLERS ---
         container.addEventListener('pointerdown', (e) => {
             if (!state.image) return;
             if (e.target !== canvas) return;
@@ -932,7 +987,9 @@
                         <button onclick="window.resetApp()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white text-black shadow-lg pointer-events-auto active:scale-95 transition-transform"><i data-lucide="plus" width="18"></i></button>
                     </div>
                 `;
-            } else { contentDiv.innerHTML = ''; }
+            } else { 
+                contentDiv.innerHTML = ''; 
+            }
 
             setHidden('upload-screen', state.mode !== 'upload');
             setHidden('edit-tools', state.mode !== 'edit');
@@ -1047,8 +1104,8 @@
                 selShape[key] = value;
                 if (key === 'effect') {
                      if (value === 'pixelate' && !selShape.pixelSize) selShape.pixelSize = 20;
-                     if (!selShape.intensity) selShape.intensity = 50;
-                     if (!selShape.opacity) selShape.opacity = 100;
+                     if (selShape.intensity == null) selShape.intensity = 50;
+                     if (selShape.opacity == null) selShape.opacity = 100;
                 }
             } else {
                 if (key === 'effect') state.globalEffect = value;
@@ -1092,6 +1149,8 @@
             const c = document.createElement('canvas');
             c.width = state.image.width; c.height = state.image.height;
             const x = c.getContext('2d');
+            x.setTransform(1,0,0,1,0,0);
+            x.clearRect(0,0,c.width,c.height);
             x.drawImage(state.image,0,0);
             state.shapes.forEach(s => {
                 x.save();
