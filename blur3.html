@@ -1,0 +1,1117 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Blur</title>
+    
+    <!-- PWA & Mobile Optimization -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Blur">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/50y5mQfJ/App-Icon-2x.png">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/50y5mQfJ/App-Icon-2x.png">
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiQmx1ciIsImRlc2NyaXB0aW9uIjoiUHJpdmFjeSBtYWRlIGJlYXV0aWZ1bC4iLCJzaG9ydF9uYW1lIjoiQmx1ciIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2kucG9zdGltZy5jYy81MHk1bVFmSi9BcHAtSWNvbi0yeC5wbmciLCJzaXplcyI6IjUxMng1MTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIn1dLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzAwMDAwMCIsInRoZW1lX2NvbG9yIjoiIzAwMDAwMCJ9">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/context-filter-polyfill/dist/index.min.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* iOS-like Font Stack */
+        body { 
+            background-color: #000; 
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overscroll-behavior: none;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Animations */
+        .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .scale-in { animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        #canvas-container {
+            background-color: #000;
+            background-image: radial-gradient(circle at 50% 50%, #111 0%, #000 100%);
+        }
+        
+        /* Modern Polished Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            cursor: pointer;
+            height: 24px;
+            margin: 0;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #333; 
+            border-radius: 999px;
+            border: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 28px;
+            width: 28px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            margin-top: -11px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            transition: transform 0.1s ease;
+        }
+
+        input[type=range]:active::-webkit-slider-thumb { transform: scale(1.1); }
+
+        /* --- SAFE AREA UTILITIES --- */
+        :root {
+            --sat: env(safe-area-inset-top);
+            --sab: env(safe-area-inset-bottom);
+            --sal: env(safe-area-inset-left);
+            --sar: env(safe-area-inset-right);
+        }
+
+        #header {
+            padding-top: max(16px, var(--sat)); 
+            padding-left: max(16px, var(--sal));
+            padding-right: max(16px, var(--sar));
+            height: calc(60px + var(--sat)); 
+            align-items: flex-start; 
+        }
+        
+        .header-content {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        #edit-tools { bottom: calc(30px + var(--sab)); }
+        #process-controls { padding-bottom: max(24px, calc(16px + var(--sab))); }
+        #context-menu { top: calc(70px + var(--sat)); }
+    </style>
+</head>
+<body class="h-[100dvh] flex flex-col text-white overflow-hidden">
+
+    <!-- HEADER -->
+    <div id="header" class="absolute top-0 left-0 right-0 z-30 pointer-events-none">
+        <div class="header-content">
+            <!-- Content injected by JS -->
+        </div>
+    </div>
+
+    <!-- CANVAS AREA -->
+    <div id="canvas-container" class="flex-1 relative overflow-hidden w-full h-full">
+        <canvas id="main-canvas" class="block w-full h-full touch-none"></canvas>
+        
+        <!-- EDIT MODE TOOLS -->
+        <div id="edit-tools" class="hidden absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-40 scale-in w-max pointer-events-auto">
+            <div class="flex bg-gray-900/80 backdrop-blur-2xl rounded-full p-2 shadow-2xl border border-white/10 gap-4 ring-1 ring-black/20">
+                <button id="btn-tool-select" class="flex flex-col items-center justify-center w-12 h-12 rounded-full transition-all text-gray-400 active:scale-95 touch-manipulation" onclick="setTool('select')">
+                    <i data-lucide="mouse-pointer-2" width="22"></i>
+                </button>
+                <div class="w-px bg-white/10 my-2"></div>
+                <button id="btn-tool-poly" class="flex flex-col items-center justify-center w-12 h-12 rounded-full transition-all text-gray-400 active:scale-95 touch-manipulation" onclick="setTool('poly')">
+                    <i data-lucide="pen-tool" width="22"></i>
+                </button>
+                <button id="btn-tool-rect" class="flex flex-col items-center justify-center w-12 h-12 rounded-full transition-all text-gray-400 active:scale-95 touch-manipulation" onclick="setTool('rect')">
+                    <i data-lucide="square" width="22"></i>
+                </button>
+                <button id="btn-tool-circle" class="flex flex-col items-center justify-center w-12 h-12 rounded-full transition-all text-gray-400 active:scale-95 touch-manipulation" onclick="setTool('circle')">
+                    <i data-lucide="circle" width="22"></i>
+                </button>
+            </div>
+            <div id="tool-helper" class="text-[12px] font-medium text-white/80 bg-black/50 px-4 py-1.5 rounded-full backdrop-blur-md border border-white/5 transition-opacity opacity-0 pointer-events-none shadow-lg">
+                Tap points to draw
+            </div>
+        </div>
+
+        <!-- CONTEXT MENU -->
+        <div id="context-menu" class="hidden absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-40 animate-in fade-in duration-200 w-max pointer-events-auto">
+             <div class="bg-gray-900/90 backdrop-blur-md p-1.5 rounded-2xl shadow-2xl border border-white/10 flex gap-1">
+                <button id="btn-delete-shape" class="flex items-center gap-2 text-red-400 px-5 py-3 hover:bg-white/5 rounded-xl transition-colors touch-manipulation">
+                    <i data-lucide="trash-2" width="20"></i>
+                    <span class="text-sm font-semibold">Delete</span>
+                </button>
+                <div class="w-px bg-white/10 my-1"></div>
+                <button id="btn-deselect" class="flex items-center gap-2 text-white px-5 py-3 hover:bg-white/5 rounded-xl transition-colors touch-manipulation">
+                    <i data-lucide="check" width="20"></i>
+                    <span class="text-sm font-semibold">Done</span>
+                </button>
+             </div>
+        </div>
+
+        <!-- UPLOAD SCREEN -->
+        <div id="upload-screen" class="absolute inset-0 bg-black flex flex-col items-center justify-between p-8 z-50 pointer-events-auto">
+            <div class="absolute top-0 left-0 w-full h-[60%] bg-gradient-to-b from-blue-900/20 to-transparent pointer-events-none"></div>
+            <div class="flex-1 flex flex-col items-center justify-center w-full max-w-sm gap-10 fade-in">
+                <div class="flex flex-col items-center gap-6">
+                    <div class="w-32 h-32 rounded-[28px] bg-gray-900 shadow-2xl shadow-blue-900/20 border border-white/10 overflow-hidden relative group">
+                        <img src="https://i.postimg.cc/50y5mQfJ/App-Icon-2x.png" alt="Blur App Icon" class="w-full h-full object-cover scale-105">
+                        <div class="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-[28px]"></div>
+                    </div>
+                    <div class="text-center space-y-2">
+                        <h1 class="text-4xl font-bold tracking-tight text-white">Blur</h1>
+                        <p class="text-white/50 text-lg font-medium">Privacy made beautiful.</p>
+                    </div>
+                </div>
+                <div id="btn-upload" class="w-full bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-1 cursor-pointer hover:bg-white/15 active:scale-[0.98] transition-all shadow-2xl">
+                    <div class="flex items-center gap-5 p-5">
+                        <div class="w-14 h-14 rounded-2xl bg-blue-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                            <i data-lucide="image-plus" width="28"></i>
+                        </div>
+                        <div class="flex flex-col text-left">
+                            <span class="text-lg font-semibold text-white">New Project</span>
+                            <span class="text-sm text-white/50">Select photo to edit</span>
+                        </div>
+                        <div class="ml-auto text-white/20">
+                            <i data-lucide="chevron-right" width="24"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-white/20 text-xs font-medium tracking-widest uppercase mb-4 fade-in">
+                Created by Peymaan in 2025
+            </div>
+            <input type="file" id="file-input" accept="image/*" class="hidden">
+        </div>
+    </div>
+
+    <!-- PROCESS CONTROLS -->
+    <div id="process-controls" class="hidden bg-black/85 backdrop-blur-2xl border-t border-white/10 flex flex-col gap-7 slide-up z-30 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] rounded-t-[2.5rem] pointer-events-auto absolute bottom-0 left-0 right-0">
+        <div class="px-6 pt-6 pb-safe flex flex-col gap-6">
+            <div class="flex justify-between items-center px-1">
+                <span id="selection-label" class="text-xs font-bold text-white/50 uppercase tracking-widest">
+                    Global Settings
+                </span>
+                <div class="flex gap-3">
+                     <button id="btn-apply-all" class="hidden text-[11px] font-bold bg-white/10 px-4 py-2 rounded-full text-white/90 active:scale-95">
+                        Reset to Global
+                    </button>
+                     <button id="btn-auto" class="flex items-center gap-1.5 text-[11px] font-bold text-black bg-white px-4 py-2 rounded-full shadow-lg active:scale-95 touch-manipulation">
+                         <i data-lucide="sparkles" width="14"></i> Auto
+                     </button>
+                </div>
+            </div>
+            <div class="flex justify-between items-center gap-4 overflow-x-auto scrollbar-hide py-1 -mx-2 px-2" id="effect-buttons"></div>
+            <div class="space-y-7">
+                <div class="flex flex-col gap-3">
+                    <div class="flex justify-between text-xs font-medium text-white/90 px-1">
+                        <span>Blur Strength</span>
+                        <span id="label-intensity" class="font-bold">50%</span>
+                    </div>
+                    <input type="range" id="slider-intensity" min="0" max="100" value="50" class="touch-none">
+                </div>
+                <div class="flex flex-col gap-3">
+                    <div class="flex justify-between text-xs font-medium text-white/90 px-1">
+                        <span>Transparency</span>
+                        <span id="label-opacity" class="font-bold">100%</span>
+                    </div>
+                    <input type="range" id="slider-opacity" min="0" max="100" value="100" class="touch-none">
+                </div>
+                <div id="container-pixel-size" class="flex flex-col gap-3 hidden">
+                    <div class="flex justify-between text-xs font-medium text-white/90 px-1">
+                        <span>Pixel Size</span>
+                        <span id="label-pixel-size" class="font-bold">15%</span>
+                    </div>
+                    <input type="range" id="slider-pixel-size" min="0" max="100" value="15" class="touch-none">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- STATE ---
+        const state = {
+            image: null,
+            shapes: [], 
+            currentPath: [],
+            redoPathStack: [],
+            history: [],
+            historyIndex: -1,
+            scale: 1,
+            offset: { x: 0, y: 0 },
+            mode: 'upload', 
+            tool: 'poly',
+            
+            globalEffect: 'blur',
+            globalIntensity: 50,
+            globalPixelSize: 15,
+            globalOpacity: 100,
+            
+            selectedShapeId: null,
+            isComparing: false,
+            
+            draggedVertex: null,
+            isDraggingShape: false,
+            activePointers: new Map(),
+            lastPinchDist: null,
+            wasZooming: false,
+            pointerStartPos: null,
+            dragStartPos: null
+        };
+
+        const canvas = document.getElementById('main-canvas');
+        // Use willReadFrequently for better readback performance on mobile
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const container = document.getElementById('canvas-container');
+        
+        // Helper Canvas for Offscreen Rendering (Critical for iOS Blur)
+        const helperCanvas = document.createElement('canvas');
+        const helperCtx = helperCanvas.getContext('2d', { willReadFrequently: true });
+
+        function init() {
+            lucide.createIcons();
+            requestAnimationFrame(renderLoop);
+            updateUI();
+            updateSliderStyles();
+        }
+
+        function updateSliderStyles() {
+            ['slider-intensity', 'slider-opacity', 'slider-pixel-size'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) updateSliderBackground(el);
+            });
+        }
+
+        function updateSliderBackground(el) {
+            const val = ((el.value - el.min) / (el.max - el.min)) * 100;
+            el.style.background = `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${val}%, #333 ${val}%, #333 100%)`;
+        }
+
+        // --- HISTORY ---
+        function saveToHistory() {
+            if (state.historyIndex < state.history.length - 1) {
+                state.history = state.history.slice(0, state.historyIndex + 1);
+            }
+            const snapshot = JSON.parse(JSON.stringify({
+                shapes: state.shapes,
+                globalEffect: state.globalEffect,
+                globalIntensity: state.globalIntensity,
+                globalPixelSize: state.globalPixelSize,
+                globalOpacity: state.globalOpacity
+            }));
+            state.history.push(snapshot);
+            state.historyIndex++;
+            updateUI();
+        }
+
+        window.undo = () => {
+            if (state.tool === 'poly' && state.currentPath.length > 0) {
+                const pt = state.currentPath.pop();
+                state.redoPathStack.push(pt);
+                updateUI();
+                return;
+            }
+            if (state.historyIndex > 0) {
+                state.historyIndex--;
+                restoreSnapshot(state.history[state.historyIndex]);
+            } else if (state.historyIndex === 0) {
+                state.historyIndex = -1;
+                state.shapes = [];
+                updateUI();
+            }
+        };
+
+        window.redo = () => {
+            if (state.tool === 'poly' && state.redoPathStack.length > 0) {
+                const pt = state.redoPathStack.pop();
+                state.currentPath.push(pt);
+                updateUI();
+                return;
+            }
+            if (state.historyIndex < state.history.length - 1) {
+                state.historyIndex++;
+                restoreSnapshot(state.history[state.historyIndex]);
+            }
+        };
+
+        function restoreSnapshot(snap) {
+            state.shapes = JSON.parse(JSON.stringify(snap.shapes));
+            state.globalEffect = snap.globalEffect;
+            state.globalIntensity = snap.globalIntensity;
+            state.globalPixelSize = snap.globalPixelSize;
+            state.globalOpacity = snap.globalOpacity || 100;
+            if (state.selectedShapeId && !state.shapes.find(s => s.id === state.selectedShapeId)) {
+                state.selectedShapeId = null;
+            }
+            updateUI();
+        }
+
+        window.resetApp = () => {
+            state.image = null;
+            state.shapes = [];
+            state.currentPath = [];
+            state.history = [];
+            state.historyIndex = -1;
+            state.mode = 'upload';
+            updateUI();
+        }
+
+        // --- IMAGE LOAD ---
+        document.getElementById('file-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                const img = new Image();
+                img.onload = () => {
+                    const max = 2048;
+                    let w = img.width, h = img.height;
+                    if (w > max || h > max) {
+                        const r = Math.min(max/w, max/h);
+                        w *= r; h *= r;
+                    }
+                    const tc = document.createElement('canvas');
+                    tc.width = w; tc.height = h;
+                    tc.getContext('2d').drawImage(img, 0, 0, w, h);
+                    
+                    const fImg = new Image();
+                    fImg.onload = () => {
+                        state.image = fImg;
+                        state.mode = 'edit';
+                        centerImage(w, h);
+                        state.shapes = [];
+                        state.history = [];
+                        state.historyIndex = -1;
+                        state.currentPath = [];
+                        updateUI();
+                    };
+                    fImg.src = tc.toDataURL('image/jpeg', 0.95);
+                };
+                img.src = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function centerImage(w, h) {
+            const cw = container.clientWidth;
+            const ch = container.clientHeight;
+            const s = Math.min(cw/w, ch/h) * 0.9;
+            state.scale = s;
+            state.offset = { x: (cw - w*s)/2, y: (ch - h*s)/2 };
+        }
+
+        // --- RENDER ---
+        function renderLoop() {
+            render();
+            requestAnimationFrame(renderLoop);
+        }
+
+        function render() {
+            if (!state.image) return;
+            
+            const cw = container.clientWidth;
+            const ch = container.clientHeight;
+            if (canvas.width !== cw || canvas.height !== ch) {
+                canvas.width = cw; canvas.height = ch;
+            }
+
+            ctx.clearRect(0,0,cw,ch);
+            ctx.save();
+            ctx.translate(state.offset.x, state.offset.y);
+            ctx.scale(state.scale, state.scale);
+
+            ctx.drawImage(state.image, 0, 0);
+
+            if (!state.isComparing && (state.mode === 'process')) {
+                if (helperCanvas.width !== state.image.width || helperCanvas.height !== state.image.height) {
+                    helperCanvas.width = state.image.width;
+                    helperCanvas.height = state.image.height;
+                }
+                state.shapes.forEach(s => {
+                    ctx.save();
+                    drawEffectPath(ctx, s);
+                    ctx.restore();
+                });
+            }
+
+            state.shapes.forEach(s => {
+                const isSel = s.id === state.selectedShapeId;
+                if (state.mode === 'process' && !isSel) return;
+
+                ctx.beginPath();
+                s.points.forEach((p,i) => {
+                    const x = p.x * state.image.width;
+                    const y = p.y * state.image.height;
+                    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                });
+                ctx.closePath();
+                
+                ctx.lineWidth = 2 / state.scale;
+                
+                if (state.mode === 'edit') {
+                    ctx.strokeStyle = isSel ? '#3b82f6' : 'rgba(255,255,255,0.7)';
+                    ctx.fillStyle = isSel ? 'rgba(59, 130, 246, 0.2)' : 'rgba(0,0,0,0.1)';
+                    ctx.fill();
+                    ctx.stroke();
+                } else if (state.mode === 'process' && isSel) {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+                    ctx.setLineDash([5/state.scale, 5/state.scale]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+
+                if (state.mode === 'edit' && isSel) {
+                    ctx.fillStyle = '#fff';
+                    s.points.forEach(p => {
+                        ctx.beginPath();
+                        ctx.arc(p.x * state.image.width, p.y * state.image.height, 6 / state.scale, 0, Math.PI*2);
+                        ctx.fill();
+                        ctx.lineWidth = 1.5/state.scale;
+                        ctx.strokeStyle = '#3b82f6';
+                        ctx.stroke();
+                    });
+                }
+            });
+
+            if (state.tool === 'poly' && state.currentPath.length > 0 && state.mode === 'edit') {
+                ctx.beginPath();
+                state.currentPath.forEach((p,i) => {
+                    const x = p.x * state.image.width;
+                    const y = p.y * state.image.height;
+                    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                });
+                ctx.lineWidth = 3 / state.scale;
+                ctx.strokeStyle = '#ef4444'; 
+                ctx.stroke();
+
+                const start = state.currentPath[0];
+                ctx.beginPath();
+                ctx.arc(start.x * state.image.width, start.y * state.image.height, 8 / state.scale, 0, Math.PI*2);
+                ctx.fillStyle = '#22c55e';
+                ctx.fill();
+                ctx.stroke();
+                
+                if (state.activePointers.size === 1 && !state.wasZooming) {
+                     const pt = state.activePointers.values().next().value;
+                     if (pt) {
+                         const r = canvas.getBoundingClientRect();
+                         const lx = (pt.x - r.left - state.offset.x) / state.scale;
+                         const ly = (pt.y - r.top - state.offset.y) / state.scale;
+                         const lastP = state.currentPath[state.currentPath.length-1];
+                         ctx.beginPath();
+                         ctx.moveTo(lastP.x * state.image.width, lastP.y * state.image.height);
+                         ctx.lineTo(lx, ly);
+                         ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
+                         ctx.setLineDash([5/state.scale, 5/state.scale]);
+                         ctx.stroke();
+                         ctx.setLineDash([]);
+                     }
+                }
+            }
+
+            if ((state.tool === 'rect' || state.tool === 'circle') && state.dragStartPos && state.activePointers.size === 1) {
+                const pt = state.activePointers.values().next().value;
+                const r = canvas.getBoundingClientRect();
+                const startX = (state.dragStartPos.x - r.left - state.offset.x) / state.scale;
+                const startY = (state.dragStartPos.y - r.top - state.offset.y) / state.scale;
+                const currX = (pt.x - r.left - state.offset.x) / state.scale;
+                const currY = (pt.y - r.top - state.offset.y) / state.scale;
+
+                ctx.beginPath();
+                ctx.lineWidth = 3 / state.scale;
+                ctx.strokeStyle = '#ef4444';
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.2)';
+
+                if (state.tool === 'rect') {
+                    ctx.rect(startX, startY, currX - startX, currY - startY);
+                } else {
+                    const rx = Math.abs(currX - startX) / 2;
+                    const ry = Math.abs(currY - startY) / 2;
+                    const cx = Math.min(startX, currX) + rx;
+                    const cy = Math.min(startY, currY) + ry;
+                    ctx.ellipse(cx, cy, rx, ry, 0, 0, 2 * Math.PI);
+                }
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            ctx.restore();
+        }
+
+        function drawEffectPath(ctx, shape) {
+            const w = state.image.width;
+            const h = state.image.height;
+            const points = shape.points;
+            
+            const effect = shape.effect || state.globalEffect;
+            const intensity = shape.intensity !== undefined ? shape.intensity : state.globalIntensity;
+            const pixelSize = shape.pixelSize !== undefined ? shape.pixelSize : state.globalPixelSize;
+            const opacity = shape.opacity !== undefined ? shape.opacity : state.globalOpacity;
+
+            // Define Shape Path
+            ctx.beginPath();
+            points.forEach((p,i) => {
+                const x=p.x*w, y=p.y*h;
+                if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+            });
+            ctx.closePath();
+            
+            // --- ROBUST iOS FOCUS FIX (Non-Zero Winding Rule) ---
+            if (effect === 'focus') {
+                 // Draw the full screen rect in Counter-Clockwise direction.
+                 // Combined with the shape (likely Clockwise or arbitrary), this forces
+                 // the "Non-Zero" winding rule to treat the shape as a hole.
+                 ctx.rect(w, 0, -w, h); 
+            }
+            
+            ctx.clip(); // Default clip is non-zero, which works better than even-odd on mobile
+            ctx.globalAlpha = opacity / 100;
+
+            // --- OFFSCREEN RENDERING PIPELINE (iOS Fix) ---
+            // Clear helper
+            helperCtx.clearRect(0,0,w,h);
+            helperCtx.save();
+
+            if (effect === 'blur' || effect === 'focus') {
+                const maxRad = Math.max(2, Math.max(w,h)*0.02); 
+                const blur = Math.max(1, (intensity/100) * maxRad); 
+                
+                helperCtx.filter = `blur(${blur}px)`;
+                helperCtx.drawImage(state.image, 0, 0);
+                helperCtx.filter = 'none';
+                
+                ctx.drawImage(helperCanvas, 0, 0);
+            } 
+            else if (effect === 'pixelate') {
+                 const factor = Math.max(0.005, (pixelSize / 100) * 0.15);
+                 const blockSize = Math.max(4, w * factor);
+                 const sw = Math.ceil(w/blockSize);
+                 const sh = Math.ceil(h/blockSize);
+                 const tc = document.createElement('canvas');
+                 tc.width = sw; tc.height = sh;
+                 const tCtx = tc.getContext('2d');
+                 tCtx.imageSmoothingEnabled = true; 
+                 tCtx.imageSmoothingQuality = 'high';
+                 tCtx.drawImage(state.image, 0, 0, w, h, 0, 0, sw, sh);
+                 
+                 const imgData = tCtx.getImageData(0, 0, sw, sh);
+                 const d = imgData.data;
+                 const contrast = 60; 
+                 const contrastFactor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+                 for (let i = 0; i < d.length; i += 4) {
+                     d[i] = contrastFactor * (d[i] - 128) + 128;
+                     d[i+1] = contrastFactor * (d[i+1] - 128) + 128;
+                     d[i+2] = contrastFactor * (d[i+2] - 128) + 128;
+                 }
+                 tCtx.putImageData(imgData, 0, 0);
+                 ctx.imageSmoothingEnabled = false;
+                 ctx.drawImage(tc, 0, 0, sw, sh, 0, 0, w, h);
+                 ctx.imageSmoothingEnabled = true;
+            } 
+            else if (effect === 'frost') {
+                 helperCtx.filter = `blur(${w*0.005}px)`;
+                 helperCtx.drawImage(state.image,0,0);
+                 helperCtx.filter = 'none';
+                 helperCtx.globalCompositeOperation = 'overlay';
+                 helperCtx.fillStyle = `rgba(255,255,255,${intensity/200 + 0.15})`;
+                 helperCtx.fillRect(0,0,w,h);
+                 helperCtx.globalCompositeOperation = 'source-over';
+                 ctx.drawImage(helperCanvas, 0, 0);
+            }
+            else if (effect === 'glass') { 
+                const blur = Math.max(10, (intensity/100) * 50); 
+                helperCtx.filter = `blur(${blur}px) saturate(200%) brightness(1.15)`;
+                helperCtx.drawImage(state.image, 0, 0);
+                helperCtx.filter = 'none';
+                ctx.drawImage(helperCanvas, 0, 0);
+                ctx.fillStyle = `rgba(255, 255, 255, ${0.1 + (intensity / 250)})`;
+                ctx.fill(); 
+                ctx.lineWidth = Math.max(1, w * 0.0015);
+                ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+                ctx.stroke();
+            }
+            
+            helperCtx.restore();
+            ctx.globalAlpha = 1.0;
+        }
+
+        function getCoords(e) {
+            const cx = e.touches ? e.touches[0].clientX : e.clientX;
+            const cy = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: cx, y: cy };
+        }
+
+        function toImageCoords(screenX, screenY) {
+            return {
+                x: ((screenX - canvas.getBoundingClientRect().left - state.offset.x) / state.scale) / state.image.width,
+                y: ((screenY - canvas.getBoundingClientRect().top - state.offset.y) / state.scale) / state.image.height
+            };
+        }
+
+        function isPointInPoly(p, vs) {
+            let x=p.x, y=p.y, inside=false;
+            for(let i=0,j=vs.length-1; i<vs.length; j=i++) {
+                let xi=vs[i].x, yi=vs[i].y, xj=vs[j].x, yj=vs[j].y;
+                if(((yi>y)!==(yj>y)) && (x<(xj-xi)*(y-yi)/(yj-yi)+xi)) inside=!inside;
+            }
+            return inside;
+        }
+
+        container.addEventListener('pointerdown', (e) => {
+            if (!state.image) return;
+            if (e.target !== canvas) return;
+            try { container.setPointerCapture(e.pointerId); } catch(err){}
+            state.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+            if (state.activePointers.size >= 2) {
+                state.wasZooming = true;
+                state.pointerStartPos = null;
+                state.dragStartPos = null;
+                return; 
+            }
+
+            state.wasZooming = false;
+            state.pointerStartPos = { x: e.clientX, y: e.clientY };
+            const imgPt = toImageCoords(e.clientX, e.clientY);
+
+            if ((state.tool === 'rect' || state.tool === 'circle') && state.mode === 'edit') {
+                state.dragStartPos = { x: e.clientX, y: e.clientY };
+                return;
+            }
+
+            if (state.mode === 'edit' && state.tool === 'select') {
+                 if (state.selectedShapeId) {
+                    const shape = state.shapes.find(s => s.id === state.selectedShapeId);
+                    if (shape) {
+                        const hitbox = 30 / (state.scale * state.image.width); 
+                        const vIndex = shape.points.findIndex(p => Math.hypot(p.x-imgPt.x, (p.y-imgPt.y)*(state.image.height/state.image.width)) < hitbox);
+                        if (vIndex !== -1) {
+                            state.draggedVertex = { shapeId: shape.id, index: vIndex };
+                            return;
+                        }
+                    }
+                }
+                const hitShape = state.shapes.slice().reverse().find(s => isPointInPoly(imgPt, s.points));
+                if (hitShape) {
+                    state.selectedShapeId = hitShape.id;
+                    state.isDraggingShape = true;
+                    updateUI();
+                } else {
+                    state.selectedShapeId = null;
+                    updateUI();
+                }
+            } 
+            else if (state.mode === 'process') {
+                 const hitShape = state.shapes.slice().reverse().find(s => isPointInPoly(imgPt, s.points));
+                 if (hitShape) {
+                     state.selectedShapeId = hitShape.id;
+                     updateUI();
+                 }
+            }
+        });
+
+        container.addEventListener('pointermove', (e) => {
+            if (state.activePointers.has(e.pointerId)) {
+                state.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+            }
+
+            if (state.activePointers.size === 2) {
+                state.wasZooming = true;
+                state.draggedVertex = null; 
+                state.isDraggingShape = null;
+                state.dragStartPos = null;
+
+                const points = Array.from(state.activePointers.values());
+                const p1 = points[0];
+                const p2 = points[1];
+                const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+                const center = { x: (p1.x + p2.x)/2, y: (p1.y + p2.y)/2 };
+
+                if (state.lastPinchDist) {
+                    const ratio = dist / state.lastPinchDist;
+                    const newScale = Math.max(0.1, Math.min(10, state.scale * ratio));
+                    const rect = canvas.getBoundingClientRect();
+                    const cx = center.x - rect.left;
+                    const cy = center.y - rect.top;
+                    state.offset.x = cx - (cx - state.offset.x) * (newScale / state.scale);
+                    state.offset.y = cy - (cy - state.offset.y) * (newScale / state.scale);
+                    state.scale = newScale;
+                }
+                state.lastPinchDist = dist;
+                return; 
+            }
+
+            if (state.activePointers.size === 1) {
+                if (state.draggedVertex && state.mode === 'edit') {
+                    const shape = state.shapes.find(s => s.id === state.draggedVertex.shapeId);
+                    const imgPt = toImageCoords(e.clientX, e.clientY);
+                    shape.points[state.draggedVertex.index] = {
+                        x: Math.max(0, Math.min(1, imgPt.x)),
+                        y: Math.max(0, Math.min(1, imgPt.y))
+                    };
+                    return;
+                }
+            }
+            
+            if (!state.lastPointer) { state.lastPointer = {x: e.clientX, y: e.clientY}; return; }
+            const dx = e.clientX - state.lastPointer.x;
+            const dy = e.clientY - state.lastPointer.y;
+            state.lastPointer = {x: e.clientX, y: e.clientY};
+
+            if (state.isDraggingShape && state.selectedShapeId && state.mode === 'edit' && state.activePointers.size === 1) {
+                 const shape = state.shapes.find(s => s.id === state.selectedShapeId);
+                 const normDx = dx / state.scale / state.image.width;
+                 const normDy = dy / state.scale / state.image.height;
+                 shape.points = shape.points.map(p => ({ x: p.x + normDx, y: p.y + normDy }));
+                 return;
+            }
+            
+            const isDrawing = (state.tool === 'poly' || state.tool === 'rect' || state.tool === 'circle') && state.mode === 'edit';
+            if (!state.draggedVertex && !state.isDraggingShape && !isDrawing && state.activePointers.size === 1) {
+                state.offset.x += dx;
+                state.offset.y += dy;
+            }
+        });
+
+        const handlePointerUp = (e) => {
+            state.activePointers.delete(e.pointerId);
+            if (state.activePointers.size < 2) state.lastPinchDist = null;
+            
+            if (state.wasZooming) {
+                if (state.activePointers.size === 0) setTimeout(() => { state.wasZooming = false; }, 100); 
+                try { container.releasePointerCapture(e.pointerId); } catch(err){}
+                state.dragStartPos = null;
+                return;
+            }
+
+            if (state.dragStartPos && (state.tool === 'rect' || state.tool === 'circle') && state.mode === 'edit') {
+                const pStart = toImageCoords(state.dragStartPos.x, state.dragStartPos.y);
+                const pEnd = toImageCoords(e.clientX, e.clientY);
+                if (Math.hypot(pEnd.x-pStart.x, pEnd.y-pStart.y) > 0.01) {
+                    let points = [];
+                    if (state.tool === 'rect') {
+                        points = [
+                            {x: pStart.x, y: pStart.y},
+                            {x: pEnd.x, y: pStart.y},
+                            {x: pEnd.x, y: pEnd.y},
+                            {x: pStart.x, y: pEnd.y}
+                        ];
+                    } else {
+                        const rx = Math.abs(pEnd.x - pStart.x)/2;
+                        const ry = Math.abs(pEnd.y - pStart.y)/2;
+                        const cx = Math.min(pStart.x, pEnd.x) + rx;
+                        const cy = Math.min(pStart.y, pEnd.y) + ry;
+                        for (let i=0; i<40; i++) {
+                            const theta = (i/40) * Math.PI * 2;
+                            points.push({
+                                x: cx + Math.cos(theta) * rx,
+                                y: cy + Math.sin(theta) * ry
+                            });
+                        }
+                    }
+                    const newShape = {
+                        id: Date.now().toString(),
+                        points: points,
+                        effect: state.globalEffect,
+                        intensity: state.globalIntensity,
+                        pixelSize: state.globalPixelSize,
+                        opacity: state.globalOpacity
+                    };
+                    state.shapes.push(newShape);
+                    state.selectedShapeId = newShape.id;
+                    state.tool = 'select'; 
+                    saveToHistory();
+                    updateUI();
+                }
+            }
+
+            if (state.draggedVertex || state.isDraggingShape) saveToHistory();
+            
+            if (state.tool === 'poly' && state.pointerStartPos && state.activePointers.size === 0) {
+                const dist = Math.hypot(e.clientX - state.pointerStartPos.x, e.clientY - state.pointerStartPos.y);
+                if (dist < 10) handleTapAction({x: e.clientX, y: e.clientY});
+            }
+
+            state.draggedVertex = null;
+            state.isDraggingShape = false;
+            state.lastPointer = null; 
+            state.pointerStartPos = null;
+            state.dragStartPos = null;
+            try { container.releasePointerCapture(e.pointerId); } catch(err){}
+        };
+        
+        window.addEventListener('pointerup', handlePointerUp);
+        window.addEventListener('pointercancel', handlePointerUp);
+
+        function handleTapAction(pt) {
+            if (state.mode !== 'edit' || state.tool !== 'poly') return;
+            const imgPt = toImageCoords(pt.x, pt.y);
+            if(imgPt.x<0||imgPt.x>1||imgPt.y<0||imgPt.y>1) return;
+
+            if (state.currentPath.length > 2) {
+                const start = state.currentPath[0];
+                const screenDist = Math.hypot((imgPt.x-start.x)*state.image.width*state.scale, (imgPt.y-start.y)*state.image.height*state.scale);
+                if (screenDist < 40) { 
+                    const newShape = { 
+                        id: Date.now().toString(), 
+                        points: [...state.currentPath],
+                        effect: state.globalEffect,
+                        intensity: state.globalIntensity,
+                        pixelSize: state.globalPixelSize,
+                        opacity: state.globalOpacity
+                    };
+                    state.shapes.push(newShape);
+                    state.currentPath = [];
+                    state.selectedShapeId = newShape.id;
+                    state.tool = 'select';
+                    state.redoPathStack = [];
+                    saveToHistory();
+                    updateUI();
+                    return;
+                }
+            }
+            state.currentPath.push(imgPt);
+            state.redoPathStack = [];
+            updateUI();
+        }
+
+        // --- UI ---
+        window.setTool = (t) => {
+            state.tool = t;
+            if (t !== 'poly') { state.currentPath = []; state.redoPathStack = []; }
+            if (t !== 'select') state.selectedShapeId = null;
+            updateUI();
+        };
+
+        function updateUI() {
+            const setHidden = (id, hidden) => document.getElementById(id).classList.toggle('hidden', hidden);
+            
+            const header = document.getElementById('header');
+            const contentDiv = header.querySelector('.header-content');
+            
+            if (state.mode === 'edit') {
+                const canUndo = (state.tool === 'poly' && state.currentPath.length > 0) || state.historyIndex >= 0;
+                const canRedo = (state.tool === 'poly' && state.redoPathStack.length > 0) || state.historyIndex < state.history.length - 1;
+
+                contentDiv.innerHTML = `
+                    <button onclick="window.resetApp()" class="w-10 h-10 flex items-center justify-center rounded-full bg-black/40 text-white backdrop-blur pointer-events-auto active:scale-95 transition-transform"><i data-lucide="x" width="20"></i></button>
+                    <div class="flex gap-4 pointer-events-auto">
+                        <button onclick="window.undo()" class="w-10 h-10 flex items-center justify-center rounded-full bg-black/40 text-white backdrop-blur active:scale-95 transition-transform ${!canUndo?'opacity-50 pointer-events-none':''}"><i data-lucide="undo" width="18"></i></button>
+                        <button onclick="window.redo()" class="w-10 h-10 flex items-center justify-center rounded-full bg-black/40 text-white backdrop-blur active:scale-95 transition-transform ${!canRedo?'opacity-50 pointer-events-none':''}"><i data-lucide="redo" width="18"></i></button>
+                    </div>
+                    <button onclick="window.goToProcess()" class="bg-blue-600 text-white font-semibold text-sm px-6 py-2.5 rounded-full shadow-lg hover:bg-blue-500 transition-colors pointer-events-auto active:scale-95 transform">Next</button>
+                `;
+            } else if (state.mode === 'process') {
+                 contentDiv.innerHTML = `
+                    <button onclick="setMode('edit')" class="w-10 h-10 flex items-center justify-center rounded-full bg-black/40 text-white backdrop-blur pointer-events-auto active:scale-95 transition-transform"><i data-lucide="arrow-left" width="20"></i></button>
+                    <div class="flex items-center gap-2 px-4 py-2 bg-black/60 backdrop-blur rounded-full cursor-pointer select-none active:bg-black/80 transition-colors pointer-events-auto active:scale-95"
+                         onpointerdown="state.isComparing=true" onpointerup="state.isComparing=false" 
+                         onpointerleave="state.isComparing=false">
+                        <i data-lucide="eye" width="16" class="${state.isComparing ? 'text-blue-400':'text-gray-400'}"></i>
+                        <span class="text-xs font-semibold text-gray-200">Hold to Compare</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="window.saveImage()" class="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white shadow-lg pointer-events-auto active:scale-95 transition-transform"><i data-lucide="download" width="18"></i></button>
+                        <button onclick="window.resetApp()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white text-black shadow-lg pointer-events-auto active:scale-95 transition-transform"><i data-lucide="plus" width="18"></i></button>
+                    </div>
+                `;
+            } else { contentDiv.innerHTML = ''; }
+
+            setHidden('upload-screen', state.mode !== 'upload');
+            setHidden('edit-tools', state.mode !== 'edit');
+            setHidden('process-controls', state.mode !== 'process');
+            
+            const showContext = state.mode === 'edit' && state.selectedShapeId && state.currentPath.length === 0;
+            setHidden('context-menu', !showContext);
+
+            if (state.mode === 'edit') {
+                const tools = ['select', 'poly', 'rect', 'circle'];
+                tools.forEach(t => {
+                    const btn = document.getElementById(`btn-tool-${t}`);
+                    if(btn) {
+                        const active = state.tool === t;
+                        btn.className = `flex flex-col items-center justify-center w-12 h-12 rounded-full transition-all active:scale-95 touch-manipulation ${active ? 'bg-white text-black shadow-lg scale-110' : 'text-gray-400 hover:text-white'}`;
+                    }
+                });
+                
+                const helper = document.getElementById('tool-helper');
+                helper.style.opacity = state.tool === 'poly' ? '1' : '0';
+                helper.innerText = state.currentPath.length > 0 ? 'Tap Green point to Close' : 'Tap points to draw';
+            }
+
+            if (state.mode === 'process') {
+                let currentEffect, currentIntensity, currentPixelSize, currentOpacity;
+                const selShape = state.selectedShapeId ? state.shapes.find(s => s.id === state.selectedShapeId) : null;
+                
+                if (selShape) {
+                    currentEffect = selShape.effect;
+                    currentIntensity = selShape.intensity;
+                    currentPixelSize = selShape.pixelSize;
+                    currentOpacity = selShape.opacity !== undefined ? selShape.opacity : 100;
+                    document.getElementById('selection-label').innerText = "Selection";
+                    setHidden('btn-apply-all', false);
+                } else {
+                    currentEffect = state.globalEffect;
+                    currentIntensity = state.globalIntensity;
+                    currentPixelSize = state.globalPixelSize;
+                    currentOpacity = state.globalOpacity;
+                    document.getElementById('selection-label').innerText = "Global Settings";
+                    setHidden('btn-apply-all', true);
+                }
+
+                const efDiv = document.getElementById('effect-buttons');
+                const effects = ['blur','pixelate','frost','glass','focus'];
+                efDiv.innerHTML = effects.map(e => `
+                    <button onclick="setEffect('${e}')" class="flex-shrink-0 flex flex-col items-center justify-center w-16 h-16 rounded-2xl transition-all border touch-manipulation ${currentEffect===e ? 'bg-white text-black border-white shadow-lg scale-105':'bg-white/5 text-gray-400 border-white/5 hover:bg-white/10'}">
+                        <i data-lucide="${e==='blur'?'droplet':e==='pixelate'?'grid':e==='frost'?'zap':e==='glass'?'layers':'maximize'}" width="24"></i>
+                        <span class="text-[10px] font-bold mt-1 uppercase">${e}</span>
+                    </button>
+                `).join('');
+
+                const sInt = document.getElementById('slider-intensity');
+                const sPix = document.getElementById('slider-pixel-size');
+                const sOp = document.getElementById('slider-opacity');
+                
+                sInt.value = currentIntensity;
+                document.getElementById('label-intensity').innerText = currentIntensity + '%';
+                
+                sOp.value = currentOpacity;
+                document.getElementById('label-opacity').innerText = currentOpacity + '%';
+
+                setHidden('container-pixel-size', currentEffect !== 'pixelate');
+                sPix.value = currentPixelSize;
+                document.getElementById('label-pixel-size').innerText = currentPixelSize + '%';
+                
+                const handleInput = (key, el) => {
+                    const val = parseInt(el.value);
+                    updateSettings(key, val);
+                    updateSliderBackground(el);
+                };
+
+                sInt.oninput = (e) => handleInput('intensity', e.target);
+                sPix.oninput = (e) => handleInput('pixelSize', e.target);
+                sOp.oninput = (e) => handleInput('opacity', e.target);
+                
+                updateSliderBackground(sInt);
+                updateSliderBackground(sPix);
+                updateSliderBackground(sOp);
+            }
+
+            if (document.getElementById('btn-delete-shape')) {
+                document.getElementById('btn-delete-shape').onclick = (e) => {
+                    e.stopPropagation();
+                    state.shapes = state.shapes.filter(s => s.id !== state.selectedShapeId);
+                    state.selectedShapeId = null;
+                    saveToHistory();
+                    updateUI();
+                };
+                document.getElementById('btn-deselect').onclick = (e) => {
+                    e.stopPropagation();
+                    state.selectedShapeId = null;
+                    state.tool = 'select';
+                    updateUI();
+                };
+            }
+            
+            document.getElementById('btn-apply-all').onclick = () => {
+                state.selectedShapeId = null; 
+                updateUI();
+            };
+
+            lucide.createIcons();
+        }
+
+        window.setEffect = (e) => updateSettings('effect', e);
+        window.setMode = (m) => { state.mode=m; updateUI(); };
+        
+        function updateSettings(key, value) {
+            const selShape = state.selectedShapeId ? state.shapes.find(s => s.id === state.selectedShapeId) : null;
+            if (selShape) {
+                selShape[key] = value;
+                if (key === 'effect') {
+                     if (value === 'pixelate' && !selShape.pixelSize) selShape.pixelSize = 20;
+                     if (!selShape.intensity) selShape.intensity = 50;
+                     if (!selShape.opacity) selShape.opacity = 100;
+                }
+            } else {
+                if (key === 'effect') state.globalEffect = value;
+                if (key === 'intensity') state.globalIntensity = value;
+                if (key === 'pixelSize') state.globalPixelSize = value;
+                if (key === 'opacity') state.globalOpacity = value;
+                state.shapes.forEach(s => {
+                    if (key === 'effect') s.effect = value;
+                    if (key === 'intensity') s.intensity = value;
+                    if (key === 'pixelSize') s.pixelSize = value;
+                    if (key === 'opacity') s.opacity = value;
+                });
+            }
+            if (key === 'effect') updateUI(); 
+            else {
+                const lbl = document.getElementById(`label-${key === 'pixelSize' ? 'pixel-size' : key}`);
+                if(lbl) lbl.innerText = value + '%';
+            }
+        }
+
+        window.goToProcess = () => {
+            if(state.shapes.length === 0 && state.currentPath.length === 0) return alert("Select an area first");
+            if(state.currentPath.length > 2) {
+                 const newShape = { 
+                     id: Date.now().toString(), 
+                     points: [...state.currentPath],
+                     effect: state.globalEffect,
+                     intensity: state.globalIntensity,
+                     pixelSize: state.globalPixelSize,
+                     opacity: state.globalOpacity
+                 };
+                 state.shapes.push(newShape);
+                 state.currentPath = [];
+            }
+            state.mode = 'process';
+            state.selectedShapeId = null;
+            updateUI();
+        };
+
+        window.saveImage = () => {
+            const c = document.createElement('canvas');
+            c.width = state.image.width; c.height = state.image.height;
+            const x = c.getContext('2d');
+            x.drawImage(state.image,0,0);
+            state.shapes.forEach(s => {
+                x.save();
+                drawEffectPath(x, s);
+                x.restore();
+            });
+            const link = document.createElement('a');
+            link.download = 'edited_image.jpg';
+            link.href = c.toDataURL('image/jpeg', 0.95);
+            link.click();
+        };
+        
+        document.getElementById('btn-upload').onclick = () => document.getElementById('file-input').click();
+        document.getElementById('btn-auto').onclick = () => { 
+            updateSettings('intensity', 60); 
+            updateSettings('pixelSize', 15);
+            updateUI();
+        };
+
+        init();
+    </script>
+</body>
+</html>
