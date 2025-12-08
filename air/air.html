@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<!-- داخل <head> قرار بده -->
 <link rel="icon" type="image/png" sizes="32x32" href="https://8upload.com/image/171db5bf84cf07d4/AppIcon_2x.png">
 <link rel="icon" type="image/png" sizes="192x192" href="https://8upload.com/image/171db5bf84cf07d4/AppIcon_2x.png">
 <link rel="apple-touch-icon" sizes="180x180" href="https://8upload.com/image/171db5bf84cf07d4/AppIcon_2x.png">
@@ -19,7 +18,10 @@
 
 <title>هوای پاک پلاس</title>
 
-<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/misc/Farsi-Digits/font-face.css" rel="stylesheet" type="text/css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 
 <style>
@@ -53,7 +55,8 @@
         background-color: var(--bg-color);
         background-image: var(--bg-image);
         color: var(--text-primary);
-        font-family: 'Vazirmatn', sans-serif;
+        /* FIX: Updated Font Stack for iOS */
+        font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         min-height: 100vh;
         overflow-x: hidden;
         display: flex; flex-direction: column;
@@ -555,7 +558,8 @@
         if(typeof Chart === 'undefined') return;
         if(chartInstance) chartInstance.destroy();
 
-        Chart.defaults.font.family = 'Vazirmatn';
+        // FIX: Ensuring font works in Chart.js
+        Chart.defaults.font.family = 'Vazirmatn, -apple-system, sans-serif';
         Chart.defaults.color = isLight ? '#666' : '#aaa';
 
         chartInstance = new Chart(ctx, {
