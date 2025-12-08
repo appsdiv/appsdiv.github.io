@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>هوای پاک پلاس</title>
+
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/misc/Farsi-Digits/font-face.css" rel="stylesheet" type="text/css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    /* --- SYSTEM VARIABLES --- */
+    :root {
+        --bg-color: #050505;
+        --accent-color: #34d399; /* پیش‌فرض سبز */
+        --glass-surface: rgba(20, 20, 20, 0.6);
+        --glass-highlight: rgba(255, 255, 255, 0.08);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --text-primary: #ffffff;
+        --text-secondary: rgba(255, 255, 255, 0.55);
+        --font-stack: 'Vazirmatn', -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
+
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-primary);
+        font-family: var(--font-stack);
+        height: 100vh;
+        overflow-x: hidden;
+        overflow-y: auto;
+        display: flex; flex-direction: column;
+        transition: background-color 1s ease;
+    }
+
+    /* --- AMBIENT GLOW & NOISE --- */
+    .ambient-glow {
+        position: fixed; top: -20%; left: 50%; transform: translateX(-50%);
+        width: 100vw; height: 100vw;
+        background: radial-gradient(circle, var(--accent-color) 0%, transparent 70%);
+        opacity: 0.15; pointer-events: none; z-index: 0;
+        transition: background 1s ease;
+    }
+    .noise-overlay {
+        position: fixed; inset: 0; pointer-events: none; z-index: 1;
+        opacity: 0.05;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    /* --- LAYOUT --- */
+    #app {
+        position: relative; z-index: 10;
+        padding: max(20px, env(safe-area-inset-top)) 24px 40px 24px;
+        max-width: 500px; margin: 0 auto; width: 100%;
+        display: flex; flex-direction: column; gap: 24px;
+    }
+
+    /* --- HEADER --- */
+    header { display: flex; justify-content: space-between; align-items: center; }
+    .location-pill {
+        display: flex; align-items: center; gap: 8px;
+        background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+        padding: 8px 16px; border-radius: 30px;
+        font-size: 14px; font-weight: 600; cursor: pointer;
+        backdrop-filter: blur(10px); transition: 0.3s;
+    }
+    .location-pill:active { transform: scale(0.96); background: rgba(255,255,255,0.1); }
+    
+    .settings-btn {
+        width: 40px; height: 40px; border-radius: 50%;
+        background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+        display: flex; align-items: center; justify-content: center;
+        color: white; cursor: pointer;
+    }
+
+    /* --- HERO SECTION (AQI) --- */
+    .hero-aqi {
+        position: relative;
+        display: flex; flex-direction: column; align-items: center;
+        margin-top: 10px;
+    }
+    .gauge-wrapper { width: 260px; height: 260px; position: relative; }
+    .gauge-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    
+    .track { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 8; stroke-linecap: round; }
+    .progress { 
+        fill: none; stroke: var(--accent-color); stroke-width: 8; stroke-linecap: round;
+        stroke-dasharray: 753; stroke-dashoffset: 753; /* 2*PI*120 */
+        transition: stroke-dashoffset 1.5s cubic-bezier(0.2, 0.8, 0.2, 1), stroke 1s;
+        filter: drop-shadow(0 0 15px var(--accent-color));
+    }
+    
+    .hero-content {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        text-align: center;
+    }
+    .hero-val { 
+        font-size: 86px; font-weight: 800; line-height: 0.9; letter-spacing: -3px;
+        background: linear-gradient(180deg, #fff 20%, rgba(255,255,255,0.5) 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-label {
+        font-size: 18px; font-weight: 700; color: var(--accent-color);
+        margin-top: 8px; text-shadow: 0 0 20px var(--accent-color);
+    }
+    .hero-time { font-size: 12px; color: var(--text-secondary); margin-top: 5px; }
+
+    /* --- HEALTH RECOMMENDATIONS --- */
+    .reco-card {
+        background: var(--glass-surface);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px; padding: 20px;
+        backdrop-filter: blur(20px);
+    }
+    .reco-header { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; font-weight: 700; }
+    .reco-text { font-size: 15px; line-height: 1.6; color: rgba(255,255,255,0.9); margin-bottom: 15px; }
+    
+    .reco-actions { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+    .action-pill {
+        background: rgba(255,255,255,0.05); padding: 8px 14px; border-radius: 12px;
+        font-size: 12px; display: flex; align-items: center; gap: 6px; white-space: nowrap;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* --- WEATHER STRIP --- */
+    .weather-strip {
+        display: grid; grid-template-columns: 1fr 1fr 1fr;
+        background: rgba(255,255,255,0.03); border-radius: 20px;
+        padding: 16px; border: 1px solid var(--glass-border);
+    }
+    .w-item { text-align: center; display: flex; flex-direction: column; gap: 4px; }
+    .w-icon { font-size: 20px; margin-bottom: 4px; }
+    .w-val { font-size: 18px; font-weight: 700; }
+    .w-lbl { font-size: 11px; color: var(--text-secondary); }
+
+    /* --- CHART SECTION --- */
+    .chart-section {
+        background: var(--glass-surface);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px; padding: 20px;
+        backdrop-filter: blur(20px);
+    }
+    .chart-header { display: flex; justify-content: space-between; margin-bottom: 15px; align-items: center; }
+    .chart-toggle {
+        display: flex; background: rgba(0,0,0,0.3); padding: 3px; border-radius: 10px;
+    }
+    .t-btn {
+        background: transparent; border: none; color: var(--text-secondary);
+        padding: 6px 12px; font-family: var(--font-stack); font-size: 12px; border-radius: 8px;
+        transition: 0.3s;
+    }
+    .t-btn.active { background: rgba(255,255,255,0.15); color: white; font-weight: 700; }
+
+    /* --- DETAILS GRID --- */
+    .grid-bento { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .bento-card {
+        background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
+        border-radius: 20px; padding: 16px;
+        display: flex; flex-direction: column; justify-content: space-between;
+        height: 110px;
+    }
+    .b-head { font-size: 12px; color: var(--text-secondary); display: flex; justify-content: space-between; }
+    .b-val { font-size: 24px; font-weight: 700; margin-top: auto; }
+    .b-unit { font-size: 12px; color: var(--text-secondary); margin-right: 4px; }
+    
+    .progress-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 2px; transition: width 1s; }
+
+    /* --- SEARCH MODAL --- */
+    .modal {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100;
+        padding: 24px; display: flex; flex-direction: column;
+        transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        backdrop-filter: blur(10px);
+    }
+    .modal.open { transform: translateY(0); }
+    .modal-header { display: flex; justify-content: space-between; margin-bottom: 24px; align-items: center; }
+    .modal-title { font-size: 20px; font-weight: 800; }
+    .close-btn { background: rgba(255,255,255,0.1); border: none; width: 32px; height: 32px; border-radius: 50%; color: white; display:flex; align-items:center; justify-content:center;}
+    
+    .search-input {
+        background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);
+        padding: 16px; border-radius: 16px; color: white; font-family: var(--font-stack);
+        font-size: 16px; width: 100%; margin-bottom: 20px;
+    }
+    .search-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+    .city-item {
+        padding: 16px; border-radius: 14px; background: rgba(255,255,255,0.03);
+        display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+    }
+
+    /* --- LOADER --- */
+    #loader {
+        position: fixed; inset: 0; background: #000; z-index: 200;
+        display: flex; justify-content: center; align-items: center;
+        transition: opacity 0.5s;
+    }
+</style>
+</head>
+<body>
+
+    <div class="ambient-glow" id="glow"></div>
+    <div class="noise-overlay"></div>
+    <div id="loader"><svg width="50" height="50" viewBox="0 0 24 24" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10" fill="none" stroke-dasharray="32" stroke-dashoffset="32"><animate attributeName="stroke-dashoffset" from="64" to="0" dur="1s" repeatCount="indefinite"/></circle></svg></div>
+
+    <div class="modal" id="search-modal">
+        <div class="modal-header">
+            <span class="modal-title">تغییر موقعیت</span>
+            <button class="close-btn" onclick="toggleSearch(false)">✕</button>
+        </div>
+        <input type="text" class="search-input" id="city-input" placeholder="نام شهر را جستجو کنید..." dir="rtl">
+        <div class="search-list" id="search-results">
+            </div>
+    </div>
+
+    <div id="app">
+        <header>
+            <div class="location-pill" onclick="toggleSearch(true)">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span id="loc-text">تهران</span>
+            </div>
+            <div class="settings-btn" onclick="useGPS()">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="6"/></svg>
+            </div>
+        </header>
+
+        <div class="hero-aqi">
+            <div class="gauge-wrapper">
+                <svg class="gauge-svg" viewBox="0 0 260 260">
+                    <circle class="track" cx="130" cy="130" r="120"></circle>
+                    <circle id="aqi-ring" class="progress" cx="130" cy="130" r="120"></circle>
+                </svg>
+                <div class="hero-content">
+                    <div class="hero-val" id="aqi-num">--</div>
+                    <div class="hero-label" id="aqi-text">...</div>
+                </div>
+            </div>
+            <div class="hero-time" id="last-update">بروزرسانی: لحظاتی پیش</div>
+        </div>
+
+        <div class="reco-card">
+            <div class="reco-header">توصیه هوشمند سلامتی</div>
+            <div class="reco-text" id="reco-msg">درحال تحلیل وضعیت هوا برای ارائه توصیه دقیق...</div>
+            <div class="reco-actions" id="reco-actions">
+                </div>
+        </div>
+
+        <div class="weather-strip">
+            <div class="w-item">
+                <div class="w-icon">🌡</div>
+                <div class="w-val" id="temp-val">--°</div>
+                <div class="w-lbl">دما</div>
+            </div>
+            <div class="w-item">
+                <div class="w-icon">💧</div>
+                <div class="w-val" id="hum-val">--%</div>
+                <div class="w-lbl">رطوبت</div>
+            </div>
+            <div class="w-item">
+                <div class="w-icon">🌬</div>
+                <div class="w-val" id="wind-val">--</div>
+                <div class="w-lbl">باد (km/h)</div>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <div class="chart-header">
+                <span style="font-weight:700; font-size:14px;">روند تغییرات</span>
+                <div class="chart-toggle">
+                    <button class="t-btn active" onclick="setChartMode('24h')" id="btn-24h">۲۴ ساعت</button>
+                    <button class="t-btn" onclick="setChartMode('7d')" id="btn-7d">۷ روز</button>
+                </div>
+            </div>
+            <div style="height: 180px; width: 100%;">
+                <canvas id="mainChart"></canvas>
+            </div>
+        </div>
+
+        <div class="grid-bento">
+            <div class="bento-card">
+                <div class="b-head"><span>ذرات PM2.5</span><span>µg/m³</span></div>
+                <div class="b-val"><span id="pm25-val">--</span></div>
+                <div class="progress-bar"><div class="progress-fill" id="pm25-bar" style="background:#34d399; width:0%"></div></div>
+            </div>
+            <div class="bento-card">
+                <div class="b-head"><span>دی‌اکسید نیتروژن</span><span>ppb</span></div>
+                <div class="b-val"><span id="no2-val">--</span></div>
+                <div class="progress-bar"><div class="progress-fill" id="no2-bar" style="background:#fbbf24; width:0%"></div></div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // --- 1. تنظیمات و داده‌های ثابت ---
+    const CONFIG = {
+        colors: {
+            good: '#34d399',      // سبز
+            moderate: '#fbbf24',  // زرد
+            sensitive: '#fb923c', // نارنجی
+            unhealthy: '#f87171', // قرمز
+            danger: '#c084fc'     // بنفش
+        }
+    };
+
+    let chartInstance = null;
+    let cachedData = { hourly: [], daily: [] };
+
+    // تابع تبدیل عدد به فارسی
+    const toFarsi = (num) => {
+        if (num === null || num === undefined) return '-';
+        return num.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+    };
+
+    // --- 2. منطق رنگ و توصیه‌ها ---
+    function getAnalysis(aqi) {
+        if (aqi <= 50) return {
+            c: CONFIG.colors.good, t: 'پاک',
+            msg: 'کیفیت هوا عالی است. بهترین زمان برای ورزش و فعالیت در فضای باز.',
+            actions: ['🏃 پیاده‌روی آزاد', '🪟 باز کردن پنجره']
+        };
+        if (aqi <= 100) return {
+            c: CONFIG.colors.moderate, t: 'سالم',
+            msg: 'کیفیت هوا قابل قبول است، اما اگر حساسیت شدید دارید مراقب باشید.',
+            actions: ['🙂 فعالیت عادی', '🚲 دوچرخه‌سواری']
+        };
+        if (aqi <= 150) return {
+            c: CONFIG.colors.sensitive, t: 'ناسالم حساس',
+            msg: 'برای کودکان، سالمندان و بیماران تنفسی مناسب نیست. فعالیت سنگین نکنید.',
+            actions: ['😷 ماسک برای حساس‌ها', '🏠 کاهش فعالیت بیرون']
+        };
+        if (aqi <= 200) return {
+            c: CONFIG.colors.unhealthy, t: 'ناسالم',
+            msg: 'هشدار! غلظت آلاینده‌ها بالاست. حتما از ماسک فیلتردار استفاده کنید.',
+            actions: ['⛔ ورزش ممنوع', '😷 ماسک الزامی', '🪟 بستن پنجره']
+        };
+        return {
+            c: CONFIG.colors.danger, t: 'خطرناک',
+            msg: 'وضعیت اضطراری. به هیچ وجه از منزل خارج نشوید.',
+            actions: ['☠️ خطر جدی', '🏠 خانه بمانید', 'دستگاه تصفیه']
+        };
+    }
+
+    // --- 3. بروزرسانی رابط کاربری ---
+    function updateUI(data, city) {
+        const currentAqi = data.aqi.current.us_aqi;
+        const analysis = getAnalysis(currentAqi);
+        
+        // تنظیم تم رنگی
+        document.documentElement.style.setProperty('--accent-color', analysis.c);
+        document.getElementById('glow').style.background = `radial-gradient(circle, ${analysis.c} 0%, transparent 70%)`;
+
+        // هدر و گیج
+        document.getElementById('loc-text').innerText = city;
+        document.getElementById('aqi-num').innerText = toFarsi(currentAqi);
+        document.getElementById('aqi-text').innerText = analysis.t;
+        document.getElementById('aqi-text').style.color = analysis.c;
+
+        // انیمیشن گیج (دور 2*PI*120 ≈ 753)
+        const offset = 753 - (Math.min(currentAqi, 300) / 300) * 753;
+        const ring = document.getElementById('aqi-ring');
+        ring.style.strokeDashoffset = offset;
+        ring.style.stroke = analysis.c;
+        ring.style.filter = `drop-shadow(0 0 15px ${analysis.c})`;
+
+        // توصیه‌ها
+        document.getElementById('reco-msg').innerText = analysis.msg;
+        const actionsDiv = document.getElementById('reco-actions');
+        actionsDiv.innerHTML = '';
+        analysis.actions.forEach(act => {
+            const pill = document.createElement('div');
+            pill.className = 'action-pill';
+            pill.innerText = act;
+            actionsDiv.appendChild(pill);
+        });
+
+        // آب و هوا
+        document.getElementById('temp-val').innerText = toFarsi(Math.round(data.weather.current.temperature_2m)) + '°';
+        document.getElementById('hum-val').innerText = toFarsi(data.weather.current.relative_humidity_2m) + '%';
+        document.getElementById('wind-val').innerText = toFarsi(data.weather.current.wind_speed_10m);
+
+        // آلاینده‌ها
+        const pm25 = data.aqi.current.pm2_5;
+        const no2 = data.aqi.current.nitrogen_dioxide;
+        document.getElementById('pm25-val').innerText = toFarsi(pm25);
+        document.getElementById('pm25-bar').style.width = Math.min((pm25/60)*100, 100) + '%';
+        document.getElementById('no2-val').innerText = toFarsi(no2);
+        document.getElementById('no2-bar').style.width = Math.min((no2/100)*100, 100) + '%';
+
+        // ذخیره داده برای نمودار
+        const nowHour = new Date().getHours();
+        cachedData.hourly = data.aqi.hourly.us_aqi.slice(nowHour, nowHour + 24).map((val, i) => ({
+            x: data.aqi.hourly.time[nowHour+i].slice(11, 16),
+            y: val
+        }));
+        cachedData.daily = data.aqi.daily.us_aqi_max.map((val, i) => ({
+            x: new Date(data.aqi.daily.time[i]).toLocaleDateString('fa-IR', {weekday:'short'}),
+            y: val
+        }));
+
+        setChartMode('24h');
+
+        // مخفی کردن لودر
+        setTimeout(() => {
+            document.getElementById('loader').style.opacity = '0';
+            setTimeout(() => document.getElementById('loader').style.display='none', 500);
+        }, 800);
+    }
+
+    // --- 4. نمودار ---
+    function setChartMode(mode) {
+        document.getElementById('btn-24h').classList.toggle('active', mode === '24h');
+        document.getElementById('btn-7d').classList.toggle('active', mode === '7d');
+
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        if (chartInstance) chartInstance.destroy();
+
+        const dataSet = mode === '24h' ? cachedData.hourly : cachedData.daily;
+        const color = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
+
+        // گرادینت
+        const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+        gradient.addColorStop(0, color + '60');
+        gradient.addColorStop(1, color + '00');
+
+        Chart.defaults.font.family = 'Vazirmatn';
+        chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dataSet.map(d => toFarsi(d.x)),
+                datasets: [{
+                    data: dataSet.map(d => d.y),
+                    borderColor: color,
+                    backgroundColor: gradient,
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#fff',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: {
+                    titleFont: {family: 'Vazirmatn'}, bodyFont: {family: 'Vazirmatn'},
+                    callbacks: { label: c => ' شاخص: ' + toFarsi(c.raw) }
+                }},
+                scales: {
+                    x: { grid: {display: false}, ticks: {color: '#888', font: {size: 11}} },
+                    y: { border: {display: false}, grid: {color: 'rgba(255,255,255,0.05)'}, ticks: {color: '#888', callback: v => toFarsi(v)} }
+                }
+            }
+        });
+    }
+
+    // --- 5. دریافت داده ---
+    async function fetchData(lat, lon, name) {
+        document.getElementById('loader').style.display = 'flex';
+        document.getElementById('loader').style.opacity = '1';
+
+        try {
+            // ذخیره موقعیت
+            localStorage.setItem('last_loc', JSON.stringify({lat, lon, name}));
+
+            const urls = [
+                `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi,pm2_5,nitrogen_dioxide&hourly=us_aqi&daily=us_aqi_max&timezone=auto&past_days=0&forecast_days=7`,
+                `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&timezone=auto`
+            ];
+
+            const [aqiData, weatherData] = await Promise.all(urls.map(u => fetch(u).then(r => r.json())));
+            
+            updateUI({aqi: aqiData, weather: weatherData}, name);
+        } catch (e) {
+            alert('خطا در دریافت اطلاعات');
+            document.getElementById('loader').style.display = 'none';
+        }
+    }
+
+    // --- 6. جستجو و شروع ---
+    function toggleSearch(open) {
+        const modal = document.getElementById('search-modal');
+        if(open) {
+            modal.classList.add('open');
+            document.getElementById('city-input').focus();
+        } else {
+            modal.classList.remove('open');
+        }
+    }
+
+    let debounceTimer;
+    document.getElementById('city-input').addEventListener('input', (e) => {
+        clearTimeout(debounceTimer);
+        const val = e.target.value;
+        if(val.length < 2) return;
+
+        debounceTimer = setTimeout(async () => {
+            const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${val}&count=5&language=en&format=json`);
+            const data = await res.json();
+            const list = document.getElementById('search-results');
+            list.innerHTML = '';
+            
+            if(data.results) {
+                data.results.forEach(city => {
+                    const item = document.createElement('div');
+                    item.className = 'city-item';
+                    item.innerHTML = `<span>${city.name}</span><span style="opacity:0.5; font-size:12px">${city.country_code}</span>`;
+                    item.onclick = () => {
+                        fetchData(city.latitude, city.longitude, city.name);
+                        toggleSearch(false);
+                    };
+                    list.appendChild(item);
+                });
+            }
+        }, 500);
+    });
+
+    function useGPS() {
+        if(navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                p => fetchData(p.coords.latitude, p.coords.longitude, "موقعیت من"),
+                () => alert("دسترسی مکان داده نشد")
+            );
+        }
+    }
+
+    // شروع برنامه
+    const saved = localStorage.getItem('last_loc');
+    if(saved) {
+        const l = JSON.parse(saved);
+        fetchData(l.lat, l.lon, l.name);
+    } else {
+        fetchData(35.68, 51.38, "تهران");
+    }
+
+</script>
+</body>
+</html>
