@@ -34,7 +34,7 @@
         header {
             padding: 20px;
             text-align: center;
-            background: rgba(2, 6, 23, 0.8);
+            background: rgba(2, 6, 23, 0.9);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255,255,255,0.05);
             position: fixed;
@@ -101,7 +101,7 @@
             font-size: 3.5rem;
             font-weight: 800;
             color: var(--primary);
-            font-family: 'Inter', sans-serif; /* Numbers usually look better in Inter/Roboto */
+            font-family: 'Inter', sans-serif;
             text-shadow: 0 0 25px rgba(0, 243, 255, 0.5);
         }
 
@@ -123,7 +123,7 @@
         .terminal {
             width: 100%;
             height: 160px;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 12px;
             padding: 15px;
@@ -160,7 +160,7 @@
         #user-image {
             width: 100%;
             display: block;
-            opacity: 0.3; /* Darkened significantly for overlay readability */
+            opacity: 0.3; /* Darkened for overlay readability */
             filter: grayscale(10%) contrast(110%);
         }
 
@@ -225,7 +225,7 @@
 
     <header>
         <div class="logo">AI BODY ANALYZER</div>
-        <div style="font-size:0.7rem; color:#94a3b8; margin-top:5px;">نسخه ۸.۰ | موتور قدرتمند Flash</div>
+        <div style="font-size:0.7rem; color:#94a3b8; margin-top:5px;">نسخه ۸.۱ (Direct API)</div>
     </header>
 
     <main>
@@ -271,31 +271,13 @@
         </div>
     </main>
 
-    <script type="importmap">
-      {
-        "imports": {
-          "@google/generative-ai": "https://esm.run/@google/generative-ai"
-        }
-      }
-    </script>
-
-    <script type="module">
-        import { GoogleGenerativeAI } from "@google/generative-ai";
-
-        // *** FIX: USING GEMINI 1.5 FLASH (Free Tier Friendly) ***
+    <script>
+        // *** CONFIGURATION ***
         const API_KEY = "AIzaSyD6GYtr65fA4KR6ixnMZZjudtl_0-BRu0g";
-        const genAI = new GoogleGenerativeAI(API_KEY);
         
-        // Use Flash. It is fast, free, and great at analyzing images.
-        const model = genAI.getGenerativeModel({ 
-            model: "gemini-1.5-flash",
-            safetySettings: [
-                { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-                { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-                { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
-                { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
-            ]
-        });
+        // DIRECT ENDPOINT (Bypasses SDK Version Issues)
+        const MODEL = "gemini-1.5-flash"; 
+        const URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
 
         // DOM Elements
         const stepUpload = document.getElementById('step-upload');
@@ -315,7 +297,7 @@
         lucide.createIcons();
 
         // 1. Handle File
-        window.handleFile = async (event) => {
+        async function handleFile(event) {
             const file = event.target.files[0];
             if (!file) return;
 
@@ -327,76 +309,103 @@
             reader.readAsDataURL(file);
 
             startAnalysis(file);
-        };
+        }
 
-        // 2. Logic
+        // 2. Main Logic
         async function startAnalysis(file) {
             isProcessing = true;
             resetLogs();
             startProgressLoop();
 
             try {
-                log("بهینه‌سازی تصویر برای مدل...", "info");
-                const base64Data = await fileToGenerativePart(file);
+                log("آماده‌سازی تصویر برای ارسال...", "info");
+                const base64Data = await fileToBase64(file);
 
-                log("ارسال به سرور هوش مصنوعی (Flash)...", "info");
+                log("اتصال مستقیم به سرور گوگل...", "info");
 
-                // Prompt designed for Text Analysis (which we overlay)
-                const prompt = `
-                Act as 'Nano Banana Pro' Body Analyzer.
-                LANGUAGE: PERSIAN (FARSI) ONLY.
+                // Construct JSON Payload for REST API
+                const payload = {
+                    contents: [{
+                        parts: [
+                            {
+                                text: `
+                                Act as 'Nano Banana Pro' Body Analyzer.
+                                LANGUAGE: PERSIAN (FARSI) ONLY.
+                                
+                                Analyze this physique photo strictly.
+                                Output a structured Markdown report.
+
+                                REQUIRED SECTIONS:
+                                1. **مشخصات تخمینی (Physical Stats)**:
+                                - Height (cm), Weight (kg), Body Fat %.
+                                - Somatotype.
+                                
+                                2. **امتیاز نانو (Nano Score)**: 
+                                - Score out of 100.
+                                - Tier: (GOD / TOP / MID / LOW).
+
+                                3. **تحلیل عضلات (Muscle Analysis)**:
+                                - 2 Strong Points (with scores /10).
+                                - 2 Weak Points (with scores /10).
+
+                                4. **تقارن (Symmetry)**:
+                                - Shoulder alignment & Left/Right balance.
+
+                                5. **مسیر پیشرفت (Nano Plan)**:
+                                - One sentence specific training advice.
+
+                                Do not output JSON. Output clean Markdown lists.
+                                ` 
+                            },
+                            {
+                                inline_data: {
+                                    mime_type: file.type,
+                                    data: base64Data
+                                }
+                            }
+                        ]
+                    }],
+                    // IMPORTANT: Safety Settings to allow body photos
+                    safetySettings: [
+                        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+                    ]
+                };
+
+                // Direct Fetch
+                const response = await fetch(URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || "Server Error " + response.status);
+                }
+
+                const data = await response.json();
                 
-                Analyze this physique photo strictly.
-                Output a structured Markdown report.
-
-                REQUIRED SECTIONS:
-                1. **مشخصات تخمینی (Physical Stats)**:
-                   - Height (cm), Weight (kg), Body Fat %.
-                   - Somatotype.
-                
-                2. **امتیاز نانو (Nano Score)**: 
-                   - Score out of 100.
-                   - Tier: (GOD / TOP / MID / LOW).
-
-                3. **تحلیل عضلات (Muscle Analysis)**:
-                   - 2 Strong Points (with scores /10).
-                   - 2 Weak Points (with scores /10).
-
-                4. **تقارن (Symmetry)**:
-                   - Shoulder alignment & Left/Right balance.
-
-                5. **مسیر پیشرفت (Nano Plan)**:
-                   - One sentence specific training advice.
-
-                Do not output JSON. Output clean Markdown lists.
-                If no body is visible, say "لطفا تصویر کامل بدن آپلود کنید".
-                `;
-
-                // API Call
-                const result = await model.generateContent([prompt, base64Data]);
-                
-                if (!isProcessing) return;
-
-                const response = await result.response;
-                const text = response.text();
-
-                finishProcess(text);
+                // Parse Response
+                if (data.candidates && data.candidates[0].content) {
+                    const text = data.candidates[0].content.parts[0].text;
+                    finishProcess(text);
+                } else {
+                    throw new Error("پاسخی دریافت نشد (Body blocked by internal filter?)");
+                }
 
             } catch (error) {
                 if(isProcessing) {
                     console.error(error);
-                    // Detailed error message in Persian
-                    if(error.message.includes("429") || error.message.includes("Quota")) {
-                        log("خطا: محدودیت استفاده از API. لطفا ۱ دقیقه صبر کنید.", "error");
-                    } else {
-                        log("خطا: " + error.message, "error");
-                    }
+                    log("خطا: " + error.message, "error");
                     clearInterval(progressInterval);
                 }
             }
         }
 
-        // 3. Progress Loop
+        // 3. Helpers
         function startProgressLoop() {
             let width = 0;
             const msgs = [
@@ -421,7 +430,6 @@
             }, 250);
         }
 
-        // 4. Utils
         function log(msg, type) {
             const div = document.createElement('div');
             div.className = `log-entry ${type}`;
@@ -435,18 +443,12 @@
             log("شروع عملیات...", "info");
         }
 
-        async function fileToGenerativePart(file) {
-            return new Promise((resolve) => {
+        async function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.onloadend = () => {
-                    resolve({
-                        inlineData: {
-                            data: reader.result.split(',')[1],
-                            mimeType: file.type
-                        }
-                    });
-                };
                 reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
             });
         }
 
@@ -463,15 +465,15 @@
             }, 800);
         }
 
-        window.cancelProcess = () => {
+        function cancelProcess() {
             isProcessing = false;
             clearInterval(progressInterval);
             fileInput.value = "";
             stepProcess.style.display = 'none';
             stepUpload.style.display = 'flex';
-        };
+        }
 
-        window.resetApp = () => {
+        function resetApp() {
             isProcessing = false;
             fileInput.value = "";
             stepResult.style.display = 'none';
@@ -479,9 +481,9 @@
             aiContent.innerHTML = "";
             progressBar.style.width = "0%";
             percentDisplay.innerText = "0%";
-        };
+        }
 
-        window.downloadImage = () => {
+        function downloadImage() {
             const el = document.getElementById("render-target");
             html2canvas(el, {
                 useCORS: true,
@@ -493,7 +495,7 @@
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             });
-        };
+        }
     </script>
 </body>
 </html>
