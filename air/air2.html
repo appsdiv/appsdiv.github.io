@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="icon" type="image/png" sizes="32x32" href="https://8upload.com/image/171db5bf84cf07d4/AppIcon_2x.png">
+<link rel="icon" type="image/png" sizes="192x192" href="https://8upload.com/image/171db5bf84cf07d4/AppIcon_2x.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://8upload.com/image/171db5bf84cf07d4/AppIcon_2x.png">
+
+<meta name="apple-mobile-web-app-title" content="هوای پاک پلاس">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<link rel="manifest" href="/manifest.webmanifest">
+
+<title>هوای پاک پلاس</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+<style>
+    /* --- تم و متغیرها --- */
+    :root {
+        --bg-color: #000000;
+        --bg-image: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #000000 100%);
+        --text-primary: #ffffff;
+        --text-secondary: rgba(255, 255, 255, 0.7);
+        --glass-bg: rgba(255, 255, 255, 0.06);
+        --glass-border: rgba(255, 255, 255, 0.12);
+        --glass-blur: 40px;
+        --accent-color: #34d399;
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    body.light-mode {
+        --bg-color: #f0f2f5;
+        --bg-image: radial-gradient(circle at 50% 0%, #dbeafe 0%, #f0f2f5 100%);
+        --text-primary: #1e293b;
+        --text-secondary: rgba(30, 41, 59, 0.7);
+        --glass-bg: rgba(255, 255, 255, 0.6);
+        --glass-border: rgba(255, 255, 255, 0.6);
+        --glass-blur: 30px;
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
+
+    body {
+        background-color: var(--bg-color);
+        background-image: var(--bg-image);
+        color: var(--text-primary);
+        /* FIX: Updated Font Stack for iOS */
+        font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+        display: flex; flex-direction: column;
+        transition: background 0.5s ease, color 0.5s ease;
+    }
+
+    .ambient-glow {
+        position: fixed; top: -10%; left: 50%; transform: translateX(-50%);
+        width: 120vw; height: 120vw;
+        background: radial-gradient(circle, var(--accent-color) 0%, transparent 60%);
+        opacity: 0.2; pointer-events: none; z-index: 0;
+        transition: background 1s ease;
+    }
+
+    #app {
+        position: relative; z-index: 10;
+        padding: max(20px, env(safe-area-inset-top)) 24px 40px 24px;
+        max-width: 500px; margin: 0 auto; width: 100%;
+        display: flex; flex-direction: column; gap: 20px;
+        opacity: 0; transition: opacity 0.6s ease;
+        padding-bottom: 80px;
+    }
+
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    
+    .location-pill {
+        display: flex; align-items: center; gap: 8px;
+        background: var(--glass-bg); border: 1px solid var(--glass-border);
+        padding: 8px 16px; border-radius: 30px;
+        font-size: 14px; font-weight: 700; cursor: pointer;
+        backdrop-filter: blur(var(--glass-blur));
+        box-shadow: var(--card-shadow);
+        transition: 0.3s;
+    }
+    .location-pill:active { transform: scale(0.96); }
+
+    .header-actions { display: flex; gap: 10px; }
+    .btn-circle {
+        width: 40px; height: 40px; border-radius: 50%;
+        background: var(--glass-bg); border: 1px solid var(--glass-border);
+        display: flex; align-items: center; justify-content: center;
+        color: var(--text-primary); cursor: pointer;
+        backdrop-filter: blur(var(--glass-blur));
+        box-shadow: var(--card-shadow);
+        transition: 0.3s;
+    }
+
+    .hero-aqi {
+        position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        margin-top: 10px;
+    }
+    .gauge-wrapper { width: 240px; height: 240px; position: relative; }
+    .gauge-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .track { fill: none; stroke: var(--glass-border); stroke-width: 12; stroke-linecap: round; }
+    .progress { 
+        fill: none; stroke: var(--accent-color); stroke-width: 12; stroke-linecap: round;
+        stroke-dasharray: 660; stroke-dashoffset: 660;
+        transition: stroke-dashoffset 1.5s cubic-bezier(0.2, 0.8, 0.2, 1), stroke 1s;
+        filter: drop-shadow(0 0 15px var(--accent-color));
+    }
+    .hero-content {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        text-align: center;
+    }
+    .hero-val { font-size: 82px; font-weight: 900; line-height: 0.9; letter-spacing: -3px; }
+    .hero-label { 
+        font-size: 18px; font-weight: 700; color: var(--accent-color); margin-top: 8px; 
+        background: var(--glass-bg); padding: 4px 12px; border-radius: 12px;
+        backdrop-filter: blur(10px);
+    }
+
+    .glass-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 28px; padding: 24px;
+        backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+        box-shadow: var(--card-shadow);
+        text-align: center;
+    }
+
+    /* --- باکس جدید توصیه کیفیت هوا --- */
+    .aqi-reco-card {
+        text-align: right !important;
+        border-right: 4px solid var(--accent-color);
+        background: linear-gradient(270deg, var(--glass-bg) 0%, rgba(0,0,0,0.02) 100%);
+        margin-top: -10px; /* چسبیده به گیج */
+    }
+    body.light-mode .aqi-reco-card { background: linear-gradient(270deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.2) 100%); }
+    .aqi-reco-title { font-size: 15px; font-weight: 800; margin-bottom: 8px; color: var(--accent-color); display: flex; align-items: center; gap: 8px; }
+    .aqi-reco-text { font-size: 13px; line-height: 1.8; opacity: 0.95; white-space: pre-line; text-align: justify; }
+
+
+    .story-card {
+        text-align: right !important;
+        border-right: 4px solid #60a5fa; /* رنگ آبی برای آب و هوا */
+        background: linear-gradient(90deg, var(--glass-bg) 0%, rgba(0,0,0,0) 100%);
+    }
+    body.light-mode .story-card { background: linear-gradient(90deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 100%); }
+    
+    .story-title { font-size: 16px; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .story-text { font-size: 13px; line-height: 1.8; opacity: 0.9; white-space: pre-line; text-align: justify; }
+
+    .weather-strip {
+        display: grid; grid-template-columns: 1fr 1fr 1fr;
+        background: var(--glass-bg); border-radius: 24px;
+        padding: 20px; border: 1px solid var(--glass-border); text-align: center;
+        backdrop-filter: blur(var(--glass-blur));
+    }
+    .w-icon { font-size: 24px; margin-bottom: 8px; display: block; }
+    .w-val { font-size: 20px; font-weight: 800; margin-bottom: 2px; }
+    .w-lbl { font-size: 12px; color: var(--text-secondary); }
+
+    .pollutant-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .p-card {
+        background: var(--glass-bg); border-radius: 20px; padding: 16px;
+        border: 1px solid var(--glass-border); display: flex; flex-direction: column;
+        align-items: center; text-align: center;
+        backdrop-filter: blur(var(--glass-blur));
+    }
+    .p-val { font-size: 24px; font-weight: 800; margin: 5px 0; }
+    .p-head { font-size: 12px; color: var(--text-secondary); }
+    .p-unit { font-size: 10px; opacity: 0.5; }
+
+    .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .chart-title { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .chart-toggles { display: flex; background: rgba(0,0,0,0.1); border-radius: 12px; padding: 4px; border: 1px solid var(--glass-border); }
+    .toggle-btn {
+        background: transparent; border: none; color: var(--text-secondary);
+        padding: 6px 12px; font-size: 12px; font-family: inherit; border-radius: 8px;
+        transition: 0.3s; cursor: pointer;
+    }
+    .toggle-btn.active { background: var(--text-primary); color: var(--bg-color); font-weight: 700; }
+
+    footer {
+        text-align: center; font-size: 12px; color: var(--text-secondary);
+        margin-top: 20px; padding-bottom: 10px; opacity: 0.7; font-weight: 500;
+    }
+
+    .modal-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100;
+        backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: flex-end;
+        opacity: 0; pointer-events: none; transition: 0.4s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal-sheet {
+        width: 100%; max-width: 500px; background: var(--bg-color);
+        border-top-left-radius: 30px; border-top-right-radius: 30px;
+        padding: 24px; transform: translateY(100%); transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        border-top: 1px solid var(--glass-border);
+        max-height: 80vh; display: flex; flex-direction: column;
+    }
+    .modal-overlay.open .modal-sheet { transform: translateY(0); }
+    .search-input {
+        background: var(--glass-bg); border: 1px solid var(--glass-border);
+        padding: 16px; border-radius: 18px; color: var(--text-primary); font-family: inherit;
+        font-size: 16px; width: 100%; margin-top: 20px; text-align: center;
+    }
+    .search-results { margin-top: 15px; overflow-y: auto; flex: 1; }
+    .search-item { padding: 15px; border-bottom: 1px solid var(--glass-border); cursor: pointer; text-align: center; }
+
+    #loader {
+        position: fixed; inset: 0; background: var(--bg-color); z-index: 200;
+        display: flex; justify-content: center; align-items: center; flex-direction: column;
+        transition: opacity 0.5s;
+    }
+</style>
+</head>
+<body>
+
+    <div class="ambient-glow" id="glow"></div>
+    
+    <div id="loader">
+        <svg width="50" height="50" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" fill="none" stroke-dasharray="32" stroke-dashoffset="32" stroke="var(--accent-color)"><animate attributeName="stroke-dashoffset" from="64" to="0" dur="1s" repeatCount="indefinite"/></circle></svg>
+        <div style="margin-top: 20px; font-size: 14px; opacity: 0.7;">در حال دریافت اطلاعات دقیق...</div>
+    </div>
+
+    <div class="modal-overlay" id="search-modal">
+        <div class="modal-sheet">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:18px; font-weight:800;">تغییر موقعیت</span>
+                <button onclick="toggleSearch(false)" style="background:none; border:none; color:var(--text-primary); font-size:24px;">✕</button>
+            </div>
+            <input type="text" class="search-input" id="city-input" placeholder="نام شهر را بنویسید..." dir="rtl">
+            <div class="search-results" id="search-list"></div>
+        </div>
+    </div>
+
+    <div id="app">
+        <header>
+            <div class="location-pill" onclick="toggleSearch(true)">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span id="loc-name">تهران</span>
+                <span style="opacity:0.6; font-size:10px;">▼</span>
+            </div>
+            <div class="header-actions">
+                <div class="btn-circle" onclick="toggleTheme()">
+                    <svg id="theme-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </div>
+                <div class="btn-circle" onclick="getLocation()">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="6"/></svg>
+                </div>
+            </div>
+        </header>
+
+        <div class="hero-aqi">
+            <div class="gauge-wrapper">
+                <svg class="gauge-svg" viewBox="0 0 240 240">
+                    <circle class="track" cx="120" cy="120" r="110"></circle>
+                    <circle id="aqi-ring" class="progress" cx="120" cy="120" r="110"></circle>
+                </svg>
+                <div class="hero-content">
+                    <div class="hero-val" id="aqi-val">--</div>
+                    <div class="hero-label" id="aqi-text">...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card aqi-reco-card">
+            <div class="aqi-reco-title">
+                <span>🍃</span>
+                <span id="aqi-reco-head">توصیه هوشمند سلامتی</span>
+            </div>
+            <div class="aqi-reco-text" id="aqi-reco-body">
+                در حال تحلیل ذرات معلق و وضعیت تنفسی...
+            </div>
+        </div>
+
+        <div class="glass-card story-card">
+            <div class="story-title" id="story-title">
+                <span id="story-icon">✨</span>
+                <span id="story-head">وضعیت هوا</span>
+            </div>
+            <div class="story-text" id="story-body">
+                در حال بررسی وضعیت جوی...
+            </div>
+        </div>
+
+        <div class="weather-strip">
+            <div>
+                <span class="w-icon">🌡️</span>
+                <div class="w-val" id="temp-val">--°</div>
+                <div class="w-lbl">دما</div>
+            </div>
+            <div>
+                <span class="w-icon">💧</span>
+                <div class="w-val" id="hum-val">--%</div>
+                <div class="w-lbl">رطوبت</div>
+            </div>
+            <div>
+                <span class="w-icon">💨</span>
+                <div class="w-val" id="wind-val">--</div>
+                <div class="w-lbl">باد (km/h)</div>
+            </div>
+        </div>
+
+        <div class="glass-card" style="border-right: 4px solid #60a5fa; text-align: right;">
+            <div class="chart-title" style="color:#60a5fa !important; justify-content: flex-start; margin-bottom: 8px;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"/><path d="M13 11l-4 4"/><path d="M9 11l4 4"/></svg>
+                پیش‌بینی بارش
+            </div>
+            <div>
+                <div style="font-size:14px; font-weight:800;" id="rain-title">--</div>
+                <div style="font-size:12px; opacity:0.8; margin-top:4px;" id="rain-desc">--</div>
+            </div>
+        </div>
+
+        <div class="pollutant-grid">
+            <div class="p-card">
+                <span style="font-size:24px;">😷</span>
+                <div class="p-val" id="pm25-val">--</div>
+                <div class="p-head">ذرات PM2.5</div>
+                <div class="p-unit">µg/m³</div>
+            </div>
+            <div class="p-card">
+                <span style="font-size:24px;">🌫️</span>
+                <div class="p-val" id="no2-val">--</div>
+                <div class="p-head">دی‌اکسید نیتروژن</div>
+                <div class="p-unit">ppb</div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <div class="chart-header">
+                <div class="chart-title">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+                    نمودار کیفیت هوا
+                </div>
+                <div class="chart-toggles">
+                    <button class="toggle-btn" id="btn-24h" onclick="toggleChart('24h')">ساعتی</button>
+                    <button class="toggle-btn active" id="btn-7d" onclick="toggleChart('7d')">روزانه</button>
+                </div>
+            </div>
+            <div style="position:relative; height:200px; width:100%;">
+                <canvas id="chart"></canvas>
+            </div>
+            <div style="font-size: 11px; opacity: 0.5; margin-top: 10px;">نقطه توپر نشان‌دهنده امروز است</div>
+        </div>
+
+        <footer>
+            طراحی و توسعه توسط <span style="font-weight:700; color:var(--accent-color);">پیمان عابدین پور</span>
+        </footer>
+    </div>
+
+<script>
+   const _0x3d9c33=_0x590d;(function(_0x2ba18a,_0x4af71d){const _0x2cfecf=_0x590d,_0x1a8a78=_0x2ba18a();while(!![]){try{const _0x3dfff5=-parseInt(_0x2cfecf(0x262))/0x1*(-parseInt(_0x2cfecf(0x20a))/0x2)+parseInt(_0x2cfecf(0x1e4))/0x3+-parseInt(_0x2cfecf(0x1f0))/0x4*(-parseInt(_0x2cfecf(0x290))/0x5)+parseInt(_0x2cfecf(0x1e6))/0x6*(-parseInt(_0x2cfecf(0x1e5))/0x7)+-parseInt(_0x2cfecf(0x1f9))/0x8*(parseInt(_0x2cfecf(0x205))/0x9)+-parseInt(_0x2cfecf(0x200))/0xa+-parseInt(_0x2cfecf(0x268))/0xb;if(_0x3dfff5===_0x4af71d)break;else _0x1a8a78['push'](_0x1a8a78['shift']());}catch(_0x368b09){_0x1a8a78['push'](_0x1a8a78['shift']());}}}(_0x34de,0xd3f31));let chartInstance=null,currentLoc={'lat':35.68,'lon':51.38,'name':'تهران'},chartDataStore={'hourly':[],'daily':[]},isLight=![];const toFarsi=_0x5df96b=>_0x5df96b?.[_0x3d9c33(0x26e)]()[_0x3d9c33(0x1ff)](/\d/g,_0x49f4e4=>_0x3d9c33(0x295)[_0x49f4e4])||'-';function toggleTheme(){const _0x30f745=_0x3d9c33;isLight=!isLight,document[_0x30f745(0x217)]['classList'][_0x30f745(0x1e0)](_0x30f745(0x20e));const _0x3bac43=document[_0x30f745(0x256)]('theme-icon');isLight?_0x3bac43[_0x30f745(0x26a)]=_0x30f745(0x21b):_0x3bac43['innerHTML']=_0x30f745(0x239);const _0x4a5d0c=document[_0x30f745(0x256)](_0x30f745(0x21c))[_0x30f745(0x1ee)][_0x30f745(0x215)](_0x30f745(0x274))?'7d':_0x30f745(0x201);toggleChart(_0x4a5d0c);}function getAirQualityMessage(_0x4229bb){const _0x17e219=_0x3d9c33;if(_0x4229bb<=0x32)return{'text':'هوا\x20امروز\x20واقعاً\x20تمیز\x20و\x20عالیه!\x20🍃\x20انگار\x20طبیعت\x20دکمه‌ی\x20ریست\x20رو\x20زده.\x0a\x0aالان\x20بهترین\x20وقت\x20برای\x20اینه\x20که\x20پنجره‌ها\x20رو\x20باز\x20کنی\x20تا\x20هوای\x20تازه\x20بپیچه\x20توی\x20خونه.\x20اگه\x20اهل\x20ورزشی،\x20پارک\x20و\x20دویدن\x20امروز\x20حسابی\x20می‌چسبه.\x20ریه‌هات\x20امروز\x20دارن\x20جشن\x20می‌گیرن،\x20پس\x20از\x20این\x20هوای\x20پاک\x20نهایت\x20لذت\x20رو\x20ببر.'};if(_0x4229bb<=0x64)return{'text':_0x17e219(0x22a)};if(_0x4229bb<=0x96)return{'text':_0x17e219(0x257)};if(_0x4229bb<=0xc8)return{'text':_0x17e219(0x231)};return{'text':_0x17e219(0x211)};}function _0x34de(){const _0x4d5006=['length','body','ممکن\x20است\x20در\x20برخی\x20ساعات\x20بارش\x20خفیفی\x20داشته\x20باشیم.','ناسالم\x20حساس','city-input','<circle\x20cx=\x2212\x22\x20cy=\x2212\x22\x20r=\x225\x22/><path\x20d=\x22M12\x201v2M12\x2021v2M4.22\x204.22l1.42\x201.42M18.36\x2018.36l1.42\x201.42M1\x2012h2M21\x2012h2M4.22\x2019.78l1.42-1.42M18.36\x205.64l1.42-1.42\x22/>','btn-7d','https://api.open-meteo.com/v1/forecast?latitude=','family','پاک','بارش\x20شدید','no2-val','coords','chart','🌧️','نم‌نم\x20بارون','احتمال\x20بارش\x20بالاست.\x20چتر\x20همراه\x20داشته\x20باشید.','toggle-btn','هوای\x20خیلی\x20گرم','input','کیفیت\x20هوا\x20قابل\x20قبوله،\x20اما\x20کریستالی\x20نیست.\x20😐\x0a\x0aاگه\x20حساسیت\x20فصلی\x20یا\x20مشکل\x20تنفسی\x20خاصی\x20نداری،\x20می‌تونی\x20کارهای\x20روزمره‌ت\x20رو\x20انجام\x20بدی.\x20ولی\x20اگه\x20جزو\x20گروه‌های\x20حساسی،\x20شاید\x20بهتر\x20باشه\x20تایم\x20بیرون\x20موندنت\x20رو\x20کمتر\x20کنی.\x20هوای\x20خونه\x20امن‌تره،\x20پس\x20پنجره‌ها\x20رو\x20برای\x20مدت\x20طولانی\x20باز\x20نذار.','appendChild','search-item','btn-24h','current','getPropertyValue','latitude','هوا\x20اصلاً\x20شوخی\x20نداره!\x20🌫️\x20غلظت\x20آلاینده‌ها\x20بالاست\x20و\x20شهر\x20داره\x20سرفه\x20می‌کنه.\x0a\x0aلطفاً،\x20لطفاً\x20اگه\x20کار\x20واجبی\x20نداری\x20بیرون\x20نرو.\x20اگه\x20مجبوری\x20بری،\x20حتماً\x20از\x20ماسک\x20فیلتردار\x20(N95)\x20استفاده\x20کن.\x20پنجره‌ها\x20رو\x20کیپ\x20ببند\x20و\x20مایعات\x20و\x20شیر\x20و\x20سبزیجات\x20تازه\x20رو\x20فراموش\x20نکن\x20تا\x20بدنت\x20بتونه\x20مقاومت\x20کنه.','هوای\x20دل‌نشین','labels','parse','🌫️','&longitude=','defaults','search-list','<path\x20d=\x22M21\x2012.79A9\x209\x200\x201\x201\x2011.21\x203\x207\x207\x200\x200\x200\x2021\x2012.79z\x22/>','&current=us_aqi,pm2_5,nitrogen_dioxide&hourly=us_aqi&timezone=auto&forecast_days=7','getCurrentPosition','story-icon','🌨️','radial-gradient(circle,\x20','احتمال\x20بارش\x20پراکنده','هوا\x20امروز\x20مه‌آلود\x20و\x20کمی\x20رازآلود\x20شده،\x20انگار\x20شهر\x20توی\x20رویا\x20فرو\x20رفته\x20🌫️\x0a\x0aاما\x20برای\x20رانندگی\x20و\x20راه\x20رفتن،\x20این\x20رویا\x20می‌تونه\x20خطرناک\x20باشه؛\x20چراغ‌ها\x20رو\x20روشن‌تر\x20کن،\x20سرعتت\x20رو\x20کمتر\x20کن\x20و\x20حواست\x20رو\x20بیشتر.\x0a\x0aتو\x20برای\x20آدم‌هایی\x20که\x20دوستت\x20دارن\x20خیلی\x20مهمی؛\x20لطفاً\x20با\x20احتیاط\x20حرکت\x20کن.','min','fill','getItem','#34d399','هوای\x20خیلی\x20سرد','گرم','innerText','setItem','display','از\x20اون\x20بارون‌های\x20ریز\x20و\x20آرومه\x20که\x20آدم\x20دلش\x20می‌خواد\x20زیرش\x20راه\x20بره\x20و\x20یه\x20آهنگ\x20ملایم\x20گوش\x20بده\x20☔\x0a\x0aچتر\x20کوچیک\x20یا\x20یه\x20بارونی\x20سبک\x20بردار\x20که\x20از\x20این\x20حال\x20خوب،\x20بدون\x20خیس\x20شدن\x20کامل،\x20لذت\x20ببری.\x0a\x0aاگه\x20حسش\x20رو\x20داشتی،\x20چند\x20دقیقه\x20گوشی\x20رو\x20بذار\x20کنار،\x20به\x20صدای\x20بارون\x20گوش\x20بده؛\x20همون‌جا\x20توی\x20اون\x20لحظه‌های\x20ساده،\x20کلی\x20آرامش\x20قایم\x20شده.','precipitation_probability','خطرناک','line','#aaa','title','temp-val','saved_loc','خطا\x20در\x20دریافت\x20اطلاعات.\x20لطفا\x20اتصال\x20اینترنت\x20را\x20بررسی\x20کنید.','#fb923c','https://geocoding-api.open-meteo.com/v1/search?name=','GPS\x20خاموش\x20است.','getElementById','هوا\x20برای\x20گروه‌های\x20حساس\x20یه‌کم\x20سنگینه.\x20😷\x0a\x0aاگه\x20آسم\x20داری،\x20بارداری،\x20یا\x20سن‌ت\x20بالاست،\x20امروز\x20روزِ\x20موندن\x20توی\x20خونه\x20و\x20استراحت\x20کردنه.\x20بچه‌ها\x20بهتره\x20تو\x20حیاط\x20بازی\x20نکنن.\x20ورزش\x20سنگین\x20تو\x20فضای\x20باز\x20هم\x20پیشنهاد\x20نمی‌شه\x20چون\x20ممکنه\x20زودتر\x20خسته\x20بشی\x20یا\x20سرفه\x20کنی.','max','us_aqi','سالم','none','امروز\x20از\x20اون\x20روزهایی‌یه\x20که\x20هوا\x20می‌گه:\x20“من\x20حالم\x20خوبه،\x20بیا\x20تو\x20هم\x20حالت\x20رو\x20خوب\x20کن”\x20🌼\x0a\x0aنه\x20خیلی\x20گرمه\x20نه\x20خیلی\x20سرد؛\x20یه\x20لباس\x20معمولی\x20یا\x20یه\x20سویشرت\x20نازک\x20کافیه.\x0a\x0aاگه\x20می‌تونی\x20چند\x20دقیقه\x20برای\x20خودت\x20بردار،\x20یه\x20پیاده‌روی\x20کوتاه،\x20یه\x20بستنی،\x20یا\x20حتی\x20نشستن\x20پشت\x20پنجره\x20و\x20تماشا\x20کردن\x20شهر…\x20تو\x20لایق\x20این\x20استراحتی.','addEventListener','عدم\x20پشتیبانی\x20از\x20GPS','aqi-reco-body','value','#ffffff','1kxqZUL','#f87171','امروز\x20آسمون\x20شیر\x20آب\x20رو\x20کامل\x20باز\x20کرده؛\x20بارون\x20درست\x20و\x20حسابی\x20می‌باره\x20🌧️\x0a\x0aچتر\x20محکم،\x20کفش\x20مناسب\x20و\x20یه\x20کمی\x20حوصله‌ی\x20اضافه\x20برای\x20ترافیک\x20لازم\x20داری.\x0a\x0aزودتر\x20از\x20همیشه\x20راه\x20بیفت،\x20خودت\x20رو\x20سرزنش\x20نکن،\x20و\x20اگه\x20دیر\x20شد،\x20بدون\x20که\x20تو\x20تقصیری\x20نداری؛\x20گاهی\x20باید\x20فقط\x20نفس\x20بکشیم\x20و\x20بگیم:\x20“اشکال\x20نداره،\x20مهم\x20اینه\x20سالم\x20رسیدم.”','keys','rain-title','app','8157699GEJcFs','add','innerHTML','country_code','name','احتمال\x20بارش\x20در\x20۲۴\x20ساعت\x20آینده\x20بسیار\x20کم\x20است.','toString','API\x20Error','ابری\x20ملایم','\x200%,\x20transparent\x2060%)','search-modal','split','active','relative_humidity_2m','data','aqi','aqi-val','pm25-val','long','results','lat','geolocation','بارندگی\x20قابل\x20توجهی\x20پیش‌بینی\x20می‌شود.','focus','برف\x20شدید','strokeDashoffset','div','#facc15','toLocaleDateString','getHours','sort','برف\x20آروم‌آروم\x20داره\x20می‌باره،\x20از\x20اون\x20صحنه‌هایی\x20که\x20اگه\x20حواست\x20نباشه،\x20زیباییش\x20رو\x20از\x20دست\x20می‌دی\x20☃️\x0a\x0aاگه\x20با\x20ماشین\x20می‌ری\x20بیرون،\x20زنجیر\x20چرخ\x20و\x20یه\x20بطری\x20آب\x20و\x20یه\x20خوراکی\x20کوچیک\x20بذار\x20تو\x20ماشین؛\x20برف\x20گاهی\x20حوصله‌ی\x20ما\x20رو\x20هم\x20امتحان\x20می‌کنه.\x0a\x0aتو\x20این\x20همه\x20سفیدی\x20یادت\x20نره\x20خودت\x20رو\x20هم\x20ببینی؛\x20یه\x20عکس\x20بگیر،\x20یه\x20لحظه\x20مکث\x20کن،\x20این\x20روزها\x20هم\x20یه\x20روز\x20می‌شن\x20خاطره.','style','text','aqi-ring','aqi-text','hourly','loc-name','rain-desc','flex','15hNqjGg','lon','بارانی','رعد\x20و\x20برق','background','۰۱۲۳۴۵۶۷۸۹','weather','includes','toggle','امروز\x20از\x20اون\x20سوزهاییه\x20که\x20با\x20اولین\x20نفس\x20کشیدن\x20می‌فهمی\x20زمستون\x20جدی\x20گرفته\x20قضیه\x20رو\x20🥶\x0a\x0aقبل\x20از\x20این‌که\x20از\x20در\x20بری\x20بیرون،\x20یه\x20کم\x20به\x20خودت\x20مهربونی\x20کن:\x20کاپشن\x20گرم،\x20شال،\x20دستکش،\x20حتی\x20اگه\x20دوست\x20داری\x20یه\x20کلاه\x20بامزه.\x0a\x0aنذار\x20سرما\x20حال\x20خوبت\x20رو\x20بدزده؛\x20تو\x20مهم‌تر\x20از\x20همه‌ی\x20کارهایی\x20هستی\x20که\x20امروز\x20باید\x20انجام\x20بدی.','loader','nitrogen_dioxide','3922506GwQOwo','6034aTKKLW','198iFYSxl','forEach','امروز\x20هوا\x20روی\x20حالت\x20“کوره”\x20تنظیم\x20شده\x20🔥\x0a\x0aلباس\x20خیلی\x20سبک\x20و\x20روشن\x20بپوش،\x20تا\x20می‌تونی\x20تو\x20سایه\x20راه\x20برو\x20و\x20حتماً\x20یه\x20بطری\x20آب\x20کنارت\x20داشته\x20باش.\x0a\x0aاگه\x20حس\x20خستگی،\x20سردرد\x20یا\x20بی‌حوصلگی\x20کردی،\x20شاید\x20بدنِ\x20مهربونت\x20داره\x20بهت\x20می‌گه:\x20“لطفاً\x20یه\x20کم\x20آب\x20و\x20استراحت\x20بیشتر”.\x20بهش\x20گوش\x20بده.','values','slice','باد\x20امروز\x20همه‌چیز\x20رو\x20زیر\x20و\x20رو\x20کرده؛\x20از\x20موها\x20گرفته\x20تا\x20برگ‌های\x20خیابون\x20💨\x0a\x0aاگه\x20قراره\x20بیرون\x20بری،\x20کلاه،\x20روسری\x20یا\x20هودی\x20می‌تونه\x20نجات‌دهنده‌ت\x20باشه،\x20و\x20چیزهای\x20سبک\x20و\x20شُل\x20رو\x20محکم‌تر\x20نگه\x20دار.\x0a\x0aبذار\x20باد\x20هرچی\x20می‌خواد\x20با\x20دنیا\x20بکنه،\x20مهم\x20اینه\x20تو\x20تعادل\x20خودت\x20رو\x20پیدا\x20کنی\x20و\x20محکم‌تر\x20از\x20همیشه\x20بایستی.','time','opacity','classList','#c084fc','2264484goqBzb','برف\x20امروز\x20دیگه\x20شوخی\x20نداره،\x20انگار\x20آسمون\x20همه\x20ذخیره‌ش\x20رو\x20با\x20هم\x20ریخته\x20پایین\x20⛄\x0a\x0aلباس\x20خیلی\x20گرم،\x20کفش\x20ضدآب،\x20کلاه،\x20دستکش…\x20هرچی\x20فکر\x20می‌کنی\x20ممکنه\x20کمک\x20کنه،\x20دریغ\x20نکن.\x0a\x0aاگه\x20رانندگی\x20می‌کنی،\x20زنجیر\x20چرخ\x20همراهت\x20باشه\x20و\x20حوصله‌تو\x20زیاد\x20کن؛\x20این\x20مسیر\x20طولانی‌تر\x20از\x20همیشه‌ست،\x20ولی\x20تو\x20مهم‌تر\x20از\x20رسیدن\x20به\x20موقع\x20هستی.','className','json','trim','مه‌آلود','fa-IR','باد\x20شدید','#666','299960yJpVyn','error','daily','color','هوای\x20امروز\x20تمیز\x20نیست،\x20انگار\x20شهر\x20داره\x20نفس‌نفس\x20می‌زنه\x20🌫️\x0a\x0aتا\x20جایی\x20که\x20می‌تونی\x20کمتر\x20بیرون\x20بمون،\x20پنجره‌ها\x20رو\x20ببند،\x20و\x20اگر\x20باید\x20بیرون\x20بری،\x20ماسک\x20رو\x20جدی\x20بگیر.\x0a\x0aآب\x20بیشتری\x20بخور\x20و\x20به\x20بدنت\x20استراحت\x20بده؛\x20تو\x20فقط\x20“یه\x20نفر”\x20نیستی،\x20تو\x20برای\x20خودت\x20و\x20آدم‌هایی\x20که\x20دوستت\x20دارن،\x20همه‌چیزی.','Vazirmatn,\x20-apple-system,\x20sans-serif','replace','15833150uDKUum','24h','دمای\x20هوا\x20وسط\x20روز\x20یهو\x20می‌ره\x20بالا،\x20طوری\x20که\x20صبح\x20فکر\x20می‌کنی\x20خوبه\x20ولی\x20ظهر\x20از\x20گرما\x20کلافه\x20می‌شی\x20🌞\x0a\x0aیه\x20لباس\x20سبک\x20زیر\x20لباست\x20بپوش\x20که\x20اگه\x20لازم\x20شد\x20بتونی\x20کمش\x20کنی،\x20و\x20حتماً\x20یه\x20بطری\x20آب\x20همراهت\x20باشه.\x0a\x0aبدن‌ت\x20داره\x20برات\x20کار\x20می‌کنه،\x20تو\x20هم\x20برگرد\x20براش\x20یه\x20کم\x20هوای\x20خنک\x20و\x20آب\x20هدیه\x20بده.','&count=5&language=en&format=json','undefined','135vPiIMy','glow','stringify','رعد\x20و\x20برق\x20آسمون\x20رو\x20تبدیل\x20کرده\x20به\x20یک\x20شوی\x20نور\x20و\x20صدا\x20⚡⛈️\x0a\x0aتا\x20می‌تونی\x20زیر\x20سقف\x20بمون،\x20و\x20اگر\x20مجبور\x20شدی\x20بیرون\x20بری،\x20از\x20ایستادن\x20زیر\x20درخت‌ها\x20و\x20نزدیک\x20کابل‌های\x20برق\x20دوری\x20کن.\x0a\x0aاین‌جور\x20هواها\x20یه\x20یادآوری\x20کوچیکن\x20که\x20چقدر\x20ظریف\x20و\x20ارزشمندیم؛\x20لطفاً\x20بیشتر\x20از\x20همیشه\x20مواظب\x20خودت\x20باش.','بارون\x20شدید','1556150ozPydh','icon','wind_speed_10m','wind-val','light-mode','stroke','--accent-color','وضعیت\x20اضطراری\x20و\x20خطرناک!\x20☠️\x20آلودگی\x20به\x20حد\x20هشدار\x20رسیده.\x0a\x0aالان\x20امن‌ترین\x20جای\x20دنیا\x20خونه‌ست\x20با\x20پنجره‌های\x20بسته.\x20هر\x20نوع\x20فعالیتی\x20بیرون\x20از\x20خونه\x20می‌تونه\x20به\x20ریه‌هات\x20آسیب\x20بزنه.\x20دستگاه\x20تصفیه\x20هوا\x20رو\x20روشن\x20کن\x20و\x20مراقب\x20خودت\x20و\x20عزیزانت\x20باش.\x20این\x20هوا\x20سمیه!','map','hum-val','longitude','contains'];_0x34de=function(){return _0x4d5006;};return _0x34de();}function getDetailedQuote(_0x3139f8,_0x72f96a,_0x30a612,_0x42fad7,_0x5cd29e){const _0x41c72a=_0x3d9c33;if(_0x42fad7>0x96)return{'title':'آلودگی\x20هوا\x20و\x20کیفیت\x20بد','icon':'😷','text':_0x41c72a(0x1fd)};if([0x47,0x49,0x4b,0x55,0x56][_0x41c72a(0x1df)](_0x72f96a)){if(_0x72f96a===0x47)return{'title':'برف\x20ملایم\x20و\x20آرام','icon':_0x41c72a(0x23d),'text':_0x41c72a(0x287)};return{'title':_0x41c72a(0x280),'icon':'❄️','text':_0x41c72a(0x1f1)};}if([0x5f,0x60,0x63]['includes'](_0x72f96a))return{'title':_0x41c72a(0x293),'icon':'⚡','text':_0x41c72a(0x208)};if([0x33,0x35,0x37,0x3d,0x3f,0x41,0x50,0x51,0x52][_0x41c72a(0x1df)](_0x72f96a)){if([0x3f,0x41,0x51,0x52][_0x41c72a(0x1df)](_0x72f96a))return{'title':_0x41c72a(0x209),'icon':_0x41c72a(0x224),'text':_0x41c72a(0x264)};return{'title':_0x41c72a(0x225),'icon':'☔','text':_0x41c72a(0x24a)};}if([0x2d,0x30][_0x41c72a(0x1df)](_0x72f96a))return{'title':_0x41c72a(0x1f5),'icon':_0x41c72a(0x235),'text':_0x41c72a(0x240)};if(_0x3139f8<0x0)return{'title':_0x41c72a(0x245),'icon':'🥶','text':_0x41c72a(0x1e1)};if(_0x3139f8>0x23)return{'title':_0x41c72a(0x228),'icon':'🔥','text':_0x41c72a(0x1e8)};if(_0x3139f8>0x1c)return{'title':_0x41c72a(0x246),'icon':'☀️','text':_0x41c72a(0x202)};if(_0x30a612>0x1e)return{'title':_0x41c72a(0x1f7),'icon':'💨','text':_0x41c72a(0x1eb)};if(_0x3139f8>=0xf&&_0x3139f8<=0x19)return{'title':_0x41c72a(0x232),'icon':'🌼','text':_0x41c72a(0x25c)};return{'title':_0x41c72a(0x270),'icon':'☁️','text':'آسمون\x20امروز\x20ابریه،\x20اما\x20نه\x20اون‌قدر\x20ترسناک\x20که\x20بگه\x20“نیا\x20بیرون”\x20☁️\x0a\x0aهوای\x20ملایمیه؛\x20یه\x20لباس\x20معمولی،\x20شاید\x20یه\x20لایه‌ی\x20سبک\x20اضافه.\x0a\x0aاگه\x20ذهنت\x20امروز\x20کمی\x20گرفته‌ست،\x20بدون\x20که\x20آسمان\x20هم\x20گاهی\x20ابری\x20می‌شه،\x20اما\x20بعدش\x20دوباره\x20آبی\x20می‌شه؛\x20تو\x20هم\x20حق\x20داری\x20این‌طوری\x20باشی،\x20و\x20بعد\x20دوباره\x20روشن‌تر\x20بشی.'};}function _0x590d(_0x5011c4,_0x30c682){_0x5011c4=_0x5011c4-0x1df;const _0x34defb=_0x34de();let _0x590d6b=_0x34defb[_0x5011c4];return _0x590d6b;}function getRainMessage(_0x37af68){const _0x832c00=_0x3d9c33,_0x491c37=Math[_0x832c00(0x258)](..._0x37af68);if(_0x491c37<0x14)return{'t':'آسمان\x20صاف\x20تا\x20کمی\x20ابری','d':_0x832c00(0x26d)};if(_0x491c37<0x32)return{'t':_0x832c00(0x23f),'d':_0x832c00(0x218)};if(_0x491c37<0x50)return{'t':_0x832c00(0x292),'d':_0x832c00(0x226)};return{'t':_0x832c00(0x220),'d':_0x832c00(0x27e)};}function processDailyData(_0x2e91dd,_0x14aeb2){const _0x33ad4d=_0x3d9c33,_0x532cc9={};_0x2e91dd[_0x33ad4d(0x1e7)]((_0x5d58b2,_0x44a6ff)=>{const _0x2caea2=_0x33ad4d,_0x1d0a34=_0x5d58b2[_0x2caea2(0x273)]('T')[0x0],_0x541d0b=_0x14aeb2[_0x44a6ff];if(_0x541d0b!==null){if(!_0x532cc9[_0x1d0a34])_0x532cc9[_0x1d0a34]=0x0;if(_0x541d0b>_0x532cc9[_0x1d0a34])_0x532cc9[_0x1d0a34]=_0x541d0b;}});const _0x22484b=Object[_0x33ad4d(0x265)](_0x532cc9)[_0x33ad4d(0x286)]()['slice'](0x0,0x7);return{'labels':_0x22484b[_0x33ad4d(0x212)](_0x3f11fb=>new Date(_0x3f11fb)[_0x33ad4d(0x284)](_0x33ad4d(0x1f6),{'weekday':_0x33ad4d(0x27a)})),'values':_0x22484b[_0x33ad4d(0x212)](_0x36ba03=>_0x532cc9[_0x36ba03])};}function updateUI(_0x1f0f38,_0x10bf27){const _0x4b327a=_0x3d9c33,_0x5f1bba=_0x1f0f38['aqi'][_0x4b327a(0x22e)]['us_aqi'],_0x59bc9c=_0x1f0f38[_0x4b327a(0x296)][_0x4b327a(0x22e)];let _0x24963e=_0x4b327a(0x244),_0x57d071=_0x4b327a(0x21f);_0x5f1bba>0x32&&(_0x24963e=_0x4b327a(0x283),_0x57d071=_0x4b327a(0x25a));_0x5f1bba>0x64&&(_0x24963e=_0x4b327a(0x253),_0x57d071=_0x4b327a(0x219));_0x5f1bba>0x96&&(_0x24963e=_0x4b327a(0x263),_0x57d071='ناسالم');_0x5f1bba>0xc8&&(_0x24963e=_0x4b327a(0x1ef),_0x57d071=_0x4b327a(0x24c));document['documentElement'][_0x4b327a(0x288)]['setProperty'](_0x4b327a(0x210),_0x24963e),document['getElementById'](_0x4b327a(0x206))[_0x4b327a(0x288)][_0x4b327a(0x294)]=_0x4b327a(0x23e)+_0x24963e+_0x4b327a(0x271),document[_0x4b327a(0x256)](_0x4b327a(0x28d))['innerText']=_0x10bf27,document['getElementById'](_0x4b327a(0x278))['innerText']=toFarsi(_0x5f1bba),document['getElementById'](_0x4b327a(0x28b))[_0x4b327a(0x247)]=_0x57d071,document['getElementById'](_0x4b327a(0x28b))[_0x4b327a(0x288)][_0x4b327a(0x1fc)]=_0x24963e;const _0x359716=0x294-Math[_0x4b327a(0x241)](_0x5f1bba,0x12c)/0x12c*0x294,_0x402035=document[_0x4b327a(0x256)](_0x4b327a(0x28a));_0x402035[_0x4b327a(0x288)][_0x4b327a(0x281)]=_0x359716,_0x402035[_0x4b327a(0x288)][_0x4b327a(0x20f)]=_0x24963e;const _0x38d8b0=getAirQualityMessage(_0x5f1bba);document[_0x4b327a(0x256)](_0x4b327a(0x25f))[_0x4b327a(0x247)]=_0x38d8b0[_0x4b327a(0x289)];const _0x351005=getDetailedQuote(_0x59bc9c['temperature_2m'],_0x59bc9c['weather_code'],_0x59bc9c[_0x4b327a(0x20c)],_0x5f1bba,new Date()[_0x4b327a(0x285)]());document['getElementById']('story-head')['innerText']=_0x351005[_0x4b327a(0x24f)],document[_0x4b327a(0x256)](_0x4b327a(0x23c))['innerText']=_0x351005[_0x4b327a(0x20b)],document[_0x4b327a(0x256)]('story-body')[_0x4b327a(0x247)]=_0x351005[_0x4b327a(0x289)],document['getElementById'](_0x4b327a(0x250))[_0x4b327a(0x247)]=toFarsi(Math['round'](_0x59bc9c['temperature_2m']))+'°',document['getElementById'](_0x4b327a(0x213))[_0x4b327a(0x247)]=toFarsi(_0x59bc9c[_0x4b327a(0x275)])+'%',document['getElementById'](_0x4b327a(0x20d))[_0x4b327a(0x247)]=toFarsi(_0x59bc9c[_0x4b327a(0x20c)]),document[_0x4b327a(0x256)](_0x4b327a(0x279))['innerText']=toFarsi(_0x1f0f38[_0x4b327a(0x277)][_0x4b327a(0x22e)]['pm2_5']),document[_0x4b327a(0x256)](_0x4b327a(0x221))['innerText']=toFarsi(_0x1f0f38[_0x4b327a(0x277)][_0x4b327a(0x22e)][_0x4b327a(0x1e3)]);const _0x36bd95=new Date()['getHours'](),_0x1f1e8e=_0x1f0f38['weather'][_0x4b327a(0x28c)][_0x4b327a(0x24b)][_0x4b327a(0x1ea)](_0x36bd95,_0x36bd95+0x18),_0x1ad0c4=getRainMessage(_0x1f1e8e);document[_0x4b327a(0x256)](_0x4b327a(0x266))[_0x4b327a(0x247)]=_0x1ad0c4['t'],document[_0x4b327a(0x256)](_0x4b327a(0x28e))[_0x4b327a(0x247)]=_0x1ad0c4['d'],chartDataStore[_0x4b327a(0x28c)]={'labels':_0x1f0f38['aqi'][_0x4b327a(0x28c)][_0x4b327a(0x1ec)][_0x4b327a(0x1ea)](_0x36bd95,_0x36bd95+0x18)['map'](_0x44bba2=>toFarsi(_0x44bba2[_0x4b327a(0x1ea)](0xb,0x10))),'data':_0x1f0f38['aqi'][_0x4b327a(0x28c)][_0x4b327a(0x259)][_0x4b327a(0x1ea)](_0x36bd95,_0x36bd95+0x18)};const _0x24bc33=processDailyData(_0x1f0f38[_0x4b327a(0x277)][_0x4b327a(0x28c)]['time'],_0x1f0f38['aqi']['hourly']['us_aqi']);chartDataStore[_0x4b327a(0x1fb)]={'labels':_0x24bc33[_0x4b327a(0x233)],'data':_0x24bc33[_0x4b327a(0x1e9)]},toggleChart('7d'),document[_0x4b327a(0x256)](_0x4b327a(0x1e2))[_0x4b327a(0x288)][_0x4b327a(0x1ed)]='0',setTimeout(()=>{const _0x6e5dcf=_0x4b327a;document[_0x6e5dcf(0x256)](_0x6e5dcf(0x1e2))['style'][_0x6e5dcf(0x249)]='none',document[_0x6e5dcf(0x256)](_0x6e5dcf(0x267))[_0x6e5dcf(0x288)][_0x6e5dcf(0x1ed)]='1';},0x1f4);}function toggleChart(_0x5161df){const _0x4cae23=_0x3d9c33;document[_0x4cae23(0x256)](_0x4cae23(0x22d))[_0x4cae23(0x1f2)]=_0x5161df===_0x4cae23(0x201)?'toggle-btn\x20active':_0x4cae23(0x227),document[_0x4cae23(0x256)]('btn-7d')['className']=_0x5161df==='7d'?'toggle-btn\x20active':_0x4cae23(0x227);const _0x1f7677=_0x5161df===_0x4cae23(0x201)?chartDataStore['hourly']:chartDataStore['daily'],_0x540c5e=getComputedStyle(document['documentElement'])[_0x4cae23(0x22f)]('--accent-color')[_0x4cae23(0x1f4)]();let _0x5438e1=Array(_0x1f7677[_0x4cae23(0x276)][_0x4cae23(0x216)])[_0x4cae23(0x242)](_0x4cae23(0x261)),_0x293ee6=Array(_0x1f7677['data']['length'])[_0x4cae23(0x242)](0x3);_0x5161df==='7d'&&(_0x5438e1[0x0]=_0x540c5e,_0x293ee6[0x0]=0x6),drawChart(_0x1f7677[_0x4cae23(0x233)],_0x1f7677[_0x4cae23(0x276)],_0x540c5e,_0x5438e1,_0x293ee6);}function drawChart(_0x20b772,_0xe3ea3f,_0x587cd2,_0x4513e4,_0x5cbacc){const _0x206f76=_0x3d9c33,_0x171596=document['getElementById'](_0x206f76(0x223));if(!_0x171596)return;if(typeof Chart===_0x206f76(0x204))return;if(chartInstance)chartInstance['destroy']();Chart[_0x206f76(0x237)]['font'][_0x206f76(0x21e)]=_0x206f76(0x1fe),Chart[_0x206f76(0x237)][_0x206f76(0x1fc)]=isLight?_0x206f76(0x1f8):_0x206f76(0x24e),chartInstance=new Chart(_0x171596,{'type':_0x206f76(0x24d),'data':{'labels':_0x20b772,'datasets':[{'data':_0xe3ea3f,'borderColor':_0x587cd2,'backgroundColor':_0x587cd2+'33','borderWidth':0x3,'pointRadius':_0x5cbacc,'pointBackgroundColor':_0x4513e4,'fill':!![],'tension':0.4}]},'options':{'responsive':!![],'maintainAspectRatio':![],'plugins':{'legend':{'display':![]}},'scales':{'x':{'grid':{'display':![]},'ticks':{'font':{'size':0xb}}},'y':{'display':![]}}}});}async function fetchData(_0xeb4fdb,_0x4871fd,_0x3214b4){const _0x45ca94=_0x3d9c33,_0x2d79de=document[_0x45ca94(0x256)](_0x45ca94(0x1e2));_0x2d79de[_0x45ca94(0x288)][_0x45ca94(0x249)]=_0x45ca94(0x28f),_0x2d79de['style'][_0x45ca94(0x1ed)]='1',currentLoc={'lat':_0xeb4fdb,'lon':_0x4871fd,'name':_0x3214b4};try{localStorage[_0x45ca94(0x248)](_0x45ca94(0x251),JSON[_0x45ca94(0x207)]({'lat':_0xeb4fdb,'lon':_0x4871fd,'name':_0x3214b4}));const [_0x2b3411,_0x2aa940]=await Promise['all']([fetch('https://air-quality-api.open-meteo.com/v1/air-quality?latitude='+_0xeb4fdb+_0x45ca94(0x236)+_0x4871fd+_0x45ca94(0x23a)),fetch(_0x45ca94(0x21d)+_0xeb4fdb+_0x45ca94(0x236)+_0x4871fd+'&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&hourly=precipitation_probability&timezone=auto')]);if(!_0x2b3411['ok']||!_0x2aa940['ok'])throw new Error(_0x45ca94(0x26f));const _0x4f9ca1=await _0x2b3411[_0x45ca94(0x1f3)](),_0x2265c1=await _0x2aa940['json']();updateUI({'aqi':_0x4f9ca1,'weather':_0x2265c1},_0x3214b4);}catch(_0x3565b6){console[_0x45ca94(0x1fa)](_0x3565b6),alert(_0x45ca94(0x252)),_0x2d79de['style']['opacity']='0',setTimeout(()=>_0x2d79de[_0x45ca94(0x288)][_0x45ca94(0x249)]=_0x45ca94(0x25b),0x1f4);}}function toggleSearch(_0x4f2cac){const _0x454634=_0x3d9c33,_0x147575=document[_0x454634(0x256)](_0x454634(0x272));_0x4f2cac?(_0x147575[_0x454634(0x1ee)][_0x454634(0x269)]('open'),document['getElementById'](_0x454634(0x21a))[_0x454634(0x27f)]()):_0x147575[_0x454634(0x1ee)]['remove']('open');}let debounce;document[_0x3d9c33(0x256)](_0x3d9c33(0x21a))[_0x3d9c33(0x25d)](_0x3d9c33(0x229),_0x3501c5=>{const _0x4ad315=_0x3d9c33;clearTimeout(debounce);const _0x54a496=_0x3501c5['target'][_0x4ad315(0x260)];if(_0x54a496[_0x4ad315(0x216)]<0x2)return;debounce=setTimeout(async()=>{const _0x5a749d=_0x4ad315;try{const _0x8d84de=await fetch(_0x5a749d(0x254)+_0x54a496+_0x5a749d(0x203)),_0x19e86d=await _0x8d84de[_0x5a749d(0x1f3)](),_0x51ea14=document[_0x5a749d(0x256)](_0x5a749d(0x238));_0x51ea14[_0x5a749d(0x26a)]='',_0x19e86d[_0x5a749d(0x27b)]&&_0x19e86d[_0x5a749d(0x27b)][_0x5a749d(0x1e7)](_0x3439fb=>{const _0x44ef10=_0x5a749d,_0x300581=document['createElement'](_0x44ef10(0x282));_0x300581[_0x44ef10(0x1f2)]=_0x44ef10(0x22c),_0x300581[_0x44ef10(0x247)]=_0x3439fb[_0x44ef10(0x26c)]+'\x20('+_0x3439fb[_0x44ef10(0x26b)]+')',_0x300581['onclick']=()=>{const _0xa41b6=_0x44ef10;fetchData(_0x3439fb[_0xa41b6(0x230)],_0x3439fb[_0xa41b6(0x214)],_0x3439fb['name']),toggleSearch(![]);},_0x51ea14[_0x44ef10(0x22b)](_0x300581);});}catch(_0x15f16e){}},0x1f4);});function getLocation(){const _0x33a4ea=_0x3d9c33;navigator[_0x33a4ea(0x27d)]?navigator[_0x33a4ea(0x27d)][_0x33a4ea(0x23b)](_0x5c0b35=>fetchData(_0x5c0b35[_0x33a4ea(0x222)][_0x33a4ea(0x230)],_0x5c0b35[_0x33a4ea(0x222)][_0x33a4ea(0x214)],'موقعیت\x20من'),()=>alert(_0x33a4ea(0x255))):alert(_0x33a4ea(0x25e));}const saved=localStorage[_0x3d9c33(0x243)](_0x3d9c33(0x251));if(saved){const l=JSON[_0x3d9c33(0x234)](saved);fetchData(l[_0x3d9c33(0x27c)],l[_0x3d9c33(0x291)],l[_0x3d9c33(0x26c)]);}else fetchData(35.68,51.38,'تهران');
+</script>
+</body>
+</html>
