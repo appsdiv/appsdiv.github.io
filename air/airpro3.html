@@ -309,17 +309,70 @@
         .chart-container { position: relative; height: 250px; width: 100%; margin-top: 10px; }
 
         /* --- لیست پیش‌بینی ۷ روزه (جدید) --- */
-        .forecast-list { display: flex; flex-direction: column; gap: 12px; }
-        .forecast-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 16px; background: rgba(0,0,0,0.2); border-radius: 20px;
-            border: 1px solid var(--glass-border); transition: 0.2s;
-        }
-        .forecast-item:hover { background: rgba(255,255,255,0.05); }
-        .f-day { font-weight: 900; width: 80px; font-size: 15px; }
-        .f-icon { width: 40px; text-align: center; font-size: 24px; }
-        .f-desc-short { font-size: 13px; opacity: 0.7; flex: 1; padding: 0 15px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .f-temp { font-weight: 800; font-size: 16px; width: 90px; text-align: left; direction: ltr; color: var(--accent-color); }
+/* --- لیست پیش‌بینی ۷ روزه (نسخه دو ردیفه) --- */
+.forecast-list { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+}
+
+.forecast-item {
+    display: flex;
+    flex-direction: column; /* چیدمان ستونی: بالا و پایین */
+    gap: 10px;
+    padding: 18px;
+    background: rgba(0,0,0,0.25); /* کمی تیره‌تر برای خوانایی */
+    border-radius: 24px;
+    border: 1px solid var(--glass-border);
+    transition: 0.2s;
+}
+
+.forecast-item:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+/* ردیف بالا: روز، آیکون، دما */
+.f-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.f-day-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.f-day { 
+    font-weight: 900; 
+    font-size: 15px;
+    color: var(--text-primary);
+}
+
+.f-icon { 
+    font-size: 24px; 
+}
+
+.f-temp { 
+    font-weight: 800; 
+    font-size: 18px; 
+    direction: ltr; 
+    color: var(--accent-color);
+}
+
+/* ردیف پایین: توضیحات */
+.f-bot-row {
+    font-size: 13px;
+    opacity: 0.85;
+    line-height: 1.8;
+    text-align: justify; /* تراز کردن متن */
+    color: var(--text-secondary);
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.08); /* خط جداکننده ظریف */
+    width: 100%;
+}
 
         /* --- کارت ارتفاع (جدید) --- */
         .elevation-card { text-align: center; border-bottom: 8px solid var(--accent-color); }
@@ -1079,57 +1132,132 @@
         return { t: "بارش قطعی و فراگیر", d: "آسمان قطعاً خواهد بارید. برنامه‌ریزی خود را بر اساس یک روز خیس و بارانی انجام دهید و تجهیزات لازم را همراه داشته باشید." };
     }
 
-    // --- فاز ماه (کامل و آسترولوژی) ---
+   // --- فاز ماه (نسخه نهایی: دقیق، جذاب و صیقل‌خورده) ---
     function renderMoonPhase() {
         const date = new Date();
-        const cycle = 29.53; 
-        const knownNewMoon = new Date('2000-01-06T18:14:00');
+        
+        // 1. محاسبات دقیق سیکل ماه
+        const synodicCycle = 29.53059; // دوره کامل
+        const knownNewMoon = new Date('2023-01-21T20:53:00'); // مرجع زمانی
         const diffTime = date - knownNewMoon;
         const diffDays = diffTime / (1000 * 60 * 60 * 24);
-        const moonAge = diffDays % cycle;
+        const moonAge = diffDays % synodicCycle;
         
+        // محاسبه درصد روشنایی دقیق
+        const illumination = Math.round(((1 - Math.cos((moonAge * 2 * Math.PI) / synodicCycle)) / 2) * 100);
+
+        // 2. روزشمار (Countdown)
+        const fullMoonAge = 14.765;
+        let daysToEvent = 0;
+        let eventLabel = "";
+        
+        if (moonAge < fullMoonAge) {
+            daysToEvent = Math.round(fullMoonAge - moonAge);
+            eventLabel = "روز تا ماه کامل";
+        } else {
+            daysToEvent = Math.round((synodicCycle - moonAge));
+            eventLabel = "روز تا ماه نو";
+        }
+
+        // 3. محاسبه فاصله و تحلیل گرانش (Supermoon Logic)
+        const anomalisticCycle = 27.55455;
+        const knownPerigee = new Date('2023-01-21T20:58:00');
+        const diffPerigee = (date - knownPerigee) / (1000 * 60 * 60 * 24);
+        const anomaly = (diffPerigee % anomalisticCycle) / anomalisticCycle * 2 * Math.PI;
+        
+        // فاصله لحظه‌ای به کیلومتر
+        const distance = Math.round(384400 - 21000 * Math.cos(anomaly));
+        
+        // تحلیل گرانش و فاصله با زبان جذاب
+        let gravityText = "";
+        let distanceTag = "";
+        
+        if (distance < 365000) {
+            gravityText = "گرانش در حالت «ماکسیمم» قرار داره! (Supermoon Vibes). ممکنه احساساتت شدیدتر باشه و خوابت سبک‌تر.";
+            distanceTag = "خیلی نزدیک (Super)";
+        } else if (distance > 400000) {
+            gravityText = "گرانش در حالت «مینیمم» و آرومه (Micromoon). فشار روانی کمتره و حس سبکی می‌کنی.";
+            distanceTag = "دور (Chill Mode)";
+        } else {
+            gravityText = "گرانش در وضعیت «نرمال و متعادل» قرار داره. همه‌چیز تحت کنترله.";
+            distanceTag = "استاندارد";
+        }
+
+        // فرمت کردن اعداد
+        const distStr = toFarsi(distance.toLocaleString());
+        const illuStr = toFarsi(illumination) + "٪";
+        const dayCountStr = toFarsi(daysToEvent);
+
         let phaseName = "";
         let phaseDesc = "";
         
+        // --- سناریوهای متنی جذاب و صیقل‌خورده ---
+        
         if (moonAge < 1.5) { 
-            phaseName = "ماه نو (New Moon)"; 
-            phaseDesc = "امشب آسمان تاریک است و ماه چهره‌اش را پنهان کرده. در آسترولوژی، این لحظه‌ی «تولد دوباره» است. انرژی کیهانی در پایین‌ترین سطح ظاهری اما بالاترین پتانسیل درونی قرار دارد. زمان فوق‌العاده‌ای برای کاشتن بذر نیت‌های جدید، شروع پروژه‌های تازه و مدیتیشن برای پاکسازی ذهن است. سکوت ماه نو به شما فرصت می‌دهد تا بدون حواس‌پرتی نور، به درون خود نگاه کنید و نقشه‌ی راه ماه آینده را ترسیم کنید."; 
-        } else if (moonAge < 7) { 
-            phaseName = "هلال افزاینده"; 
-            phaseDesc = "یک داس نقره‌ای زیبا در آسمان غروب خودنمایی می‌کند. انرژی ماه در حال رشد است و زمان «عمل» فرا رسیده. اگر در ماه نو نیتی کردید، اکنون زمان برداشتن قدم‌های اولیه است. کیهان از شجاعت و حرکت رو به جلو حمایت می‌کند. این فاز نماد امید و خوش‌بینی است؛ موانع هنوز کوچک‌اند و انگیزه بالاست. ارتباطات اجتماعی و یادگیری مهارت‌های جدید در این روزها بسیار پربار خواهد بود."; 
-        } else if (moonAge < 8) { 
-            phaseName = "تربیع اول"; 
-            phaseDesc = "ماه نیمی از چهره‌اش را روشن کرده و نیمی دیگر در تاریکی است. این نقطه عطف اول است. ممکن است با اولین چالش‌ها یا مقاومت‌ها در مسیر اهدافتان روبرو شوید. آسترولوژی می‌گوید این زمانِ «تعهد» است. آیا حاضرید برای خواسته‌هایتان بجنگید؟ انرژی این فاز قاطع و سازنده است. زمان تصمیم‌گیری‌های جدی و مدیریت بحران است. تعادل بین نور و تاریکی، شما را به تعادل در زندگی دعوت می‌کند."; 
-        } else if (moonAge < 14) { 
-            phaseName = "تحدب افزاینده"; 
-            phaseDesc = "ماه تقریباً کامل شده و نور زیادی به زمین می‌تابد. شما در آستانه‌ی تکمیل هستید. جزئیات برنامه‌ها را دقیق کنید و آخرین اصلاحات را انجام دهید. انرژی کیهانی بالاست و احساسات شدت می‌گیرند. این زمان برای جذب منابع، شبکه‌سازی و نشان دادن استعدادها عالی است. هر چیزی که اکنون روی آن تمرکز کنید، با سرعت بیشتری رشد می‌کند."; 
-        } else if (moonAge < 16) { 
-            phaseName = "ماه کامل (Full Moon)"; 
-            phaseDesc = "اوج درخشش و قدرت! ماه چون مرواریدی در شب می‌درخشد و تمام رازها را آشکار می‌کند. در آسترولوژی، ماه کامل زمان «برداشت» و «رهایی» است. نتایج تلاش‌هایتان را می‌بینید. احساسات و شهود به بالاترین حد خود می‌رسند، پس مراقب واکنش‌های هیجانی باشید. خواب ممکن است کمی مختل شود. این بهترین زمان برای جشن گرفتن موفقیت‌ها و همچنین رها کردن الگوهای رفتاری قدیمی است که دیگر به کارتان نمی‌آیند."; 
-        } else if (moonAge < 22) { 
-            phaseName = "تحدب کاهنده"; 
-            phaseDesc = "نور ماه اندک اندک رو به کاهش است. زمانِ اشتراک‌گذاری دانش، تجربه و برکت با دیگران است. انرژی آرام‌تر می‌شود و زمان بازتاب و قدردانی فرا رسیده. اگر در ماه کامل چیزی به دست آوردید، اکنون زمان بخشیدن و آموزش دادن آن است. بدن شروع به استراحت می‌کند و ذهن به سمت تحلیل می‌رود."; 
-        } else if (moonAge < 23) { 
-            phaseName = "تربیع آخر"; 
-            phaseDesc = "باز هم نیمه روشن و نیمه تاریک، اما این بار رو به خاموشی. زمانِ رها کردنِ جدی است. خانه تکانی ذهنی و فیزیکی در این فاز عالی است. چیزهایی که دیگر به دردتان نمی‌خورد را دور بریزید. روابط سمی یا عادت‌های بد را قطع کنید. این فاز مقدمه‌ای برای استراحت عمیق است. انرژی کیهانی شما را به سمت درون‌نگری و پایان دادن به کارهای نیمه‌تمام سوق می‌دهد."; 
-        } else { 
-            phaseName = "هلال کاهنده"; 
-            phaseDesc = "پایان چرخه نزدیک است. هلالی باریک که فقط سحرخیزها قبل از طلوع آفتاب آن را می‌بینند. انرژی کاملاً تخلیه شده و زمان استراحت مطلق است. خودتان را برای شروع دوره‌ی جدید آماده کنید اما اقدام جدیدی نکنید. این فاز، فازِ «شفا» و «بازیابی» است. به رویاهایتان توجه کنید، زیرا پیام‌های مهمی برای دوره‌ی بعدی دارند."; 
+            phaseName = "🌑 ماه نو (New Moon)"; 
+            phaseDesc = "امشب ماه دکمه «ریست» رو زده! تو آسمون پیداش نیست، ولی انرژیش کاملاً حس میشه. الان بهترین وقت برای استارت زدن هدف‌های جدیده. یه لیست از آرزوهات بنویس، چون کائنات تو این فاز شنونده‌ی خوبیه. گذشته رو رها کن و فصل جدیدت رو شروع کن."; 
+        } 
+        else if (moonAge < 7) { 
+            phaseName = "🌒 هلال افزاینده (Waxing Crescent)"; 
+            phaseDesc = "یه هلال نقره‌ای خوشگل تو آسمونه. انرژیت داره میره بالا؟ طبیعیه! وقتشه اون نقشه‌هایی که کشیدی رو عملی کنی. تنبلی ممنوع؛ کائنات الان از حرکت و شجاعت حمایت می‌کنه. اگه می‌خوای عادت جدیدی بسازی، امشب بهترین شبه."; 
+        } 
+        else if (moonAge < 8) { 
+            phaseName = "🌓 تربیع اول (First Quarter)"; 
+            phaseDesc = "ماه دقیقاً نصف شده. این یعنی یه چالش کوچیک برای امتحان کردن اراده‌ت. اگه مانعی سر راهت اومد، جا نزن. الان باید نشون بدی چقدر پای هدفات وایسادی. انرژی برای تصمیم‌های منطقی و جدی عالیه."; 
+        } 
+        else if (moonAge < 14) { 
+            phaseName = "🌔 تحدب افزاینده (Waxing Gibbous)"; 
+            phaseDesc = "ماه داره کامل میشه و نورش زیاده. الان کاریزمات تو اوجه و جذابیت کلامت بالاست. آخرین ریزه‌کاری‌های پروژه‌هات رو انجام بده که نمایش اصلی نزدیکه. همه چی رو دورِ تنده، پس از سرعتت کم نکن."; 
+        } 
+        else if (moonAge < 16) { 
+            phaseName = "🌕 ماه کامل (Full Moon)"; 
+            phaseDesc = "فول شارژ! ماه ۱۰۰٪ می‌درخشه و همه چی رو آشکار می‌کنه. اگه امشب بی‌خواب شدی یا زیادی احساساتی، نترس؛ کارِ جاذبه‌ست. وقتشه نتیجه زحماتت رو ببینی و هر چی (یا هر کی) که حالتو بد می‌کنه، آنفالو کنی و رها شی."; 
+        } 
+        else if (moonAge < 22) { 
+            phaseName = "🌖 تحدب کاهنده (Waning Gibbous)"; 
+            phaseDesc = "بعد از هیجان دیشب، حالا وقتشه یه نفس عمیق بکشی. نور داره آروم کم میشه. اگه چیزی یاد گرفتی، به بقیه هم یاد بده. الان فازِ شکرگزاری و آرامشه. یه کم سرعت زندگی رو کم کن و لذت ببر."; 
+        } 
+        else if (moonAge < 23) { 
+            phaseName = "🌗 تربیع آخر (Last Quarter)"; 
+            phaseDesc = "وقت خونه‌تکونیه! نه فقط خونه، بلکه ذهن. هر فکر منفی، عادت بد یا فایل اضافه‌ای داری بریز دور. ماه داره میگه: «سبک شو تا بتونی دوباره اوج بگیری». بحث و جدل نکن، فقط رها کن."; 
+        } 
+        else { 
+            phaseName = "🌘 هلال کاهنده (Waning Crescent)"; 
+            phaseDesc = "آخرِ خط. باتری کیهانی داره خالی میشه تا دوباره شارژ بشه. الان فقط استراحت، یوگا و ریلکس کردن جوابه. به خودت فشار نیار و بذار روحت نفس بکشه. به رویاهات دقت کن، پیام‌های مهمی دارن."; 
         }
 
-        document.getElementById('moon-phase-name').innerText = phaseName;
-        document.getElementById('moon-desc').innerText = phaseDesc;
+        // ساختار HTML خروجی
+        const infoBar = `
+            <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:12px; opacity:0.8; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;">
+                <span>💡 روشنایی: <b style="color:var(--accent-color)">${illuStr}</b></span>
+                <span>⏳ ${dayCountStr} ${eventLabel}</span>
+            </div>
+            <div style="font-size:12px; margin-bottom:10px; color:#a78bfa;">
+                <span>📏 فاصله: <b>${distStr}</b> km (${distanceTag})</span>
+            </div>
+        `;
 
+        document.getElementById('moon-phase-name').innerText = phaseName;
+        document.getElementById('moon-desc').innerHTML = infoBar + `<div style="line-height:1.9;">${phaseDesc} <br><br> <span style="font-size:12px; opacity:0.7">🧲 ${gravityText}</span></div>`;
+
+        // رندر گرافیکی ماه (سایه‌زنی دقیق)
         let svg = '';
         if(moonAge < 15) { 
-             svg = `<svg width="100%" height="100%" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#1e293b"/><path d="M50 2 a48 48 0 0 1 0 96 a${Math.abs(48 - 3.2 * moonAge)} 48 0 0 ${moonAge < 7.5 ? 0 : 1} 0 -96" fill="#f8fafc" filter="drop-shadow(0 0 8px rgba(255,255,255,0.8))"/></svg>`;
+             svg = `<svg width="100%" height="100%" viewBox="0 0 100 100">
+                <defs><filter id="glow"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                <circle cx="50" cy="50" r="48" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+                <path d="M50 2 a48 48 0 0 1 0 96 a${Math.abs(48 - 3.2 * moonAge)} 48 0 0 ${moonAge < 7.5 ? 0 : 1} 0 -96" fill="#f8fafc" filter="url(#glow)"/>
+             </svg>`;
         } else { 
              const age = moonAge - 15;
-             svg = `<svg width="100%" height="100%" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#1e293b"/><path d="M50 2 a48 48 0 0 0 0 96 a${Math.abs(48 - 3.2 * age)} 48 0 0 ${age > 7.5 ? 0 : 1} 0 -96" fill="#f8fafc" filter="drop-shadow(0 0 8px rgba(255,255,255,0.8))"/></svg>`;
+             svg = `<svg width="100%" height="100%" viewBox="0 0 100 100">
+                <defs><filter id="glow"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                <circle cx="50" cy="50" r="48" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+                <path d="M50 2 a48 48 0 0 0 0 96 a${Math.abs(48 - 3.2 * age)} 48 0 0 ${age > 7.5 ? 0 : 1} 0 -96" fill="#f8fafc" filter="url(#glow)"/>
+             </svg>`;
         }
         document.getElementById('moon-render').innerHTML = svg;
     }
-
     function renderChart(dates, maxTemps, minTemps) {
         if (typeof Chart === 'undefined') return;
         
@@ -1197,37 +1325,46 @@
         });
     }
 
-    function renderForecastList(daily) {
-        const listEl = document.getElementById('forecast-list');
-        listEl.innerHTML = '';
+   // --- رندر لیست پیش‌بینی ۷ روزه (نسخه دو ردیفه زیبا) ---
+function renderForecastList(daily) {
+    const listEl = document.getElementById('forecast-list');
+    listEl.innerHTML = '';
+    
+    for(let i=1; i<7; i++) { // شروع از فردا
+        const date = new Date(daily.time[i]);
+        const dayName = date.toLocaleDateString('fa-IR', { weekday: 'long' });
+        const code = daily.weather_code[i];
+        const maxT = Math.round(daily.temperature_2m_max[i]);
+        const minT = Math.round(daily.temperature_2m_min[i]);
         
-        for(let i=1; i<7; i++) { 
-            const date = new Date(daily.time[i]);
-            const dayName = date.toLocaleDateString('fa-IR', { weekday: 'long' });
-            const code = daily.weather_code[i];
-            const maxT = Math.round(daily.temperature_2m_max[i]);
-            const minT = Math.round(daily.temperature_2m_min[i]);
-            
-            let shortDesc = "";
-            if (code <= 1) shortDesc = "آسمانی صاف، عالی برای گردش.";
-            else if (code <= 3) shortDesc = "کمی ابری، هوای ملایم.";
-            else if (code <= 48) shortDesc = "مه‌آلود، دید کم است.";
-            else if (code <= 67) shortDesc = "بارانی، چتر لازم است.";
-            else if (code <= 77) shortDesc = "برفی و سرد، مراقب باشید.";
-            else if (code >= 95) shortDesc = "طوفانی، در خانه بمانید.";
-            else shortDesc = "هوای متغیر، لباس مناسب بپوشید.";
+        // جملات توصیفی
+        let shortDesc = "";
+        if (code <= 1) shortDesc = "آسمانی صاف و درخشان؛ فرصتی عالی برای فعالیت‌های خارج از خانه.";
+        else if (code <= 3) shortDesc = "تکه‌های ابر در آسمان؛ هوایی ملایم و دوست‌داشتنی.";
+        else if (code <= 48) shortDesc = "مه‌آلود و مرموز؛ در رانندگی احتیاط کنید، دید محدود است.";
+        else if (code <= 67) shortDesc = "باران خواهد بارید؛ چتر و بارانی را فراموش نکنید.";
+        else if (code <= 77) shortDesc = "بارش برف و سرما؛ لباس‌های گرم و پشمی بپوشید.";
+        else if (code >= 95) shortDesc = "احتمال رعد و برق و طوفان؛ بهتر است در مکان امن بمانید.";
+        else shortDesc = "هوایی متغیر و ناپایدار؛ آماده تغییرات جوی باشید.";
 
-            const div = document.createElement('div');
-            div.className = 'forecast-item';
-            div.innerHTML = `
-                <div class="f-day">${dayName}</div>
-                <div class="f-icon">${getSmallIcon(code)}</div>
-                <div class="f-desc-short">${shortDesc}</div>
-                <div class="f-temp">${toFarsi(maxT)}° <span style="font-size:12px; opacity:0.6; color:var(--text-primary)">${toFarsi(minT)}°</span></div>
-            `;
-            listEl.appendChild(div);
-        }
+        const div = document.createElement('div');
+        div.className = 'forecast-item';
+        div.innerHTML = `
+            <div class="f-top-row">
+                <div class="f-day-group">
+                    <div class="f-icon">${getSmallIcon(code)}</div>
+                    <div class="f-day">${dayName}</div>
+                </div>
+                <div class="f-temp">
+                    ${toFarsi(maxT)}° 
+                    <span style="font-size:14px; opacity:0.5; color:var(--text-primary); margin-left:4px;">${toFarsi(minT)}°</span>
+                </div>
+            </div>
+            <div class="f-bot-row">${shortDesc}</div>
+        `;
+        listEl.appendChild(div);
     }
+}
 
     function renderElevation(meters) {
         document.getElementById('elev-val').innerText = toFarsi(Math.round(meters)) + ' متر';
