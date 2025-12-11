@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#020617">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://8upload.com/image/171db5bf84cf07d4/AppIcon_2x.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://8upload.com/image/171db5bf84cf07d4/AppIcon_2x.png">
+    <meta name="apple-mobile-web-app-title" content="هوای پاک پلاس">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>هوای پاک پلاس | نسخه اولترا</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@200..900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* --- تنظیمات کلی و متغیرها --- */
+        :root {
+            /* تم دارک (پیش‌فرض) */
+            --bg-color: #020617;
+            --bg-gradient: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --glass-bg: rgba(15, 23, 42, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.03);
+            --glass-blur: 40px;
+            --card-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7);
+            --inner-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15);
+            --accent-color: #34d399;
+            --liquid-1: #4f46e5;
+            --liquid-2: #db2777;
+        }
+        body.light-mode {
+            --bg-color: #f8fafc;
+            --bg-gradient: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.9);
+            --glass-highlight: rgba(255, 255, 255, 0.8);
+            --glass-blur: 30px;
+            --card-shadow: 0 15px 35px -5px rgba(148, 163, 184, 0.35);
+            --inner-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9);
+            --liquid-1: #60a5fa;
+            --liquid-2: #f472b6;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-color);
+            background-image: var(--bg-gradient);
+            color: var(--text-primary);
+            font-family: 'Vazirmatn', -apple-system, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.5s ease, color 0.5s ease;
+            position: relative;
+        }
+
+        /* --- انیمیشن پس‌زمینه مایع --- */
+        .liquid-blob {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden; z-index: 0; pointer-events: none;
+        }
+        .blob {
+            position: absolute; border-radius: 50%;
+            filter: blur(90px); opacity: 0.5;
+            animation: floatBlob 15s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+            mix-blend-mode: screen;
+        }
+        body.light-mode .blob { mix-blend-mode: multiply; opacity: 0.3; }
+        .blob-1 { top: -20%; left: -20%; width: 60vw; height: 60vw; background: var(--liquid-1); }
+        .blob-2 { bottom: -20%; right: -20%; width: 70vw; height: 70vw; background: var(--liquid-2); animation-delay: -7s; }
+        @keyframes floatBlob {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            100% { transform: translate(40px, 60px) scale(1.1) rotate(10deg); }
+        }
+
+        /* --- ذرات معلق --- */
+        #particles {
+            position: fixed; inset: 0; pointer-events: none; z-index: 5;
+            background-image: none; background-size: 0 0;
+            transition: opacity 0.5s;
+        }
+        body.weather-rain #particles {
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 0 L10 10' stroke='rgba(120,120,255,0.6)' stroke-width='1'/%3E%3C/svg%3E");
+            animation: rainFall 0.6s linear infinite;
+        }
+        body.weather-snow #particles {
+            background-image: radial-gradient(white 30%, transparent 30%);
+            background-size: 10px 10px;
+            animation: snowFall 4s linear infinite;
+        }
+        @keyframes rainFall { from { background-position: 0 0; } to { background-position: -10px 400px; } }
+        @keyframes snowFall { from { background-position: 0 0; } to { background-position: 30px 200px; } }
+
+        #app {
+            position: relative; z-index: 10;
+            padding: max(20px, env(safe-area-inset-top)) 24px 40px 24px;
+            max-width: 550px; margin: 0 auto; width: 100%;
+            display: flex; flex-direction: column; gap: 24px;
+            padding-bottom: 100px;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0; transform: translateY(30px);
+        }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* --- هدر و دکمه‌ها --- */
+        header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .location-pill {
+            display: flex; align-items: center; gap: 12px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid var(--glass-highlight);
+            padding: 12px 24px; border-radius: 50px;
+            font-size: 16px; font-weight: 800; cursor: pointer;
+            backdrop-filter: blur(var(--glass-blur));
+            box-shadow: var(--card-shadow), var(--inner-shadow);
+            transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: var(--text-primary);
+            max-width: 60%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .header-actions { display: flex; gap: 12px; align-items: center; flex-direction: row; }
+        .btn-circle {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid var(--glass-highlight);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-primary); cursor: pointer;
+            backdrop-filter: blur(var(--glass-blur));
+            box-shadow: var(--card-shadow), var(--inner-shadow);
+            transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            flex-shrink: 0;
+        }
+        .btn-circle:hover, .location-pill:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.3), var(--inner-shadow); }
+        .btn-circle:active, .location-pill:active { transform: scale(0.95); }
+
+        /* --- گیج کیفیت هوا --- */
+        .hero-section {
+            display: flex; flex-direction: column; align-items: center;
+            position: relative; margin-top: 20px;
+        }
+        .gauge-wrapper {
+             width: 300px; height: 300px; position: relative;
+             filter: drop-shadow(0 20px 40px rgba(0,0,0,0.3));
+         }
+        .gauge-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .track { fill: none; stroke: var(--glass-border); stroke-width: 16; stroke-linecap: round; }
+        .progress {
+             fill: none; stroke: var(--accent-color); stroke-width: 16; stroke-linecap: round;
+            stroke-dasharray: 660; stroke-dashoffset: 660;
+            transition: stroke-dashoffset 2s cubic-bezier(0.2, 0.8, 0.2, 1), stroke 1s;
+            filter: drop-shadow(0 0 10px var(--accent-color));
+        }
+        .hero-center {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center; display: flex; flex-direction: column; align-items: center;
+        }
+        .hero-val {
+             font-size: 90px; font-weight: 900; line-height: 0.9; letter-spacing: -3px;
+             text-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .hero-label {
+             font-size: 18px; font-weight: 800; color: #fff; margin-top: 15px;
+             background: var(--accent-color); padding: 8px 20px; border-radius: 30px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* --- کارت‌های شیشه‌ای عمومی --- */
+        .glass-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid var(--glass-highlight);
+            border-radius: 32px; padding: 28px;
+            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+            box-shadow: var(--card-shadow), var(--inner-shadow);
+            position: relative; overflow: hidden;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 50px -5px rgba(0, 0, 0, 0.6), var(--inner-shadow);
+        }
+        
+        /* --- مودال ولکام (Onboarding) جدید --- */
+        .welcome-modal {
+            position: fixed; inset: 0; z-index: 300;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(15px);
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: 0.5s;
+        }
+        .welcome-modal.active { opacity: 1; pointer-events: auto; }
+        .welcome-card {
+            width: 90%; max-width: 400px; background: var(--bg-color);
+            border: 1px solid var(--glass-border); border-radius: 40px; padding: 40px;
+            text-align: center; box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+            transform: scale(0.9); transition: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .welcome-modal.active .welcome-card { transform: scale(1); }
+        .welcome-icon { font-size: 60px; margin-bottom: 20px; display:inline-block; animation: float 4s ease-in-out infinite; }
+        .welcome-btn {
+            width: 100%; padding: 18px; border-radius: 20px; border: none; font-family: inherit;
+            font-size: 16px; font-weight: 800; margin-top: 15px; cursor: pointer;
+            transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-primary { background: var(--accent-color); color: #000; box-shadow: 0 10px 20px rgba(52, 211, 153, 0.3); }
+        .btn-secondary { background: var(--glass-bg); color: var(--text-primary); border: 1px solid var(--glass-border); }
+        .btn-primary:active, .btn-secondary:active { transform: scale(0.96); }
+
+        /* --- کارت بصری آب و هوا --- */
+        .weather-visual-card {
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            background: linear-gradient(160deg, var(--glass-bg) 0%, rgba(255,255,255,0.01) 100%);
+            padding-top: 40px;
+        }
+        .weather-anim-container {
+            width: 180px; height: 180px; margin-bottom: 10px;
+            position: relative; z-index: 2;
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.25));
+            transform: perspective(500px) translateZ(20px);
+        }
+        .visual-temp {
+             font-size: 80px; font-weight: 900; line-height: 1; margin-bottom: 8px;
+             text-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            background: linear-gradient(to bottom, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .visual-desc {
+             font-size: 22px; opacity: 1; margin-bottom: 30px; font-weight: 700;
+             color: var(--accent-color); letter-spacing: -0.5px;
+        }
+        .visual-grid {
+            display: flex; gap: 20px; width: 100%; justify-content: center;
+            margin-top: 20px; padding-top: 25px;
+            border-top: 1px solid var(--glass-border);
+        }
+        .v-item { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; }
+        .v-icon { font-size: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+        .v-val { font-size: 20px; font-weight: 800; color: var(--text-primary); }
+        .v-lbl { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+
+        /* --- کارت دوستانه --- */
+        .friendly-card {
+            text-align: right; border-right: 8px solid #fbbf24;
+            background: linear-gradient(90deg, var(--glass-bg) 0%, rgba(0,0,0,0) 100%);
+        }
+        .friendly-title {
+             font-size: 20px; font-weight: 900; margin-bottom: 16px;
+             color: #fbbf24; display: flex; align-items: center; gap: 10px;
+             text-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+        }
+        .friendly-text {
+             font-size: 16px; line-height: 2.1; font-weight: 500;
+             text-align: justify; color: var(--text-primary); opacity: 0.95;
+        }
+
+        /* --- کارت‌های متنی --- */
+        .info-card { padding-right: 36px; }
+        .info-title {
+             font-size: 18px; font-weight: 900; margin-bottom: 16px;
+             display: flex; align-items: center; gap: 10px;
+         }
+        .info-body {
+             font-size: 15px; line-height: 2; font-weight: 400;
+             color: var(--text-primary); opacity: 0.9; white-space: pre-line; text-align: justify;
+         }
+
+        /* --- گرید آلاینده‌ها --- */
+        .pollutant-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .p-card {
+            background: var(--glass-bg); border-radius: 30px; padding: 24px;
+            border: 1px solid var(--glass-border); border-top: 1px solid var(--glass-highlight);
+            text-align: center;
+            backdrop-filter: blur(var(--glass-blur));
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            box-shadow: var(--card-shadow), var(--inner-shadow);
+        }
+        .p-val {
+             font-size: 36px; font-weight: 900; margin: 12px 0; color: var(--accent-color);
+             text-shadow: 0 0 20px rgba(52, 211, 153, 0.3);
+        }
+
+        /* --- کارت فاز ماه (جدید) --- */
+        .moon-card {
+            border-right: 8px solid #a78bfa;
+            background: linear-gradient(135deg, rgba(20,20,40,0.8), rgba(0,0,0,0.2));
+            display: flex; flex-direction: column; gap: 20px;
+        }
+        .moon-header { display: flex; align-items: center; gap: 20px; }
+        .moon-visual {
+            width: 100px; height: 100px; position: relative; border-radius: 50%;
+            flex-shrink: 0; background-color: #0f172a; overflow: hidden;
+            box-shadow: 0 0 40px rgba(167, 139, 250, 0.2);
+        }
+        .moon-text-col { flex: 1; }
+        .moon-phase-name { font-size: 20px; font-weight: 900; color: #a78bfa; margin-bottom: 8px; }
+        .moon-desc { font-size: 14px; line-height: 2; opacity: 0.9; text-align: justify; color: var(--text-primary); }
+
+        /* --- کارت نمودار (جدید) --- */
+        .chart-card { padding: 20px; }
+        .chart-container { position: relative; height: 250px; width: 100%; margin-top: 10px; }
+
+        /* --- لیست پیش‌بینی ۷ روزه (جدید) --- */
+        .forecast-list { display: flex; flex-direction: column; gap: 12px; }
+        .forecast-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px; background: rgba(0,0,0,0.2); border-radius: 20px;
+            border: 1px solid var(--glass-border); transition: 0.2s;
+        }
+        .forecast-item:hover { background: rgba(255,255,255,0.05); }
+        .f-day { font-weight: 900; width: 80px; font-size: 15px; }
+        .f-icon { width: 40px; text-align: center; font-size: 24px; }
+        .f-desc-short { font-size: 13px; opacity: 0.7; flex: 1; padding: 0 15px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .f-temp { font-weight: 800; font-size: 16px; width: 90px; text-align: left; direction: ltr; color: var(--accent-color); }
+
+        /* --- کارت ارتفاع (جدید) --- */
+        .elevation-card { text-align: center; border-bottom: 8px solid var(--accent-color); }
+        .elev-icon { font-size: 48px; margin-bottom: 15px; display: block; animation: float 5s ease-in-out infinite; }
+        .elev-val { font-size: 38px; font-weight: 900; color: var(--accent-color); margin: 5px 0; text-shadow: 0 0 20px rgba(52, 211, 153, 0.4); }
+        .elev-desc { font-size: 15px; opacity: 0.8; font-weight: 500; margin-top: 10px; line-height: 1.8; }
+
+        /* --- انیمیشن‌های SVG --- */
+        .anim-sun { animation: spin 20s linear infinite; transform-origin: center; }
+        .anim-cloud { animation: float 6s ease-in-out infinite; }
+        .anim-rain { animation: rainDrop 0.8s linear infinite; }
+        .anim-snow { animation: snowDrop 3s linear infinite; }
+        .anim-thunder { animation: flash 5s infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes rainDrop { 0% { transform: translateY(0); opacity:1; } 100% { transform: translateY(30px); opacity:0; } }
+        @keyframes flash { 0%, 90%, 100% { opacity: 0; } 92%, 96% { opacity: 1; filter: drop-shadow(0 0 20px #facc15); } }
+
+        /* --- لودر و مودال سرچ --- */
+        #loader {
+            position: fixed; inset: 0; background: var(--bg-color); z-index: 200;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
+            transition: opacity 0.6s;
+        }
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100;
+            backdrop-filter: blur(25px); display: flex; justify-content: center; align-items: flex-end;
+            opacity: 0; pointer-events: none; transition: 0.4s;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        .modal-sheet {
+            width: 100%; max-width: 550px; background: var(--bg-color);
+            border-top-left-radius: 40px; border-top-right-radius: 40px;
+            padding: 36px; transform: translateY(100%); transition: 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            border-top: 1px solid var(--glass-border);
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+        }
+        .modal-overlay.open .modal-sheet { transform: translateY(0); }
+        .search-input {
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            padding: 20px; border-radius: 24px; color: var(--text-primary); font-family: inherit; font-weight: 700;
+            font-size: 18px; width: 100%; margin-top: 24px; text-align: center;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .search-item {
+             padding: 20px; border-bottom: 1px solid var(--glass-border); cursor: pointer; text-align: center;
+             color: var(--text-primary); font-weight: 500; transition: 0.2s;
+        }
+        .search-item:hover { background: rgba(255,255,255,0.05); }
+
+    </style></head><body>
+
+    <div class="liquid-blob">        <div class="blob blob-1"></div>        <div class="blob blob-2"></div>    </div>
+    <div id="particles"></div>
+    
+    <div id="loader">
+        <svg width="80" height="80" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <defs>
+                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:var(--accent-color);stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:var(--liquid-1);stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            <circle cx="12" cy="12" r="10" fill="none" stroke-dasharray="32" stroke-dashoffset="32" stroke="url(#grad1)">
+                <animate attributeName="stroke-dashoffset" from="64" to="0" dur="1.2s" repeatCount="indefinite"/>
+                <animate attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="2s" repeatCount="indefinite"/>
+            </circle>
+        </svg>
+        <div style="margin-top: 25px; font-size: 18px; font-weight: 700; opacity: 0.9; letter-spacing: -0.5px;">در حال دریافت دیتا...</div>
+    </div>
+
+    <div class="welcome-modal" id="welcome-modal">
+        <div class="welcome-card">
+            <div class="welcome-icon">🌍</div>
+            <h2 style="font-size: 24px; margin-bottom: 10px; font-weight: 900;">سلام! به هوای پاک پلاس خوش آمدید</h2>
+            <p style="opacity: 0.8; margin-bottom: 30px; line-height: 1.8;">برای شروع و ارائه دقیق‌ترین گزارش آب و هوا، لطفاً موقعیت مکانی خود را مشخص کنید.</p>
+            <button class="welcome-btn btn-primary" onclick="handleWelcomeGPS()">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="6"/></svg>
+                یافتن خودکار موقعیت
+            </button>
+            <button class="welcome-btn btn-secondary" onclick="handleWelcomeManual()">جستجوی دستی شهر</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="search-modal">        <div class="modal-sheet">            <div style="display:flex; justify-content:space-between; align-items:center;">                <span style="font-size:22px; font-weight:900;">کجا هستید؟</span>                <button onclick="toggleSearch(false)" style="background:none; border:none; color:var(--text-primary); font-size:28px; cursor:pointer;">✕</button>            </div>            <input type="text" class="search-input" id="city-input" placeholder="نام شهر را به انگلیسی بنویسید (مثلاً: tehran)" dir="rtl">            <div id="search-list" style="margin-top:20px; max-height:300px; overflow-y:auto;"></div>        </div>    </div>
+
+    <div id="app">
+                <header class="fade-in-up" style="animation-delay: 0.1s;">
+            <div class="location-pill" onclick="toggleSearch(true)">
+                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span id="loc-name">تهران</span>
+            </div>
+            
+            <div class="header-actions">
+                <div class="btn-circle" onclick="toggleTheme()" title="تغییر تم">
+                    <svg id="theme-icon" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </div>
+                <div class="btn-circle" onclick="getLocation()" title="موقعیت مکانی من">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="6"/></svg>
+                </div>
+            </div>
+        </header>  
+        <div class="hero-section fade-in-up" style="animation-delay: 0.2s;">            <div class="gauge-wrapper">                <svg class="gauge-svg" viewBox="0 0 240 240">                    <circle class="track" cx="120" cy="120" r="110"></circle>                    <circle id="aqi-ring" class="progress" cx="120" cy="120" r="110"></circle>                </svg>                <div class="hero-center">                    <div class="hero-val" id="aqi-val">--</div>                    <div class="hero-label" id="aqi-text">...</div>                </div>            </div>        </div>
+
+        <div class="glass-card friendly-card fade-in-up" style="animation-delay: 0.3s;">            <div class="friendly-title">                <span style="font-size: 24px;">👋</span>                <span>گزارش اختصاصی برای شما</span>            </div>            <div class="friendly-text" id="friendly-text">                در حال نگارش گزارش اختصاصی...            </div>        </div>
+
+        <div class="glass-card weather-visual-card fade-in-up" style="animation-delay: 0.4s;">            <div class="weather-anim-container" id="weather-icon-container"></div>            <div class="visual-temp" id="visual-temp">--°</div>            <div class="visual-desc" id="visual-desc">--</div>                        <div class="visual-grid">                <div class="v-item">                    <span class="v-icon" style="color:#60a5fa">💧</span>                    <span class="v-val" id="hum-val">--%</span>                    <span class="v-lbl">رطوبت نسبی</span>                </div>                <div class="v-item">                    <span class="v-icon" style="color:#a78bfa">💨</span>                    <span class="v-val" id="wind-val">--</span>                    <span class="v-lbl">باد (کیلومتر/ساعت)</span>                </div>            </div>        </div>
+
+        <div class="glass-card moon-card fade-in-up" style="animation-delay: 0.45s;">
+            <div class="moon-header">
+                <div class="moon-visual" id="moon-render">
+                    </div>
+                <div class="moon-text-col">
+                    <div class="moon-phase-name" id="moon-phase-name">--</div>
+                    <div style="font-size:12px; opacity:0.6; margin-bottom:5px;">وضعیت کیهانی امشب</div>
+                </div>
+            </div>
+            <div class="moon-desc" id="moon-desc">--</div>
+        </div>
+
+        <div class="glass-card chart-card fade-in-up" style="animation-delay: 0.5s;">
+            <div style="font-size:18px; font-weight:900; margin-bottom:15px; display:flex; gap:10px; align-items:center;">
+                <span style="color:var(--accent-color)">📈</span>
+                روند دمایی هفته آینده
+            </div>
+            <div class="chart-container">
+                <canvas id="forecastChart"></canvas>
+            </div>
+        </div>
+
+        <div class="glass-card fade-in-up" style="animation-delay: 0.55s;">
+            <div style="font-size:18px; font-weight:900; margin-bottom:20px; display:flex; gap:10px; align-items:center;">
+                <span>🗓️</span>
+                چشم‌انداز روزهای آینده
+            </div>
+            <div class="forecast-list" id="forecast-list">
+                </div>
+        </div>
+
+        <div class="glass-card info-card fade-in-up" style="animation-delay: 0.6s; border-right: 8px solid var(--accent-color);">            <div class="info-title" style="color:var(--accent-color);">                <span style="font-size: 22px;">🍃</span>                <span id="aqi-reco-head">توصیه هوشمند سلامتی</span>            </div>            <div class="info-body" id="aqi-reco-body">در حال تحلیل داده‌های سلامتی...</div>        </div>
+
+        <div class="glass-card info-card fade-in-up" style="animation-delay: 0.65s; border-right: 8px solid #60a5fa;">            <div class="info-title" style="color:#60a5fa;">                <span id="story-icon" style="font-size: 22px;">✨</span>                <span id="story-head">داستان آسمان</span>            </div>            <div class="info-body" id="story-body">در حال شنیدن صدای آسمان...</div>        </div>                <div class="glass-card info-card fade-in-up" style="animation-delay: 0.7s; border-right: 8px solid #818cf8;">            <div class="info-title" style="color:#818cf8;">                <span style="font-size: 22px;">🌧️</span>                <span>پیش‌بینی بارش (۲۴ ساعت)</span>            </div>            <div>                <div style="font-size:18px; font-weight:900; margin-bottom: 8px;" id="rain-title">--</div>                <div style="font-size:15px; opacity:0.8; line-height:1.8; text-align:justify;" id="rain-desc">--</div>            </div>        </div>
+
+        <div class="glass-card elevation-card fade-in-up" style="animation-delay: 0.75s;">
+            <span class="elev-icon">🏔️</span>
+            <div style="font-size:16px; font-weight:700;">ارتفاع شما از سطح دریا</div>
+            <div class="elev-val" id="elev-val">--</div>
+            <div class="elev-desc" id="elev-desc">--</div>
+        </div>
+
+        <div class="pollutant-grid fade-in-up" style="animation-delay: 0.8s;">            <div class="p-card">                <span style="font-size:32px; margin-bottom: 5px;">😷</span>                <div class="p-val" id="pm25-val">--</div>                <div style="font-size:14px; font-weight:700; opacity:0.7;">ذرات PM2.5</div>            </div>            <div class="p-card">                <span style="font-size:32px; margin-bottom: 5px;">🌫️</span>                <div class="p-val" id="no2-val">--</div>                <div style="font-size:14px; font-weight:700; opacity:0.7;">دی‌اکسید نیتروژن</div>            </div>        </div>
+
+        <footer class="fade-in-up" style="animation-delay: 0.9s; text-align:center; font-size:14px; font-weight:500; opacity:0.4; margin-top:40px;">            طراحی و توسعه توسط پیمان عابدین پور ❤️ | نسخه اولترا پلاس        </footer>    </div>
+<script>
+    const toFarsi = (n) => n?.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]) || '-';
+    let isLight = false;
+    let chartInstance = null;
+
+    // --- تنظیمات Chart.js ---
+    if (typeof Chart !== 'undefined') {
+        Chart.defaults.font.family = 'Vazirmatn';
+        Chart.defaults.color = '#94a3b8';
+    }
+
+    // --- تغییر تم (دارک/لایت) ---
+    function toggleTheme() {
+        isLight = !isLight;
+        document.body.classList.toggle('light-mode');
+        const icon = document.getElementById('theme-icon');
+        if(isLight) {
+            icon.innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+        } else {
+            icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+        }
+        if(chartInstance) {
+            chartInstance.options.scales.y.grid.color = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)';
+            chartInstance.update();
+        }
+    }
+
+    // --- آیکون‌های SVG ---
+    function getWeatherSVG(code, isDay) {
+        const sunColor = "#facc15";
+        const cloudColor = isLight ? "#94a3b8" : "#cbd5e1"; 
+        const cloudFilter = "filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));";
+        
+        if (code <= 1) return isDay ? 
+            `<svg viewBox="0 0 100 100" overflow="visible"><defs><filter id="glow"><feGaussianBlur stdDeviation="5" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="50" cy="50" r="24" fill="${sunColor}" filter="url(#glow)"><animate attributeName="r" values="24;28;24" dur="4s" repeatCount="indefinite"/></circle><g class="anim-sun" stroke="${sunColor}" stroke-width="4" stroke-linecap="round"><line x1="50" y1="10" x2="50" y2="-5"/><line x1="50" y1="90" x2="50" y2="105"/><line x1="10" y1="50" x2="-5" y2="50"/><line x1="90" y1="50" x2="105" y2="50"/><line x1="22" y1="22" x2="12" y2="12"/><line x1="78" y1="78" x2="88" y2="88"/><line x1="22" y1="78" x2="12" y2="88"/><line x1="78" y1="22" x2="88" y2="12"/></g></svg>` : 
+            `<svg viewBox="0 0 100 100"><path d="M40 20 A30 30 0 1 0 80 70 A20 20 0 1 1 40 20" fill="#f1f5f9" filter="drop-shadow(0 0 20px rgba(255,255,255,0.6))"/><circle cx="65" cy="45" r="3" fill="#94a3b8" opacity="0.6"/><circle cx="50" cy="65" r="4" fill="#94a3b8" opacity="0.4"/></svg>`;
+        
+        if (code <= 3) return `<svg viewBox="0 0 100 100" overflow="visible"><path class="anim-cloud" d="M25,60 a20,20 0 0,1 0,-40 a20,20 0 0,1 40,0 a20,20 0 0,1 0,40 z" fill="${cloudColor}" stroke="white" stroke-width="1.5" style="${cloudFilter}"/></svg>`;
+        if (code <= 67 || code >= 80 && code <= 82) return `<svg viewBox="0 0 100 100" overflow="visible"><path class="anim-cloud" d="M25,60 a20,20 0 0,1 0,-40 a20,20 0 0,1 40,0 a20,20 0 0,1 0,40 z" fill="${cloudColor}" style="${cloudFilter}"/><g class="anim-rain"><line x1="35" y1="65" x2="30" y2="85" stroke="#60a5fa" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="65" x2="45" y2="90" stroke="#60a5fa" stroke-width="4" stroke-linecap="round"/><line x1="65" y1="65" x2="60" y2="85" stroke="#60a5fa" stroke-width="4" stroke-linecap="round"/></g></svg>`;
+        if (code >= 71 && code <= 77 || code >= 85) return `<svg viewBox="0 0 100 100" overflow="visible"><path class="anim-cloud" d="M25,60 a20,20 0 0,1 0,-40 a20,20 0 0,1 40,0 a20,20 0 0,1 0,40 z" fill="${cloudColor}" style="${cloudFilter}"/><g class="anim-snow"><circle cx="35" cy="75" r="5" fill="white"/><circle cx="55" cy="85" r="5" fill="white"/><circle cx="70" cy="70" r="5" fill="white"/></g></svg>`;
+        if (code >= 95) return `<svg viewBox="0 0 100 100" overflow="visible"><path class="anim-cloud" d="M25,60 a20,20 0 0,1 0,-40 a20,20 0 0,1 40,0 a20,20 0 0,1 0,40 z" fill="#475569" style="${cloudFilter}"/><path class="anim-thunder" d="M45,60 L35,80 L50,80 L40,105" fill="none" stroke="#facc15" stroke-width="6" stroke-linejoin="round" filter="drop-shadow(0 0 15px #facc15)"/></svg>`;
+        
+        return `<svg viewBox="0 0 100 100"><g stroke="${cloudColor}" stroke-width="4" stroke-linecap="round"><line x1="20" y1="40" x2="80" y2="40"/><line x1="10" y1="60" x2="90" y2="60" opacity="0.7"/><line x1="30" y1="80" x2="70" y2="80" opacity="0.4"/></g></svg>`;
+    }
+
+    function getSmallIcon(code) {
+        if (code <= 1) return '☀️';
+        if (code <= 3) return '☁️';
+        if (code <= 67) return '🌧️';
+        if (code <= 77) return '❄️';
+        if (code >= 95) return '⛈️';
+        return '🌥️';
+    }
+
+    function checkIsNight(date = new Date(), sunriseHour = null, sunsetHour = null) {
+        const currentHour = date.getHours();
+        if (sunriseHour !== null && sunsetHour !== null) {
+            return currentHour < sunriseHour || currentHour >= sunsetHour;
+        }
+        const month = date.getMonth() + 1;
+        let estimatedSunrise, estimatedSunset;
+        if (month >= 1 && month <= 3) { estimatedSunrise = 7; estimatedSunset = 17; } 
+        else if (month >= 4 && month <= 6) { estimatedSunrise = 6; estimatedSunset = 19; } 
+        else if (month >= 7 && month <= 9) { estimatedSunrise = 6; estimatedSunset = 20; } 
+        else { estimatedSunrise = 7; estimatedSunset = 17; }
+        return currentHour < estimatedSunrise || currentHour >= estimatedSunset;
+    }
+
+    // --- وضعیت دوستانه (کامل) ---
+// --- وضعیت دوستانه و صمیمی (نسخه نهایی: ادبی، سینمایی و باوقار) ---
+    function getFriendlyStatus(t, wCode, wind, hum, isDay) {
+        
+        // تابع انتخاب تصادفی برای تنوع بخشی به مکالمات
+        const pick = (opts) => opts[Math.floor(Math.random() * opts.length)];
+        
+        // بخش خوش‌آمدگویی: گرم، محترمانه و دعوت‌کننده
+        const greeting = isDay ? 
+            pick([
+                "سلام دوست عزیزم، روزت سرشار از روشنایی. ☀️ ",
+                "درود بر تو! امیدوارم لحظاتت پر از آرامش باشه. ",
+                "سلام! چه فرصت خوبی برای تجربه کردنِ امروزه. ",
+                "وقت بخیر همراه من، امیدوارم حالت عالی باشه. ",
+                "سلامی گرم در این روز زیبا تقدیم تو. "
+            ]) : 
+            pick([
+                "شب بخیر دوست من، امیدوارم خستگی روز رو فراموش کنی. 🌙 ",
+                "درود! شب آرام و پرستاره‌ای داشته باشی. ✨ ",
+                "سلام. سکوت شب بهترین زمان برای آرامش ذهنه. ",
+                "شب خوش! امیدوارم رویاهای شیرینی ببینی. 🌌 ",
+                "سلامی از جنس آرامش شبانه. "
+            ]);
+
+        let body = "";
+
+        // --- ۱. یخبندان و سرمای شدید (زیر صفر درجه) ---
+        // توصیف: سکوت، کریستال‌های یخ، زیبایی بصری در کنار هشدار جدی
+        if (t < 0) {
+            if ([71, 73, 75, 77, 85, 86].includes(wCode)) { // برف
+                body = pick([
+                    "شهر زیر پوششی از حریر سفید به خواب رفته و دانه‌های برف با ظرافتی بی‌نظیر در هوا می‌رقصند. ❄️ این منظره، شاهکارِ هنری طبیعت است؛ آرام، سفید و بی‌نهایت زیبا. اما در پس این زیبایی، سرمایی گزنده نهفته است که اگر بدون آمادگی با آن روبرو شوی، تمام وجودت را کرخت می‌کند. بهترین پیشنهاد؟ تماشای این شکوه از پشت پنجره‌ای گرم با نوشیدنی محبوبت. اما اگر ناچار به رفتن هستی، شال‌گردن و کلاه ضخیم، سپرهای تو در برابر این سرما خواهند بود.",
+                    "صدای قدم‌هایت روی برف‌های تازه، تنها موسیقیِ این سکوتِ مطلق است. ☃️ دما به قدری پایین است که هر بازدم، ابری کوچک در هوا می‌سازد. طبیعت با رنگ سفید، چهره‌ای تازه و معصوم به شهر بخشیده، اما زمین‌ها لغزنده و فریبنده‌اند. قدم‌هایت را با احتیاط بردار و اجازه نده زیبایی برف، خطرات یخ‌زدگی را از یادت ببرد. این هوا برای ثبت خاطرات تصویری بی‌نظیر است، به شرطی که لباس‌هایت به اندازه کافی گرم باشند.",
+                    "زمستان با تمام وقار و قدرتش بر شهر حکمرانی می‌کند. 🌨️ بارش برف، افق دید را محدود کرده و فضایی رازآلود پدید آورده است. امروز از آن روزهایی است که خانه، امن‌ترین و دلپذیرترین پناهگاه دنیاست. اگر می‌توانی، قرارهای غیرضروری را به روزی دیگر موکول کن و از گرمای مطبوع خانه لذت ببر. اما اگر بیرون هستی، لایه لایه لباس بپوش تا گرمای بدنت حفظ شود."
+                ]);
+            } else { // سرمای خشک / یخبندان
+                body = pick([
+                    "هوا شفاف، شیشه‌ای و به‌شدت سرد است؛ گویی زمان در انجماد متوقف شده. 🥶 خبری از بارش نیست، اما سوز سرما مانند تیغی نامرئی بر صورت می‌نشیند. آسمان ممکن است آبی و فریبنده باشد، اما خورشید در این دما تنها یک تماشاگر سرد است. امروز لباس‌های پشمی و عایق، بهترین همراهان تو هستند. مراقب باش، چون در این دما فلزات و سطوح خارجی می‌توانند به پوسته آسیب بزنند.",
+                    "شب یا روزی که در آن نفس‌ها در سینه حبس می‌شوند. 🧊 زمین سخت و منجمد است و آب‌چاله‌ها به آینه‌های یخی تبدیل شده‌اند. این هوای سرد و خشک، هشیاری عجیبی به ذهن می‌بخشد اما برای جسم، چالشی بزرگ است. اگر اهل ورزش در فضای بازی، امروز احتیاط کن چون تنفس هوای زیر صفر می‌تواند به ریه‌ها فشار بیاورد. یک نوشیدنی گرم در فلاسک، همسفری نجات‌بخش خواهد بود.",
+                    "سکوت مطلق زمستانی بر فضا حاکم شده. ❄️ دماسنج‌ها اعدادی را نشان می‌دهند که شوخی‌بردار نیست. اگر پوشش مناسبی داشته باشی، پیاده‌روی کوتاه در این هوای استریل و تمیز لذت‌بخش است، اما ایستادن و سکون، یعنی تسلیم شدن در برابر سرما. امروز قدردانِ گرمای خانه و سیستم‌های گرمایشی خواهیم بود."
+                ]);
+            }
+        } 
+        
+        // --- ۲. سرمای زمستانی (۰ تا ۱۰ درجه) ---
+        // توصیف: پالتو، کافه، هوای گرفته، بوی نم
+        else if (t < 10) {
+            if (wCode >= 51 || wCode === 3) { // باران سرد یا ابری
+                body = pick([
+                    "ترکیبی از سرما و رطوبت، فضایی ملایم و کمی اندوهگین اما بسیار باکلاس ساخته است. 🌧️ قطرات باران بر شیشه‌ها می‌کوبند و انعکاس نورها روی آسفالت خیس، شهر را سینمایی کرده است. این هوا نیازمند پوششی است که هم گرم باشد و هم در برابر رطوبت مقاوم. چترت را همراه داشته باش دوست من. صدای باران، آرام‌بخش‌ترین موسیقی برای تمرکز یا استراحت است.",
+                    "آسمان جامه خاکستری پوشیده و هوای نمناک، سرما را عمیق‌تر می‌کند. ☔ پیاده‌روی در این هوا یعنی مواجهه با چاله‌های آب و نسیم سرد، پس کفش مناسب اولویت اول است. شاید فضا کمی دلگیر به نظر برسد، اما تنفس این هوای شسته شده و پاک، هدیه‌ای ارزشمند برای ریه‌هاست. صبور باش، ترافیک روزهای بارانی بخشی از ماجراست.",
+                    "هوایی ابری و سرد که جان می‌دهد برای خلوت کردن در کنج یک کافه یا خواندن کتابی ناتمام. ☁️ نور خورشید فیلتر شده و ملایم است. نیاز به تجهیزات سنگین نیست، اما یک پالتو یا کاپشن گرم ضروری است. روزی آرام برای کارهای فکری و هنری، به دور از هیاهو و شلوغی."
+                ]);
+            } else if ([45, 48].includes(wCode)) { // مه
+                body = pick([
+                    "شهر در هاله‌ای از مه غلیظ و اسرارآمیز فرو رفته است. 🌫️ دید محدود شده و همه چیز حالتی رویاگونه و نرم پیدا کرده است. رانندگی در این شرایط نیازمند هوشیاری و آرامش کامل است. رطوبتِ مه، سرما را به لایه‌های زیرین لباس می‌رساند، پس گرم بپوش. قدم زدن در مه، تجربه‌ای متفاوت است؛ گویی در میان ابرها راه می‌روی.",
+                    "فضایی مه‌آلود که چراغ‌های شهر را به لکه‌هایی نورانی و محو تبدیل کرده است. 👻 سکوتی خاص حکم‌فرماست و صداها بم‌تر شنیده می‌شوند. مراقب باش، این رطوبتِ سرد می‌تواند زمینه‌ساز سرماخوردگی شود. اگر حساسیت تنفسی داری، شاید استفاده از ماسک ایده خوبی باشد. از این اتمسفر خاص و متفاوت لذت ببر."
+                ]);
+            } else { // صاف و سرد
+                body = pick([
+                    "هوا سرد است و سوز زمستانی بر گونه‌ها می‌نشیند، اما آسمان صاف و امیدوارکننده است. 🧣 هنوز به یخبندان نرسیده‌ایم اما توقف در فضای باز دشوار است. این هوا فرصتی عالی برای استایل‌های شیک زمستانی و قدم زدن‌های سریع است. فراموش نکن که سرما راه نفوذش را از گردن و دست‌ها پیدا می‌کند، پس مجهز باش.",
+                    "یک روز سرد واقعی با آسمانی به رنگ آبیِ عمیق. 🧥 اگر خورشید می‌تابد، از پشت پنجره لذت‌بخش است اما در بیرون گرمای چندانی ندارد. احتمال سرماخوردگی در این دما بالاست، پس سیستم ایمنی‌ات را تقویت کن. پیاده‌روی سریع در این هوای تمیز، خون را در رگ‌هایت به جریان می‌اندازد و نشاط‌آور است.",
+                    "سرد، خشک و شفاف. 🌬️ این هوا خواب‌آلودگی را می‌شوید و ذهن را بیدار می‌کند. اگر خوب پوشیده باشی، احساس تازگی خواهی کرد. قرارهای دوستانه در فضاهای گرم و صمیمی، بهترین انتخاب برای امروز است."
+                ]);
+            }
+        } 
+        
+        // --- ۳. خنک و پاییزی (۱۰ تا ۱۸ درجه) ---
+        // توصیف: خش‌خش برگ‌ها، باد، پیاده‌روی، تعادل
+        else if (t < 18) {
+            if (wind > 15) { // بادی
+                body = pick([
+                    "باد در کوچه‌ها می‌پیچد و برگ‌ها را به رقصی آشفته دعوت می‌کند. 🍃 هوا خنک است، اما وزش باد باعث می‌شود احساس سرما کنی. پوشیدن یک بادگیر یا لباس کلاه‌دار، هوشمندانه‌ترین انتخاب امروز است. این هوا انرژی سرکش و زنده‌ای دارد، هرچند ممکن است نظم موهایت را به هم بریزد! هندزفری را بگذار و با ریتم باد هماهنگ شو.",
+                    "پاییز با تمام شکوهش خودنمایی می‌کند. 🍂 نسیمی خنک می‌وزد که روح را تازه می‌کند. نه آنقدر سرد که بلرزی و نه گرم. یک ژاکت سبک یا هودی کافیست. صدای هوهوی باد، فضای بیرون را دراماتیک کرده است. بهترین زمان برای اینکه در شهر قدم بزنی و افکارت را مرتب کنی."
+                ]);
+            } else if (wCode >= 51) { // باران ملایم
+                body = pick([
+                    "بارانی ریز و لطیف می‌بارد و عطر خاک باران‌خورده (پتریکور) فضا را پر کرده است. 🌧️ این عطر، نوستالژیک‌ترین رایحه طبیعت است. هوا نه سرد است و نه گرم، فقط مرطوب و دلپذیر. بارانی‌ات را بپوش و بی‌هدف قدم بزن. خیس شدن در این باران ملایم، حس رهایی و آرامش عمیقی دارد.",
+                    "آسمان آرام می‌گرید و غبار شهر را می‌شوید. 🌦️ خیابون‌ها تمیز شده‌اند و هوا سبک است. شاید ترافیک کمی آزاردهنده باشد، اما صدای برخورد قطرات آب جبرانش می‌کند. روزی عالی برای نوشتن، تفکر و یا نوشیدن یک قهوه داغ در حین تماشای خیابان."
+                ]);
+            } else { // هوای عالی
+                body = pick([
+                    "چه تعادل دلپذیری در هوا برقرار است! 🧥 نه ردی از گرماست و نه گزند سرما. پنجره‌ها را بگشا و اجازه بده هوای تازه در خانه جریان یابد. این هوا جان می‌دهد برای تیپ‌های اسپرت و لایه‌لایه. اگر فرصت داری، حتماً زمانی را در فضای باز بگذران، حیف است این لطافت را از دست بدهی.",
+                    "هوا خنکایی شیک و مطبوع دارد، گویی طبیعت سیستم تهویه را روی بهترین درجه تنظیم کرده است. 😍 بهترین زمان برای ورزش، دویدن یا پیاده‌روی‌های طولانی. آسمان شفاف است و به تو اجازه می‌دهد بدون کلافگی به تمام کارهایت برسی. امروز انرژی‌ات باید در بالاترین سطح باشد.",
+                    "از آن روزهایی است که آرزو می‌کنی تمام نشود. 🌆 هوا پوست را نوازش می‌کند و حس سبکی می‌دهد. یک لباس سبک کافیست تا بزنی به دل خیابان. حال و هوای شهر در این دما، مثبت، آرام و دوست‌داشتنی است.",
+                    "خنک، سبک و سرشار از اکسیژن. 🍃 نه تعریق آزارت می‌دهد و نه لرزش سرما. اگر می‌توانی مسیرت را پیاده طی کن. این هوا معجزه می‌کند؛ استرس را دور می‌ریزد و اعصاب را آرام می‌کند."
+                ]);
+            }
+        } 
+        
+        // --- ۴. بهاری و دلپذیر (۱۸ تا ۲۷ درجه) ---
+        // توصیف: کمال، شادی، نور، زندگی
+        else if (t < 27) {
+            if (isDay) {
+                if (wCode <= 2) { // آفتابی
+                    body = pick([
+                        "بهشت یعنی همین وضعیت! 🌼 هوا آنقدر عالی است که ماندن در فضای بسته کم‌لطفی به خودت است. خورشید با مهربانی می‌تابد و نسیمی ملایم گونه‌ها را لمس می‌کند. سطح انرژی مثبت در اوج است. اگر می‌توانی، دمی فارغ از کار شو و به دل طبیعت بزن. یک ناهار در فضای باز، روزت را می‌سازد.",
+                        "امروز از آن روزهایی است که گویی فیلتر رنگی دنیا را روشن‌تر کرده‌اند. ☀️ دما بی‌نظیر است و طبیعت در زیباترین حالت خود جلوه‌گری می‌کند. شیشه‌های ماشین را پایین بده و از جریان هوا لذت ببر. پیاده‌روی، خرید و معاشرت در این هوا طعم دیگری دارد.",
+                        "خورشید می‌درخشد اما نمی‌سوزاند. 😎 عینک آفتابی‌ات را بزن و از تماشای شهر غرق در نور لذت ببر. لباس‌های نخی و رنگ روشن بپوش. امروز روزی است که باید لبخند زد، چرا که شرایط جوی دقیقاً با حال خوب هماهنگ است.",
+                        "یک روز بهاری کلاسیک و بی‌نقص. 🌸 آواز پرندگان شنیده می‌شود و هوا عطر شکوفه می‌دهد. هیچ بهانه‌ای برای رخوت نیست. بیرون برو و سهمت را از ویتامین D و شادی بگیر. حال دلت با این هوا کوک می‌شود."
+                    ]);
+                } else { // ابری
+                    body = pick([
+                        "هوا ابری است اما دما فوق‌العاده مطلوب. 🌥️ نوری ملایم و دیفیوز شده (پخش شده) از میان ابرها می‌تابد که بهترین نور برای عکاسی است. نه گرمت می‌شود نه سرد. روزی آرام، باثبات و بدون حواس‌پرتی برای انجام کارهای عقب‌افتاده.",
+                        "آسمان بوم نقاشی شده و ابرها تکه‌های پنبه‌ای روی آن هستند. 🎨 هوا لطیف است و گاهی نسیمی می‌وزد که روح را جلا می‌دهد. اگر پارکی در نزدیکی است، روی چمن‌ها دراز بکش و حرکت ابرها را تماشا کن؛ آرامش خالص."
+                    ]);
+                }
+            } else { // شب
+                body = pick([
+                    "چه شبی! رویایی، آرام و دلپذیر. 🌙 دما برای شب‌نشینی‌های طولانی یا قدم زدن زیر نور ماه ایده‌آل است. نه اثری از سرماست و نه گرما. سکوت شب همراه با این هوای لطیف، مرهمی برای خستگی‌های روزانه است. چای نوشیدن در بالکن را از دست نده.",
+                    "شب فرا رسیده اما هوا همچنان دلبری می‌کند. ✨ خنکایی بسیار ملایم که خواب را شیرین و عمیق می‌کند. می‌توانی پنجره اتاق را باز بگذاری تا نسیم صبحگاهی بیدارت کند. صدای شهر در این هوا حسی از زنده بودن و در عین حال آرامش دارد.",
+                    "یک شب مخملی و زیبا. 🌌 ستاره‌ها در آسمان می‌درخشند. هوا جان می‌دهد برای پیاده‌روی‌های طولانی و گفتگوهای عمیق با دوستان. استرس‌ها را دور بریز و در لحظه حال زندگی کن.",
+                    "هوا در شب بسیار سبک شده است. 🌠 نه نیاز به پتو داری و نه سیستم سرمایشی. آرامشی خاص در فضا موج می‌زند. اگر بیداری، موسیقی ملایمی گوش بده و به آسمان خیره شو تا ذهنت پرواز کند."
+                ]);
+            }
+        } 
+        
+        // --- ۵. گرم و تابستانی (۲۷ تا ۳۵ درجه) ---
+        // توصیف: تابستان، استخر، سایه، نوشیدنی خنک
+        else if (t < 35) {
+            if (hum > 60) { // شرجی
+                body = pick([
+                    "هوا گرم است و رطوبت بالا، فضایی چسبناک ایجاد کرده. 💧 گویی هوا سنگین شده و تنفس عمیق را دشوار می‌کند. فعالیت بدنی باعث تعریق شدید می‌شود. لباس‌های گشاد و الیاف طبیعی بپوش. ساحل یا استخر در این شرایط حکم بهشت را دارد، اما مرکز شهر کلافه‌کننده است.",
+                    "شرجی و گرم! 🥵 حس می‌کنی در یک سونای بخار بزرگ قدم می‌زنی. سایه‌ها هم خنک نیستند. آب بدنت به سرعت تبخیر می‌شود، پس بطری آب را لحظه‌ای از خودت جدا نکن. اگر سیستم خنک‌کننده داری، امروز بهترین رفیق توست. بیرون رفتن را به حداقل برسان."
+                ]);
+            } else { // گرم خشک
+                body = pick([
+                    "تابستان قدرت‌نمایی می‌کند! ☀️ خورشید مستقیم و بی‌پروا می‌تابد. سایه‌ها اکنون ارزشمندترین نقاط شهر هستند. عینک آفتابی و کلاه لبه‌دار ضروری است. یک بستنی خنک، آیس‌کافی یا شربت سنتی در این هوا معجزه می‌کند و نشاط را برمی‌گرداند.",
+                    "هوا گرم است و بوی تابستان در فضا پیچیده. 🔥 شور و هیجان در شهر بالاست. شاید ظهرها کلافه‌کننده باشد، اما عصرها که تیزی آفتاب می‌رود، هوا قابل تحمل‌تر می‌شود. قبل از سوار شدن به ماشین، درها را باز بگذار تا حرارت خارج شود. هیدراته ماندن (نوشیدن آب) فراموش نشود.",
+                    "گرمایی خشک و سوزان. 🌵 پوست در این هوا خشک می‌شود، پس مرطوب‌کننده بزن. لباس‌های رنگ روشن بپوش تا نور خورشید را منعکس کنند. اکنون زمان مناسبی برای تفریحات آبی است. مراقب گرمازدگی باش و زیاد زیر تابش مستقیم نمان.",
+                    "آفتاب زمین را داغ کرده است. 😎 اگر عاشق خورشیدی، امروز روز توست. اما به یاد داشته باش اشعه UV بالاست، پس ضدآفتاب بزن. روزی پرانرژی برای کارهایی که تحرک فیزیکی زیادی نمی‌خواهند.",
+                    "شب‌های تابستانی، گرم و زنده. 🌃 خورشید رفته اما گرمای روز در سنگ‌فرش‌ها باقی مانده. مردم در پارک‌ها و خیابان‌ها حضور دارند. یک شام سبک در فضای باز بسیار دلچسب است. کولر را روشن کن و با آرامش بخواب.",
+                    "گرما حتی در شب هم احساس می‌شود. 🌡️ پنجره‌ها را باز بگذار، شاید نسیمی بوزد. یک دوش ولرم قبل از خواب، کیفیت خوابت را نجات می‌دهد و دمای بدنت را تنظیم می‌کند."
+                ]);
+            }
+        } 
+        
+        // --- ۶. گرمای طاقت‌فرسا (بالای ۳۵ درجه) ---
+        // توصیف: کویر، خطر، ذوب شدن، پناه گرفتن
+        else {
+            body = pick([
+                "وضعیت حرارتی قرمز! بیرون به معنای واقعی کلمه تبدیل به کوره شده است. 🔥 آسفالت در حال نرم شدن است و امواج گرما از سطوح بلند می‌شود. تنفس هوای داغ دشوار است. اگر کار حیاتی نداری، در خنکای خانه بمان و انرژی‌ات را ذخیره کن. بیرون رفتن در این ساعات یعنی استقبال از خطر گرمازدگی.",
+                "گویی خورشید پایین آمده و زمین را در آغوش گرفته است! 🥵 دماسنج‌ها اعدادی باورنکردنی را نشان می‌دهند. اگر بادی بوزد، مانند باد سشوار داغ است. سایه‌ها هم پناهگاه خنکی نیستند. فعالیت بدنی اکیداً ممنوع! تا می‌توانی مایعات بنوش و لباس تیره نپوش.",
+                "گرمایی که نفس را می‌گیرد! 🌋 حیوانات شهری تشنه‌اند، اگر می‌توانی ظرفی آب برایشان بگذار. تنها خنکی هندوانه و آب یخ می‌تواند التهاب درون را آرام کند. شب‌ها هم هوا دم‌کرده باقی می‌ماند. چاره‌ای نیست جز صبر تا عبور این موج گرما.",
+                "داغ، سوزان و سنگین. ☀️ حتی عینک آفتابی هم حریف شدت نور نمی‌شود. مراقب کودکان و سالمندان باش. سیستم خنک‌کننده ماشینت را چک کن. امروز هدف فقط خنک ماندن است، نه کار سخت. زیاد به خودت فشار نیاور دوست من."
+            ]);
+        }
+
+        // --- ۷. شرایط خاص جوی (رعد و برق و طوفان) ---
+        // (Override - اولویت با شرایط خطرناک است)
+        if ([95, 96, 99].includes(wCode)) {
+            body = pick([
+                "آسمان نمایشی دراماتیک به راه انداخته است! ⚡ رعد و برق و طوفان شدید در جریان است. جای امن را ترک نکن و از درختان و دکل‌های مرتفع فاصله بگیر. این قدرت‌نمایی باشکوه طبیعت است؛ از پنجره تماشا کن و لذت ببر، اما بیرون نرو.",
+                "سمفونی نور و صدا در آسمان! 🌩️ غرش ابرها زمین را می‌لرزاند و احتمالا تگرگ می‌بارد. خیابان‌ها ممکن است دچار آب‌گرفتگی شوند. یک فنجان چای بریز و منتظر باش تا خشم طبیعت فروکش کند. ایمنی را اولویت قرار بده.",
+                "برق آسمان می‌درخشد و ابرها می‌غرند! ⛈️ هوا به‌شدت ناپایدار است. اگر بیرون هستی سریعاً پناه بگیر. استفاده از چتر در این رعد و برق خطرناک است. وسایل الکترونیکی حساس را از برق بکش. هیجانی آمیخته با دلهره در فضا موج می‌زند.",
+                "طوفان تندری در حال شستن شهر است. 🌪️ باد و باران هم‌دست شده‌اند. دید رانندگی به حداقل رسیده است. بهترین کار ماندن در خانه و تماشای این شکوهِ ترسناک از پشت شیشه است. مراقب خودت باش و ریسک نکن."
+            ]);
+        }
+
+        return greeting + body;
+    }
+
+    // --- پیام کیفیت هوا (کامل) ---
+    function getAirQualityMessage(aqi) {
+        const pick = (options) => options[Math.floor(Math.random() * options.length)];
+        
+        if (aqi <= 50) return pick([
+            { text: "حالا که خوش‌شانسی آوردی! 🎉 امروز ریه‌هات نمی‌خوان خودشونو بکشن. هوا عالیه!\nتوصیه: از فرصت استفاده کن. پنجره‌ها رو باز کن و فقط بری بیرون تا نفس کشیدن رو احساس کنی." },
+            { text: "هوای کریستالی و نایاب! 💎 باورت نمیشه ولی الان کیفیت هوا در حد کوه‌های آلپ تمیزه!\nتوصیه: حیفه که تو خونه بمونی. پنجره‌ها رو تا آخر باز کن. عمیق نفس بکش و ریه‌هات رو جشن بگیر." },
+            { text: "تنفس زندگی خالص 🌿 امروز ریه‌هات ازت تشکر می‌کنن! هوا انقدر پاکه که هر نفسش بهت انرژی میده.\nتوصیه: این بهترین فرصت برای پیک‌نیک یا پیاده‌روی طولانی تو فضای بازه." },
+            { text: "شفافیت 4K آسمان 🏔️ اگه به دوردست نگاه کنی، کوه‌ها و ساختمون‌ها رو با وضوح باورنکردنی می‌بینی.\nتوصیه: الان وقتشه که بری بیرون و با طبیعت آشتی کنی. این هوا سیستم ایمنی بدنت رو تقویت می‌کنه." },
+            { text: "اکسیژن‌تراپی رایگان 🧘‍♂️ امروز هوا داروی روح و جسمه. سطح آلاینده‌ها تقریباً صفره.\nتوصیه: پنجره اتاق خوابت رو باز بذار تا شب تو هوای تمیز بخوابی." },
+            { text: "وضعیت سبز: آرامش مطلق 💚 همه چی آرومه و هوا پاک. هیچ خطری تهدیدت نمی‌کنه.\nتوصیه: می‌تونی با خیال راحت نوزاد یا سالمندان رو ببری بیرون. حس تازگی و طراوت تو هوا موج می‌زنه." }
+        ]);
+
+        if (aqi <= 100) return pick([
+            { text: "آره، هوا نسبتا خوبه. خیلی زیاد هم خراب نیست. 😊\nتوصیه: برو به کارت برس. اگه حساسیت خیلی داری، ممکنه یه کمی اذیت بشی." },
+            { text: "هوای معمولی و بی‌خطر 😐 هوا عالی نیست ولی اذیت‌کننده هم نیست. یه وضعیت زردِ کم‌رنگ.\nتوصیه: می‌تونی کارهای روزمره‌ت رو انجام بدی و بیرون بری." },
+            { text: "نه عالی، نه بد 👌 کیفیت هوا تو محدوده «قابل قبول» قرار داره. یعنی می‌شه نفس کشید و نَمُرد!\nتوصیه: پیاده‌روی و ورزش سبک مشکلی نداره." },
+            { text: "وضعیت زرد: احتیاط برای خاص‌ها ⚠️ هوا سالمه اما یه هاله نازک از آلودگی تو افق دیده میشه.\nتوصیه: اگه آسم یا آلرژی شدید داری، ممکنه یه کم گلوت رو بزنه." },
+            { text: "شهر با فیلتر ملایم 🏙️ یک لایه نازک غبار روی شهر نشسته ولی هنوز وارد مرحله خطرناک نشده.\nتوصیه: فعالیت‌های خارج از خونه مجازه. نگران نباش، هنوز ماسک لازم نیست." },
+            { text: "مرز باریک سلامتی 🚧 شاخص داره به سمت ۱۰۰ نزدیک میشه. هوا هنوز تو دسته سالمه ولی داره تلاش می‌کنه خراب بشه!\nتوصیه: اگه سیستم ایمنی قوی داری، برو بیرون و لذت ببر." }
+        ]);
+
+        if (aqi <= 150) return pick([
+            { text: "هوا برای آدم‌های حساس خطرناکه. 😷 هشدار زرد، یه جورایی دیگه خودت می‌دونی چی می‌گم.\nتوصیه: اگه بچه داری، سالمند تو خونه هست یا بارداری، دیگه بیرون نرو! اصلاً ارزشش رو نداره." },
+            { text: "نارنجی شدیم: هشدار حساسیت 😷 خب، هوا داره شوخی‌بردار نمیشه. شاخص رفته بالا.\nتوصیه: اگه جزو گروه‌های حساسی، لطفاً بیرون نرو. بقیه هم بهتره ورزش سنگین نکنن." },
+            { text: "سرفه ممنوع! 🤧 هوا یه بوی خاصی میده، بوی دود و ترافیک.\nتوصیه: اگه آسم داری، اسپریت رو حتماً چک کن. امروز روز دویدن تو پارک نیست." },
+            { text: "ریه‌هایت را دریاب 🫁 کیفیت هوا افت کرده و ذرات معلق زیاد شدن.\nتوصیه: سعی کن پنجره‌های رو به خیابون رو ببندی. یه روز آروم تو خونه با چای سبز گزینه بهتریه." },
+            { text: "غبار نارنجی در کمین 🏭 دید افقی کم شده و هوا رنگ و رو رفته‌ست.\nتوصیه: برای عموم مردم خطر فوری نداره ولی برای گروه‌های حساس سمه." },
+            { text: "احتیاط شرط عقله 🧐 شاید بیرون رو نگاه کنی و بگی «خوبه که!»، ولی گول نخور.\nتوصیه: اگه ورزشکاری، تایم ورزشت رو بنداز وقتی هوا بهتره یا برو باشگاه سرپوشیده." }
+        ]);
+
+        if (aqi <= 200) return pick([
+            { text: "هشدار قرمز! ⛔ اینجا دیگه هوا برای همه مسموم شده. کاملاً آلوده است.\nتوصیه: دیگه همین جا بمون! ماسک بزن، در غیر این صورت واقعاً داری خودتو بی‌خود می‌کشی." },
+            { text: "قرمزِ جیغ: خطر عمومی ⛔ هوا برای *همه* ناسالمه، نه فقط مریض‌ها. الان دیگه شوخی نداریم.\nتوصیه: هر کسی که بیرون بره داره به بدنش آسیب می‌زنه. ماسک فیلتردار (N95) الزامیه." },
+            { text: "خفگی در غبار 🌫️ آسمون خاکستری و دلمرده شده. نفس کشیدن سخت شده.\nتوصیه: کلاً بیخیال بیرون رفتن شو مگه اینکه کار حیاتی داشته باشی. مایعات و شیر زیاد بخور." },
+            { text: "اتاق گاز شهری ☠️ شاخص داره بیداد می‌کنه. غلظت آلاینده‌ها بالاست.\nتوصیه: هیچ درز و پنجره‌ای رو باز نذار. ترافیک موندن تو این وضعیت یعنی استنشاق مستقیم سم." },
+            { text: "ریه‌ها در خطر 🚑 وضعیت قرمزه. قلب و ریه زیر فشارن.\nتوصیه: امروز هیچ فعالیت بدنی سنگینی نکن، حتی تو خونه." },
+            { text: "ماسک‌ها بالا! 😷 بدون ماسک بیرون رفتن امروز اشتباه بزرگیه.\nتوصیه: اگه می‌تونی دورکاری کن یا مرخصی بگیر. ارزشش رو نداره." }
+        ]);
+
+        return pick([
+            { text: "خطر جدی و غیرقابل تحمل! ☠️ آلودگی از حد گذشت.\nتوصیه: اصلاً بیرون نرو. هر نفس کشیدن مثل یه تقلب به خودته. تمام درزها رو ببند." },
+            { text: "وضعیت بنفش: اضطرار 🟣 این دیگه هوا نیست، سمه! شاخص از ۲۰۰ رد شده.\nتوصیه: بیرون رفتن تو این شرایط دیوونگی محضه. درها و پنجره‌ها رو با چسب پهن ببند!" },
+            { text: "قیامتِ دودی ☢️ آلودگی به حد بحرانی رسیده. چشم‌ها می‌سوزه.\nتوصیه: هر دقیقه‌ای که بیرون باشی داری عمرت رو کم می‌کنی. دستگاه تصفیه هوا رو بذار رو دور تند." },
+            { text: "خطر مرگبار (Maroon) 🏴 شاخص به رنگ خرمایی (خطرناک) رسیده.\nتوصیه: بیرون نرو! تکرار می‌کنم، بیرون نرو! امروز فقط استراحت مطلق مجازه." },
+            { text: "شهرِ ارواح 👻 تو خیابون‌ها جای دیدن آدم، فقط دود می‌بینی.\nتوصیه: اگه آسم یا مشکل قلبی داری، کپسول اکسیژنت دم دستت باشه. شرایط جنگیه!" },
+            { text: "سیاهچاله آلودگی 🌚 روز روشن تاریک شده. خورشید پشت لایه‌های دود گم شده.\nتوصیه: هیچ فعالیت فیزیکی نکن، حتی جاروبرقی کشیدن تو خونه هم الان ضرر داره." }
+        ]);
+    }
+
+    // --- داستان آسمان (نسخه پریمیوم: ۵۰ سناریو کامل) ---
+     // --- داستان آسمان (نسخه پریمیوم: ۵۰ سناریو) ---
+    function getDetailedQuote(temp, weatherCode, windSpeed, aqi, isNight) {
+        
+        // --- ۱. شرایط اضطراری و خطرناک ---
+        if (aqi > 200) return {
+            title: "مود: آخرالزمان زامبی‌ها",
+            icon: "☢️",
+            text: "وضعیت الان شهر دقیقاً شبیه مپ‌های آخرالزمانی تو گیم‌ها شده! شاخص آلودگی داره سقف رو سوراخ می‌کنه و عملاً داری به جای اکسیژن، عناصر سنگین جدول مندلیف رو تنفس می‌کنی. آسمون یه رنگ خاکستریِ سمی و افسرده‌کننده به خودش گرفته که کلاً وایبش منفیه. بیرون رفتن تو این شرایط یعنی خیانت محض به ریه‌هات و کلاً سیستم بدنت رو شات‌دان می‌کنه. اگه جونت رو دوست داری و نمی‌خوای فردا با سردرد و سرفه از خواب بیدار شی، همین الان در و پنجره‌ها رو قفل کن، دستگاه تصفیه هوا رو بزن به برق و تمام پلن‌های بیرون رو کلاً «کنسل» اعلام کن."
+        };
+
+        if (aqi > 150) return {
+            title: "فیلتر دودی روی شهر",
+            icon: "😷",
+            text: "انگار یه نفر یه فیلتر دودی و کثیف انداخته روی لنز دوربین شهر. هوا به شدت سنگینه و نفس کشیدن مثل قورت دادن خاک می‌مونه. دید افقی کم شده و ساختمون‌های دوردست تو غبار گم شدن. این هوا اصلاً شوخی‌بردار نیست؛ شاید الان حس نکنی ولی داره ذره‌ذره انرژیت رو می‌گیره. اگه مجبور نیستی پات رو از خونه بیرون نذار. اگر هم مجبوری بری، ماسک فیلتردار بزن و سعی کن سریع‌ترین مسیر رو انتخاب کنی. امروز روزِ پیاده‌روی و کشف شهر نیست، روزِ پناه گرفتن تو کنج امن خونس."
+        };
+
+        // --- ۲. طوفان و شرایط خشن جوی ---
+        if ([96, 99].includes(weatherCode)) return {
+            title: "کنسرت متالِ آسمان",
+            icon: "⛈️",
+            text: "آسمون امروز رسماً قاطی کرده و داره خشمش رو سر زمین خالی می‌کنه! رعد و برق‌ها مثل فلاش دوربین‌های غول‌پیکر دارن تاریکی رو می‌شکافن و صدای غرش ابرها شبیه بیسِ یه موزیک متال، شیشه‌ها رو می‌لرزونه. تگرگ و بارون دارن مسابقه میدن که کی محکم‌تر بکوبه زمین. تو این وضعیت، بیرون بودن یعنی یه ریسک بزرگ و غیرمنطقی. ماشینت رو ببر زیر سقف و خودت هم از پنجره‌ها فاصله بگیر. یه لیوان چای بریز و از پشت شیشه، قدرت‌نمایی ترسناک ولی باشکوه طبیعت رو تماشا کن."
+        };
+
+        if (windSpeed > 60) return {
+            title: "جنگ باد با همه چیز",
+            icon: "🌪️",
+            text: "باد امروز تصمیم گرفته هر چیزی که محکم به زمین میخ نشده رو با خودش ببره! صدای زوزه باد توی کوچه و خیابون، حس دلهره‌آوری داره. درختا دارن تا مرز شکستن خم میشن و راه رفتن تو خیابون شبیه مبارزه فیزیکی شده. موهات که هیچ، افکارت هم تو این باد به هم می‌ریزه. احتمال سقوط اشیاء زیاده، پس اگه جونت برات مهمه، دور و بر ساختمون‌های نیمه‌کاره و درخت‌های پیر آفتابی نشو. امروز روزیه که باید تو خونه بمونی و پلی‌لیست آرامش‌بخش گوش بدی تا این هیاهو تموم شه."
+        };
+
+        // --- ۳. برف و یخبندان ---
+        if ([73, 75, 85, 86].includes(weatherCode)) return {
+            title: "محاصره در سرزمین یخی",
+            icon: "☃️",
+            text: "آسمون داره بی‌امان برف می‌پاشه و شهر رو زیر یه لحاف سفید و سنگین دفن می‌کنه. منظره بیرون شبیه کارت پستال‌های کریسمسی شده ولی گول ظاهر قشنگش رو نخور؛ واقعیت ماجرا ترافیک، لیز خوردن و یخ زدن انگشت‌های پاته. سکوت عجیبی که برف با خودش میاره، هم آرامش‌بخشه هم یه کم ترسناک. اگه ماشینت زنجیر چرخ نداره یا کفش مناسب نداری، بیرون رفتن یعنی گیر کردن تو دردسر. بهترین کار؟ یه نوشیدنی داغ، یه پتوی نرم و تماشای دونه‌های برف از پشت پنجره گرم."
+        };
+
+        if ([71, 77].includes(weatherCode) && isNight) return {
+            title: "رقص الماس‌ها زیر نور چراغ",
+            icon: "❄️",
+            text: "امشب هوا یه جادوی خاصی داره. دونه‌های برف دارن زیر نور چراغ‌های خیابون مثل تیکه‌های الماس می‌درخشن و آروم فرود میان. هوا سرده ولی نه اون سرمای اذیت‌کننده؛ یه سرمای شیک و باکلاسه که جون میده برای یه پیاده‌روی دو نفره یا حتی تنهایی قدم زدن و فکر کردن. صدای خش‌خش برف تازه زیر پا، بهترین ASMR طبیعی دنیاست. شال‌گردنت رو محکم ببند، هندزفری رو بذار تو گوشت و برو بیرون تا از این سکوت و زیبایی بی‌نظیر شب برفی اکسیژن بگیری."
+        };
+
+        if ([66, 67, 56, 57].includes(weatherCode)) return {
+            title: "اسکی اجباری روی آسفالت",
+            icon: "🧊",
+            text: "این یکی از اون وضعیت‌هاییه که هوا رسماً قصد جانت رو کرده! بارون میاد ولی به محض اینکه به زمین می‌رسه تبدیل به لایه‌ای از یخ شفاف و نامرئی میشه. پیاده‌روها الان حکم پیست پاتیناژ رو دارن و خیابون‌ها سرسره شدن. کنترل ماشین تو این وضعیت تقریباً غیرممکنه و قدم برداشتن مهارت آکروباتیک می‌خواد. هیچ زیبایی شاعرانه‌ای تو این هوا نیست، فقط خطر شکستگی و تصادف وجود داره. تا جایی که می‌تونی قرارهات رو کنسل کن و تو جای گرم و امن بمون تا یخ‌ها آب بشن."
+        };
+
+        // --- ۴. باران ---
+        if ([63, 65, 81, 82].includes(weatherCode)) return {
+            title: "آسمان سوراخ شده",
+            icon: "☔",
+            text: "انگار آسمون دلش خیلی پر بوده و داره عقده‌های چند وقت اخیرش رو خالی می‌کنه! بارون به قدری شدیده که چتر عملاً یه وسیله دکوری و بی‌فایده‌ست. جوی آب‌ها لبریز شدن و خیابون‌ها دارن تبدیل به رودخونه میشن. صدای برخورد قطره‌ها به شیشه انقدر بلنده که تمرکزت رو می‌گیره. اگه الان بیرون بری، در عرض سه ثانیه جوری خیس میشی که انگار با لباس پریدی تو استخر. این هوا فقط به درد این می‌خوره که از پشت پنجره با یه ماگ قهوه نگاش کنی و شکر کنی که سقف بالا سرته."
+        };
+
+        if ([51, 53, 61, 80].includes(weatherCode) && !isNight) return {
+            title: "هوای عاشقانه‌ی کلاسیک",
+            icon: "🌧️",
+            text: "یه هوای ابری و بارونی که انگار فیلتر آبی و خاکستری کشیدن رو کل شهر. بارون داره نرم‌نرمک می‌باره و بوی خاک بارون‌خورده (پتریکور) فضا رو پر کرده. این همون هواییه که جون میده واسه پوشیدن بارونی و چکمه و قدم زدن تو ولیعصر یا هر خیابون پر درختی. شاید ترافیک کلافت کنه، ولی صدای بارون و هوای تمیزی که ایجاد کرده ارزشش رو داره. یه موزیک ملایم پلی کن و اجازه بده این هوا روحت رو بشوره و ببره. فقط مراقب باش تو چاله‌های آب نری!"
+        };
+
+        if ([51, 53, 61, 80].includes(weatherCode) && isNight) return {
+            title: "لالایی قطرات روی سقف",
+            icon: "🌃",
+            text: "شب، سکوت و صدای بارون؛ این ترکیب برنده‌ی آرامشه. خیابون‌ها خیسن و بازتاب نور قرمز و زرد چراغ‌ها روی آسفالت خیس، شهر رو شبیه فیلم‌های سینمایی کرده. هوا تازه و خنکه و خبری از هیاهوی روز نیست. اگه خوابت نمیاد، الان بهترین وقت برای نوشتن، خوندن یا فقط زل زدن به بیرونه. این بارون شبانه انگار داره گرد و غبار غم و خستگی روز رو از روی شهر پاک می‌کنه تا فردا رو تمیز شروع کنی. پنجره رو یه ذره باز بذار تا صدای بارون بیاد تو."
+        };
+
+        // --- ۵. مه و دید کم ---
+        if ([45, 48].includes(weatherCode)) return {
+            title: "گمشده در سایلنت هیل",
+            icon: "🌫️",
+            text: "فضای بیرون کاملاً سوررئال و وهم‌آلود شده. مه انقدر غلیظه که انتهای خیابون ناپیداست و ساختمون‌های بلند نصفه دیده میشن. حس می‌کنی تو یه دنیای دیگه بیدار شدی که مرزها توش محو شدن. رانندگی تو این هوا تمرکز بالایی می‌خواد چون دیدت به شدت محدوده و فاصله‌ها رو درست تشخیص نمیدی. ولی اگه پیاده‌ای، این هوا خوراک عکاسیِ هنری و مودیه. همه‌چیز آروم‌تر و مرموزتر به نظر می‌رسه. مراقب باش تو افکارت گم نشی، چون این هوا بدجوری آدم رو می‌بره تو فکر."
+        };
+
+        // --- ۶. دماهای حدی ---
+        if (temp > 40) return {
+            title: "زندگی در کوره آجرپزی",
+            icon: "🔥",
+            text: "خورشید امروز هیچ رحمی نداره و داره با تمام قوا زمین رو کباب می‌کنه! حرارت از آسفالت بلند میشه و هوا انقدر داغه که نفس کشیدن هم سخته. انگار یه سشوار بزرگ رو با باد داغ گرفتن مستقیم رو صورتت. بیرون رفتن تو این ساعات یعنی دعوت کردن گرمازدگی و سردرد. سایه‌ها هم گرمشون شده! آب خنک، کولر روی درجه آخر و لباس‌های نخی نازک تنها راه نجاته. مثل خون‌آشام‌ها از نور خورشید فرار کن و تا وقتی هوا خنک‌تر نشده، از غار خنکت بیرون نیا."
+        };
+
+        if (temp < -10) return {
+            title: "انجماد مطلق",
+            icon: "🥶",
+            text: "هوا به طرز وحشتناکی سرده، جوری که نفست تو هوا یخ می‌زنه و تبدیل به ابر میشه. سرما مثل یه تیغ تیز از هر درز و شکافی عبور می‌کنه و مستقیم میره سراغ استخون‌هات. دستگیره درها یخ زدن و ماشین‌ها به زور روشن میشن. اگه مجبور شدی بری بیرون، جوری خودت رو بپوشون که فقط چشمات معلوم باشه. این سرما با کسی شوخی نداره و اگه آمادگی نداشته باشی، بدجوری اذیتت می‌کنه. امروز، قهوه و چای داغ حکم اکسیژن رو دارن، ازشون غافل نشو."
+        };
+
+        if (temp > 30 && temp <= 40) return {
+            title: "سونای بخار رایگان",
+            icon: "🥵",
+            text: "ترکیب گرما و رطوبت باعث شده هوا سنگین و چسبناک بشه. هنوز پات رو بیرون نذاشتی خیس عرق میشی و لباس‌ها به تنت می‌چسبن که حس کلافه‌کننده‌ایه. انگار اکسیژن کم اومده و هوا دم کرده. انرژی آدم تو این هوا زود تخلیه میشه و عصبا ضعیف‌تره. اگه کار واجبی نداری، فعالیت‌های بدنی رو بذار کنار. یه دوش آب سرد و یه لیوان شربت آبلیمو می‌تونه نجات‌بخش باشه. تحمل کن، اینم می‌گذره، ولی فعلاً کولر بهترین رفیقته."
+        };
+
+        if (temp <= 0 && temp >= -10) return {
+            title: "سرما بدون برف، فقط سوز",
+            icon: "🧊",
+            text: "هیچ خبری از برف نیست، اما هوا ناجوانمردانه سرده. زمین خشکه ولی باد سرد صورتت رو سرخ می‌کنه و دست‌هات رو بی‌حس. آسمون ممکنه صاف باشه و خورشید گول‌زنک بتابه، اما هیچ گرمایی نداره. این مدل سرما موذی‌ترین نوعه چون انتظارش رو نداری. حتماً پوستت رو مرطوب نگه دار و لباس‌های لایه‌لایه بپوش. امروز از اون روزاییه که بخاری ماشین یا شوفاژ خونه دوست‌داشتنی‌ترین چیزای دنیان."
+        };
+
+        // --- ۷. هوای مطلوب و "مود" خوب ---
+        if (temp >= 20 && temp <= 25 && !isNight && weatherCode <= 3) return {
+            title: "هوایی که باید ستایش کرد",
+            icon: "🍀",
+            text: "امروز هوا انقدر خوبه که موندن تو خونه باید جرم محسوب بشه! نه گرمه، نه سرد؛ یه اعتدال بی‌نقص با نسیم ملایم که پوستت رو نوازش می‌کنه. خورشید مهربونه و آسمون آبیِ کارتونی. سطح دوپامین با نفس کشیدن تو این هوا خود به خود میره بالا. این همون هواییه که بهت انگیزه میده شروع کنی، بسازی و بخندی. پنجره‌ها رو تا آخر باز کن، یه پلی‌لیست شاد بذار و بزن بیرون. کافه‌گردی، پارک، یا حتی قدم زدن ساده تو این هوا تبدیل به بهترین خاطره میشه."
+        };
+
+        if (temp >= 15 && temp <= 25 && isNight && weatherCode <= 3) return {
+            title: "شب‌نشینی زیر آسمان مخملی",
+            icon: "🌙",
+            text: "شب‌های این شکلی رو باید قاب کرد. هوا یه خنکیِ ملایم و شیک داره که جون میده واسه پوشیدن یه سوییشرت نازک و زدن به دل خیابون. آسمون صافه و ستاره‌ها (اگه نور شهر بذاره) معلومن. سکوت شب با این هوای لطیف، بهترین فرصت برای رفرش کردن ذهن و دور ریختن استرس‌های روزه. اگه پایه داری، پاشو برو بیرون چون حیفه این هوا رو تو خواب بگذرونی. یه چای یا قهوه تو فضای باز الان عجیب می‌چسبه."
+        };
+
+        if (weatherCode === 3 && !isNight) return {
+            title: "سقف خاکستری و نور ملایم",
+            icon: "☁️",
+            text: "کل آسمون با یه لایه ابر یکدست پوشیده شده. خبری از سایه‌های تند و آفتاب تیز نیست؛ نور ملایم و پخش‌شده‌ای همه جا هست که چشم رو اذیت نمی‌کنه. شاید یه کم دلگیر به نظر بیاد، ولی برای کسایی که عاشق تمرکز و مطالعه‌ن، بهترین هواست. انگار زمان کندتر می‌گذره. هوا ساکنه و منتظره ببینه قراره بباره یا نه. یه هوای کاملاً خنثی ولی با کلاس. اگه عکاسی می‌کنی، الان بهترین نور رو داری چون سایه مزاحم نداری."
+        };
+
+        if ([1, 2].includes(weatherCode) && !isNight) return {
+            title: "بازی قایم موشک خورشید",
+            icon: "🌤️",
+            text: "آسمون امروز یه نقاشی زنده‌ست. تکه‌های پنبه‌ای ابر تو آسمون آبی شناورن و خورشید هی میره پشتشون و میاد بیرون. هوا دائم بین سایه خنک و آفتاب گرم در نوسانه. این تنوع باعث میشه نه خسته بشی نه کلافه. یه باد ملایم هم ممکنه ابرها رو هل بده. هوای پرانرژی و متغیریه که بهت حس زنده بودن میده. عینک آفتابیت رو ببر ولی شاید خیلی هم لازم نشه. روز خوبیه برای اینکه کارهای عقب‌افتاده رو با انرژی انجام بدی."
+        };
+
+        // --- ادامه سناریوهای متنوع ---
+        if (windSpeed > 15 && windSpeed <= 30 && temp > 15 && temp < 25) return {
+            title: "رقص باد در موها",
+            icon: "🍃",
+            text: "یه نسیم جون‌دار و خنک داره می‌وزه که هوا رو از حالت سکون درآورده. درختا دارن تکون می‌خورن و هوای تازه دائماً جریان داره. این باد حال‌خوب‌کنه و حس رهایی میده، نه اون بادی که اذیتت کنه. اگه پنجره‌ها بسته‌ست، بازشون کن تا هوای خونه عوض شه. پیاده‌روی تو مسیر باد می‌تونه تمام گرد و غبار ذهنت رو پاک کنه."
+        };
+
+        if (temp < 10 && weatherCode === 0 && !isNight) return {
+            title: "خورشید فریبکار و دندان‌گرد",
+            icon: "🌞",
+            text: "بیرون رو نگاه می‌کنی همه‌چی آفتابی و روشنه، ولی گول نخور! هوا مثل تیغ تیزه. تضاد عجیبی بین نور گرم خورشید و سرمای خشکی که به صورتت می‌خوره وجود داره. آسمون آبیِ سیر و شفاف شده چون رطوبتی نیست. اگه لباس گرم بپوشی، این هوا یکی از لذت‌بخش‌ترین تجربه‌هاست چون هم ویتامین D می‌گیری هم از هوای پاک و سرد لذت می‌بری. فقط یادت باشه، سایه‌ها فریزرن!"
+        };
+
+        if (temp < 5 && weatherCode === 0 && isNight) return {
+            title: "آسمان شیشه‌ای و منجمد",
+            icon: "🌌",
+            text: "چون ابری نیست که مثل پتو عمل کنه، گرمای زمین فرار کرده و هوا سوز داره. اما عوضش آسمون انقدر تمیز و شفاف شده که ستاره‌ها انگار بهت نزدیک‌ترن. فضای شهر آروم و ساکته و بخاری که از دهنت بیرون میاد نشون میده چقدر هوا سرده. این هوا یه حس تنهاییِ باشکوه داره. اگه عاشق نجوم یا سکوت مطلقی، امشب شب توئه. فقط کاپشن پُفی یادت نره."
+        };
+
+        if (weatherCode === 3 && windSpeed > 20 && temp > 15) return {
+            title: "آرامش قبل از طوفان",
+            icon: "🌩️",
+            text: "ابرها دارن تیره و متراکم میشن و باد بوی بارون و خاک میاره. فشار هوا یه جوریه که سردرد میاره. یه حس انتظار و دلهره تو فضاست. پرنده‌ها ساکت شدن و درختا خش‌خش می‌کنن. آسمون داره برای یه اتفاق بزرگ آماده میشه. اگه لباس‌های روی بند داری جمع کن و پنجره‌ها رو چک کن. این هوا مرموزه و هر لحظه ممکنه بترکه."
+        };
+
+        if (weatherCode === 79) return {
+            title: "بارش ساچمه‌های یخی",
+            icon: "🌨️",
+            text: "چیزی که داره میاد پایین نه برفه نه بارون؛ دونه‌های سفت یخه که وقتی می‌خوره تو صورتت درد می‌گیره! صدای برخوردشون به پنجره و سقف ماشین مثل ریختن شن و ماسه‌ست. زمین سفید نمیشه ولی لیز و خطرناک میشه. یه هوای کاملاً نچسب و مزاحم. کلاهت رو بکش سرت و سرتو بگیر پایین، چون طبیعت امروز اعصاب نداره."
+        };
+
+        if (weatherCode === 45 && temp > 5 && temp < 20) return {
+            title: "غبار رویاگونه صبح",
+            icon: "🌫️",
+            text: "یه لایه نازک و لطیف از مه همه جا رو گرفته که هنوز تبدیل به مه غلیظ نشده. نور خورشید داره تلاش می‌کنه از توش رد بشه و منظره‌ها سافت و مات شدن. هوا مرطوب و خنکه و بوی علف خیس میده. قدم زدن تو این هوا حس قدم زدن تو یه تابلوی نقاشی آبرنگ رو داره. همه‌چیز آرومه و هنوز هیاهوی روز شروع نشده."
+        };
+
+        if (temp > 30 && windSpeed > 25 && aqi < 100) return {
+            title: "سشوار طبیعی",
+            icon: "🌵",
+            text: "باد گرم و خشکی می‌وزه که انگار وسط کویری. پوستت خشک میشه و چشمات می‌سوزه. گرد و خاک ریز تو هوا معلقه. آب بدنت به سرعت تبخیر میشه بدون اینکه حس کنی عرق کردی. حتماً آب زیاد بخور و مرطوب‌کننده بزن. این هوا آدم رو عصبی و تشنه می‌کنه. عینک دودی بزن تا گرد و خاک نره تو چشمت."
+        };
+
+        if ([80, 81].includes(weatherCode) && !isNight && temp > 15) return {
+            title: "گرگ و میش بارانی",
+            icon: "🌈",
+            text: "هوا تکلیفش با خودش مشخص نیست! خورشید داره می‌تابه ولی همزمان بارون هم میاد. آسمون یه تضاد عجیب و زیبا داره. احتمالاً اگه خوش‌شانس باشی یه رنگین‌کمون خوشگل هم می‌بینی. هوا بوی تازگی میده و قطره‌ها زیر نور برق می‌زنن. یه هوای شاد و دیوونه‌کننده که بهت یادآوری می‌کنه زندگی چقدر غیرقابل پیش‌بینی و قشنگه."
+        };
+
+        if (temp > 10 && temp < 20 && weatherCode === 3 && windSpeed < 10) return {
+            title: "روزمرگی مطلق",
+            icon: "😐",
+            text: "نه اونقدر سرده که بلرزی، نه گرمه که عرق کنی، نه بارون میاد، نه آفتابیه. یه روز کاملاً خاکستری و معمولی. انگار دکمه‌ی «توقف» رو زدن روی هیجانات جوی. هیچ اتفاق خاصی تو آسمون نمیفته. یه روز خوب برای کارهای روتین و خسته‌کننده اداری یا درسی، چون هیچ چیزی بیرون نیست که حواست رو پرت کنه."
+        };
+
+        if (aqi > 100 && aqi <= 150) return {
+            title: "خاکستریِ هشدار",
+            icon: "😶",
+            text: "هوا سمی نیست ولی تمیز هم نیست. یه هاله چرکی افق رو گرفته. برای آدم‌های حساس، سالمندان و بچه‌ها خوب نیست. اگه ورزشکار حرفه‌ای هستی، امروز بیخیال دویدن تو پارک شو چون ضررش بیشتر از منفعتشه. یه روز معمولیِ شهری با چاشنی دود اگزوز که متاسفانه بهش عادت کردیم. ماسک سبک بزنی ضرر نکردی."
+        };
+
+        if (aqi <= 50) return {
+            title: "اکسیژن خالص و کمیاب",
+            icon: "🏔️",
+            text: "باورت نمیشه ولی هوا انقدر تمیزه که کوه‌ها و دوردست‌ها با وضوح 4K دیده میشن! رنگ‌ها زنده‌ترن و آسمون آبیِ سیر شده. ریه‌هات با هر نفس جشن می‌گیرن. این هوا تو شهر ما حکم طلا رو داره. حیفه که این هوا رو تو خونه حبس کنی. برو بیرون، عمیق نفس بکش و ریه‌هات رو از این اکسیژن ناب پر کن. امروز روزیه که باید با طبیعت آشتی کرد."
+        };
+
+        if (temp > 0 && temp < 5 && weatherCode > 50) return {
+            title: "سرمایی که به مغز استخوان می‌رسد",
+            icon: "💧",
+            text: "دما زیر صفر نیست، ولی چون رطوبت بالاست و شاید یه نم‌بارونی هم باشه، سرما رو ده برابر بیشتر حس می‌کنی. لباس‌های پشمی خیس میشن و بوی نم میدن. سرما تو تنت رسوخ می‌کنه و با لرزوندن ولت نمی‌کنه. بدترین نوع سرما برای مریض شدنه. خودت رو خشک نگه دار و حتماً کلاه بپوش، چون بیشترین گرما از سر خارج میشه."
+        };
+
+        if (temp > 25 && isNight) return {
+            title: "شب‌های بیدار و گرم",
+            icon: "🌃",
+            text: "خورشید رفته ولی گرما هنوز تو خیابون‌ها پرسه می‌زنه. آسفالت داغه و باد گرم می‌وزه. از اون شباییه که تا صبح می‌تونی با تیشرت بیرون باشی و یخ نکنی. پارک‌ها و کافه‌ها شلوغن و مردم فراری از گرمای روز، پناه آوردن به شب. یه بستنی یا نوشیدنی خنک تو این هوا حکم طلا رو داره. خوابیدن بدون کولر؟ غیرممکنه!"
+        };
+
+        if ((weatherCode === 6 || weatherCode === 7) || (aqi > 150 && windSpeed > 40)) return {
+            title: "هجوم ریزگردها",
+            icon: "🏜️",
+            text: "آسمون نارنجی و کدر شده. گرد و خاک همه جا رو گرفته و زیر دندونت حس شن‌ریزه داری. دید به شدت کمه و کیفیت هوا افتضاحه. انگار تو مریخ داری راه می‌ری. پنجره‌ها رو دوجداره قفل کن چون این خاک از کوچکترین درزی نفوذ می‌کنه. بیرون رفتن تو این هوا یعنی استقبال از سرفه و سوزش چشم. صبر کن تا خاک بخوابه."
+        };
+
+        if (weatherCode <= 2 && (temp > 10 && temp < 25) && !isNight && windSpeed < 10) { 
+           return {
+            title: "ساعت طلایی: فیلتر طبیعی اینستاگرام",
+            icon: "🌅",
+            text: "الان تو اون ساعت جادویی روز هستیم که نور خورشید کج می‌تابه و همه چیز رو طلایی و سینمایی می‌کنه. سایه‌ها بلند و نرم شدن و کنتراست رنگ‌ها به شدت بالاست. این همون نوریه که عکاس‌ها براش می‌میرن! هوا یه آرامش عجیب قبل از تاریکی (یا بعد از بیداری) داره. اگر الان بیرون باشی، حس می‌کنی «کاراکتر اصلی» یه فیلم درامی. حیفه این نور و هوا رو از دست بدی، حتی اگه شده برای ۱۰ دقیقه برو بیرون و اجازه بده نور طلایی پوستت رو لمس کنه."
+        };
+        }
+
+        if (weatherCode === 77) return {
+            title: "کنفتی‌های یخی آسمان",
+            icon: "🌨️",
+            text: "برف میاد ولی نه اون برفی که بشینه و آدم‌برفی بشه. دونه‌های ریز و خشک یخ مثل اکلیل از آسمون می‌ریزن. وقتی به صورتت می‌خورن یه سوز ریز دارن انگار طبیعت داره باهات شوخی فیزیکی می‌کنه! هوا به شدت سرده و آسمون یه رنگ سفیدِ مات داره. زمین خیس نمیشه ولی لیز میشه. این هوا یه زیبایی مینیمال و سرد داره. اگه بیرونی، کلاهت رو بکش پایین و یقه‌ت رو بده بالا. تماشای این دونه‌های ریز از پشت پنجره با یه چای داغ، امن‌ترین تفریح امروزه."
+        };
+
+        if (weatherCode === 3 && temp > 28) return {
+            title: "سونای بخار با سقف ابری",
+            icon: "🌫️",
+            text: "خورشید نیست ولی گرما بیداد می‌کنه! ابرها مثل یه پتوی پشمی ضخیم جلوی خروج گرما رو گرفتن و هوا دم کرده. نفس که می‌کشی انگار داری بخار آب می‌دی تو ریه‌هات. موهات وز میشه و لباسات به تنت می‌چسبه. بدترین نوع گرماست چون حتی سایه هم نداره که خنک باشه. آدم بی‌دلیل کلافه و عصبی میشه. امروز فقط جاهای کولردار قابل تحمله. اگه می‌تونی، قرارهای بیرون رو بنداز برای شب یا یه روز دیگه، چون الان بیرون بودن فقط عرق ریختنه."
+        };
+
+        if (temp > 5 && temp < 15 && windSpeed > 25 && weatherCode <= 2) return {
+            title: "خش‌خش برگ‌ها و باد وحشی",
+            icon: "🍂",
+            text: "پاییز داره قدرتش رو نشون میده. باد سردی می‌وزه که برگ‌های خشک رو تو هوا می‌چرخونه و صدای خش‌خش‌شون موزیک متن خیابونه. هوا تمیزه ولی بادی که می‌خوره به پیشونیت باعث میشه سردرد بگیری اگه کلاه نداشته باشی. این هوا جون میده برای تیپ‌های لایه لایه و شال‌گردن‌های بزرگ. حس و حالِ شروع مدرسه‌ها و بوی پاییز کاملاً حس میشه. یه پیاده‌روی کوتاه تو این باد حالت رو جا میاره، به شرطی که گوش‌هات رو بپوشونی."
+        };
+
+        if ([80, 81, 82].includes(weatherCode) && temp > 25) return {
+            title: "آب‌بازی ناگهانی وسط تابستان",
+            icon: "🌦️",
+            text: "هوا گرمه ولی آسمون یهو تصمیم می‌گیره دوش بگیره! ابرها تیکه‌تیکه هستن؛ یه محله خشک و آفتابیه، دو تا کوچه اونورتر سیل اومده. بوی خاک خیس خورده (پتریکور) که بلند میشه مست‌کننده‌ست. این بارون‌ها زودگذرن ولی شدید. اگه بیرون میری چتر خیلی به کار نمیاد، بهتره یه پناهگاه موقت پیدا کنی تا رگبار رد بشه. بعدش هوا انقدر تمیز و خنک میشه که انگار کولر روشن کردن. یه هوای هیجان‌انگیز و غیرقابل پیش‌بینی."
+        };
+
+        if (temp < -5 && windSpeed > 15) return {
+            title: "سیلی‌های نامرئی باد قطبی",
+            icon: "🌬️",
+            text: "دما پایینه، ولی بادی که میاد باعث میشه حس کنی دما منفی چهل درجه‌ست! (Wind Chill). این سرما شوخی نداره و اگه پوستت بیرون باشه سریع سرخ میشه و می‌سوزه. اشک تو چشمات جمع میشه و جاری نشده یخ می‌زنه. تمام شهر کز کرده و پرنده‌ها هم قایم شدن. امروز از اون روزاییه که باید مثل اسکیموها لباس بپوشی. هیچ زیبایی خاصی بیرون منتظرت نیست جز مبارزه برای گرم موندن. سریع‌ترین مسیر رو به سمت گرما انتخاب کن."
+        };
+
+        if (weatherCode === 45 && windSpeed < 5) return {
+            title: "پرسه در رویای خاکستری",
+            icon: "🌫️",
+            text: "یه لایه نازک و لطیف از مه همه جا رو گرفته، انگار یه حریر سفید انداختن رو شهر. برعکس مه غلیظ که ترسناکه، این یکی خیلی شاعرانه و آرومه. نور چراغ‌ها و خورشید تو مه پخش میشه و یه هاله نورانی دورشون ایجاد می‌کنه. صداها خفه‌تر شنیده میشن و آرامش عمیقی حاکمه. اگه اهل قدم زدن و فکر کردن یا گوش دادن به پادکست هستی، این بهترین هواست. دنیا الان سافت‌فوکوس و زیباست، ازش لذت ببر."
+        };
+
+        if (temp > 28 && windSpeed > 30 && weatherCode <= 3) return {
+            title: "رقص گرد و خاک در باد گرم",
+            icon: "🌪️",
+            text: "باد گرم و شدیدی می‌وزه که بیشتر کلافه‌کننده‌ست تا خنک‌کننده. گرد و خاک بلند شده و تو چشم میره. درختا دارن تکون‌های شدید می‌خورن. حس می‌کنی یه طوفان شن کوچیک تو راهه. اصلا هوای مناسبی برای استایل کردن مو نیست چون در عرض یک ثانیه جنگلی میشه! اگه لنز می‌ذاری، امروز عینک بزن. این هوا یه انرژی عصبی و بی‌قرار داره که آدم رو بی‌حوصله می‌کنه. پناه ببر به محیط بسته."
+        };
+
+        if (weatherCode <= 3 && [61, 63].includes(weatherCode)) {
+            return {
+            title: "آینه شدن خیابان‌ها",
+            icon: "✨",
+            text: "بارون تموم شده و ابرها دارن میرن کنار. زمین خیسه و مثل آینه آسمون رو منعکس می‌کنه. هوا بی‌نهایت تمیز، سبک و اکسیژن‌داره. همه رنگ‌ها (سبز درختا، خاکستری آسفالت) اشباع و براق شدن. بوی تمیزی کل شهر رو گرفته. الان بهترین زمان برای بیرون رفتنه چون نه خیس میشی نه گرمته، و شهر تو قشنگ‌ترین حالت خودشه. یه نفس عمیق بکش و ریه‌هات رو از هوای تازه پر کن."
+        };
+        }
+
+        if (windSpeed < 2 && weatherCode === 0) return {
+            title: "سکوت مطلق طبیعت",
+            icon: "🧘",
+            text: "حتی یه برگ هم تکون نمی‌خوره. هوا کاملاً ساکن و راکده. دودکش‌ها دودشون مستقیم میره بالا. این سکوت یه حس تعلیق عجیب داره، انگار زمان وایساده. اگه کنار دریا یا دریاچه باشی، آب مثل شیشه‌ست. توی شهر، این سکوت باعث میشه صداهای دوردست بهتر شنیده بشن. یه هوای عالی برای مدیتیشن یا تمرکز عمیق، چون هیچ عامل مزاحمی تو هوا نیست. از این آرامش کمیاب استفاده کن."
+        };
+
+        if (weatherCode === 3 && temp > 15 && temp < 25) return {
+            title: "نورپردازی استودیویی طبیعت",
+            icon: "🌥️",
+            text: "ابرها خیلی بالان و نازک، طوری که نور خورشید ازشون رد میشه ولی خبری از سایه تند نیست. نور همه جا یکنواخت و روشنه. نه چشمت رو می‌زنه نه تاریکه. بهترین هوا برای سلفی گرفتن و عکاسی پرتره چون پوستت رو صاف نشون میده! هوا ملایم و مطبوعه. یه روز آروم و بدون حاشیه که می‌تونی با خیال راحت به همه کارهات برسی بدون اینکه هوا مانعت بشه."
+        };
+
+        if ([51, 53, 55].includes(weatherCode)) return {
+            title: "خیس شدن تدریجی و مرموز",
+            icon: "💧",
+            text: "بارون نیست، انگار هوا تبدیل به آب شده! قطرات انقدر ریزن که دیده نمیشن ولی بعد از ۵ دقیقه می‌بینی کاملاً نمدار شدی. چتر زدن تو این هوا عجیبه، نزدن هم خیس می‌کنه. یه مهِ خیسِ معلق تو هواست. فضای شهر خیلی بریتیش (لندنی) و کلاسیک شده. اگه موهات فر میشه، امروز روز بدشانسیته! ولی برای قدم زدن و فکر کردن، این هوای خنک و مرطوب، حس خیلی خاص و نوستالژیکی داره."
+        };
+
+        if (weatherCode > 0 && weatherCode < 3 && windSpeed > 15) return {
+            title: "تکلیف نامشخص آسمان",
+            icon: "🎲",
+            text: "آسمون امروز دوقطبی شده! یه لحظه آفتاب داغه، یه لحظه ابر میاد جلوش سرد میشه، یه لحظه باد می‌زنه. باید لباس «لایه لایه» بپوشی چون هر ده دقیقه دما عوض میشه. ابرها با سرعت تو آسمون حرکت می‌کنن و سایه‌هاشون روی زمین می‌دوَند. این پویایی آسمون بهت انرژی میده. هوا زنده و پر جنب و جوشه. اگه خونه بمونی حوصله‌ت سر میره، بزن بیرون و با ریتم متغیر طبیعت همراه شو."
+        };
+
+        if (temp > 26 && isNight && windSpeed < 10) return {
+            title: "شب‌زنده‌داری در هوای گرم",
+            icon: "🌌",
+            text: "خورشید رفته ولی گرمای روز توی خیابون‌ها مونده. هوا سنگینه ولی یه حس صمیمیت داره. صدای جیرجیرک‌ها میاد و بوی گل‌های شب‌بو فضا رو پر کرده. این هوا جون میده برای نشستن تو بالکن یا کافه روباز و خوردن یه نوشیدنی پر از یخ. اصلاً حس خوابیدن نیست، شهر هنوز بیداره و انرژی داره. لباس نخی و گشاد بپوش و از این شب گرم تابستونی که خاطره‌ساز میشه لذت ببر."
+        };
+
+        if (temp >= 15 && temp < 18 && !isNight) return {
+            title: "نه سرد، نه گرم، عالی",
+            icon: "🧥",
+            text: "هوا یه خنکیِ شیک داره که تکلیفش روشنه: یه لباس آستین بلند یا سوییشرت نازک بنداز رو دوشت و برو. نه عرق می‌کنی نه می‌لرزی. هوای ترد و باحالیه که آدم رو سر حال میاره. جون میده برای پیاده‌روی سریع یا دویدن صبحگاهی. از اون روزاییه که دوست داری بی‌هدف تو شهر بچرخی."
+        };
+        
+        if (temp >= 30 && temp < 35 && !isNight) return {
+            title: "آفتاب‌گیری تابستانی",
+            icon: "😎",
+            text: "هوا گرمه، حسابی هم گرمه، ولی هنوز به مرحله ذوب شدن نرسیده. آسمون آبی و درخشانه. اگه تو سایه باشی و یه نسیم بیاد، کاملاً لذت‌بخشه. عینک دودی و کرم ضدآفتاب واجبه. یه روز تابستونیِ کلاسیک که جون میده برای استخر روباز یا پیک‌نیک زیر سایه درختای انبوه."
+        };
+
+        // --- Fallback ---
+        return {
+            title: "آسمانِ پر از راز",
+            icon: "🔮",
+            text: "شرایط جوی الان یه ترکیب خاصه که تو کلمات جا نمیشه! شاید یه تغییر بزرگ تو راهه. پنجره رو باز کن و خودت دمای هوا رو لمس کن. گاهی وقتا بهترین هواشناسی، حس ششم خودته!"
+        };
+    }
+
+    function getRainMessage(probs) {
+        const maxProb = Math.max(...probs);
+        if (maxProb < 10) return { t: "آسمانی خشک و مطمئن", d: "خیالتان راحت! در ۲۴ ساعت آینده احتمال بارش تقریباً صفر است. می‌توانید با خیال راحت برنامه‌های فضای باز بچینید." };
+        if (maxProb < 40) return { t: "شاید چند قطره", d: "احتمال بارش کم است، اما شاید ابرهای گذرا چند قطره‌ای ببارند. نیازی به تغییر جدی برنامه‌ها نیست." };
+        if (maxProb < 75) return { t: "چترها آماده باشند", d: "احتمال بارندگی قابل توجه است. به احتمال زیاد در ساعاتی از روز شاهد بارش خواهیم بود. همراه داشتن چتر عاقلانه است." };
+        return { t: "بارش قطعی و فراگیر", d: "آسمان قطعاً خواهد بارید. برنامه‌ریزی خود را بر اساس یک روز خیس و بارانی انجام دهید و تجهیزات لازم را همراه داشته باشید." };
+    }
+
+    // --- فاز ماه (کامل و آسترولوژی) ---
+    function renderMoonPhase() {
+        const date = new Date();
+        const cycle = 29.53; 
+        const knownNewMoon = new Date('2000-01-06T18:14:00');
+        const diffTime = date - knownNewMoon;
+        const diffDays = diffTime / (1000 * 60 * 60 * 24);
+        const moonAge = diffDays % cycle;
+        
+        let phaseName = "";
+        let phaseDesc = "";
+        
+        if (moonAge < 1.5) { 
+            phaseName = "ماه نو (New Moon)"; 
+            phaseDesc = "امشب آسمان تاریک است و ماه چهره‌اش را پنهان کرده. در آسترولوژی، این لحظه‌ی «تولد دوباره» است. انرژی کیهانی در پایین‌ترین سطح ظاهری اما بالاترین پتانسیل درونی قرار دارد. زمان فوق‌العاده‌ای برای کاشتن بذر نیت‌های جدید، شروع پروژه‌های تازه و مدیتیشن برای پاکسازی ذهن است. سکوت ماه نو به شما فرصت می‌دهد تا بدون حواس‌پرتی نور، به درون خود نگاه کنید و نقشه‌ی راه ماه آینده را ترسیم کنید."; 
+        } else if (moonAge < 7) { 
+            phaseName = "هلال افزاینده"; 
+            phaseDesc = "یک داس نقره‌ای زیبا در آسمان غروب خودنمایی می‌کند. انرژی ماه در حال رشد است و زمان «عمل» فرا رسیده. اگر در ماه نو نیتی کردید، اکنون زمان برداشتن قدم‌های اولیه است. کیهان از شجاعت و حرکت رو به جلو حمایت می‌کند. این فاز نماد امید و خوش‌بینی است؛ موانع هنوز کوچک‌اند و انگیزه بالاست. ارتباطات اجتماعی و یادگیری مهارت‌های جدید در این روزها بسیار پربار خواهد بود."; 
+        } else if (moonAge < 8) { 
+            phaseName = "تربیع اول"; 
+            phaseDesc = "ماه نیمی از چهره‌اش را روشن کرده و نیمی دیگر در تاریکی است. این نقطه عطف اول است. ممکن است با اولین چالش‌ها یا مقاومت‌ها در مسیر اهدافتان روبرو شوید. آسترولوژی می‌گوید این زمانِ «تعهد» است. آیا حاضرید برای خواسته‌هایتان بجنگید؟ انرژی این فاز قاطع و سازنده است. زمان تصمیم‌گیری‌های جدی و مدیریت بحران است. تعادل بین نور و تاریکی، شما را به تعادل در زندگی دعوت می‌کند."; 
+        } else if (moonAge < 14) { 
+            phaseName = "تحدب افزاینده"; 
+            phaseDesc = "ماه تقریباً کامل شده و نور زیادی به زمین می‌تابد. شما در آستانه‌ی تکمیل هستید. جزئیات برنامه‌ها را دقیق کنید و آخرین اصلاحات را انجام دهید. انرژی کیهانی بالاست و احساسات شدت می‌گیرند. این زمان برای جذب منابع، شبکه‌سازی و نشان دادن استعدادها عالی است. هر چیزی که اکنون روی آن تمرکز کنید، با سرعت بیشتری رشد می‌کند."; 
+        } else if (moonAge < 16) { 
+            phaseName = "ماه کامل (Full Moon)"; 
+            phaseDesc = "اوج درخشش و قدرت! ماه چون مرواریدی در شب می‌درخشد و تمام رازها را آشکار می‌کند. در آسترولوژی، ماه کامل زمان «برداشت» و «رهایی» است. نتایج تلاش‌هایتان را می‌بینید. احساسات و شهود به بالاترین حد خود می‌رسند، پس مراقب واکنش‌های هیجانی باشید. خواب ممکن است کمی مختل شود. این بهترین زمان برای جشن گرفتن موفقیت‌ها و همچنین رها کردن الگوهای رفتاری قدیمی است که دیگر به کارتان نمی‌آیند."; 
+        } else if (moonAge < 22) { 
+            phaseName = "تحدب کاهنده"; 
+            phaseDesc = "نور ماه اندک اندک رو به کاهش است. زمانِ اشتراک‌گذاری دانش، تجربه و برکت با دیگران است. انرژی آرام‌تر می‌شود و زمان بازتاب و قدردانی فرا رسیده. اگر در ماه کامل چیزی به دست آوردید، اکنون زمان بخشیدن و آموزش دادن آن است. بدن شروع به استراحت می‌کند و ذهن به سمت تحلیل می‌رود."; 
+        } else if (moonAge < 23) { 
+            phaseName = "تربیع آخر"; 
+            phaseDesc = "باز هم نیمه روشن و نیمه تاریک، اما این بار رو به خاموشی. زمانِ رها کردنِ جدی است. خانه تکانی ذهنی و فیزیکی در این فاز عالی است. چیزهایی که دیگر به دردتان نمی‌خورد را دور بریزید. روابط سمی یا عادت‌های بد را قطع کنید. این فاز مقدمه‌ای برای استراحت عمیق است. انرژی کیهانی شما را به سمت درون‌نگری و پایان دادن به کارهای نیمه‌تمام سوق می‌دهد."; 
+        } else { 
+            phaseName = "هلال کاهنده"; 
+            phaseDesc = "پایان چرخه نزدیک است. هلالی باریک که فقط سحرخیزها قبل از طلوع آفتاب آن را می‌بینند. انرژی کاملاً تخلیه شده و زمان استراحت مطلق است. خودتان را برای شروع دوره‌ی جدید آماده کنید اما اقدام جدیدی نکنید. این فاز، فازِ «شفا» و «بازیابی» است. به رویاهایتان توجه کنید، زیرا پیام‌های مهمی برای دوره‌ی بعدی دارند."; 
+        }
+
+        document.getElementById('moon-phase-name').innerText = phaseName;
+        document.getElementById('moon-desc').innerText = phaseDesc;
+
+        let svg = '';
+        if(moonAge < 15) { 
+             svg = `<svg width="100%" height="100%" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#1e293b"/><path d="M50 2 a48 48 0 0 1 0 96 a${Math.abs(48 - 3.2 * moonAge)} 48 0 0 ${moonAge < 7.5 ? 0 : 1} 0 -96" fill="#f8fafc" filter="drop-shadow(0 0 8px rgba(255,255,255,0.8))"/></svg>`;
+        } else { 
+             const age = moonAge - 15;
+             svg = `<svg width="100%" height="100%" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#1e293b"/><path d="M50 2 a48 48 0 0 0 0 96 a${Math.abs(48 - 3.2 * age)} 48 0 0 ${age > 7.5 ? 0 : 1} 0 -96" fill="#f8fafc" filter="drop-shadow(0 0 8px rgba(255,255,255,0.8))"/></svg>`;
+        }
+        document.getElementById('moon-render').innerHTML = svg;
+    }
+
+    function renderChart(dates, maxTemps, minTemps) {
+        if (typeof Chart === 'undefined') return;
+        
+        const ctx = document.getElementById('forecastChart').getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+        gradient.addColorStop(0, 'rgba(52, 211, 153, 0.5)'); 
+        gradient.addColorStop(1, 'rgba(52, 211, 153, 0)');
+
+        if (chartInstance) chartInstance.destroy();
+
+        chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dates.map(d => {
+                    const date = new Date(d);
+                    return date.toLocaleDateString('fa-IR', { weekday: 'long' });
+                }),
+                datasets: [
+                    {
+                        label: 'حداکثر دما',
+                        data: maxTemps,
+                        borderColor: '#34d399',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#34d399',
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'حداقل دما',
+                        data: minTemps,
+                        borderColor: '#60a5fa',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleFont: { family: 'Vazirmatn' },
+                        bodyFont: { family: 'Vazirmatn' },
+                        padding: 12,
+                        cornerRadius: 10,
+                        displayColors: true,
+                        rtl: true
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { family: 'Vazirmatn', size: 11 }, color: '#94a3b8' } },
+                    y: { grid: { color: isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)' }, border: { display: false }, ticks: { display: false } }
+                }
+            }
+        });
+    }
+
+    function renderForecastList(daily) {
+        const listEl = document.getElementById('forecast-list');
+        listEl.innerHTML = '';
+        
+        for(let i=1; i<7; i++) { 
+            const date = new Date(daily.time[i]);
+            const dayName = date.toLocaleDateString('fa-IR', { weekday: 'long' });
+            const code = daily.weather_code[i];
+            const maxT = Math.round(daily.temperature_2m_max[i]);
+            const minT = Math.round(daily.temperature_2m_min[i]);
+            
+            let shortDesc = "";
+            if (code <= 1) shortDesc = "آسمانی صاف، عالی برای گردش.";
+            else if (code <= 3) shortDesc = "کمی ابری، هوای ملایم.";
+            else if (code <= 48) shortDesc = "مه‌آلود، دید کم است.";
+            else if (code <= 67) shortDesc = "بارانی، چتر لازم است.";
+            else if (code <= 77) shortDesc = "برفی و سرد، مراقب باشید.";
+            else if (code >= 95) shortDesc = "طوفانی، در خانه بمانید.";
+            else shortDesc = "هوای متغیر، لباس مناسب بپوشید.";
+
+            const div = document.createElement('div');
+            div.className = 'forecast-item';
+            div.innerHTML = `
+                <div class="f-day">${dayName}</div>
+                <div class="f-icon">${getSmallIcon(code)}</div>
+                <div class="f-desc-short">${shortDesc}</div>
+                <div class="f-temp">${toFarsi(maxT)}° <span style="font-size:12px; opacity:0.6; color:var(--text-primary)">${toFarsi(minT)}°</span></div>
+            `;
+            listEl.appendChild(div);
+        }
+    }
+
+    function renderElevation(meters) {
+        document.getElementById('elev-val').innerText = toFarsi(Math.round(meters)) + ' متر';
+        let desc = "";
+        const milad = 435;
+        const khalifa = 828;
+        const azadi = 45;
+
+        if (meters < azadi) desc = `شما در ارتفاعی پایین قرار دارید، تقریباً هم‌سطح برج آزادی. فشار هوا در اینجا بالاست و اکسیژن کافی وجود دارد.`;
+        else if (meters < milad) desc = `ارتفاع شما حدوداً ${toFarsi((meters / azadi).toFixed(1))} برابر ارتفاع برج آزادی تهران است. منظره شهر از اینجا باید دیدنی باشد.`;
+        else if (meters < khalifa) desc = `شما در ارتفاعی معادل ${toFarsi((meters / milad).toFixed(1))} برابر برج میلاد ایستاده‌اید! هوای اینجا کمی رقیق‌تر و خنک‌تر از سطح شهر است.`;
+        else if (meters < 2000) desc = `شگفت‌انگیز! شما ${toFarsi((meters / khalifa).toFixed(1))} برابر بلندتر از بلندترین برج جهان (برج خلیفه) هستید. شما عملاً در یک منطقه کوهپایه‌ای زندگی می‌کنید.`;
+        else desc = `شما در ارتفاعات کوهستانی هستید! نزدیک به نیمه راه قله دماوند. هوا رقیق است و آسمان شفاف‌تر دیده می‌شود.`;
+        
+        document.getElementById('elev-desc').innerText = desc;
+    }
+
+    function updateUI(data, city) {
+        const aqi = data.aqi.current.us_aqi;
+        const current = data.weather.current;
+        const daily = data.weather.daily;
+        const elevation = data.weather.elevation;
+        const hour = new Date().getHours();
+        
+        const isNight = checkIsNight();
+        const isDay = !isNight;
+        const wCode = current.weather_code;
+
+        let accent = '#34d399'; 
+        let status = 'پاک و عالی';
+        document.body.classList.remove('weather-rain', 'weather-snow');
+
+        if(aqi > 50) { accent = '#facc15'; status = 'سالم و قابل قبول'; }
+        if(aqi > 100) { accent = '#fb923c'; status = 'ناسالم برای حساس‌ها'; }
+        if(aqi > 150) { accent = '#f87171'; status = 'ناسالم برای همه'; }
+        if(aqi > 200) { accent = '#c084fc'; status = 'بسیار خطرناک'; }
+        if(aqi > 300) { accent = '#7e22ce'; status = 'مرگبار'; }
+
+        if(wCode >= 95) document.body.classList.add('weather-rain');
+        else if(wCode >= 51 && wCode <= 67 || wCode >= 80) document.body.classList.add('weather-rain');
+        else if(wCode >= 71) document.body.classList.add('weather-snow');
+
+        document.documentElement.style.setProperty('--accent-color', accent);
+        document.documentElement.style.setProperty('--liquid-1', accent);
+        document.getElementById('loc-name').innerText = city;
+        
+        animateValue("aqi-val", 0, aqi, 1500);
+        document.getElementById('aqi-text').innerText = status;
+        document.getElementById('aqi-text').style.backgroundColor = accent;
+        const offset = 660 - (Math.min(aqi, 400) / 400) * 660;
+        document.getElementById('aqi-ring').style.strokeDashoffset = offset;
+        document.getElementById('aqi-ring').style.stroke = accent;
+
+        document.getElementById('visual-temp').innerText = toFarsi(Math.round(current.temperature_2m)) + '°';
+        
+        const quote = getDetailedQuote(current.temperature_2m, wCode, current.wind_speed_10m, aqi, isNight);
+        document.getElementById('visual-desc').innerText = quote.title;
+        document.getElementById('weather-icon-container').innerHTML = getWeatherSVG(wCode, isDay);
+        document.getElementById('hum-val').innerText = toFarsi(current.relative_humidity_2m) + '%';
+        document.getElementById('wind-val').innerText = toFarsi(current.wind_speed_10m);
+
+        document.getElementById('friendly-text').innerText = getFriendlyStatus(current.temperature_2m, wCode, current.wind_speed_10m, current.relative_humidity_2m, isDay);
+
+        const aqiMsg = getAirQualityMessage(aqi);
+        document.getElementById('aqi-reco-head').innerText = "وضعیت تنفس شما";
+        document.getElementById('aqi-reco-body').innerText = aqiMsg.text;
+
+        document.getElementById('story-head').innerText = quote.title;
+        document.getElementById('story-icon').innerText = quote.icon;
+        document.getElementById('story-body').innerText = quote.text;
+
+        const rainProbs = data.weather.hourly.precipitation_probability.slice(hour, hour+24);
+        const rainInfo = getRainMessage(rainProbs);
+        document.getElementById('rain-title').innerText = rainInfo.t;
+        document.getElementById('rain-desc').innerText = rainInfo.d;
+
+        document.getElementById('pm25-val').innerText = toFarsi(data.aqi.current.pm2_5);
+        document.getElementById('no2-val').innerText = toFarsi(data.aqi.current.nitrogen_dioxide);
+
+        renderMoonPhase();
+        renderChart(daily.time, daily.temperature_2m_max, daily.temperature_2m_min);
+        renderForecastList(daily);
+        renderElevation(elevation);
+
+        document.getElementById('loader').style.opacity = '0';
+        setTimeout(() => document.getElementById('loader').style.display = 'none', 600);
+    }
+
+    function animateValue(id, start, end, duration) {
+        if (start === end) return;
+        var range = end - start;
+        var current = start;
+        var increment = end > start ? 1 : -1;
+        var stepTime = Math.abs(Math.floor(duration / range));
+        var obj = document.getElementById(id);
+        var timer = setInterval(function() {
+            current += increment;
+            obj.innerHTML = toFarsi(current);
+            if (current == end) { clearInterval(timer); }
+        }, Math.max(stepTime, 20));
+    }
+
+    async function fetchData(lat, lon, name) {
+        document.getElementById('loader').style.display = 'flex';
+        setTimeout(() => document.getElementById('loader').style.opacity = '1', 10);
+        
+        try {
+            const [aqiRes, weatherRes] = await Promise.all([
+                fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi,pm2_5,nitrogen_dioxide&timezone=auto`),
+                fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&hourly=precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&elevation=nan&timezone=auto`)
+            ]);
+            
+            if(!aqiRes.ok || !weatherRes.ok) throw new Error("API Error");
+            
+            localStorage.setItem('last_lat', lat);
+            localStorage.setItem('last_lon', lon);
+            localStorage.setItem('last_name', name);
+
+            updateUI({aqi: await aqiRes.json(), weather: await weatherRes.json()}, name);
+        } catch (e) { 
+            console.error(e);
+            alert("متاسفانه در دریافت اطلاعات مشکلی پیش آمده.");
+            document.getElementById('loader').style.opacity = '0';
+            setTimeout(() => document.getElementById('loader').style.display = 'none', 600);
+        }
+    }
+
+    function toggleSearch(show) {
+        const modal = document.getElementById('search-modal');
+        if(show) { modal.classList.add('open'); setTimeout(() => document.getElementById('city-input').focus(), 100); }
+        else modal.classList.remove('open');
+    }
+
+    let debounce;
+    document.getElementById('city-input').addEventListener('input', (e) => {
+        clearTimeout(debounce);
+        if(e.target.value.length < 2) return;
+        debounce = setTimeout(async () => {
+            try {
+                const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${e.target.value}&count=5&language=en&format=json`);
+                const data = await res.json();
+                const list = document.getElementById('search-list');
+                list.innerHTML = '';
+                if(!data.results) {
+                    list.innerHTML = '<div style="text-align:center; padding:20px; opacity:0.6">شهری پیدا نشد</div>';
+                    return;
+                }
+                data.results?.forEach(c => {
+                    const div = document.createElement('div');
+                    div.className = 'search-item';
+                    div.innerText = `${c.name} (${c.country_code})`;
+                    div.onclick = () => { fetchData(c.latitude, c.longitude, c.name); toggleSearch(false); };
+                    list.appendChild(div);
+                });
+            } catch(e) {}
+        }, 600);
+    });
+
+    function handleWelcomeGPS() {
+        if(navigator.geolocation) {
+            document.getElementById('welcome-modal').classList.remove('active');
+            document.getElementById('loader').style.display = 'flex';
+            document.getElementById('loader').style.opacity = '1';
+            navigator.geolocation.getCurrentPosition(
+                p => fetchData(p.coords.latitude, p.coords.longitude, "موقعیت من"),
+                () => { 
+                    alert("دسترسی به موقعیت مکانی داده نشد."); 
+                    document.getElementById('welcome-modal').classList.add('active');
+                    document.getElementById('loader').style.opacity = '0';
+                    setTimeout(() => document.getElementById('loader').style.display = 'none', 600);
+                }
+            );
+        } else alert("مرورگر شما پشتیبانی نمی‌کند.");
+    }
+
+    function handleWelcomeManual() {
+        document.getElementById('welcome-modal').classList.remove('active');
+        toggleSearch(true);
+    }
+    
+    function getLocation() { handleWelcomeGPS(); }
+
+    function initApp() {
+        const savedLat = localStorage.getItem('last_lat');
+        const savedLon = localStorage.getItem('last_lon');
+        const savedName = localStorage.getItem('last_name');
+
+        if (savedLat && savedLon && savedName) {
+            fetchData(savedLat, savedLon, savedName);
+        } else {
+            setTimeout(() => {
+                document.getElementById('welcome-modal').classList.add('active');
+                document.getElementById('loader').style.display = 'none';
+            }, 100);
+        }
+    }
+    initApp();
+</script></body></html>

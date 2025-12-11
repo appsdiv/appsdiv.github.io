@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#020617">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>هوای پاک پلاس | نسخه اولترا</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@200..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* --- تنظیمات کلی و متغیرها --- */
+        :root {
+            --bg-color: #020617;
+            --bg-gradient: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --glass-bg: rgba(15, 23, 42, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.03);
+            --glass-blur: 40px;
+            --card-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7);
+            --inner-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15);
+            --accent-color: #34d399;
+            --liquid-1: #4f46e5;
+            --liquid-2: #db2777;
+        }
+        body.light-mode {
+            --bg-color: #f8fafc;
+            --bg-gradient: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.9);
+            --glass-highlight: rgba(255, 255, 255, 0.8);
+            --glass-blur: 30px;
+            --card-shadow: 0 15px 35px -5px rgba(148, 163, 184, 0.35);
+            --inner-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9);
+            --liquid-1: #60a5fa;
+            --liquid-2: #f472b6;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-color);
+            background-image: var(--bg-gradient);
+            color: var(--text-primary);
+            font-family: 'Vazirmatn', -apple-system, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.5s ease, color 0.5s ease;
+            position: relative;
+        }
+
+        /* --- انیمیشن پس‌زمینه مایع --- */
+        .liquid-blob { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5; animation: floatBlob 15s infinite alternate cubic-bezier(0.4, 0, 0.2, 1); mix-blend-mode: screen; }
+        body.light-mode .blob { mix-blend-mode: multiply; opacity: 0.3; }
+        .blob-1 { top: -20%; left: -20%; width: 60vw; height: 60vw; background: var(--liquid-1); }
+        .blob-2 { bottom: -20%; right: -20%; width: 70vw; height: 70vw; background: var(--liquid-2); animation-delay: -7s; }
+        @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1) rotate(0deg); } 100% { transform: translate(40px, 60px) scale(1.1) rotate(10deg); } }
+
+        /* --- ذرات معلق --- */
+        #particles { position: fixed; inset: 0; pointer-events: none; z-index: 5; background-image: none; background-size: 0 0; transition: opacity 0.5s; }
+        body.weather-rain #particles { background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 0 L10 10' stroke='rgba(120,120,255,0.6)' stroke-width='1'/%3E%3C/svg%3E"); animation: rainFall 0.6s linear infinite; }
+        body.weather-snow #particles { background-image: radial-gradient(white 30%, transparent 30%); background-size: 10px 10px; animation: snowFall 4s linear infinite; }
+        @keyframes rainFall { from { background-position: 0 0; } to { background-position: -10px 400px; } }
+        @keyframes snowFall { from { background-position: 0 0; } to { background-position: 30px 200px; } }
+
+        #app {
+            position: relative; z-index: 10;
+            padding: max(20px, env(safe-area-inset-top)) 24px 40px 24px;
+            max-width: 550px; margin: 0 auto; width: 100%;
+            display: flex; flex-direction: column; gap: 24px;
+            padding-bottom: 100px;
+        }
+
+        .fade-in-up { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(30px); }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* --- هدر و دکمه‌ها --- */
+        header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .location-pill {
+            display: flex; align-items: center; gap: 12px;
+            background: var(--glass-bg); border: 1px solid var(--glass-border); border-top: 1px solid var(--glass-highlight);
+            padding: 12px 24px; border-radius: 50px; font-size: 16px; font-weight: 800; cursor: pointer;
+            backdrop-filter: blur(var(--glass-blur)); box-shadow: var(--card-shadow), var(--inner-shadow);
+            transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); color: var(--text-primary);
+            max-width: 60%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .header-actions { display: flex; gap: 12px; align-items: center; flex-direction: row; }
+        .btn-circle {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: var(--glass-bg); border: 1px solid var(--glass-border); border-top: 1px solid var(--glass-highlight);
+            display: flex; align-items: center; justify-content: center; color: var(--text-primary); cursor: pointer;
+            backdrop-filter: blur(var(--glass-blur)); box-shadow: var(--card-shadow), var(--inner-shadow);
+            transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); flex-shrink: 0;
+        }
+        .btn-circle:hover, .location-pill:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.3), var(--inner-shadow); }
+        .btn-circle:active, .location-pill:active { transform: scale(0.95); }
+
+        /* --- بخش اصلی گیج --- */
+        .hero-section { display: flex; flex-direction: column; align-items: center; position: relative; margin-top: 20px; }
+        .gauge-wrapper { width: 300px; height: 300px; position: relative; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.3)); }
+        .gauge-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .track { fill: none; stroke: var(--glass-border); stroke-width: 16; stroke-linecap: round; }
+        .progress {
+            fill: none; stroke: var(--accent-color); stroke-width: 16; stroke-linecap: round;
+            stroke-dasharray: 660; stroke-dashoffset: 660; transition: stroke-dashoffset 2s cubic-bezier(0.2, 0.8, 0.2, 1), stroke 1s;
+            filter: drop-shadow(0 0 10px var(--accent-color));
+        }
+        .hero-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .hero-val { font-size: 90px; font-weight: 900; line-height: 0.9; letter-spacing: -3px; text-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .hero-label {
+            font-size: 18px; font-weight: 800; color: #fff; margin-top: 15px;
+            background: var(--accent-color); padding: 8px 20px; border-radius: 30px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3); text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* --- کارت‌های عمومی --- */
+        .glass-card {
+            background: var(--glass-bg); border: 1px solid var(--glass-border); border-top: 1px solid var(--glass-highlight);
+            border-radius: 32px; padding: 28px; backdrop-filter: blur(var(--glass-blur));
+            box-shadow: var(--card-shadow), var(--inner-shadow); position: relative; overflow: hidden;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .glass-card:hover { transform: translateY(-4px); box-shadow: 0 25px 50px -5px rgba(0, 0, 0, 0.6), var(--inner-shadow); }
+        
+        .friendly-card { text-align: right; border-right: 8px solid #fbbf24; background: linear-gradient(90deg, var(--glass-bg) 0%, rgba(0,0,0,0) 100%); }
+        .friendly-title { font-size: 20px; font-weight: 900; margin-bottom: 12px; color: #fbbf24; display: flex; align-items: center; gap: 10px; }
+        .friendly-text { font-size: 16px; line-height: 1.8; font-weight: 500; text-align: justify; color: var(--text-primary); opacity: 0.95; }
+
+        .weather-visual-card { display: flex; flex-direction: column; align-items: center; text-align: center; background: linear-gradient(160deg, var(--glass-bg) 0%, rgba(255,255,255,0.01) 100%); padding-top: 40px; }
+        .weather-anim-container { width: 160px; height: 160px; margin-bottom: 10px; position: relative; z-index: 2; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.25)); }
+        .visual-temp { font-size: 70px; font-weight: 900; line-height: 1; margin-bottom: 8px; background: linear-gradient(to bottom, var(--text-primary), var(--text-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .visual-desc { font-size: 20px; opacity: 1; margin-bottom: 25px; font-weight: 700; color: var(--accent-color); }
+        .visual-grid { display: flex; gap: 20px; width: 100%; justify-content: center; margin-top: 15px; padding-top: 20px; border-top: 1px solid var(--glass-border); }
+        .v-item { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
+        .v-val { font-size: 18px; font-weight: 800; }
+
+        /* --- لیست پیش‌بینی ۷ روزه --- */
+        .forecast-list { display: flex; flex-direction: column; gap: 15px; }
+        .forecast-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 0; border-bottom: 1px solid var(--glass-border);
+        }
+        .forecast-item:last-child { border-bottom: none; }
+        .f-day { font-weight: 900; width: 60px; font-size: 15px; }
+        .f-icon { width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; }
+        .f-desc { font-size: 12px; opacity: 0.7; flex: 1; padding: 0 10px; text-align: right; }
+        .f-temp { font-weight: 800; font-size: 16px; width: 80px; text-align: left; direction: ltr; }
+
+        /* --- نمودار --- */
+        .chart-container { position: relative; height: 200px; width: 100%; margin-top: 10px; }
+
+        /* --- فاز ماه --- */
+        .moon-card { border-right: 8px solid #a78bfa; background: linear-gradient(135deg, rgba(20,20,40,0.8), rgba(0,0,0,0.2)); }
+        .moon-content { display: flex; align-items: center; gap: 20px; }
+        .moon-visual { width: 80px; height: 80px; position: relative; border-radius: 50%; box-shadow: 0 0 30px rgba(255,255,255,0.1); flex-shrink: 0; background-color: #0f172a; overflow: hidden; }
+        .moon-text-col { flex: 1; }
+        .moon-phase-name { font-size: 18px; font-weight: 900; color: #a78bfa; margin-bottom: 5px; }
+        .moon-desc { font-size: 13px; line-height: 1.8; opacity: 0.85; text-align: justify; }
+
+        /* --- ارتفاع --- */
+        .elevation-card { text-align: center; border-bottom: 8px solid var(--accent-color); }
+        .elev-icon { font-size: 40px; margin-bottom: 10px; display: block; }
+        .elev-val { font-size: 32px; font-weight: 900; color: var(--accent-color); margin: 5px 0; }
+        .elev-desc { font-size: 14px; opacity: 0.7; font-weight: 500; }
+
+        /* --- انیمیشن‌های SVG --- */
+        .anim-sun { animation: spin 20s linear infinite; transform-origin: center; }
+        .anim-cloud { animation: float 6s ease-in-out infinite; }
+        .anim-rain { animation: rainDrop 0.8s linear infinite; }
+        .anim-snow { animation: snowDrop 3s linear infinite; }
+        .anim-thunder { animation: flash 5s infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes rainDrop { 0% { transform: translateY(0); opacity:1; } 100% { transform: translateY(30px); opacity:0; } }
+        @keyframes flash { 0%, 90%, 100% { opacity: 0; } 92%, 96% { opacity: 1; filter: drop-shadow(0 0 20px #facc15); } }
+
+        /* --- مودال ولکام (جدید) --- */
+        .welcome-modal {
+            position: fixed; inset: 0; z-index: 300;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(20px);
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: 0.5s;
+        }
+        .welcome-modal.active { opacity: 1; pointer-events: auto; }
+        .welcome-card {
+            width: 90%; max-width: 400px; background: var(--bg-color);
+            border: 1px solid var(--glass-border); border-radius: 40px; padding: 40px;
+            text-align: center; box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+            transform: scale(0.9); transition: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .welcome-modal.active .welcome-card { transform: scale(1); }
+        .welcome-icon { font-size: 60px; margin-bottom: 20px; animation: float 4s ease-in-out infinite; }
+        .welcome-btn {
+            width: 100%; padding: 16px; border-radius: 20px; border: none; font-family: inherit;
+            font-size: 16px; font-weight: 800; margin-top: 15px; cursor: pointer;
+            transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-primary { background: var(--accent-color); color: #000; box-shadow: 0 10px 20px rgba(52, 211, 153, 0.3); }
+        .btn-secondary { background: var(--glass-bg); color: var(--text-primary); border: 1px solid var(--glass-border); }
+        .btn-primary:active, .btn-secondary:active { transform: scale(0.96); }
+
+        /* --- لودر و سرچ --- */
+        #loader { position: fixed; inset: 0; background: var(--bg-color); z-index: 200; display: flex; justify-content: center; align-items: center; flex-direction: column; transition: opacity 0.6s; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; backdrop-filter: blur(25px); display: flex; justify-content: center; align-items: flex-end; opacity: 0; pointer-events: none; transition: 0.4s; }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        .modal-sheet { width: 100%; max-width: 550px; background: var(--bg-color); border-top-left-radius: 40px; border-top-right-radius: 40px; padding: 36px; transform: translateY(100%); transition: 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); border-top: 1px solid var(--glass-border); }
+        .modal-overlay.open .modal-sheet { transform: translateY(0); }
+        .search-input { background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 20px; border-radius: 24px; color: var(--text-primary); font-family: inherit; font-weight: 700; font-size: 18px; width: 100%; margin-top: 24px; text-align: center; }
+        .search-item { padding: 20px; border-bottom: 1px solid var(--glass-border); cursor: pointer; text-align: center; color: var(--text-primary); font-weight: 500; transition: 0.2s; }
+
+    </style>
+</head>
+<body>
+
+    <div class="liquid-blob">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+    <div id="particles"></div>
+
+    <div id="loader">
+        <svg width="80" height="80" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:var(--accent-color);stop-opacity:1" /><stop offset="100%" style="stop-color:var(--liquid-1);stop-opacity:1" /></linearGradient></defs>
+            <circle cx="12" cy="12" r="10" fill="none" stroke-dasharray="32" stroke-dashoffset="32" stroke="url(#grad1)">
+                <animate attributeName="stroke-dashoffset" from="64" to="0" dur="1.2s" repeatCount="indefinite"/>
+                <animate attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="2s" repeatCount="indefinite"/>
+            </circle>
+        </svg>
+        <div style="margin-top: 25px; font-size: 18px; font-weight: 700; opacity: 0.9;">در حال دریافت دیتا...</div>
+    </div>
+
+    <div class="welcome-modal" id="welcome-modal">
+        <div class="welcome-card">
+            <div class="welcome-icon">🌍</div>
+            <h2 style="font-size: 24px; margin-bottom: 10px;">سلام! به هوای پاک پلاس خوش آمدید</h2>
+            <p style="opacity: 0.8; margin-bottom: 30px; line-height: 1.6;">برای شروع و ارائه دقیق‌ترین گزارش آب و هوا، لطفاً موقعیت مکانی خود را مشخص کنید.</p>
+            <button class="welcome-btn btn-primary" onclick="handleWelcomeGPS()">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="6"/></svg>
+                یافتن خودکار موقعیت
+            </button>
+            <button class="welcome-btn btn-secondary" onclick="handleWelcomeManual()">جستجوی دستی شهر</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="search-modal">
+        <div class="modal-sheet">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:22px; font-weight:900;">کجا هستید؟</span>
+                <button onclick="toggleSearch(false)" style="background:none; border:none; color:var(--text-primary); font-size:28px; cursor:pointer;">✕</button>
+            </div>
+            <input type="text" class="search-input" id="city-input" placeholder="نام شهر به انگلیسی (مثلاً: Tehran)" dir="rtl">
+            <div id="search-list" style="margin-top:20px; max-height:300px; overflow-y:auto;"></div>
+        </div>
+    </div>
+
+    <div id="app">
+        <header class="fade-in-up" style="animation-delay: 0.1s;">
+            <div class="location-pill" onclick="toggleSearch(true)">
+                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span id="loc-name">تهران</span>
+            </div>
+            <div class="header-actions">
+                <div class="btn-circle" onclick="toggleTheme()" title="تغییر تم">
+                    <svg id="theme-icon" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </div>
+            </div>
+        </header>
+
+        <div class="hero-section fade-in-up" style="animation-delay: 0.2s;">
+            <div class="gauge-wrapper">
+                <svg class="gauge-svg" viewBox="0 0 240 240">
+                    <circle class="track" cx="120" cy="120" r="110"></circle>
+                    <circle id="aqi-ring" class="progress" cx="120" cy="120" r="110"></circle>
+                </svg>
+                <div class="hero-center">
+                    <div class="hero-val" id="aqi-val">--</div>
+                    <div class="hero-label" id="aqi-text">...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card friendly-card fade-in-up" style="animation-delay: 0.3s;">
+            <div class="friendly-title"><span>👋</span><span>گزارش مود شما</span></div>
+            <div class="friendly-text" id="friendly-text">...</div>
+        </div>
+
+        <div class="glass-card weather-visual-card fade-in-up" style="animation-delay: 0.4s;">
+            <div class="weather-anim-container" id="weather-icon-container"></div>
+            <div class="visual-temp" id="visual-temp">--°</div>
+            <div class="visual-desc" id="visual-desc">--</div>
+            <div class="visual-grid">
+                <div class="v-item"><span class="v-val" id="hum-val">--%</span><span style="font-size:12px;opacity:0.7">رطوبت</span></div>
+                <div class="v-item"><span class="v-val" id="wind-val">--</span><span style="font-size:12px;opacity:0.7">باد (km/h)</span></div>
+            </div>
+        </div>
+
+        <div class="glass-card moon-card fade-in-up" style="animation-delay: 0.45s;">
+            <div class="moon-content">
+                <div class="moon-visual" id="moon-render">
+                    </div>
+                <div class="moon-text-col">
+                    <div class="moon-phase-name" id="moon-phase-name">--</div>
+                    <div class="moon-desc" id="moon-desc">--</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card fade-in-up" style="animation-delay: 0.5s;">
+            <div style="font-size:18px; font-weight:900; margin-bottom:15px; display:flex; gap:10px; align-items:center;">
+                <span style="color:var(--accent-color)">📈</span>
+                روند دمایی هفته
+            </div>
+            <div class="chart-container">
+                <canvas id="forecastChart"></canvas>
+            </div>
+        </div>
+
+        <div class="glass-card fade-in-up" style="animation-delay: 0.6s;">
+            <div style="font-size:18px; font-weight:900; margin-bottom:20px; display:flex; gap:10px; align-items:center;">
+                <span>🗓️</span>
+                چشم‌انداز روزهای آینده
+            </div>
+            <div class="forecast-list" id="forecast-list">
+                </div>
+        </div>
+
+        <div class="glass-card elevation-card fade-in-up" style="animation-delay: 0.7s;">
+            <span class="elev-icon">🏔️</span>
+            <div style="font-size:16px; font-weight:700;">ارتفاع شما از سطح دریا</div>
+            <div class="elev-val" id="elev-val">--</div>
+            <div class="elev-desc" id="elev-desc">--</div>
+        </div>
+
+        <footer class="fade-in-up" style="animation-delay: 0.9s; text-align:center; font-size:13px; opacity:0.4; margin-top:20px;">
+            نسخه اولترا | طراحی با ❤️
+        </footer>
+    </div>
+
+<script>
+    const toFarsi = (n) => n?.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]) || '-';
+    let isLight = false;
+    let chartInstance = null;
+
+    // --- تنظیمات Chart.js ---
+    Chart.defaults.font.family = 'Vazirmatn';
+    Chart.defaults.color = '#94a3b8';
+
+    // --- توابع کمکی ---
+    function toggleTheme() {
+        isLight = !isLight;
+        document.body.classList.toggle('light-mode');
+        const icon = document.getElementById('theme-icon');
+        icon.innerHTML = isLight 
+            ? '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>'
+            : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+        
+        // آپدیت رنگ نمودار در تغییر تم
+        if(chartInstance) {
+            chartInstance.options.scales.y.grid.color = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)';
+            chartInstance.update();
+        }
+    }
+
+    function getDayName(dateStr) {
+        const date = new Date(dateStr);
+        const days = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'];
+        return days[date.getDay()];
+    }
+
+    // --- آیکون‌های SVG (ساده شده برای لیست) ---
+    function getSmallIcon(code) {
+        if (code <= 1) return '☀️';
+        if (code <= 3) return '☁️';
+        if (code <= 67) return '🌧️';
+        if (code <= 77) return '❄️';
+        if (code >= 95) return '⛈️';
+        return '🌥️';
+    }
+
+    function getWeatherSVG(code, isDay) {
+        // همان تابع قبلی SVG ها (خلاصه شده برای جلوگیری از تکرار کد طولانی)
+        const sunColor = "#facc15";
+        const cloudColor = isLight ? "#94a3b8" : "#cbd5e1";
+        if (code <= 1) return isDay ? `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="25" fill="${sunColor}"/><g stroke="${sunColor}" stroke-width="4"><line x1="50" y1="10" x2="50" y2="0"/><line x1="50" y1="90" x2="50" y2="100"/><line x1="10" y1="50" x2="0" y2="50"/><line x1="90" y1="50" x2="100" y2="50"/></g></svg>` : `<svg viewBox="0 0 100 100"><path d="M40 20 A30 30 0 1 0 80 70 A20 20 0 1 1 40 20" fill="#f1f5f9"/></svg>`;
+        if (code <= 3) return `<svg viewBox="0 0 100 100"><path class="anim-cloud" d="M25,60 a20,20 0 0,1 0,-40 a20,20 0 0,1 40,0 a20,20 0 0,1 0,40 z" fill="${cloudColor}"/></svg>`;
+        if (code >= 95) return `<svg viewBox="0 0 100 100"><path class="anim-cloud" d="M25,60 a20,20 0 0,1 0,-40 a20,20 0 0,1 40,0 a20,20 0 0,1 0,40 z" fill="${cloudColor}"/><path class="anim-thunder" d="M45,60 L35,80 L50,80 L40,105" stroke="#facc15" stroke-width="4" fill="none"/></svg>`;
+        return `<svg viewBox="0 0 100 100"><path class="anim-cloud" d="M25,60 a20,20 0 0,1 0,-40 a20,20 0 0,1 40,0 a20,20 0 0,1 0,40 z" fill="${cloudColor}"/><line x1="35" y1="65" x2="30" y2="85" stroke="#60a5fa" stroke-width="3"/></svg>`;
+    }
+
+    // --- محاسبه فاز ماه و رندر ---
+    function renderMoonPhase() {
+        const date = new Date();
+        const cycle = 29.53;
+        // محاسبه تقریبی سن ماه از یک تاریخ مرجع (مثلاً 6 ژانویه 2000 ماه نو بود)
+        const knownNewMoon = new Date('2000-01-06T18:14:00');
+        const diffTime = date - knownNewMoon;
+        const diffDays = diffTime / (1000 * 60 * 60 * 24);
+        const moonAge = diffDays % cycle;
+        
+        let phaseName = "";
+        let phaseDesc = "";
+        let illumination = 0;
+        
+        // تعیین متن
+        if (moonAge < 1.5) { phaseName = "ماه نو (New Moon)"; phaseDesc = "آغاز چرخه‌ای تازه. زمانی عالی برای کاشتن بذر ایده‌های جدید و شروع پروژه‌هایی که نیاز به رشد دارند. آسمان تاریک است و ستارگان می‌درخشند."; illumination = 0; }
+        else if (moonAge < 7) { phaseName = "هلال افزاینده"; phaseDesc = "انرژی در حال افزایش است. زمان اقدام و حرکت به سمت اهداف. ماه به شکل داسی باریک و زیبا در آسمان غروب خودنمایی می‌کند."; illumination = 0.25; }
+        else if (moonAge < 8) { phaseName = "تربیع اول"; phaseDesc = "ماه نیمی از چهره‌اش را نشان می‌دهد. زمان غلبه بر موانع و تصمیم‌گیری‌های جدی. تعادل بین نور و تاریکی برقرار است."; illumination = 0.5; }
+        else if (moonAge < 14) { phaseName = "تحدب افزاینده"; phaseDesc = "نزدیک به کمال. جزئیات برنامه‌ها را دقیق کنید. انرژی کیهانی بالاست و احساسات شدت می‌گیرند."; illumination = 0.75; }
+        else if (moonAge < 16) { phaseName = "ماه کامل (Full Moon)"; phaseDesc = "اوج درخشش و انرژی. ماه چون مرواریدی در شب می‌درخشد. زمان برداشت نتیجه تلاش‌ها و البته کنترل احساسات هیجانی."; illumination = 1; }
+        else if (moonAge < 22) { phaseName = "تحدب کاهنده"; phaseDesc = "زمان اشتراک‌گذاری دانش و تجربه با دیگران. ماه اندک اندک رو به خاموشی می‌رود تا استراحت کند."; illumination = 0.75; }
+        else if (moonAge < 23) { phaseName = "تربیع آخر"; phaseDesc = "زمان رها کردن چیزهایی که دیگر به دردتان نمی‌خورد. خانه تکانی ذهنی و فیزیکی در این فاز عالی است."; illumination = 0.5; }
+        else { phaseName = "هلال کاهنده"; phaseDesc = "پایان چرخه. زمانی برای استراحت، تفکر و آماده شدن برای شروعی دوباره. سحرخیزها این هلال زیبا را در صبح می‌بینند."; illumination = 0.1; }
+
+        document.getElementById('moon-phase-name').innerText = phaseName;
+        document.getElementById('moon-desc').innerText = phaseDesc;
+
+        // رندر گرافیکی ماه (سایه روی دایره)
+        // ساده‌سازی: استفاده از CSS Mask یا SVG Path برای نمایش فاز
+        // اینجا یک SVG داینامیک می‌سازیم
+        let path = "";
+        // منطق ساده شده برای رسم سایه:
+        const cx = 40, cy = 40, r = 38;
+        // برای سادگی در این دمو یک ماه کامل با ماسک سایه می‌سازیم
+        const shadowX = moonAge < 15 ? (moonAge/14.7) * 80 - 40 : ((moonAge-14.7)/14.7) * 80; 
+        
+        let svg = `<svg width="100%" height="100%" viewBox="0 0 80 80">
+            <defs>
+                <radialGradient id="moonGrad" cx="50%" cy="50%" r="50%" fx="20%" fy="20%">
+                    <stop offset="0%" style="stop-color:#f1f5f9;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#94a3b8;stop-opacity:1" />
+                </radialGradient>
+                <filter id="glow"><feGaussianBlur stdDeviation="2.5" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+            <circle cx="40" cy="40" r="36" fill="url(#moonGrad)" filter="url(#glow)" />
+            <circle cx="40" cy="40" r="36" fill="rgba(2, 6, 23, 0.85)" transform="translate(${moonAge < 15 ? -40 + (moonAge * 2.7) : 40 - ((moonAge-15)*2.7)}, 0)" style="mix-blend-mode: multiply; filter:blur(4px)" />
+        </svg>`;
+        
+        // برای دقت بالا در یک فایل تک، از یک تصویر آماده استفاده می‌کنیم چون رسم دقیق ریاضیاتی path طولانی است
+        // اما اینجا یک دایره ساده با گرادینت می‌گذاریم که نمادین باشد
+        const moonColor = "#e2e8f0";
+        let maskX = 0;
+        if(moonAge < 15) { // Waxing
+             // سایه از راست میره
+             svg = `<svg width="80" height="80" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#334155"/><path d="M50 5 a45 45 0 0 1 0 90 a${Math.abs(45 - 3 * moonAge)} 45 0 0 ${moonAge < 7.5 ? 0 : 1} 0 -90" fill="#f8fafc" filter="drop-shadow(0 0 5px white)"/></svg>`;
+        } else { // Waning
+             const age = moonAge - 15;
+             svg = `<svg width="80" height="80" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#334155"/><path d="M50 5 a45 45 0 0 0 0 90 a${Math.abs(45 - 3 * age)} 45 0 0 ${age > 7.5 ? 0 : 1} 0 -90" fill="#f8fafc" filter="drop-shadow(0 0 5px white)"/></svg>`;
+        }
+        
+        document.getElementById('moon-render').innerHTML = svg;
+    }
+
+    // --- رندر نمودار ---
+    function renderChart(dates, maxTemps, minTemps) {
+        const ctx = document.getElementById('forecastChart').getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+        gradient.addColorStop(0, 'rgba(52, 211, 153, 0.5)');
+        gradient.addColorStop(1, 'rgba(52, 211, 153, 0)');
+
+        if (chartInstance) chartInstance.destroy();
+
+        chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dates.map(d => getDayName(d)),
+                datasets: [
+                    {
+                        label: 'حداکثر دما',
+                        data: maxTemps,
+                        borderColor: '#34d399',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#34d399',
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'حداقل دما',
+                        data: minTemps,
+                        borderColor: '#60a5fa',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleFont: { family: 'Vazirmatn' },
+                        bodyFont: { family: 'Vazirmatn' },
+                        padding: 10,
+                        cornerRadius: 10,
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { family: 'Vazirmatn', size: 10 } } },
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false }, ticks: { display: false } }
+                }
+            }
+        });
+    }
+
+    // --- توابع دیتا ---
+    async function fetchData(lat, lon, name) {
+        document.getElementById('loader').style.display = 'flex';
+        document.getElementById('loader').style.opacity = '1';
+
+        try {
+            // اضافه کردن پارامترهای daily و elevation
+            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&hourly=precipitation_probability&timezone=auto`;
+            const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi,pm2_5,nitrogen_dioxide&timezone=auto`;
+            
+            const [wRes, aRes] = await Promise.all([fetch(weatherUrl), fetch(aqiUrl)]);
+            const weatherData = await wRes.json();
+            const aqiData = await aRes.json();
+
+            localStorage.setItem('last_lat', lat);
+            localStorage.setItem('last_lon', lon);
+            localStorage.setItem('last_name', name);
+
+            updateUI(weatherData, aqiData, name);
+
+        } catch (e) {
+            console.error(e);
+            alert("خطا در دریافت اطلاعات. لطفا اینترنت را بررسی کنید.");
+        } finally {
+            document.getElementById('loader').style.opacity = '0';
+            setTimeout(() => document.getElementById('loader').style.display = 'none', 600);
+        }
+    }
+
+    function updateUI(wData, aData, city) {
+        const current = wData.current;
+        const daily = wData.daily;
+        const aqi = aData.current.us_aqi;
+        const ele = wData.elevation;
+
+        // آپدیت متن‌ها و رنگ‌ها (کد قبلی)
+        let accent = '#34d399';
+        let status = 'پاک';
+        if(aqi > 50) { accent = '#facc15'; status = 'قابل قبول'; }
+        if(aqi > 100) { accent = '#fb923c'; status = 'ناسالم حساس'; }
+        if(aqi > 150) { accent = '#f87171'; status = 'ناسالم'; }
+        
+        document.documentElement.style.setProperty('--accent-color', accent);
+        document.getElementById('loc-name').innerText = city;
+        
+        // انیمیشن عدد AQI
+        document.getElementById('aqi-val').innerText = toFarsi(aqi);
+        document.getElementById('aqi-text').innerText = status;
+        document.getElementById('aqi-text').style.backgroundColor = accent;
+        const offset = 660 - (Math.min(aqi, 400) / 400) * 660;
+        document.getElementById('aqi-ring').style.strokeDashoffset = offset;
+        document.getElementById('aqi-ring').style.stroke = accent;
+
+        // آب و هوا اصلی
+        document.getElementById('visual-temp').innerText = toFarsi(Math.round(current.temperature_2m)) + '°';
+        document.getElementById('hum-val').innerText = toFarsi(current.relative_humidity_2m) + '%';
+        document.getElementById('wind-val').innerText = toFarsi(current.wind_speed_10m);
+        document.getElementById('weather-icon-container').innerHTML = getWeatherSVG(current.weather_code, current.is_day);
+        
+        // متن توصیفی
+        const descText = getFriendlyText(current.temperature_2m, current.weather_code);
+        document.getElementById('friendly-text').innerText = descText;
+        document.getElementById('visual-desc').innerText = getWeatherLabel(current.weather_code);
+
+        // --- 1. نمودار ---
+        renderChart(daily.time, daily.temperature_2m_max, daily.temperature_2m_min);
+
+        // --- 2. لیست ۷ روزه ---
+        const listEl = document.getElementById('forecast-list');
+        listEl.innerHTML = '';
+        for(let i=1; i<7; i++) { // از فردا شروع میکنیم
+            const dayCode = daily.weather_code[i];
+            const tMax = Math.round(daily.temperature_2m_max[i]);
+            const tMin = Math.round(daily.temperature_2m_min[i]);
+            const dayName = getDayName(daily.time[i]);
+            const shortDesc = getShortDailyDesc(dayCode, tMax);
+            
+            const div = document.createElement('div');
+            div.className = 'forecast-item';
+            div.innerHTML = `
+                <div class="f-day">${dayName}</div>
+                <div class="f-icon" style="font-size:24px">${getSmallIcon(dayCode)}</div>
+                <div class="f-desc">${shortDesc}</div>
+                <div class="f-temp">${toFarsi(tMax)}° / <span style="opacity:0.6">${toFarsi(tMin)}°</span></div>
+            `;
+            listEl.appendChild(div);
+        }
+
+        // --- 3. ماه ---
+        renderMoonPhase();
+
+        // --- 4. ارتفاع ---
+        renderElevation(ele);
+    }
+
+    function renderElevation(meters) {
+        document.getElementById('elev-val').innerText = toFarsi(meters) + ' متر';
+        let desc = "";
+        
+        // مقایسه با برج‌ها
+        const milad = 435;
+        const khalifa = 828;
+        const azadi = 45;
+
+        if (meters < azadi) {
+            desc = `تقریباً هم‌سطح میدان آزادی، در پایین‌ترین نقاط شهر.`;
+        } else if (meters < milad) {
+            const ratio = (meters / azadi).toFixed(1);
+            desc = `شما در ارتفاعی معادل ${toFarsi(ratio)} برابر برج آزادی قرار دارید.`;
+        } else if (meters < khalifa) {
+            const ratio = (meters / milad).toFixed(1);
+            desc = `ارتفاع شما حدوداً ${toFarsi(ratio)} برابر برج میلاد تهران است.`;
+        } else {
+            const ratio = (meters / khalifa).toFixed(1);
+            desc = `شگفت‌انگیز! شما ${toFarsi(ratio)} برابر بلندتر از بلندترین برج جهان (خلیفه) ایستاده‌اید.`;
+        }
+        document.getElementById('elev-desc').innerText = desc;
+    }
+
+    // --- متن‌های کمکی ---
+    function getWeatherLabel(code) {
+        if(code===0) return "صاف و آفتابی";
+        if(code<=3) return "کمی ابری";
+        if(code<=48) return "مه‌آلود";
+        if(code<=67) return "بارانی";
+        if(code<=77) return "برفی";
+        return "طوفانی";
+    }
+
+    function getShortDailyDesc(code, maxTemp) {
+        if(code >= 95) return "مراقب رعد و برق باشید";
+        if(code >= 71) return "لباس گرم و پشمی بپوشید";
+        if(code >= 51) return "چترتان را فراموش نکنید";
+        if(maxTemp > 35) return "روز داغی در پیش است";
+        if(maxTemp < 5) return "یخبندان احتمالی";
+        if(code <= 1) return "عالی برای پیاده‌روی";
+        return "هوایی ملایم و معمولی";
+    }
+    
+    function getFriendlyText(temp, code) {
+        if(code > 50) return "امروز آسمان کمی دلگیر است و می‌بارد. صدای باران بهترین موسیقی برای آرامش است.";
+        if(temp > 30) return "هوا حسابی گرم شده! حتما آب زیاد بنوشید و از سایه حرکت کنید.";
+        if(temp < 5) return "سوز سرما حس می‌شود. یک نوشیدنی داغ و لباس گرم امروز معجزه می‌کند.";
+        return "همه چیز متعادل است. نه آنقدر سرد که بلرزید، نه آنقدر گرم که کلافه شوید.";
+    }
+
+    // --- هندل کردن مودال شروع (Welcome) ---
+    function handleWelcomeGPS() {
+        if(navigator.geolocation) {
+            document.getElementById('welcome-modal').classList.remove('active');
+            document.getElementById('loader').style.display = 'flex';
+            document.getElementById('loader').style.opacity = '1';
+            navigator.geolocation.getCurrentPosition(
+                p => fetchData(p.coords.latitude, p.coords.longitude, "موقعیت من"),
+                () => { alert("دسترسی رد شد."); document.getElementById('welcome-modal').classList.add('active'); document.getElementById('loader').style.opacity='0'; }
+            );
+        } else alert("مرورگر پشتیبانی نمی‌کند");
+    }
+
+    function handleWelcomeManual() {
+        document.getElementById('welcome-modal').classList.remove('active');
+        toggleSearch(true);
+    }
+
+    // --- جستجو ---
+    let debounce;
+    function toggleSearch(show) {
+        const modal = document.getElementById('search-modal');
+        if(show) { modal.classList.add('open'); setTimeout(() => document.getElementById('city-input').focus(), 100); }
+        else modal.classList.remove('open');
+    }
+    document.getElementById('city-input').addEventListener('input', (e) => {
+        clearTimeout(debounce);
+        if(e.target.value.length < 2) return;
+        debounce = setTimeout(async () => {
+            try {
+                const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${e.target.value}&count=5&language=en&format=json`);
+                const data = await res.json();
+                const list = document.getElementById('search-list');
+                list.innerHTML = '';
+                if(data.results) {
+                    data.results.forEach(c => {
+                        const div = document.createElement('div');
+                        div.className = 'search-item';
+                        div.innerText = `${c.name} (${c.country_code})`;
+                        div.onclick = () => { fetchData(c.latitude, c.longitude, c.name); toggleSearch(false); };
+                        list.appendChild(div);
+                    });
+                }
+            } catch(e) {}
+        }, 600);
+    });
+
+    // --- شروع برنامه ---
+    function init() {
+        const hasData = localStorage.getItem('last_lat');
+        if(!hasData) {
+            setTimeout(() => document.getElementById('welcome-modal').classList.add('active'), 500);
+            document.getElementById('loader').style.display = 'none';
+        } else {
+            fetchData(localStorage.getItem('last_lat'), localStorage.getItem('last_lon'), localStorage.getItem('last_name'));
+        }
+    }
+    init();
+
+</script>
+</body>
+</html>
