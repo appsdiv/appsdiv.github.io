@@ -1,0 +1,2050 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="هوای پاک پلاس" />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <link rel="manifest" href="/manifest.webmanifest" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="https://8upload.com/image/171db5bf84cf07d4/AppIcon_2x.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="https://8upload.com/image/171db5bf84cf07d4/AppIcon_2x.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://8upload.com/image/171db5bf84cf07d4/AppIcon_2x.png">
+
+  <title>هوای پاک پلاس | نسخه اولترا</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@200..900&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root{
+      --bg-color:#020617;
+      --bg-gradient:linear-gradient(180deg,#020617 0%,#0f172a 100%);
+      --text-primary:#f8fafc;
+      --text-secondary:#94a3b8;
+
+      --glass-bg:rgba(15,23,42,.6);
+      --glass-border:rgba(255,255,255,.08);
+      --glass-highlight:rgba(255,255,255,.03);
+      --glass-blur:40px;
+
+      --card-shadow:0 20px 40px -10px rgba(0,0,0,.7);
+      --inner-shadow:inset 0 1px 1px rgba(255,255,255,.15);
+
+      --accent-color:#34d399;
+      --liquid-1:#4f46e5;
+      --liquid-2:#db2777;
+
+      --danger:#f87171;
+      --warn:#fb923c;
+      --ok:#34d399;
+      --info:#60a5fa;
+      --purple:#a78bfa;
+
+      --radius-xl:32px;
+      --radius-lg:24px;
+      --radius-md:18px;
+    }
+
+    body.light-mode{
+      --bg-color:#f8fafc;
+      --bg-gradient:linear-gradient(180deg,#f1f5f9 0%,#e2e8f0 100%);
+      --text-primary:#1e293b;
+      --text-secondary:#475569;
+
+      --glass-bg:rgba(255,255,255,.78);
+      --glass-border:rgba(255,255,255,.9);
+      --glass-highlight:rgba(255,255,255,.85);
+      --glass-blur:30px;
+
+      --card-shadow:0 15px 35px -5px rgba(148,163,184,.35);
+      --inner-shadow:inset 0 1px 2px rgba(255,255,255,.9);
+
+      --liquid-1:#60a5fa;
+      --liquid-2:#f472b6;
+    }
+
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;outline:none;margin:0;padding:0}
+    body{
+      background-color:var(--bg-color);
+      background-image:var(--bg-gradient);
+      color:var(--text-primary);
+      font-family:'Vazirmatn',-apple-system,system-ui,sans-serif;
+      min-height:100vh;
+      overflow-x:hidden;
+      transition:background .5s ease,color .5s ease;
+      position:relative;
+    }
+
+    /* blobs */
+    .liquid-blob{position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none}
+    .blob{
+      position:absolute;border-radius:50%;
+      filter:blur(90px);opacity:.5;
+      animation:floatBlob 15s infinite alternate cubic-bezier(.4,0,.2,1);
+      mix-blend-mode:screen
+    }
+    body.light-mode .blob{mix-blend-mode:multiply;opacity:.28}
+    .blob-1{top:-20%;left:-20%;width:60vw;height:60vw;background:var(--liquid-1)}
+    .blob-2{bottom:-20%;right:-20%;width:70vw;height:70vw;background:var(--liquid-2);animation-delay:-7s}
+    @keyframes floatBlob{0%{transform:translate(0,0) scale(1) rotate(0)}100%{transform:translate(40px,60px) scale(1.1) rotate(10deg)}}
+
+    /* particles */
+    #particles{position:fixed;inset:0;pointer-events:none;z-index:5;transition:opacity .5s}
+    body.weather-rain #particles{
+      background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 0 L10 10' stroke='rgba(120,120,255,0.6)' stroke-width='1'/%3E%3C/svg%3E");
+      animation:rainFall .6s linear infinite
+    }
+    body.weather-snow #particles{
+      background-image:radial-gradient(white 30%,transparent 30%);
+      background-size:10px 10px;
+      animation:snowFall 4s linear infinite
+    }
+    @keyframes rainFall{from{background-position:0 0}to{background-position:-10px 400px}}
+    @keyframes snowFall{from{background-position:0 0}to{background-position:30px 200px}}
+
+    #app{
+      position:relative;z-index:10;
+      padding:max(20px, env(safe-area-inset-top)) 24px 40px 24px;
+      max-width:580px;margin:0 auto;width:100%;
+      display:flex;flex-direction:column;gap:22px;
+      padding-bottom:110px;
+    }
+
+    .fade-in-up{animation:fadeInUp .75s cubic-bezier(.16,1,.3,1) forwards;opacity:0;transform:translateY(24px)}
+    @keyframes fadeInUp{to{opacity:1;transform:translateY(0)}}
+
+    /* header */
+    header{display:flex;justify-content:space-between;align-items:center;width:100%}
+    .location-pill{
+      display:flex;align-items:center;gap:12px;
+      background:var(--glass-bg);
+      border:1px solid var(--glass-border);
+      border-top:1px solid var(--glass-highlight);
+      padding:12px 22px;border-radius:999px;
+      font-size:16px;font-weight:900;cursor:pointer;
+      backdrop-filter:blur(var(--glass-blur));
+      box-shadow:var(--card-shadow),var(--inner-shadow);
+      transition:.25s cubic-bezier(.34,1.56,.64,1);
+      color:var(--text-primary);
+      max-width:62%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .header-actions{display:flex;gap:10px;align-items:center}
+    .btn-circle{
+      width:50px;height:50px;border-radius:50%;
+      background:var(--glass-bg);
+      border:1px solid var(--glass-border);
+      border-top:1px solid var(--glass-highlight);
+      display:flex;align-items:center;justify-content:center;
+      color:var(--text-primary);cursor:pointer;
+      backdrop-filter:blur(var(--glass-blur));
+      box-shadow:var(--card-shadow),var(--inner-shadow);
+      transition:.25s cubic-bezier(.34,1.56,.64,1);
+      flex-shrink:0;
+    }
+    .btn-circle:hover,.location-pill:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(0,0,0,.28),var(--inner-shadow)}
+    .btn-circle:active,.location-pill:active{transform:scale(.96)}
+
+    /* loader */
+    #loader{
+      position:fixed;inset:0;background:var(--bg-color);z-index:200;
+      display:flex;justify-content:center;align-items:center;flex-direction:column;
+      transition:opacity .6s;
+    }
+
+    /* modal */
+    .modal-overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:120;
+      backdrop-filter:blur(25px);
+      display:flex;justify-content:center;align-items:flex-end;
+      opacity:0;pointer-events:none;transition:.4s;
+    }
+    .modal-overlay.open{opacity:1;pointer-events:auto}
+    .modal-sheet{
+      width:100%;max-width:580px;background:var(--bg-color);
+      border-top-left-radius:40px;border-top-right-radius:40px;
+      padding:34px;transform:translateY(100%);
+      transition:.5s cubic-bezier(.2,.8,.2,1);
+      border-top:1px solid var(--glass-border);
+      box-shadow:0 -10px 40px rgba(0,0,0,.5);
+    }
+    .modal-overlay.open .modal-sheet{transform:translateY(0)}
+    .search-input{
+      background:var(--glass-bg);border:1px solid var(--glass-border);
+      padding:18px;border-radius:20px;color:var(--text-primary);
+      font-family:inherit;font-weight:800;font-size:17px;
+      width:100%;margin-top:18px;text-align:center;
+      box-shadow:inset 0 2px 4px rgba(0,0,0,.2);
+    }
+    .search-item{
+      padding:18px;border-bottom:1px solid var(--glass-border);
+      cursor:pointer;text-align:center;color:var(--text-primary);
+      font-weight:650;transition:.2s;border-radius:16px;
+    }
+    .search-item:hover{background:rgba(255,255,255,.06)}
+
+    /* welcome */
+    .welcome-modal{
+      position:fixed;inset:0;z-index:300;
+      background:rgba(0,0,0,.7);backdrop-filter:blur(15px);
+      display:flex;justify-content:center;align-items:center;
+      opacity:0;pointer-events:none;transition:.5s;
+    }
+    .welcome-modal.active{opacity:1;pointer-events:auto}
+    .welcome-card{
+      width:90%;max-width:420px;background:var(--bg-color);
+      border:1px solid var(--glass-border);
+      border-radius:42px;padding:38px;text-align:center;
+      box-shadow:0 40px 90px rgba(0,0,0,.6);
+      transform:scale(.92);transition:.5s cubic-bezier(.34,1.56,.64,1);
+    }
+    .welcome-modal.active .welcome-card{transform:scale(1)}
+    .welcome-icon{font-size:62px;margin-bottom:16px;display:inline-block;animation:float 4s ease-in-out infinite}
+    .welcome-btn{
+      width:100%;padding:16px 18px;border-radius:18px;border:none;font-family:inherit;
+      font-size:15.5px;font-weight:900;margin-top:12px;cursor:pointer;
+      transition:.2s;display:flex;align-items:center;justify-content:center;gap:10px;
+    }
+    .btn-primary{background:var(--accent-color);color:#000;box-shadow:0 10px 20px rgba(52,211,153,.25)}
+    .btn-secondary{background:var(--glass-bg);color:var(--text-primary);border:1px solid var(--glass-border)}
+    .btn-primary:active,.btn-secondary:active{transform:scale(.97)}
+
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+    /* glass card */
+    .glass-card{
+      background:linear-gradient(160deg, var(--glass-bg) 0%, rgba(255,255,255,0.02) 100%);
+      border:1px solid var(--glass-border);
+      border-top:1px solid var(--glass-highlight);
+      border-radius:var(--radius-xl);
+      padding:26px;
+      backdrop-filter:blur(var(--glass-blur));
+      -webkit-backdrop-filter:blur(var(--glass-blur));
+      box-shadow:var(--card-shadow),var(--inner-shadow);
+      position:relative;overflow:hidden;
+      transition:transform .35s ease,box-shadow .35s ease;
+    }
+    .glass-card:hover{transform:translateY(-4px);box-shadow:0 25px 55px -10px rgba(0,0,0,.55),var(--inner-shadow)}
+
+    /* gauge */
+    .hero-section{display:flex;flex-direction:column;align-items:center;position:relative;margin-top:8px}
+    .gauge-wrapper{width:300px;height:300px;position:relative;filter:drop-shadow(0 20px 40px rgba(0,0,0,.28))}
+    .gauge-svg{width:100%;height:100%;transform:rotate(-90deg)}
+    .track{fill:none;stroke:var(--glass-border);stroke-width:16;stroke-linecap:round}
+    .progress{
+      fill:none;stroke:var(--accent-color);stroke-width:16;stroke-linecap:round;
+      stroke-dasharray:660;stroke-dashoffset:660;
+      transition:stroke-dashoffset 1.8s cubic-bezier(.2,.8,.2,1),stroke .6s;
+      filter:drop-shadow(0 0 10px var(--accent-color));
+    }
+    .hero-center{
+      position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+      text-align:center;display:flex;flex-direction:column;align-items:center;
+    }
+    .hero-val{font-size:88px;font-weight:950;line-height:.9;letter-spacing:-3px;text-shadow:0 10px 28px rgba(0,0,0,.28)}
+    .hero-label{
+      font-size:16px;font-weight:950;color:#fff;margin-top:14px;
+      background:var(--accent-color);padding:8px 18px;border-radius:999px;
+      box-shadow:0 8px 20px rgba(0,0,0,.28);
+      text-shadow:0 1px 2px rgba(0,0,0,.18);
+      letter-spacing:-.2px;
+    }
+
+    /* weather visual */
+    .weather-visual-card{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:34px}
+    .weather-anim-container{
+      width:180px;height:180px;margin-bottom:8px;position:relative;z-index:2;
+      filter:drop-shadow(0 20px 40px rgba(0,0,0,.22));
+      transform:perspective(500px) translateZ(20px);
+    }
+    .visual-temp{
+      font-size:78px;font-weight:950;line-height:1;margin-bottom:6px;
+      text-shadow:0 4px 12px rgba(0,0,0,.08);
+      background:linear-gradient(to bottom,var(--text-primary),var(--text-secondary));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    }
+    .visual-desc{
+      font-size:19px;margin-bottom:24px;font-weight:850;
+      color:var(--accent-color);letter-spacing:-.4px;
+    }
+    .visual-grid{
+      display:flex;gap:18px;width:100%;justify-content:center;margin-top:10px;padding-top:22px;
+      border-top:1px solid var(--glass-border);
+    }
+    .v-item{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
+    .v-icon{font-size:22px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2))}
+    .v-val{font-size:19px;font-weight:900;color:var(--text-primary)}
+    .v-lbl{font-size:12px;font-weight:650;color:var(--text-secondary)}
+
+    /* friendly card */
+    .friendly-card{text-align:right;border-right:8px solid #fbbf24}
+    .friendly-title{
+      font-size:19px;font-weight:950;margin-bottom:14px;color:#fbbf24;
+      display:flex;align-items:center;gap:10px;
+      text-shadow:0 0 15px rgba(251,191,36,.35)
+    }
+    .friendly-text{font-size:15.5px;line-height:2.05;font-weight:520;text-align:justify;color:var(--text-primary);opacity:.95}
+
+    /* info cards */
+    .info-card{padding-right:34px}
+    .info-title{font-size:17px;font-weight:950;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+    .info-body{font-size:14.5px;line-height:2;color:var(--text-primary);opacity:.92;white-space:pre-line;text-align:justify}
+
+    /* pollutants */
+    .pollutant-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .p-card{
+      background:var(--glass-bg);border-radius:28px;padding:22px;
+      border:1px solid var(--glass-border);border-top:1px solid var(--glass-highlight);
+      text-align:center;backdrop-filter:blur(var(--glass-blur));
+      box-shadow:var(--card-shadow),var(--inner-shadow);
+    }
+    .p-val{font-size:34px;font-weight:950;margin:10px 0;color:var(--accent-color);text-shadow:0 0 20px rgba(52,211,153,.25)}
+
+    /* chart card */
+    .chart-card{padding:20px}
+    .chart-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+    .chart-title{font-size:17px;font-weight:950;display:flex;gap:10px;align-items:center}
+    .chart-container{position:relative;height:270px;width:100%;margin-top:8px}
+
+    /* segmented switch */
+    .segmented{
+      display:flex;gap:8px;background:rgba(0,0,0,.18);
+      border:1px solid var(--glass-border);
+      padding:6px;border-radius:999px;
+      backdrop-filter:blur(14px);
+    }
+    body.light-mode .segmented{background:rgba(0,0,0,.06)}
+    .seg-btn{
+      border:none;border-radius:999px;
+      padding:10px 14px;
+      font-family:inherit;font-weight:900;font-size:13px;
+      cursor:pointer;transition:.2s;
+      color:var(--text-secondary);
+      background:transparent;
+      display:flex;align-items:center;gap:8px;
+      white-space:nowrap;
+    }
+    .seg-btn.active{
+      background:var(--glass-bg);
+      color:var(--text-primary);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+      border:1px solid var(--glass-border);
+    }
+    .seg-btn:active{transform:scale(.98)}
+
+    /* forecast list (2 rows) */
+    .forecast-list{display:flex;flex-direction:column;gap:12px}
+    .forecast-item{
+      display:flex;flex-direction:column;gap:10px;
+      padding:18px;background:rgba(0,0,0,.23);
+      border-radius:24px;border:1px solid var(--glass-border);
+      transition:.2s;
+    }
+    body.light-mode .forecast-item{background:rgba(0,0,0,.04)}
+    .forecast-item:hover{background:rgba(255,255,255,.05)}
+    .f-top-row{display:flex;justify-content:space-between;align-items:center;width:100%}
+    .f-day-group{display:flex;align-items:center;gap:12px}
+    .f-day{font-weight:950;font-size:14.5px;color:var(--text-primary)}
+    .f-icon{font-size:22px}
+    .f-temp{font-weight:900;font-size:17px;direction:ltr;color:var(--accent-color)}
+    .f-bot-row{
+      font-size:13px;opacity:.9;line-height:1.85;text-align:justify;color:var(--text-secondary);
+      padding-top:10px;border-top:1px solid rgba(255,255,255,.08);width:100%;
+    }
+
+    /* moon card */
+    .moon-card{border-right:8px solid var(--purple);display:flex;flex-direction:column;gap:18px}
+    .moon-header{display:flex;align-items:center;gap:18px}
+    .moon-visual{width:92px;height:92px;border-radius:50%;flex-shrink:0;background:#0f172a;overflow:hidden;box-shadow:0 0 40px rgba(167,139,250,.18)}
+    .moon-phase-name{font-size:18px;font-weight:950;color:var(--purple);margin-bottom:6px}
+    .moon-desc{font-size:13.5px;line-height:1.95;opacity:.92;text-align:justify;color:var(--text-primary)}
+
+    /* elevation */
+    .elevation-card{text-align:center;border-bottom:8px solid var(--accent-color)}
+    .elev-icon{font-size:44px;margin-bottom:12px;display:block;animation:float 5s ease-in-out infinite}
+    .elev-val{font-size:36px;font-weight:950;color:var(--accent-color);margin:4px 0;text-shadow:0 0 18px rgba(52,211,153,.28)}
+    .elev-desc{font-size:14px;opacity:.86;font-weight:560;margin-top:8px;line-height:1.9}
+
+    /* uv card */
+    .uv-card{border-right:8px solid #22c55e}
+    .uv-row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .uv-big{font-size:44px;font-weight:950;letter-spacing:-1px}
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 12px;border-radius:999px;
+      border:1px solid var(--glass-border);
+      background:rgba(0,0,0,.18);
+      font-weight:900;font-size:12.5px;color:var(--text-primary);
+    }
+    body.light-mode .badge{background:rgba(0,0,0,.05)}
+    .uv-advice{margin-top:12px;font-size:14px;line-height:1.95;opacity:.95;color:var(--text-primary);text-align:justify}
+
+    /* date card */
+    .date-card{border-right:8px solid var(--info)}
+    .date-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .date-main{display:flex;flex-direction:column;gap:6px}
+    .date-fa{font-size:18px;font-weight:950;letter-spacing:-.3px}
+    .date-en{font-size:13px;font-weight:700;color:var(--text-secondary)}
+    .date-chip{
+      display:flex;align-items:center;gap:8px;
+      padding:8px 12px;border-radius:999px;
+      background:rgba(96,165,250,.14);
+      border:1px solid rgba(96,165,250,.22);
+      font-weight:900;font-size:12.5px;color:var(--text-primary);
+      white-space:nowrap;
+    }
+    .progress-block{margin-top:14px;display:flex;flex-direction:column;gap:12px}
+    .p-row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .p-label{font-size:13px;font-weight:850;color:var(--text-primary);opacity:.95}
+    .p-meta{font-size:12px;font-weight:700;color:var(--text-secondary);direction:ltr}
+    .bar{
+      height:12px;border-radius:999px;
+      background:rgba(0,0,0,.22);
+      border:1px solid var(--glass-border);
+      overflow:hidden;
+    }
+    body.light-mode .bar{background:rgba(0,0,0,.06)}
+    .bar > span{
+      display:block;height:100%;
+      width:0%;
+      border-radius:999px;
+      background:linear-gradient(90deg, var(--info), var(--accent-color));
+      box-shadow:0 0 14px rgba(96,165,250,.25);
+      transition:width 1.2s cubic-bezier(.2,.8,.2,1);
+    }
+    .mini{font-size:12px;color:var(--text-secondary);line-height:1.8;text-align:justify;margin-top:8px}
+
+    /* alerts card */
+    .alerts-card{border-right:8px solid #f472b6}
+    .alerts-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .toggle{
+      display:flex;align-items:center;gap:10px;
+      padding:10px 12px;border-radius:18px;
+      border:1px solid var(--glass-border);
+      background:rgba(0,0,0,.16);
+      cursor:pointer;user-select:none;
+      transition:.2s;
+    }
+    body.light-mode .toggle{background:rgba(0,0,0,.05)}
+    .toggle:active{transform:scale(.99)}
+    .switch{
+      width:44px;height:26px;border-radius:999px;
+      background:rgba(148,163,184,.25);
+      border:1px solid var(--glass-border);
+      position:relative;flex-shrink:0;
+    }
+    .switch::after{
+      content:"";position:absolute;top:50%;transform:translateY(-50%);
+      right:4px;width:18px;height:18px;border-radius:50%;
+      background:rgba(255,255,255,.92);
+      transition:.22s cubic-bezier(.2,.8,.2,1);
+      box-shadow:0 6px 14px rgba(0,0,0,.25);
+    }
+    .toggle.on .switch{background:rgba(52,211,153,.35)}
+    .toggle.on .switch::after{right:22px;background:#fff}
+    .toggle-title{font-weight:950;font-size:13.2px}
+    .toggle-sub{font-size:11.5px;color:var(--text-secondary);margin-top:2px}
+    .alerts-help{margin-top:12px;font-size:13px;line-height:1.9;color:var(--text-primary);opacity:.92;text-align:justify}
+    .alerts-btn{
+      border:none;border-radius:18px;
+      padding:12px 14px;font-family:inherit;
+      font-weight:950;font-size:13px;
+      cursor:pointer;transition:.2s;
+      background:var(--glass-bg);
+      border:1px solid var(--glass-border);
+      color:var(--text-primary);
+      box-shadow:var(--inner-shadow);
+      display:flex;align-items:center;gap:10px;
+    }
+    .alerts-btn:active{transform:scale(.98)}
+    .status-pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 12px;border-radius:999px;
+      border:1px solid var(--glass-border);
+      background:rgba(0,0,0,.16);
+      font-weight:900;font-size:12px;color:var(--text-primary);
+    }
+    body.light-mode .status-pill{background:rgba(0,0,0,.05)}
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--warn);box-shadow:0 0 12px rgba(251,146,60,.35)}
+
+    /* svg anim */
+    .anim-sun{animation:spin 20s linear infinite;transform-origin:center}
+    .anim-cloud{animation:float 6s ease-in-out infinite}
+    .anim-rain{animation:rainDrop .8s linear infinite}
+    .anim-snow{animation:snowDrop 3s linear infinite}
+    .anim-thunder{animation:flash 5s infinite}
+    @keyframes spin{100%{transform:rotate(360deg)}}
+    @keyframes rainDrop{0%{transform:translateY(0);opacity:1}100%{transform:translateY(30px);opacity:0}}
+    @keyframes snowDrop{0%{transform:translateY(0);opacity:1}100%{transform:translateY(18px);opacity:0.2}}
+    @keyframes flash{0%,90%,100%{opacity:0}92%,96%{opacity:1;filter:drop-shadow(0 0 20px #facc15)}}
+
+    footer{text-align:center;font-size:13px;font-weight:600;opacity:.45;margin-top:34px}
+  </style>
+</head>
+
+<body>
+  <div class="liquid-blob">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+  <div id="particles"></div>
+
+  <div id="loader" aria-live="polite">
+    <svg width="80" height="80" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <defs>
+        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:var(--accent-color);stop-opacity:1" />
+          <stop offset="100%" style="stop-color:var(--liquid-1);stop-opacity:1" />
+        </linearGradient>
+      </defs>
+      <circle cx="12" cy="12" r="10" fill="none" stroke-dasharray="32" stroke-dashoffset="32" stroke="url(#grad1)">
+        <animate attributeName="stroke-dashoffset" from="64" to="0" dur="1.2s" repeatCount="indefinite" />
+        <animate attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="2s" repeatCount="indefinite" />
+      </circle>
+    </svg>
+    <div style="margin-top: 22px; font-size: 16px; font-weight: 850; opacity: 0.9; letter-spacing: -0.5px;">
+      در حال دریافت داده زنده...
+    </div>
+  </div>
+
+  <!-- Welcome -->
+  <div class="welcome-modal" id="welcome-modal">
+    <div class="welcome-card">
+      <div class="welcome-icon">🌍</div>
+      <h2 style="font-size: 22px; margin-bottom: 10px; font-weight: 950;">سلام! به هوای پاک پلاس خوش آمدید</h2>
+      <p style="opacity: 0.82; margin-bottom: 26px; line-height: 1.9;">
+        برای گزارش دقیق و زنده، لطفاً موقعیت مکانی را مشخص کنید.
+      </p>
+      <button class="welcome-btn btn-primary" onclick="handleWelcomeGPS()">
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path d="M12 2v20M2 12h20" />
+          <circle cx="12" cy="12" r="6" />
+        </svg>
+        یافتن خودکار موقعیت
+      </button>
+      <button class="welcome-btn btn-secondary" onclick="handleWelcomeManual()">جستجوی دستی شهر</button>
+      <div style="margin-top:14px;font-size:12px;opacity:.65;line-height:1.8">
+        نکته: اعلان‌های هوشمند را بعد از انتخاب شهر می‌توانید فعال کنید.
+      </div>
+    </div>
+  </div>
+
+  <!-- Search modal -->
+  <div class="modal-overlay" id="search-modal">
+    <div class="modal-sheet">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:20px; font-weight:950;">کجا هستید؟</span>
+        <button onclick="toggleSearch(false)" style="background:none; border:none; color:var(--text-primary); font-size:28px; cursor:pointer;">✕</button>
+      </div>
+      <input type="text" class="search-input" id="city-input" placeholder="نام شهر را انگلیسی بنویسید (مثلاً: tehran)" dir="rtl" />
+      <div id="search-list" style="margin-top:16px; max-height:320px; overflow-y:auto;"></div>
+    </div>
+  </div>
+
+  <div id="app">
+    <header class="fade-in-up" style="animation-delay:.06s">
+      <div class="location-pill" onclick="toggleSearch(true)" title="تغییر شهر">
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+          <circle cx="12" cy="10" r="3" />
+        </svg>
+        <span id="loc-name">تهران</span>
+      </div>
+
+      <div class="header-actions">
+        <div class="btn-circle" onclick="toggleTheme()" title="تغییر تم">
+          <svg id="theme-icon" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+        </div>
+        <div class="btn-circle" onclick="getLocation()" title="موقعیت مکانی من">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 2v20M2 12h20" />
+            <circle cx="12" cy="12" r="6" />
+          </svg>
+        </div>
+      </div>
+    </header>
+
+    <!-- AQI Gauge -->
+    <div class="hero-section fade-in-up" style="animation-delay:.12s">
+      <div class="gauge-wrapper">
+        <svg class="gauge-svg" viewBox="0 0 240 240">
+          <circle class="track" cx="120" cy="120" r="110"></circle>
+          <circle id="aqi-ring" class="progress" cx="120" cy="120" r="110"></circle>
+        </svg>
+        <div class="hero-center">
+          <div class="hero-val" id="aqi-val">--</div>
+          <div class="hero-label" id="aqi-text">...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Friendly report -->
+    <div class="glass-card friendly-card fade-in-up" style="animation-delay:.18s">
+      <div class="friendly-title">
+        <span style="font-size:24px;">👋</span>
+        <span>گزارش اختصاصی و دقیق</span>
+      </div>
+      <div class="friendly-text" id="friendly-text">در حال تحلیل داده‌های زنده...</div>
+    </div>
+
+    <!-- Weather Visual -->
+    <div class="glass-card weather-visual-card fade-in-up" style="animation-delay:.24s">
+      <div class="weather-anim-container" id="weather-icon-container"></div>
+      <div class="visual-temp" id="visual-temp">--°</div>
+      <div class="visual-desc" id="visual-desc">--</div>
+      <div class="visual-grid">
+        <div class="v-item">
+          <span class="v-icon" style="color:#60a5fa">💧</span>
+          <span class="v-val" id="hum-val">--%</span>
+          <span class="v-lbl">رطوبت</span>
+        </div>
+        <div class="v-item">
+          <span class="v-icon" style="color:#a78bfa">💨</span>
+          <span class="v-val" id="wind-val">--</span>
+          <span class="v-lbl">باد (km/h)</span>
+        </div>
+        <div class="v-item">
+          <span class="v-icon" style="color:#f472b6">🌡️</span>
+          <span class="v-val" id="feels-val">--</span>
+          <span class="v-lbl">دمای احساسی</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW: UV Card -->
+    <div class="glass-card uv-card fade-in-up" style="animation-delay:.28s">
+      <div class="info-title" style="color:#22c55e;">
+        <span style="font-size:22px;">🧴</span>
+        <span>UV خورشید (زنده)</span>
+      </div>
+
+      <div class="uv-row">
+        <div style="display:flex;align-items:baseline;gap:10px;">
+          <div class="uv-big" id="uv-now">--</div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div class="badge" id="uv-badge">--</div>
+            <div style="font-size:12px;color:var(--text-secondary);font-weight:800" id="uv-max">حداکثر امروز: --</div>
+          </div>
+        </div>
+
+        <div class="status-pill" title="به‌روزرسانی خودکار">
+          <span class="dot" id="uv-dot"></span>
+          <span id="uv-updated">آخرین آپدیت: --</span>
+        </div>
+      </div>
+
+      <div class="uv-advice" id="uv-advice">در حال محاسبه توصیه...</div>
+    </div>
+
+    <!-- Moon -->
+    <div class="glass-card moon-card fade-in-up" style="animation-delay:.32s">
+      <div class="moon-header">
+        <div class="moon-visual" id="moon-render"></div>
+        <div style="flex:1">
+          <div class="moon-phase-name" id="moon-phase-name">--</div>
+          <div style="font-size:12px;opacity:.65">وضعیت کیهانی امشب</div>
+        </div>
+      </div>
+      <div class="moon-desc" id="moon-desc">--</div>
+    </div>
+
+    <!-- Chart (Weekly/Hourly switch) -->
+    <div class="glass-card chart-card fade-in-up" style="animation-delay:.36s">
+      <div class="chart-head">
+        <div class="chart-title">
+          <span style="color:var(--accent-color)">📈</span>
+          <span id="chart-title">نمودار هفتگی دما</span>
+        </div>
+
+        <div class="segmented" role="tablist" aria-label="switch">
+          <button class="seg-btn active" id="btn-weekly" onclick="switchChart('weekly')" role="tab" aria-selected="true">
+            🗓️ هفتگی
+          </button>
+          <button class="seg-btn" id="btn-hourly" onclick="switchChart('hourly')" role="tab" aria-selected="false">
+            🕒 ساعتی
+          </button>
+        </div>
+      </div>
+
+      <div style="font-size:12px;color:var(--text-secondary);font-weight:700;line-height:1.7">
+        <span id="chart-subtitle">نمایش روند ۷ روز آینده (حداکثر/حداقل).</span>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="mainChart"></canvas>
+      </div>
+    </div>
+
+    <!-- NEW: Date Card -->
+    <div class="glass-card date-card fade-in-up" style="animation-delay:.40s">
+      <div class="info-title" style="color:var(--info);">
+        <span style="font-size:22px;">📅</span>
+        <span>تقویم امروز (شمسی/میلادی)</span>
+      </div>
+
+      <div class="date-top">
+        <div class="date-main">
+          <div class="date-fa" id="date-fa">--</div>
+          <div class="date-en" id="date-en">--</div>
+        </div>
+        <div class="date-chip" id="date-chip">⏳ در حال محاسبه...</div>
+      </div>
+
+      <div class="progress-block">
+        <div>
+          <div class="p-row">
+            <div class="p-label">پروگرس سال شمسی</div>
+            <div class="p-meta" id="jalali-meta">--</div>
+          </div>
+          <div class="bar"><span id="jalali-bar"></span></div>
+          <div class="mini" id="jalali-mini">--</div>
+        </div>
+
+        <div>
+          <div class="p-row">
+            <div class="p-label">پروگرس سال میلادی</div>
+            <div class="p-meta" id="greg-meta">--</div>
+          </div>
+          <div class="bar"><span id="greg-bar"></span></div>
+          <div class="mini" id="greg-mini">--</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AQI recommendation -->
+    <div class="glass-card info-card fade-in-up" style="animation-delay:.44s; border-right: 8px solid var(--accent-color);">
+      <div class="info-title" style="color:var(--accent-color);">
+        <span style="font-size: 22px;">🍃</span>
+        <span id="aqi-reco-head">توصیه هوشمند سلامتی</span>
+      </div>
+      <div class="info-body" id="aqi-reco-body">در حال تحلیل...</div>
+    </div>
+
+    <!-- Sky story -->
+    <div class="glass-card info-card fade-in-up" style="animation-delay:.48s; border-right: 8px solid #818cf8;">
+      <div class="info-title" style="color:#818cf8;">
+        <span id="story-icon" style="font-size:22px;">✨</span>
+        <span id="story-head">داستان آسمان</span>
+      </div>
+      <div class="info-body" id="story-body">در حال نوشتن...</div>
+    </div>
+
+    <!-- Rain forecast 24h -->
+    <div class="glass-card info-card fade-in-up" style="animation-delay:.52s; border-right: 8px solid #f472b6;">
+      <div class="info-title" style="color:#f472b6;">
+        <span style="font-size:22px;">🌧️</span>
+        <span>پیش‌بینی بارش ۲۴ ساعت</span>
+      </div>
+      <div>
+        <div style="font-size:16px;font-weight:950;margin-bottom:8px" id="rain-title">--</div>
+        <div style="font-size:14px;opacity:.9;line-height:1.9;text-align:justify" id="rain-desc">--</div>
+      </div>
+    </div>
+
+    <!-- NEW: Alerts Card -->
+    <div class="glass-card alerts-card fade-in-up" style="animation-delay:.56s;">
+      <div class="info-title" style="color:#f472b6;">
+        <span style="font-size:22px;">🔔</span>
+        <span>هشدارهای هوشمند (PWA/Notification)</span>
+      </div>
+
+      <div class="alerts-row">
+        <button class="alerts-btn" onclick="enableNotifications()">
+          ✅ فعال‌سازی اعلان‌ها
+        </button>
+        <div class="status-pill" id="notif-status">
+          <span class="dot" id="notif-dot"></span>
+          <span id="notif-text">وضعیت: بررسی...</span>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+        <div class="toggle" id="toggle-aqi" onclick="toggleSetting('alertAqi')">
+          <div class="switch"></div>
+          <div>
+            <div class="toggle-title">هشدار آلودگی (AQI)</div>
+            <div class="toggle-sub">اگر AQI بد شود، اعلان می‌آید</div>
+          </div>
+        </div>
+
+        <div class="toggle" id="toggle-rain" onclick="toggleSetting('alertRain')">
+          <div class="switch"></div>
+          <div>
+            <div class="toggle-title">هشدار بارش نزدیک</div>
+            <div class="toggle-sub">اگر بارش طی ۳ ساعت نزدیک باشد</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alerts-help" id="alerts-help">
+        نکته: اعلان‌ها روی گوشی وقتی برنامه «نصب» باشد بهترین عملکرد را دارند. بعضی مرورگرها برای چک کردن در پس‌زمینه محدودیت دارند؛
+        با این حال داخل برنامه، بررسی‌ها به‌صورت خودکار انجام می‌شود.
+      </div>
+    </div>
+
+    <!-- Forecast list -->
+    <div class="glass-card fade-in-up" style="animation-delay:.60s">
+      <div style="font-size:17px;font-weight:950;margin-bottom:18px;display:flex;gap:10px;align-items:center;">
+        <span>🗓️</span>
+        <span>چشم‌انداز روزهای آینده</span>
+      </div>
+      <div class="forecast-list" id="forecast-list"></div>
+    </div>
+
+    <!-- Elevation -->
+    <div class="glass-card elevation-card fade-in-up" style="animation-delay:.64s">
+      <span class="elev-icon">🏔️</span>
+      <div style="font-size:15px;font-weight:800;">ارتفاع شما از سطح دریا</div>
+      <div class="elev-val" id="elev-val">--</div>
+      <div class="elev-desc" id="elev-desc">--</div>
+    </div>
+
+    <!-- Pollutants -->
+    <div class="pollutant-grid fade-in-up" style="animation-delay:.68s">
+      <div class="p-card">
+        <span style="font-size:30px;margin-bottom:4px;">😷</span>
+        <div class="p-val" id="pm25-val">--</div>
+        <div style="font-size:13px;font-weight:800;opacity:.75;">PM2.5 (µg/m³)</div>
+      </div>
+      <div class="p-card">
+        <span style="font-size:30px;margin-bottom:4px;">🌫️</span>
+        <div class="p-val" id="no2-val">--</div>
+        <div style="font-size:13px;font-weight:800;opacity:.75;">NO₂ (µg/m³)</div>
+      </div>
+    </div>
+
+    <footer class="fade-in-up" style="animation-delay:.72s">
+      طراحی و توسعه توسط پیمان عابدین‌پور ❤️ | نسخه اولترا پلاس
+    </footer>
+  </div>
+
+<script>
+  /* -------------------------
+     Utilities & State
+  --------------------------*/
+  const toFarsi = (n) => (n ?? '-').toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  let isLight = false;
+  let chartInstance = null;
+  let chartMode = 'weekly'; // weekly | hourly
+
+  // For alerts
+  const SETTINGS_KEY = 'hp_settings_v1';
+  const defaultSettings = {
+    alertAqi: true,
+    alertRain: true,
+    aqiThreshold: 151,      // ناسالم برای همه (US AQI)
+    rainThreshold: 70,      // درصد
+    rainWindowHours: 3,     // ساعت آینده
+  };
+  let settings = loadSettings();
+
+  function loadSettings(){
+    try{
+      const raw = localStorage.getItem(SETTINGS_KEY);
+      return raw ? {...defaultSettings, ...JSON.parse(raw)} : {...defaultSettings};
+    }catch(e){
+      return {...defaultSettings};
+    }
+  }
+  function saveSettings(){
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    renderToggles();
+  }
+
+  // Chart.js defaults
+  if (typeof Chart !== 'undefined') {
+    Chart.defaults.font.family = 'Vazirmatn';
+    Chart.defaults.color = '#94a3b8';
+  }
+
+  /* -------------------------
+     Theme
+  --------------------------*/
+  function toggleTheme() {
+    isLight = !isLight;
+    document.body.classList.toggle('light-mode');
+
+    const icon = document.getElementById('theme-icon');
+    icon.innerHTML = isLight
+      ? '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>'
+      : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+
+    if(chartInstance){
+      chartInstance.options.scales.x.ticks.color = isLight ? '#475569' : '#94a3b8';
+      chartInstance.options.scales.y.ticks.color = isLight ? '#475569' : '#94a3b8';
+      if(chartInstance.options.scales.yProb) chartInstance.options.scales.yProb.ticks.color = isLight ? '#475569' : '#94a3b8';
+      if(chartInstance.options.scales.yWind) chartInstance.options.scales.yWind.ticks.color = isLight ? '#475569' : '#94a3b8';
+      chartInstance.options.scales.y.grid.color = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)';
+      chartInstance.update();
+    }
+  }
+
+  /* -------------------------
+     Weather Icons (SVG)
+  --------------------------*/
+  function getWeatherSVG(code, isDay) {
+    const sunColor = "#facc15";
+    const cloudColor = isLight ? "#94a3b8" : "#cbd5e1";
+    const cloudFilter = "filter: drop-shadow(0 10px 15px rgba(0,0,0,0.28));";
+
+    if (code <= 1) return isDay
+      ? `<svg viewBox="0 0 100 100" overflow="visible">
+          <defs>
+            <filter id="glow"><feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+              <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <circle cx="50" cy="50" r="24" fill="${sunColor}" filter="url(#glow)">
+            <animate attributeName="r" values="24;28;24" dur="4s" repeatCount="indefinite"/>
+          </circle>
+          <g class="anim-sun" stroke="${sunColor}" stroke-width="4" stroke-linecap="round">
+            <line x1="50" y1="10" x2="50" y2="-5"/><line x1="50" y1="90" x2="50" y2="105"/>
+            <line x1="10" y1="50" x2="-5" y2="50"/><line x1="90" y1="50" x2="105" y2="50"/>
+            <line x1="22" y1="22" x2="12" y2="12"/><line x1="78" y1="78" x2="88" y2="88"/>
+            <line x1="22" y1="78" x2="12" y2="88"/><line x1="78" y1="22" x2="88" y2="12"/>
+          </g>
+        </svg>`
+      : `<svg viewBox="0 0 100 100">
+          <path d="M40 20 A30 30 0 1 0 80 70 A20 20 0 1 1 40 20"
+                fill="#f1f5f9" filter="drop-shadow(0 0 18px rgba(255,255,255,0.55))"/>
+          <circle cx="65" cy="45" r="3" fill="#94a3b8" opacity="0.6"/>
+          <circle cx="50" cy="65" r="4" fill="#94a3b8" opacity="0.4"/>
+        </svg>`;
+
+    if (code <= 3) return `<svg viewBox="0 0 100 100" overflow="visible">
+      <path class="anim-cloud" d="M25,60 a20,20 0 0,1 0,-40 a20,20 0 0,1 40,0 a20,20 0 0,1 0,40 z"
+            fill="${cloudColor}" stroke="white" stroke-width="1.5" style="${cloudFilter}"/>
+    </svg>`;
+
+    if (code <= 67 || (code >= 80 && code <= 82)) return `<svg viewBox="0 0 100 100" overflow="visible">
+      <path class="anim-cloud" d="M25,60 a20,20 0 0,1 0,-40 a20,20 0 0,1 40,0 a20,20 0 0,1 0,40 z"
+            fill="${cloudColor}" style="${cloudFilter}"/>
+      <g class="anim-rain">
+        <line x1="35" y1="65" x2="30" y2="85" stroke="#60a5fa" stroke-width="4" stroke-linecap="round"/>
+        <line x1="50" y1="65" x2="45" y2="90" stroke="#60a5fa" stroke-width="4" stroke-linecap="round"/>
+        <line x1="65" y1="65" x2="60" y2="85" stroke="#60a5fa" stroke-width="4" stroke-linecap="round"/>
+      </g>
+    </svg>`;
+
+    if ((code >= 71 && code <= 77) || code >= 85) return `<svg viewBox="0 0 100 100" overflow="visible">
+      <path class="anim-cloud" d="M25,60 a20,20 0 0,1 0,-40 a20,20 0 0,1 40,0 a20,20 0 0,1 0,40 z"
+            fill="${cloudColor}" style="${cloudFilter}"/>
+      <g class="anim-snow">
+        <circle cx="35" cy="75" r="5" fill="white"/>
+        <circle cx="55" cy="85" r="5" fill="white"/>
+        <circle cx="70" cy="70" r="5" fill="white"/>
+      </g>
+    </svg>`;
+
+    if (code >= 95) return `<svg viewBox="0 0 100 100" overflow="visible">
+      <path class="anim-cloud" d="M25,60 a20,20 0 0,1 0,-40 a20,20 0 0,1 40,0 a20,20 0 0,1 0,40 z"
+            fill="#475569" style="${cloudFilter}"/>
+      <path class="anim-thunder" d="M45,60 L35,80 L50,80 L40,105" fill="none" stroke="#facc15"
+            stroke-width="6" stroke-linejoin="round" filter="drop-shadow(0 0 15px #facc15)"/>
+    </svg>`;
+
+    return `<svg viewBox="0 0 100 100">
+      <g stroke="${cloudColor}" stroke-width="4" stroke-linecap="round">
+        <line x1="20" y1="40" x2="80" y2="40"/>
+        <line x1="10" y1="60" x2="90" y2="60" opacity="0.7"/>
+        <line x1="30" y1="80" x2="70" y2="80" opacity="0.4"/>
+      </g>
+    </svg>`;
+  }
+
+  function getSmallIcon(code){
+    if(code <= 1) return '☀️';
+    if(code <= 3) return '☁️';
+    if(code <= 67) return '🌧️';
+    if(code <= 77) return '❄️';
+    if(code >= 95) return '⛈️';
+    return '🌥️';
+  }
+
+  /* -------------------------
+     Night detection (REAL sunrise/sunset)
+  --------------------------*/
+  function isNightNow(daily){
+    try{
+      const now = new Date();
+      const sunrise = new Date(daily.sunrise[0]);
+      const sunset  = new Date(daily.sunset[0]);
+      return (now < sunrise) || (now >= sunset);
+    }catch(e){
+      // fallback
+      const h = new Date().getHours();
+      return h < 7 || h >= 19;
+    }
+  }
+
+  /* -------------------------
+     AQI category (US AQI)
+  --------------------------*/
+  function aqiInfo(aqi){
+    const n = Number(aqi);
+    if(n <= 50)  return {label:'پاک و عالی', color:'#34d399', emoji:'🟢', advice:'هوای عالیه! اگر می‌تونی کمی پیاده‌روی یا ورزش سبک بیرون انجام بده.'};
+    if(n <= 100) return {label:'قابل قبول', color:'#facc15', emoji:'🟡', advice:'هوا بد نیست. اگر حساسیت داری، فعالیت خیلی سنگین را کمتر کن.'};
+    if(n <= 150) return {label:'ناسالم برای حساس‌ها', color:'#fb923c', emoji:'🟠', advice:'اگر آسم/آلرژی/بیماری قلبی داری، بهتره بیرون کمتر باشی و ماسک سبک کمک می‌کنه.'};
+    if(n <= 200) return {label:'ناسالم برای همه', color:'#f87171', emoji:'🔴', advice:'بهتره بیرون رفتن را کم کنی. ورزش بیرون توصیه نمی‌شه. اگر مجبور شدی، ماسک فیلتردار بهتره.'};
+    if(n <= 300) return {label:'بسیار خطرناک', color:'#c084fc', emoji:'🟣', advice:'واقعاً ریسک نکن. در و پنجره‌ها بسته، تهویه مناسب و ترجیحاً تصفیه هوا.'};
+    return {label:'مرگبار', color:'#7e22ce', emoji:'⚫', advice:'فقط ضروری بیرون برو. ماندن در فضای بسته با فیلتراسیون/تصفیه اولویت دارد.'};
+  }
+
+  /* -------------------------
+     UV advice
+  --------------------------*/
+  function uvInfo(uv){
+    const x = Number(uv);
+    if(!isFinite(x)) return {level:'نامشخص', color:'#94a3b8', tip:'فعلاً داده UV در دسترس نیست.'};
+    if(x < 3)  return {level:'کم', color:'#22c55e', tip:'UV پایین است. عینک آفتابی اگر حساس هستی کافیست 😎'};
+    if(x < 6)  return {level:'متوسط', color:'#facc15', tip:'UV متوسط است. اگر بیرون می‌مانی، ضدآفتاب SPF ۳۰ بزن 🧴'};
+    if(x < 8)  return {level:'زیاد', color:'#fb923c', tip:'UV زیاد است. ضدآفتاب + کلاه/سایه را جدی بگیر 👒'};
+    if(x < 11) return {level:'خیلی زیاد', color:'#f87171', tip:'UV خیلی بالاست. نزدیک ظهر کمتر زیر آفتاب باش و پوشش محافظ داشته باش ☀️'};
+    return {level:'شدید', color:'#c084fc', tip:'UV شدید است. بیرون‌ماندن طولانی زیر آفتاب واقعاً توصیه نمی‌شود 🚫'};
+  }
+
+  /* -------------------------
+     Friendly data-based report
+  --------------------------*/
+  function buildFriendlyReport({temp, feels, wind, hum, code, aqi}){
+    const a = aqiInfo(aqi);
+    const t = Math.round(temp);
+    const f = Math.round(feels);
+    const w = Math.round(wind);
+    const h = Math.round(hum);
+
+    let wx = '';
+    if(code <= 1) wx = 'آسمان تقریباً صافه';
+    else if(code <= 3) wx = 'کمی ابریه';
+    else if(code <= 48) wx = 'مه/کدری هوا دیده می‌شه';
+    else if(code <= 67 || (code>=80 && code<=82)) wx = 'احتمال بارش هست';
+    else if((code>=71 && code<=77) || code>=85) wx = 'هوای برفی/یخی';
+    else if(code >= 95) wx = 'شرایط تندری/طوفانی';
+    else wx = 'هوا متغیره';
+
+    const delta = Math.abs(t - f);
+    const feelHint = delta >= 3
+      ? `دمای احساسی ${toFarsi(f)}° است؛ یعنی بدن کمی ${f>t?'گرم‌تر':'سردتر'} حس می‌کند.`
+      : `دمای احساسی تقریباً نزدیک به دمای واقعی است.`;
+
+    const windHint = w >= 25 ? 'باد نسبتاً تند است؛ لباس/کلاه سبک می‌تواند کمک کند.' : 'باد ملایم است.';
+    const humHint  = h >= 70 ? 'رطوبت بالاست؛ ممکن است حس چسبندگی/سنگینی بدهد.' : (h <= 25 ? 'هوا خشک است؛ آب کافی و مرطوب‌کننده فراموش نشود.' : 'رطوبت در حد متعادل است.');
+
+    return `الان ${wx}. دما ${toFarsi(t)}° و ${feelHint}
+باد: ${toFarsi(w)} km/h — ${windHint}
+رطوبت: ${toFarsi(h)}٪ — ${humHint}
+
+کیفیت هوا: ${a.emoji} ${a.label}
+توصیه دوستانه: ${a.advice}`;
+  }
+
+  /* -------------------------
+     Rain message (next 24h)
+  --------------------------*/
+  function getRainMessage(probs){
+    const maxProb = Math.max(...probs.filter(x => x != null));
+    if(!isFinite(maxProb)) return { t: "داده بارش نامشخص", d: "فعلاً برای این شهر، احتمال بارش ساعتی در دسترس نیست." };
+    if (maxProb < 10) return { t: "آسمانی خشک و مطمئن", d: "در ۲۴ ساعت آینده احتمال بارش خیلی پایین است. با خیال راحت برنامه‌ریزی کن." };
+    if (maxProb < 40) return { t: "شاید چند قطره", d: "احتمال بارش کم است. اگر خیلی حساس هستی، چتر کوچک همراهت باشد." };
+    if (maxProb < 75) return { t: "چترها آماده باشند", d: "احتمال بارندگی قابل توجه است. همراه داشتن چتر تصمیم باهوشانه‌ایه." };
+    return { t: "بارش محتمل و جدی", d: "احتمال بارش بالا است. برای مسیر و لباس برنامه‌ریزی کن تا غافلگیر نشی." };
+  }
+
+  /* -------------------------
+     Simple sky story (data-driven)
+  --------------------------*/
+  function skyStory({temp, code, wind, aqi, isNight}){
+    const t = Math.round(temp);
+    const w = Math.round(wind);
+    const a = aqiInfo(aqi);
+
+    let title = isNight ? "حال‌وهوای شب" : "حال‌وهوای امروز";
+    let icon = isNight ? "🌙" : "🌤️";
+    let text = '';
+
+    if(aqi >= 200){
+      icon = "😷";
+      title = "هشدار هوا";
+      text = `امروز هوا روی مُد «سخت» است (AQI: ${toFarsi(aqi)}). بهتره زمان بیرون بودن را کم کنی و اگر مجبور شدی، مسیر کوتاه‌تر و ماسک بهتر.`;
+      return {title, icon, text};
+    }
+
+    if(code >= 95){
+      icon = "⛈️";
+      title = "نمایش تندری";
+      text = "اگر رعد و برق نزدیک است، زیر درخت‌ها و فضاهای باز نمان. امن‌ترین کار: تماشا از پشت پنجره 🙂";
+      return {title, icon, text};
+    }
+
+    if((code >= 51 && code <= 67) || (code>=80 && code<=82)){
+      icon = "☔";
+      title = "هوای بارانیِ تمیزکننده";
+      text = "باران می‌تواند هوا را تازه‌تر کند. فقط حواست به کفش مناسب و خیابان‌های خیس باشد.";
+      return {title, icon, text};
+    }
+
+    if((code>=71 && code<=77) || code>=85){
+      icon = "❄️";
+      title = "هوای برفی";
+      text = "زمین ممکن است لغزنده باشد. قدم‌ها آرام، لباس گرم و مراقبت از دست‌ها/گوش‌ها فراموش نشود.";
+      return {title, icon, text};
+    }
+
+    if(w >= 35){
+      icon = "🌬️";
+      title = "باد جدی";
+      text = "باد قوی است؛ اگر بیرون می‌روی، وسایل سبک را محکم نگه دار و مراقب گردوخاک باش.";
+      return {title, icon, text};
+    }
+
+    if(t >= 30){
+      icon = "😎";
+      title = "گرمای پرانرژی";
+      text = "آب کافی، ضدآفتاب، و اگر می‌شود کارهای بیرون را به عصر منتقل کن تا بهتر نفس بکشی.";
+      return {title, icon, text};
+    }
+
+    if(t <= 5){
+      icon = "🧊";
+      title = "هوای سرد و تیز";
+      text = "لباس لایه‌لایه بهترینه. اگر زمان بیرون موندن طولانی می‌شه، نوشیدنی گرم خیلی می‌چسبه.";
+      return {title, icon, text};
+    }
+
+    text = isNight
+      ? "شب آرومه و هوا متعادله. پنجره رو کمی باز بذاری، هوای تازه کیفیت خواب رو بهتر می‌کنه."
+      : "هوا متعادل و قابل‌اعتماده. اگر فرصت داری، کمی پیاده‌روی کوتاه حالتو بهتر می‌کنه.";
+
+    return {title, icon, text};
+  }
+
+  /* -------------------------
+     Moon phase (kept, refined + accurate-ish)
+  --------------------------*/
+  function renderMoonPhase(){
+    const date = new Date();
+    const synodicCycle = 29.53059;
+    const knownNewMoon = new Date('2023-01-21T20:53:00Z');
+    const diffDays = (date - knownNewMoon) / (1000*60*60*24);
+    const moonAge = ((diffDays % synodicCycle) + synodicCycle) % synodicCycle;
+    const illumination = Math.round(((1 - Math.cos((moonAge * 2 * Math.PI) / synodicCycle)) / 2) * 100);
+
+    let phaseName = "";
+    let phaseDesc = "";
+    if(moonAge < 1.5){ phaseName="🌑 ماه نو"; phaseDesc="زمان شروع‌های تازه و جمع‌وجور کردن ذهن. امشب بهترین شب برای برنامه‌ریزیه.";}
+    else if(moonAge < 7){ phaseName="🌒 هلال افزاینده"; phaseDesc="انرژی در حال رشد است؛ قدم‌های کوچک ولی پیوسته بهترین نتیجه را می‌دهند.";}
+    else if(moonAge < 8){ phaseName="🌓 تربیع اول"; phaseDesc="فاز تصمیم‌گیری: اگر دودلی داری، امشب شفاف‌تر می‌شه.";}
+    else if(moonAge < 14){ phaseName="🌔 تحدب افزاینده"; phaseDesc="نور زیادتر؛ زمان تکمیل جزئیات و آماده‌سازی برای اوج.";}
+    else if(moonAge < 16){ phaseName="🌕 ماه کامل"; phaseDesc="اوج روشنایی. ممکن است خواب سبک‌تر شود؛ آرامش قبل از خواب کمک می‌کند.";}
+    else if(moonAge < 22){ phaseName="🌖 تحدب کاهنده"; phaseDesc="زمان جمع‌بندی و مرور. آرام‌تر پیش برو و انرژی را ذخیره کن.";}
+    else if(moonAge < 23){ phaseName="🌗 تربیع آخر"; phaseDesc="پاکسازی: چیزهای اضافی را کنار بگذار تا سبک‌تر شوی.";}
+    else { phaseName="🌘 هلال کاهنده"; phaseDesc="نزدیک ماه نو. استراحت و ریکاوری بهترین انتخاب است.";}
+
+    document.getElementById('moon-phase-name').innerText = phaseName;
+    document.getElementById('moon-desc').innerHTML =
+      `<div style="display:flex;justify-content:space-between;gap:10px;margin-bottom:10px;font-size:12px;opacity:.8;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:8px">
+        <span>💡 روشنایی: <b style="color:var(--accent-color)">${toFarsi(illumination)}٪</b></span>
+        <span>📆 سن ماه: <b>${toFarsi(moonAge.toFixed(1))}</b> روز</span>
+      </div>
+      <div style="line-height:1.9">${phaseDesc}</div>`;
+
+    // simple render
+    const r = 48;
+    const phase = moonAge / synodicCycle; // 0..1
+    const k = Math.cos(phase * 2 * Math.PI);
+    const cut = Math.abs(r * k);
+
+    const svg = `
+      <svg width="100%" height="100%" viewBox="0 0 100 100">
+        <defs>
+          <filter id="mglow"><feGaussianBlur stdDeviation="2.8" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <circle cx="50" cy="50" r="48" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+        <path d="M50 2 a48 48 0 1 0 0 96 a${cut.toFixed(1)} 48 0 0 ${(phase<0.5)?1:0} 0 -96"
+              fill="#f8fafc" filter="url(#mglow)" opacity="0.95"/>
+      </svg>`;
+    document.getElementById('moon-render').innerHTML = svg;
+  }
+
+  /* -------------------------
+     Forecast list
+  --------------------------*/
+  function renderForecastList(daily){
+    const listEl = document.getElementById('forecast-list');
+    listEl.innerHTML = '';
+
+    for(let i=1;i<7;i++){
+      const date = new Date(daily.time[i]);
+      const dayName = date.toLocaleDateString('fa-IR', { weekday:'long' });
+      const code = daily.weather_code[i];
+      const maxT = Math.round(daily.temperature_2m_max[i]);
+      const minT = Math.round(daily.temperature_2m_min[i]);
+
+      let shortDesc = "";
+      if (code <= 1) shortDesc = "آسمانی صاف و درخشان؛ مناسب برای کارهای بیرون.";
+      else if (code <= 3) shortDesc = "کمی ابری؛ هوایی ملایم و متعادل.";
+      else if (code <= 48) shortDesc = "مه/کدری؛ در رانندگی احتیاط کنید.";
+      else if (code <= 67) shortDesc = "بارش محتمل؛ چتر همراه داشته باشید.";
+      else if (code <= 77) shortDesc = "برف/سرما؛ لباس گرم و کفش مناسب.";
+      else if (code >= 95) shortDesc = "رعدوبرق/طوفان؛ ایمنی را اولویت قرار دهید.";
+      else shortDesc = "هوای متغیر؛ آماده تغییرات باشید.";
+
+      const div = document.createElement('div');
+      div.className = 'forecast-item';
+      div.innerHTML = `
+        <div class="f-top-row">
+          <div class="f-day-group">
+            <div class="f-icon">${getSmallIcon(code)}</div>
+            <div class="f-day">${dayName}</div>
+          </div>
+          <div class="f-temp">
+            ${toFarsi(maxT)}°
+            <span style="font-size:13px;opacity:.55;color:var(--text-primary);margin-left:6px">${toFarsi(minT)}°</span>
+          </div>
+        </div>
+        <div class="f-bot-row">${shortDesc}</div>
+      `;
+      listEl.appendChild(div);
+    }
+  }
+
+  /* -------------------------
+     Elevation
+  --------------------------*/
+  function renderElevation(meters){
+    if(meters == null || !isFinite(meters)){
+      document.getElementById('elev-val').innerText = '--';
+      document.getElementById('elev-desc').innerText = 'داده ارتفاع در دسترس نیست.';
+      return;
+    }
+    document.getElementById('elev-val').innerText = toFarsi(Math.round(meters)) + ' متر';
+
+    let desc = "";
+    const milad = 435;
+    const azadi = 45;
+    if (meters < azadi) desc = `ارتفاع پایین است (نزدیک سطح شهر). اکسیژن معمولاً کافی و فشار هوا بالاتر است.`;
+    else if (meters < milad) desc = `ارتفاع شما حدوداً ${toFarsi((meters / azadi).toFixed(1))} برابر برج آزادی است.`;
+    else if (meters < 2000) desc = `ارتفاع نسبتاً زیاد است؛ هوا کمی خنک‌تر و رقیق‌تر حس می‌شود.`;
+    else desc = `ارتفاع کوهستانی؛ هوا رقیق‌تر است و ممکن است سریع‌تر نفس کم بیاورید.`;
+
+    document.getElementById('elev-desc').innerText = desc;
+  }
+
+  /* -------------------------
+     Charts (Weekly / Hourly)
+  --------------------------*/
+  function destroyChart(){
+    if(chartInstance){ chartInstance.destroy(); chartInstance = null; }
+  }
+
+  function renderWeeklyChart(daily){
+    if(typeof Chart === 'undefined') return;
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    destroyChart();
+
+    const labels = daily.time.map(d => {
+      const dt = new Date(d);
+      return dt.toLocaleDateString('fa-IR', { weekday:'long' });
+    });
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, 230);
+    gradient.addColorStop(0, 'rgba(52, 211, 153, 0.45)');
+    gradient.addColorStop(1, 'rgba(52, 211, 153, 0)');
+
+    chartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'حداکثر دما',
+            data: daily.temperature_2m_max.map(x => Math.round(x)),
+            borderColor: '#34d399',
+            backgroundColor: gradient,
+            borderWidth: 3,
+            pointBackgroundColor: '#fff',
+            pointBorderColor: '#34d399',
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            fill: true,
+            tension: 0.35
+          },
+          {
+            label: 'حداقل دما',
+            data: daily.temperature_2m_min.map(x => Math.round(x)),
+            borderColor: '#60a5fa',
+            borderWidth: 2,
+            pointRadius: 0,
+            borderDash: [6,6],
+            tension: 0.35,
+            fill: false
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: isLight ? 'rgba(255,255,255,0.95)' : 'rgba(15,23,42,0.92)',
+            titleColor: isLight ? '#0f172a' : '#e2e8f0',
+            bodyColor: isLight ? '#0f172a' : '#e2e8f0',
+            padding: 12,
+            cornerRadius: 12,
+            rtl: true
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { font: { family: 'Vazirmatn', size: 11 }, color: isLight ? '#475569' : '#94a3b8' }
+          },
+          y: {
+            grid: { color: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)' },
+            border: { display: false },
+            ticks: { color: isLight ? '#475569' : '#94a3b8' }
+          }
+        }
+      }
+    });
+  }
+
+  function findNearestHourIndex(times){
+    const now = new Date();
+    let bestI = 0;
+    let bestD = Infinity;
+    for(let i=0;i<times.length;i++){
+      const dt = new Date(times[i]);
+      const d = Math.abs(dt - now);
+      if(d < bestD){
+        bestD = d; bestI = i;
+      }
+    }
+    return bestI;
+  }
+
+  function renderHourlyChart(hourly){
+    if(typeof Chart === 'undefined') return;
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    destroyChart();
+
+    const idx = findNearestHourIndex(hourly.time);
+    const sliceN = 24;
+
+    const times = hourly.time.slice(idx, idx + sliceN);
+    const labels = times.map(t => {
+      const dt = new Date(t);
+      return dt.toLocaleTimeString('fa-IR', { hour:'2-digit', minute:'2-digit' });
+    });
+
+    const temp = hourly.temperature_2m?.slice(idx, idx + sliceN)?.map(x => Math.round(x)) ?? [];
+    const prob = hourly.precipitation_probability?.slice(idx, idx + sliceN)?.map(x => Math.round(x)) ?? [];
+    const wind = hourly.wind_speed_10m?.slice(idx, idx + sliceN)?.map(x => Math.round(x)) ?? [];
+
+    chartInstance = new Chart(ctx, {
+      data: {
+        labels,
+        datasets: [
+          {
+            type: 'line',
+            label: 'دما (°C)',
+            data: temp,
+            borderColor: '#34d399',
+            borderWidth: 3,
+            pointRadius: 2,
+            pointHoverRadius: 5,
+            tension: 0.35,
+            yAxisID: 'y'
+          },
+          {
+            type: 'bar',
+            label: 'احتمال بارش (%)',
+            data: prob,
+            backgroundColor: 'rgba(96,165,250,0.35)',
+            borderColor: 'rgba(96,165,250,0.65)',
+            borderWidth: 1,
+            yAxisID: 'yProb'
+          },
+          {
+            type: 'line',
+            label: 'باد (km/h)',
+            data: wind,
+            borderColor: '#f472b6',
+            borderWidth: 2,
+            borderDash: [6,6],
+            pointRadius: 0,
+            tension: 0.3,
+            yAxisID: 'yWind'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: isLight ? 'rgba(255,255,255,0.95)' : 'rgba(15,23,42,0.92)',
+            titleColor: isLight ? '#0f172a' : '#e2e8f0',
+            bodyColor: isLight ? '#0f172a' : '#e2e8f0',
+            padding: 12,
+            cornerRadius: 12,
+            rtl: true
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { font: { family:'Vazirmatn', size: 11 }, color: isLight ? '#475569' : '#94a3b8', maxRotation:0 }
+          },
+          y: {
+            position: 'left',
+            grid: { color: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)' },
+            border: { display: false },
+            ticks: { color: isLight ? '#475569' : '#94a3b8' },
+            title: { display: true, text: '°C', color: isLight ? '#475569' : '#94a3b8', font: { family:'Vazirmatn', weight:'800' } }
+          },
+          yProb: {
+            position: 'right',
+            grid: { display: false },
+            min: 0,
+            max: 100,
+            ticks: { color: isLight ? '#475569' : '#94a3b8' },
+            title: { display: true, text: '%', color: isLight ? '#475569' : '#94a3b8', font: { family:'Vazirmatn', weight:'800' } }
+          },
+          yWind: {
+            position: 'right',
+            grid: { display: false },
+            ticks: { color: isLight ? '#475569' : '#94a3b8' },
+            title: { display: true, text: 'km/h', color: isLight ? '#475569' : '#94a3b8', font: { family:'Vazirmatn', weight:'800' } }
+          }
+        }
+      }
+    });
+  }
+
+  function switchChart(mode){
+    chartMode = mode;
+    document.getElementById('btn-weekly').classList.toggle('active', mode==='weekly');
+    document.getElementById('btn-hourly').classList.toggle('active', mode==='hourly');
+    document.getElementById('btn-weekly').setAttribute('aria-selected', mode==='weekly');
+    document.getElementById('btn-hourly').setAttribute('aria-selected', mode==='hourly');
+
+    const title = document.getElementById('chart-title');
+    const sub = document.getElementById('chart-subtitle');
+
+    if(mode==='weekly'){
+      title.innerText = 'نمودار هفتگی دما';
+      sub.innerText = 'نمایش روند ۷ روز آینده (حداکثر/حداقل).';
+      if(window.__LAST_DATA?.weather?.daily) renderWeeklyChart(window.__LAST_DATA.weather.daily);
+    }else{
+      title.innerText = 'نمودار ساعتی (دما + بارش + باد)';
+      sub.innerText = 'نمایش ۲۴ ساعت آینده (براساس زمان محلی).';
+      if(window.__LAST_DATA?.weather?.hourly) renderHourlyChart(window.__LAST_DATA.weather.hourly);
+    }
+  }
+
+  /* -------------------------
+     Date card (Jalali + Gregorian) with progress
+     (Includes full Jalali conversion)
+  --------------------------*/
+  // jalaali-js style conversion (embedded)
+  function div(a, b){ return ~~(a / b); }
+
+  function gregorianToJalali(gy, gm, gd){
+    const g_d_m = [0,31,59,90,120,151,181,212,243,273,304,334];
+    let jy = (gy <= 1600) ? 0 : 979;
+    gy -= (gy <= 1600) ? 621 : 1600;
+    const gy2 = (gm > 2) ? (gy + 1) : gy;
+    let days = (365 * gy) + div(gy2 + 3, 4) - div(gy2 + 99, 100) + div(gy2 + 399, 400) - 80 + gd + g_d_m[gm - 1];
+    jy += 33 * div(days, 12053);
+    days %= 12053;
+    jy += 4 * div(days, 1461);
+    days %= 1461;
+    if(days > 365){
+      jy += div(days - 1, 365);
+      days = (days - 1) % 365;
+    }
+    const jm = (days < 186) ? 1 + div(days, 31) : 7 + div(days - 186, 30);
+    const jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
+    return {jy, jm, jd};
+  }
+
+  function jalaliLeap(jy){
+    // accurate leap test for Jalali
+    const breaks = [-61, 9, 38, 199, 426, 686, 756, 818, 1111, 1181, 1210
+      , 1635, 2060, 2097, 2192, 2262, 2324, 2394, 2456, 3178];
+    let bl = breaks.length;
+    let jp = breaks[0], jm, jump, leapJ = -14, n, i;
+    if (jy < jp || jy >= breaks[bl-1]) return false;
+    for(i=1; i<bl; i+=1){
+      jm = breaks[i];
+      jump = jm - jp;
+      if (jy < jm) break;
+      leapJ = leapJ + div(jump, 33) * 8 + div((jump % 33), 4);
+      jp = jm;
+    }
+    n = jy - jp;
+    leapJ = leapJ + div(n, 33) * 8 + div(((n % 33) + 3), 4);
+    if ((jump % 33) === 4 && (jump - n) === 4) leapJ += 1;
+    const leapG = div((gy2(jy) + 3), 4) - div((gy2(jy) + 99), 100) + div((gy2(jy) + 399), 400) - 150;
+    const march = 20 + leapJ - leapG;
+    if ((jump - n) < 6) n = n - jump + div((jump + 4), 33) * 33;
+    let leap = ((n + 1) % 33) - 1;
+    if (leap < 0) leap += 33;
+    leap = (leap === 0 || leap === 4 || leap === 8 || leap === 12 || leap === 16 || leap === 20 || leap === 24 || leap === 28);
+    return leap;
+  }
+  function gy2(jy){ // helper, rough mapping
+    // map Jalali year to around Gregorian year
+    return jy + 621;
+  }
+  function jalaliMonthLength(jy, jm){
+    if(jm <= 6) return 31;
+    if(jm <= 11) return 30;
+    return jalaliLeap(jy) ? 30 : 29;
+  }
+
+  function dayOfYearGregorian(d){
+    const start = new Date(d.getFullYear(), 0, 1);
+    const diff = d - start;
+    return Math.floor(diff / (1000*60*60*24)) + 1;
+  }
+  function daysInGregorianYear(y){
+    const isLeap = (y%4===0 && y%100!==0) || (y%400===0);
+    return isLeap ? 366 : 365;
+  }
+
+  function computeJalaliDayOfYear(jy, jm, jd){
+    let sum = 0;
+    for(let m=1;m<jm;m++) sum += jalaliMonthLength(jy, m);
+    sum += jd;
+    const yearLen = jalaliLeap(jy) ? 366 : 365;
+    return {day: sum, yearLen};
+  }
+
+  function formatPersianDate(d){
+    // Persian calendar formatting
+    const fmt = new Intl.DateTimeFormat('fa-IR-u-ca-persian', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    return fmt.format(d);
+  }
+  function formatGregorianDate(d){
+    const fmt = new Intl.DateTimeFormat('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    return fmt.format(d);
+  }
+
+  function renderDateCard(){
+    const now = new Date();
+
+    document.getElementById('date-fa').innerText = formatPersianDate(now);
+    document.getElementById('date-en').innerText = formatGregorianDate(now);
+
+    // Gregorian progress
+    const gDay = dayOfYearGregorian(now);
+    const gLen = daysInGregorianYear(now.getFullYear());
+    const gLeft = gLen - gDay;
+
+    // Jalali progress
+    const jy = now.getFullYear();
+    const jm = now.getMonth() + 1;
+    const jd = now.getDate();
+    const j = gregorianToJalali(jy, jm, jd);
+    const jInfo = computeJalaliDayOfYear(j.jy, j.jm, j.jd);
+    const jDay = jInfo.day;
+    const jLen = jInfo.yearLen;
+    const jLeft = jLen - jDay;
+
+    // chip
+    document.getElementById('date-chip').innerText = `امروز: روز ${toFarsi(jDay)} شمسی • روز ${toFarsi(gDay)} میلادی`;
+
+    // bars
+    const jPct = (jDay / jLen) * 100;
+    const gPct = (gDay / gLen) * 100;
+
+    document.getElementById('jalali-meta').innerText = `${toFarsi(jDay)}/${toFarsi(jLen)} • باقی‌مانده: ${toFarsi(jLeft)} روز`;
+    document.getElementById('greg-meta').innerText   = `${toFarsi(gDay)}/${toFarsi(gLen)} • باقی‌مانده: ${toFarsi(gLeft)} روز`;
+
+    // animate bars
+    requestAnimationFrame(() => {
+      document.getElementById('jalali-bar').style.width = `${clamp(jPct, 0, 100)}%`;
+      document.getElementById('greg-bar').style.width   = `${clamp(gPct, 0, 100)}%`;
+    });
+
+    document.getElementById('jalali-mini').innerText =
+      `از ابتدای سال شمسی ${toFarsi(jDay)} روز گذشته و ${toFarsi(jLeft)} روز تا پایان سال باقی مانده.`;
+
+    document.getElementById('greg-mini').innerText =
+      `از ابتدای سال میلادی ${toFarsi(gDay)} روز گذشته و ${toFarsi(gLeft)} روز تا پایان سال باقی مانده.`;
+  }
+
+  /* -------------------------
+     UV rendering
+  --------------------------*/
+  function renderUV(currentUv, uvMax, updatedAt){
+    const info = uvInfo(currentUv);
+    document.getElementById('uv-now').innerText = (isFinite(Number(currentUv)) ? toFarsi(Number(currentUv).toFixed(1)) : '--');
+    document.getElementById('uv-badge').innerText = `سطح: ${info.level}`;
+    document.getElementById('uv-badge').style.borderColor = info.color;
+    document.getElementById('uv-badge').style.background = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0.18)';
+    document.getElementById('uv-badge').style.boxShadow = `0 0 18px ${info.color}22`;
+
+    document.getElementById('uv-max').innerText = `حداکثر امروز: ${isFinite(Number(uvMax)) ? toFarsi(Number(uvMax).toFixed(1)) : '--'}`;
+    document.getElementById('uv-advice').innerText = `دوست من، ${info.tip}`;
+    document.getElementById('uv-dot').style.background = info.color;
+    document.getElementById('uv-updated').innerText = `آخرین آپدیت: ${updatedAt}`;
+  }
+
+  /* -------------------------
+     Alerts (Notifications / PWA)
+  --------------------------*/
+  function renderNotifStatus(){
+    const perm = (typeof Notification !== 'undefined') ? Notification.permission : 'unsupported';
+    const dot = document.getElementById('notif-dot');
+    const text = document.getElementById('notif-text');
+
+    if(perm === 'granted'){
+      dot.style.background = '#34d399';
+      text.innerText = 'وضعیت: فعال';
+    }else if(perm === 'denied'){
+      dot.style.background = '#f87171';
+      text.innerText = 'وضعیت: مسدود شده';
+    }else if(perm === 'default'){
+      dot.style.background = '#fb923c';
+      text.innerText = 'وضعیت: نیاز به اجازه';
+    }else{
+      dot.style.background = '#94a3b8';
+      text.innerText = 'وضعیت: پشتیبانی نمی‌شود';
+    }
+  }
+
+  function renderToggles(){
+    const elAqi = document.getElementById('toggle-aqi');
+    const elRain = document.getElementById('toggle-rain');
+    elAqi.classList.toggle('on', !!settings.alertAqi);
+    elRain.classList.toggle('on', !!settings.alertRain);
+  }
+
+  function toggleSetting(key){
+    settings[key] = !settings[key];
+    saveSettings();
+  }
+
+  async function enableNotifications(){
+    if(typeof Notification === 'undefined'){
+      alert('مرورگر شما Notification را پشتیبانی نمی‌کند.');
+      return;
+    }
+    const perm = await Notification.requestPermission();
+    renderNotifStatus();
+
+    // Register SW and send config
+    await registerSWIfNeeded();
+    await syncConfigToSW();
+  }
+
+  function shouldNotify(){
+    return typeof Notification !== 'undefined' && Notification.permission === 'granted';
+  }
+
+  function getLastNotifyKey(tag){
+    return `hp_last_notify_${tag}`;
+  }
+  function canSend(tag, minMinutes){
+    const key = getLastNotifyKey(tag);
+    const last = Number(localStorage.getItem(key) || '0');
+    const now = Date.now();
+    if(!last || (now - last) > minMinutes*60*1000){
+      localStorage.setItem(key, String(now));
+      return true;
+    }
+    return false;
+  }
+
+  async function notify(title, body, tag){
+    if(!shouldNotify()) return;
+    try{
+      const reg = await navigator.serviceWorker?.getRegistration();
+      const options = {
+        body,
+        tag,
+        renotify: false,
+        icon: "https://8upload.com/image/171db5bf84cf07d4/AppIcon_2x.png",
+        badge: "https://8upload.com/image/171db5bf84cf07d4/AppIcon_2x.png",
+        data: { url: '/' }
+      };
+      if(reg && reg.showNotification){
+        await reg.showNotification(title, options);
+      }else{
+        new Notification(title, options);
+      }
+    }catch(e){}
+  }
+
+  function runSmartAlerts(data){
+    // needs coords saved; checks also in SW periodically where possible
+    if(!shouldNotify()) return;
+
+    const aqi = Number(data?.aqi?.current?.us_aqi);
+    const hourly = data?.weather?.hourly;
+    const now = new Date();
+
+    // AQI alert
+    if(settings.alertAqi && isFinite(aqi) && aqi >= settings.aqiThreshold){
+      if(canSend('aqi', 60)){
+        const a = aqiInfo(aqi);
+        notify(
+          `هشدار کیفیت هوا: ${a.label}`,
+          `AQI الان ${toFarsi(aqi)} است. ${a.advice}`,
+          'hp_aqi'
+        );
+      }
+    }
+
+    // Rain-near alert (next N hours)
+    if(settings.alertRain && hourly?.time?.length){
+      const idx = findNearestHourIndex(hourly.time);
+      const n = settings.rainWindowHours;
+      const probs = (hourly.precipitation_probability || []).slice(idx, idx + n);
+      const maxProb = Math.max(...probs.filter(x => x != null));
+
+      if(isFinite(maxProb) && maxProb >= settings.rainThreshold){
+        if(canSend('rain', 45)){
+          notify(
+            'هشدار بارش نزدیک ☔',
+            `احتمال بارش در ${toFarsi(n)} ساعت آینده تا ${toFarsi(maxProb)}٪ می‌رسد. چتر یادت نره 🙂`,
+            'hp_rain'
+          );
+        }
+      }
+    }
+  }
+
+  /* -------------------------
+     SW registration + config sync
+  --------------------------*/
+  async function registerSWIfNeeded(){
+    if(!('serviceWorker' in navigator)) return;
+    try{
+      await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+    }catch(e){}
+  }
+
+  async function syncConfigToSW(){
+    if(!('serviceWorker' in navigator)) return;
+    try{
+      const lat = localStorage.getItem('last_lat');
+      const lon = localStorage.getItem('last_lon');
+      const name = localStorage.getItem('last_name');
+      if(!lat || !lon) return;
+
+      const payload = {
+        type: 'SET_CONFIG',
+        config: {
+          lat: Number(lat),
+          lon: Number(lon),
+          name: name || 'موقعیت من',
+          settings
+        }
+      };
+
+      const reg = await navigator.serviceWorker.getRegistration();
+      if(reg?.active){
+        reg.active.postMessage(payload);
+      }
+    }catch(e){}
+  }
+
+  /* -------------------------
+     Update UI (main)
+  --------------------------*/
+  function animateValue(id, start, end, duration){
+    if(start === end) return;
+    const range = end - start;
+    let current = start;
+    const increment = end > start ? 1 : -1;
+    const stepTime = Math.abs(Math.floor(duration / Math.max(1, range)));
+    const obj = document.getElementById(id);
+    const timer = setInterval(() => {
+      current += increment;
+      obj.innerHTML = toFarsi(current);
+      if(current === end) clearInterval(timer);
+    }, Math.max(stepTime, 18));
+  }
+
+  function updateAQI(aqi){
+    const info = aqiInfo(aqi);
+    document.documentElement.style.setProperty('--accent-color', info.color);
+    document.documentElement.style.setProperty('--liquid-1', info.color);
+
+    document.getElementById('aqi-text').innerText = info.label;
+    document.getElementById('aqi-text').style.backgroundColor = info.color;
+
+    animateValue("aqi-val", 0, Math.round(aqi), 1200);
+
+    const offset = 660 - (Math.min(aqi, 400) / 400) * 660;
+    document.getElementById('aqi-ring').style.strokeDashoffset = offset;
+    document.getElementById('aqi-ring').style.stroke = info.color;
+
+    document.getElementById('aqi-reco-head').innerText = "وضعیت تنفس شما";
+    document.getElementById('aqi-reco-body').innerText =
+      `${info.emoji} شاخص AQI: ${toFarsi(Math.round(aqi))}\n${info.advice}`;
+  }
+
+  function updateParticles(weatherCode){
+    document.body.classList.remove('weather-rain','weather-snow');
+    if(weatherCode >= 95) document.body.classList.add('weather-rain');
+    else if((weatherCode >= 51 && weatherCode <= 67) || weatherCode >= 80) document.body.classList.add('weather-rain');
+    else if(weatherCode >= 71) document.body.classList.add('weather-snow');
+  }
+
+  function updateUI(payload, city){
+    window.__LAST_DATA = payload;
+
+    const aqi = payload.aqi?.current?.us_aqi;
+    const current = payload.weather?.current;
+    const daily = payload.weather?.daily;
+    const hourly = payload.weather?.hourly;
+    const elevation = payload.weather?.elevation;
+
+    const night = isNightNow(daily);
+    const isDay = !night;
+    const wCode = current.weather_code;
+
+    document.getElementById('loc-name').innerText = city;
+
+    // AQI
+    if(isFinite(aqi)) updateAQI(aqi);
+
+    // Weather main
+    const t = current.temperature_2m;
+    const feels = current.apparent_temperature ?? current.temperature_2m;
+    const hum = current.relative_humidity_2m;
+    const wind = current.wind_speed_10m;
+
+    document.getElementById('visual-temp').innerText = toFarsi(Math.round(t)) + '°';
+    document.getElementById('hum-val').innerText = toFarsi(Math.round(hum)) + '%';
+    document.getElementById('wind-val').innerText = toFarsi(Math.round(wind));
+    document.getElementById('feels-val').innerText = toFarsi(Math.round(feels)) + '°';
+
+    const story = skyStory({temp:t, code:wCode, wind, aqi, isNight: night});
+    document.getElementById('visual-desc').innerText = story.title;
+    document.getElementById('weather-icon-container').innerHTML = getWeatherSVG(wCode, isDay);
+
+    // Friendly report
+    document.getElementById('friendly-text').innerText = buildFriendlyReport({
+      temp:t, feels, wind, hum, code:wCode, aqi
+    });
+
+    // Story
+    document.getElementById('story-head').innerText = story.title;
+    document.getElementById('story-icon').innerText = story.icon;
+    document.getElementById('story-body').innerText = story.text;
+
+    // Rain 24h
+    const hourIndex = findNearestHourIndex(hourly.time);
+    const rainProbs = (hourly.precipitation_probability || []).slice(hourIndex, hourIndex + 24);
+    const rainInfo = getRainMessage(rainProbs);
+    document.getElementById('rain-title').innerText = rainInfo.t;
+    document.getElementById('rain-desc').innerText = rainInfo.d;
+
+    // Pollutants
+    document.getElementById('pm25-val').innerText = isFinite(payload.aqi?.current?.pm2_5) ? toFarsi(payload.aqi.current.pm2_5.toFixed(1)) : '--';
+    document.getElementById('no2-val').innerText  = isFinite(payload.aqi?.current?.nitrogen_dioxide) ? toFarsi(payload.aqi.current.nitrogen_dioxide.toFixed(1)) : '--';
+
+    // UV (current + daily max)
+    const uvNow = current.uv_index;
+    const uvMax = daily.uv_index_max?.[0];
+    const updatedAt = new Date().toLocaleTimeString('fa-IR', { hour:'2-digit', minute:'2-digit' });
+    renderUV(uvNow, uvMax, updatedAt);
+
+    // Moon
+    renderMoonPhase();
+
+    // Charts
+    if(chartMode === 'weekly') renderWeeklyChart(daily);
+    else renderHourlyChart(hourly);
+
+    // Forecast list
+    renderForecastList(daily);
+
+    // Elevation
+    renderElevation(elevation);
+
+    // Particles
+    updateParticles(wCode);
+
+    // Date card
+    renderDateCard();
+
+    // alerts (in-app)
+    runSmartAlerts(payload);
+
+    // Sync config for SW background checks
+    syncConfigToSW();
+
+    // hide loader
+    document.getElementById('loader').style.opacity = '0';
+    setTimeout(() => document.getElementById('loader').style.display = 'none', 600);
+  }
+
+  /* -------------------------
+     Fetch data (Open-Meteo)
+     - Adds UV and apparent temperature
+     - Uses timezone=auto for local times
+  --------------------------*/
+  async function fetchData(lat, lon, name){
+    document.getElementById('loader').style.display = 'flex';
+    setTimeout(() => document.getElementById('loader').style.opacity = '1', 10);
+
+    try{
+      const aqiUrl =
+        `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi,pm2_5,nitrogen_dioxide&timezone=auto`;
+
+      const weatherUrl =
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+        `&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code,uv_index` +
+        `&hourly=temperature_2m,precipitation_probability,wind_speed_10m,uv_index` +
+        `&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max` +
+        `&timezone=auto`;
+
+      const [aqiRes, weatherRes] = await Promise.all([ fetch(aqiUrl), fetch(weatherUrl) ]);
+      if(!aqiRes.ok || !weatherRes.ok) throw new Error("API Error");
+
+      localStorage.setItem('last_lat', lat);
+      localStorage.setItem('last_lon', lon);
+      localStorage.setItem('last_name', name);
+
+      const aqiJson = await aqiRes.json();
+      const weatherJson = await weatherRes.json();
+
+      updateUI({ aqi: aqiJson, weather: weatherJson }, name);
+
+    }catch(e){
+      console.error(e);
+      alert("متأسفانه در دریافت اطلاعات مشکلی پیش آمده.");
+      document.getElementById('loader').style.opacity = '0';
+      setTimeout(() => document.getElementById('loader').style.display = 'none', 600);
+    }
+  }
+
+  /* -------------------------
+     Search / Location
+  --------------------------*/
+  function toggleSearch(show){
+    const modal = document.getElementById('search-modal');
+    if(show){
+      modal.classList.add('open');
+      setTimeout(() => document.getElementById('city-input').focus(), 120);
+    }else{
+      modal.classList.remove('open');
+    }
+  }
+
+  let debounce;
+  document.getElementById('city-input').addEventListener('input', (e) => {
+    clearTimeout(debounce);
+    if(e.target.value.length < 2) return;
+
+    debounce = setTimeout(async () => {
+      try{
+        const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(e.target.value)}&count=7&language=en&format=json`);
+        const data = await res.json();
+        const list = document.getElementById('search-list');
+        list.innerHTML = '';
+
+        if(!data.results){
+          list.innerHTML = '<div style="text-align:center; padding:18px; opacity:0.65">شهری پیدا نشد</div>';
+          return;
+        }
+        data.results.forEach(c => {
+          const div = document.createElement('div');
+          div.className = 'search-item';
+          div.innerText = `${c.name} (${c.country_code})`;
+          div.onclick = () => { fetchData(c.latitude, c.longitude, c.name); toggleSearch(false); };
+          list.appendChild(div);
+        });
+      }catch(e){}
+    }, 550);
+  });
+
+  function handleWelcomeGPS(){
+    if(!navigator.geolocation){
+      alert("مرورگر شما موقعیت مکانی را پشتیبانی نمی‌کند.");
+      return;
+    }
+    document.getElementById('welcome-modal').classList.remove('active');
+    document.getElementById('loader').style.display = 'flex';
+    document.getElementById('loader').style.opacity = '1';
+
+    navigator.geolocation.getCurrentPosition(
+      p => fetchData(p.coords.latitude, p.coords.longitude, "موقعیت من"),
+      () => {
+        alert("دسترسی به موقعیت مکانی داده نشد.");
+        document.getElementById('welcome-modal').classList.add('active');
+        document.getElementById('loader').style.opacity = '0';
+        setTimeout(() => document.getElementById('loader').style.display = 'none', 600);
+      },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
+    );
+  }
+
+  function handleWelcomeManual(){
+    document.getElementById('welcome-modal').classList.remove('active');
+    toggleSearch(true);
+  }
+
+  function getLocation(){ handleWelcomeGPS(); }
+
+  /* -------------------------
+     App init + auto refresh + SW
+  --------------------------*/
+  async function initApp(){
+    // UI state
+    renderToggles();
+    renderNotifStatus();
+
+    // SW
+    await registerSWIfNeeded();
+
+    const savedLat = localStorage.getItem('last_lat');
+    const savedLon = localStorage.getItem('last_lon');
+    const savedName = localStorage.getItem('last_name');
+
+    if(savedLat && savedLon && savedName){
+      fetchData(savedLat, savedLon, savedName);
+    }else{
+      setTimeout(() => {
+        document.getElementById('welcome-modal').classList.add('active');
+        document.getElementById('loader').style.display = 'none';
+      }, 120);
+    }
+
+    // auto refresh (in-app) every 15 minutes
+    setInterval(() => {
+      const lat = localStorage.getItem('last_lat');
+      const lon = localStorage.getItem('last_lon');
+      const name = localStorage.getItem('last_name');
+      if(lat && lon) fetchData(lat, lon, name || 'موقعیت من');
+    }, 15 * 60 * 1000);
+  }
+  initApp();
+</script>
+</body>
+</html>

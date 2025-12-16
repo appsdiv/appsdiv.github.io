@@ -1,0 +1,22 @@
+{
+  "name": "هوای پاک پلاس",
+  "short_name": "هوای پاک+",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "lang": "fa",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "https://8upload.com/image/171db5bf84cf07d4/AppIcon_2x.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://8upload.com/image/171db5bf84cf07d4/AppIcon_2x.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
