@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+  <meta name="theme-color" content="#0f172a">
+  <title>محاسبه‌گر طلا ۱۴۰۴  </title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;500;700;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* Dark Mode (Default) */
+      --bg: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.75);
+      --input-bg: rgba(15, 23, 42, 0.6);
+      --border: rgba(255, 255, 255, 0.1);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --gold: #fbbf24;
+      --gold-dim: rgba(251, 191, 36, 0.15);
+      --success: #10b981;
+      --danger: #ef4444;
+      --radius: 18px;
+      --shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+    }
+
+    /* Light Mode Variables */
+    body.light-mode {
+      --bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --input-bg: #f8fafc;
+      --border: #e2e8f0;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --gold: #d97706;
+      --gold-dim: rgba(217, 119, 6, 0.1);
+      --shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+    
+    body {
+      margin: 0;
+      font-family: "Vazirmatn", sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      padding: 16px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      flex: 1;
+    }
+
+    /* Header & Toggle */
+    .header-row {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+    }
+    .brand h1 { margin: 0; font-size: 1.4rem; color: var(--gold); font-weight: 800; }
+    .brand .sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+    .theme-toggle {
+      background: var(--input-bg); border: 1px solid var(--border);
+      color: var(--gold); padding: 8px; border-radius: 12px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px; transition: 0.2s;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex; background: var(--input-bg); 
+      padding: 4px; border-radius: 14px; border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .tab-btn {
+      flex: 1; border: none; background: transparent; color: var(--text-muted);
+      padding: 10px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 0.9rem;
+      cursor: pointer; transition: 0.3s;
+    }
+    .tab-btn.active {
+      background: var(--gold); color: #fff; box-shadow: 0 4px 15px var(--gold-dim);
+    }
+    body.light-mode .tab-btn.active { color: #fff; }
+
+    /* Type Selectors */
+    .type-select {
+      display: flex; gap: 8px; margin-bottom: 16px;
+    }
+    .type-btn {
+      flex: 1; padding: 8px; font-size: 0.8rem; border: 1px solid var(--border);
+      background: var(--input-bg); color: var(--text-muted); border-radius: 10px;
+      cursor: pointer; font-family: inherit; font-weight: 600; transition: 0.2s;
+    }
+    .type-btn.active {
+      border-color: var(--gold); color: var(--gold); background: var(--gold-dim);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+      transition: background 0.3s, border 0.3s;
+    }
+
+    .section-head {
+      font-size: 0.85rem; color: var(--gold); font-weight: 700; margin-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .badge-info {
+        font-size: 0.65rem; background: rgba(16, 185, 129, 0.1); color: var(--success);
+        padding: 2px 6px; border-radius: 4px; font-weight: 400;
+    }
+
+    /* Inputs */
+    .grid { display: grid; gap: 14px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .field-group label {
+      display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px;
+    }
+    
+    .input-box { position: relative; }
+    
+    input {
+      width: 100%; padding: 12px 12px 12px 45px;
+      background: var(--input-bg); border: 1px solid var(--border);
+      border-radius: 12px; color: var(--text-main); font-family: inherit; 
+      font-size: 1.1rem; font-weight: 500; transition: all 0.2s;
+      direction: ltr; text-align: left;
+    }
+    input::placeholder { text-align: right; color: var(--text-muted); opacity: 0.5; font-size: 0.9rem; }
+    input:focus {
+      border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-dim);
+    }
+    input[readonly] { opacity: 0.5; cursor: not-allowed; }
+    
+    .unit {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      font-size: 0.75rem; color: var(--text-muted); pointer-events: none;
+    }
+
+    /* Result */
+    .result-area { text-align: center; padding-bottom: 15px; border-bottom: 1px dashed var(--border); margin-bottom: 15px; }
+    .price-lg {
+      font-size: 2.2rem; font-weight: 900; color: var(--success); letter-spacing: -1px; margin-top: 5px;
+    }
+    .price-lg span { font-size: 1rem; color: var(--text-muted); font-weight: 400; margin-right: 5px; }
+    
+    .breakdown-list { display: flex; flex-direction: column; gap: 8px; }
+    .list-item { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-muted); padding: 4px 0; }
+    .list-item b { color: var(--text-main); }
+    .list-item.main { border-top: 1px solid var(--border); padding-top: 10px; margin-top: 5px; color: var(--gold); font-weight: 700; }
+
+    /* Actions */
+    .actions { display: flex; gap: 10px; margin-top: 10px; }
+    .btn {
+      flex: 1; padding: 12px; border-radius: 12px; border: none; font-weight: 700; font-family: inherit; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn-gold { background: var(--gold); color: #fff; }
+    .btn-dark { background: var(--input-bg); color: var(--danger); border: 1px solid rgba(248,113,113,0.3); }
+
+    /* Footer */
+    .footer {
+      text-align: center; font-size: 0.75rem; color: var(--text-muted);
+      padding: 20px 0; opacity: 0.7;
+    }
+    .footer span { color: var(--gold); font-weight: 700; }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  
+  <div class="header-row">
+    <div class="brand">
+      <h1>محاسبه‌گر طلا ۱۴۰۴</h1>
+      <div class="sub">محاسبه دقیق با مالیات ۱۰٪ جدید</div>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="تغییر تم">
+      <svg id="icon-sun" class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+      <svg id="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tabBuy" onclick="switchMode('buy')">خرید طلا</button>
+    <button class="tab-btn" id="tabSell" onclick="switchMode('sell')">فروش طلا</button>
+  </div>
+
+  <div class="card">
+    <div class="section-head">اطلاعات پایه</div>
+    <div class="grid">
+      <div class="field-group">
+        <label>قیمت تابلو (هر گرم ۱۸ عیار)</label>
+        <div class="input-box">
+          <input type="tel" inputmode="decimal" id="goldPrice" placeholder="مثلاً 4,600,000" oninput="format(this); syncWage('price'); calc();">
+          <span class="unit">تومان</span>
+        </div>
+      </div>
+      <div class="field-group">
+        <label>وزن طلا</label>
+        <div class="input-box">
+          <input type="tel" inputmode="decimal" id="weight" placeholder="مثلاً 5.25" oninput="format(this); syncWage('weight'); calc();">
+          <span class="unit">گرم</span>
+        </div>
+      </div>
+
+      <div id="buyInputs">
+        
+        <div style="margin-top:20px; margin-bottom:10px; font-size:0.8rem; color:var(--text-muted)">نوع طلا:</div>
+        <div class="type-select">
+          <button class="type-btn active" id="typeNew" onclick="setType('new')">نو (ویترین)</button>
+          <button class="type-btn" id="typeUsed" onclick="setType('used')">دست‌دوم</button>
+          <button class="type-btn" id="typeMelt" onclick="setType('melt')">آب‌شده</button>
+        </div>
+
+        <div class="section-head" style="border-top:1px dashed var(--border); padding-top:15px;">
+          اجرت ساخت
+        </div>
+        
+        <div class="row">
+          <div class="field-group">
+            <label>درصد</label>
+            <div class="input-box">
+              <input type="tel" inputmode="decimal" id="wagePct" placeholder="٪" oninput="syncWage('pct'); calc();">
+              <span class="unit">%</span>
+            </div>
+          </div>
+          <div class="field-group">
+            <label>مبلغ</label>
+            <div class="input-box">
+              <input type="tel" inputmode="decimal" id="wageAmt" placeholder="تومان" oninput="format(this); syncWage('amt'); calc();">
+              <span class="unit">T</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-head" style="margin-top:15px;">
+          سود و مالیات 
+          <span class="badge-info">قانون ۱۴۰۴</span>
+        </div>
+        <div class="row">
+          <div class="field-group">
+            <label>سود (%)</label>
+            <div class="input-box">
+              <input type="tel" inputmode="decimal" id="profitPct" value="7" oninput="calc()">
+              <span class="unit">%</span>
+            </div>
+          </div>
+          <div class="field-group">
+            <label>مالیات (%)</label>
+            <div class="input-box">
+              <input type="tel" inputmode="decimal" id="taxPct" value="10" oninput="calc()">
+              <span class="unit">%</span>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:8px; font-size:0.7rem; color:var(--text-muted); opacity:0.8;">
+           * در سال ۱۴۰۴ مالیات ۱۰٪ فقط به (اجرت + سود) تعلق می‌گیرد و اصل طلا معاف است.
+        </div>
+      </div>
+
+      <div id="sellInputs" class="hidden">
+        <div class="section-head" style="margin-top:15px; border-top:1px dashed var(--border); padding-top:15px;">تنظیمات فروش</div>
+        <div class="row">
+          <div class="field-group">
+            <label>عیار طلا</label>
+            <div class="input-box">
+              <input type="text" value="18" disabled>
+              <span class="unit">K</span>
+            </div>
+          </div>
+          <div class="field-group">
+            <label>عیار خرید مغازه</label>
+            <div class="input-box">
+              <input type="tel" inputmode="decimal" id="shopKarat" value="740" oninput="format(this); calc()">
+              <span class="unit">عیار</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="result-area">
+      <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:5px;">مبلغ نهایی</div>
+      <div class="price-lg" id="finalPrice">--- <span>تومان</span></div>
+    </div>
+    
+    <div class="breakdown-list" id="breakdown">
+      <div style="text-align:center; font-size:0.85rem; color:var(--text-muted); padding:10px;">
+        اطلاعات را وارد کنید...
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-dark" onclick="resetForm()">پاک کردن</button>
+      <button class="btn btn-gold" onclick="copyPrice()">کپی مبلغ</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    طراحی و توسعه توسط <span>پیمان عابدین پور</span>
+  </div>
+
+</div>
+
+<script>
+  // --- Utils ---
+  const qs = (id) => document.getElementById(id);
+  const clean = (str) => str ? str.toString().replace(/,/g, "").replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d)) : "";
+  const getNum = (id) => { const v = clean(qs(id).value); return v === "" ? 0 : parseFloat(v); };
+  const fmt = (n) => (isNaN(n) || n === 0) ? "" : new Intl.NumberFormat('en-US', {maximumFractionDigits: 0}).format(n);
+  
+  const format = (el) => {
+    const val = clean(el.value);
+    if(val === "" || val === ".") { el.value = val; return; }
+    if(el.value.endsWith('.') && !el.value.slice(0,-1).includes('.')) return;
+    if(el.value.endsWith('.0')) return;
+    
+    // Don't mask small decimals like weight
+    if (el.id === 'weight' || el.id === 'wagePct') el.value = val;
+    else el.value = fmt(parseFloat(val));
+  };
+
+  // --- Logic ---
+  let mode = 'buy';
+  let buyType = 'new'; // new, used, melt
+
+  function switchMode(m) {
+    mode = m;
+    qs('tabBuy').className = m === 'buy' ? 'tab-btn active' : 'tab-btn';
+    qs('tabSell').className = m === 'sell' ? 'tab-btn active' : 'tab-btn';
+    qs('buyInputs').classList.toggle('hidden', m !== 'buy');
+    qs('sellInputs').classList.toggle('hidden', m !== 'sell');
+    calc();
+  }
+
+  function setType(t) {
+    buyType = t;
+    // UI Update
+    qs('typeNew').className = 'type-btn';
+    qs('typeUsed').className = 'type-btn';
+    qs('typeMelt').className = 'type-btn';
+    
+    if(t === 'new') {
+      qs('typeNew').classList.add('active');
+      qs('wagePct').readOnly = false; 
+      qs('wageAmt').readOnly = false;
+      qs('wagePct').placeholder = "٪";
+      // 1404 Defaults:
+      qs('profitPct').value = "7";
+      qs('taxPct').value = "10"; // Updated to 10%
+    }
+    else if(t === 'used') { // کارکرده
+      qs('typeUsed').classList.add('active');
+      qs('wagePct').value = ""; qs('wageAmt').value = "";
+      qs('wagePct').readOnly = true; qs('wageAmt').readOnly = true;
+      qs('wagePct').placeholder = "0";
+      qs('profitPct').value = "7";
+      qs('taxPct').value = "10"; // Updated to 10% (on profit only)
+    }
+    else if(t === 'melt') { // آب شده
+      qs('typeMelt').classList.add('active');
+      qs('wagePct').value = ""; qs('wageAmt').value = "";
+      qs('wagePct').readOnly = true; qs('wageAmt').readOnly = true;
+      qs('wagePct').placeholder = "0";
+      qs('profitPct').value = "1.5";
+      qs('taxPct').value = "0"; // معاف
+    }
+    calc();
+  }
+
+  function syncWage(source) {
+    if(buyType !== 'new') return; 
+    
+    const P = getNum('goldPrice');
+    const W = getNum('weight');
+    const base = P * W;
+    if (base === 0) return;
+
+    if (source === 'pct') {
+        const pct = getNum('wagePct');
+        qs('wageAmt').value = fmt(base * (pct / 100));
+    } else if (source === 'amt') {
+        const amt = getNum('wageAmt');
+        qs('wagePct').value = ((amt / base) * 100).toFixed(2);
+    } else if (source === 'price' || source === 'weight') {
+        const pct = getNum('wagePct');
+        if(pct > 0) qs('wageAmt').value = fmt(base * (pct / 100));
+    }
+  }
+
+  function calc() {
+    const P = getNum('goldPrice');
+    const W = getNum('weight');
+    
+    if (P === 0 || W === 0) {
+        qs('finalPrice').innerHTML = "--- <span>تومان</span>";
+        qs('breakdown').innerHTML = `<div style="text-align:center; font-size:0.85rem; color:var(--text-muted); padding:10px;">لطفاً قیمت و وزن را وارد کنید.</div>`;
+        return;
+    }
+
+    const baseGold = P * W;
+    let final = 0;
+    let html = "";
+
+    if (mode === 'buy') {
+        let wAmt = 0;
+        if(buyType === 'new') wAmt = getNum('wageAmt');
+
+        const pPct = getNum('profitPct');
+        const tPct = getNum('taxPct');
+
+        // سود فروشنده: درصدی از (طلا + اجرت)
+        const profit = (baseGold + wAmt) * (pPct / 100);
+        
+        // مالیات بر ارزش افزوده ۱۴۰۴: ۱۰٪ از (اجرت + سود)
+        // اصل طلا معاف است.
+        const tax = (wAmt + profit) * (tPct / 100);
+
+        final = baseGold + wAmt + profit + tax;
+
+        html += row("قیمت خام طلا", baseGold);
+        if(buyType === 'new') html += row("اجرت ساخت", wAmt);
+        else html += row("اجرت (بدون اجرت)", 0);
+        
+        html += row(`سود فروشنده (${pPct}٪)`, profit);
+        html += row(`مالیات (${tPct}٪ روی اجرت+سود)`, tax);
+        html += `<div class="list-item main"><span>قیمت تمام شده</span><b>${fmt(final)}</b></div>`;
+        html += `<div class="list-item" style="font-size:0.75rem"><span>نرخ هر گرم برای شما</span><b>${fmt(final/W)}</b></div>`;
+    
+    } else {
+        const shopK = getNum('shopKarat') || 740;
+        let ratio = shopK > 24 ? (shopK / 750) : (shopK / 18);
+        final = baseGold * ratio;
+        html += row("ارزش تابلو", baseGold);
+        html += row("کسر عیار", baseGold - final, true);
+        html += `<div class="list-item main"><span>مبلغ دریافتی شما</span><b>${fmt(final)}</b></div>`;
+    }
+
+    qs('finalPrice').innerHTML = fmt(final) + " <span>تومان</span>";
+    qs('breakdown').innerHTML = html;
+  }
+
+  function row(label, val, isNeg=false) {
+    const col = isNeg ? 'var(--danger)' : 'var(--text-main)';
+    return `<div class="list-item"><span>${label}</span><b style="color:${col}">${fmt(val)}</b></div>`;
+  }
+
+  function resetForm() {
+    qs('weight').value = "";
+    qs('wagePct').value = "";
+    qs('wageAmt').value = "";
+    setType('new'); 
+    calc();
+  }
+
+  function copyPrice() {
+    const txt = qs('finalPrice').innerText.replace(/[^0-9]/g, '');
+    if(!txt) return;
+    navigator.clipboard.writeText(txt).then(() => {
+        const btn = document.querySelector('.btn-gold');
+        const old = btn.innerText;
+        btn.innerText = "کپی شد ✅";
+        setTimeout(()=> btn.innerText = old, 1500);
+    });
+  }
+
+  // --- Theme Toggle ---
+  function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    const isLight = document.body.classList.contains('light-mode');
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    updateThemeIcon(isLight);
+  }
+  
+  function updateThemeIcon(isLight) {
+    if(isLight) {
+        qs('icon-sun').classList.remove('hidden');
+        qs('icon-moon').classList.add('hidden');
+    } else {
+        qs('icon-sun').classList.add('hidden');
+        qs('icon-moon').classList.remove('hidden');
+    }
+  }
+
+  // Init
+  const savedTheme = localStorage.getItem('theme');
+  if(savedTheme === 'light') {
+      document.body.classList.add('light-mode');
+      updateThemeIcon(true);
+  } else {
+      updateThemeIcon(false);
+  }
+  
+  setType('new');
+
+</script>
+</body>
+</html>
