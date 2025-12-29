@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>محاسبه‌گر حباب طلا و نقره + دریافت خودکار TGJU</title>
+  <title>محاسبه‌گر حباب طلا و نقره (نسخه ضد تحریم)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800;900&display=swap" rel="stylesheet">
@@ -34,10 +34,9 @@
   <div class="wrap">
     <header>
       <div>
-        <h1>حباب طلا و نقره + شمش‌ها (نسخه جدید)</h1>
+        <h1>حباب طلا و نقره (نسخه پایدار)</h1>
         <p class="sub">
-          ✅ مقادیر TGJU دریافت و به صورت خودکار تمیز می‌شوند.
-          <br>✅ دریافت خودکار اکنون از سرور واسط AllOrigins استفاده می‌کند تا خطای مرورگر رفع شود.
+          ✅ دریافت خودکار از TGJU با استفاده از پروکسی قدرتمند <b>corsproxy.io</b>.
         </p>
       </div>
       <div class="pill">
@@ -57,7 +56,7 @@
         <div class="cardHead">
           <div>
             <h2>ورودی‌ها + دریافت خودکار</h2>
-            <div class="hint">روی «دریافت از TGJU» بزن تا قیمت‌ها پر شوند.</div>
+            <div class="hint">روی «دریافت از TGJU» بزن.</div>
           </div>
           <span class="tag">وضعیت: <strong id="statusText">آماده</strong></span>
         </div>
@@ -91,17 +90,17 @@
             <div class="fields two">
               <div class="field">
                 <label for="ozGoldUsd">انس جهانی طلا (USD/oz) *</label>
-                <input id="ozGoldUsd" inputmode="decimal" placeholder="TGJU: /profile/ons" />
+                <input id="ozGoldUsd" inputmode="decimal" placeholder="TGJU: ons" />
                 <div class="unitRow"><span>دلار/انس</span><span class="chip">خودکار</span></div>
               </div>
               <div class="field">
                 <label for="g24">قیمت هر گرم ۲۴ عیار (ایران)</label>
-                <input id="g24" inputmode="numeric" placeholder="TGJU: /profile/geram24/today" />
+                <input id="g24" inputmode="numeric" placeholder="TGJU: geram24" />
                 <div class="unitRow"><span>تومان/گرم</span><span class="chip">خودکار</span></div>
               </div>
               <div class="field">
                 <label for="g18">قیمت هر گرم ۱۸ عیار (ایران)</label>
-                <input id="g18" inputmode="numeric" placeholder="TGJU: /profile/geram18" />
+                <input id="g18" inputmode="numeric" placeholder="TGJU: geram18" />
                 <div class="unitRow"><span>تومان/گرم</span><span class="chip">خودکار</span></div>
               </div>
               <div class="field">
@@ -116,12 +115,12 @@
             <div class="fields two">
               <div class="field">
                 <label for="ozSilverUsd">انس جهانی نقره (USD/oz) *</label>
-                <input id="ozSilverUsd" inputmode="decimal" placeholder="TGJU: /profile/silver" />
+                <input id="ozSilverUsd" inputmode="decimal" placeholder="TGJU: silver" />
                 <div class="unitRow"><span>دلار/انس</span><span class="chip">خودکار</span></div>
               </div>
               <div class="field">
                 <label for="gSilver">قیمت هر گرم نقره ۹۹۹ (ایران)</label>
-                <input id="gSilver" inputmode="numeric" placeholder="TGJU: /profile/silver_999" />
+                <input id="gSilver" inputmode="numeric" placeholder="TGJU: silver_999" />
                 <div class="unitRow"><span>تومان/گرم</span><span class="chip">خودکار</span></div>
               </div>
             </div>
@@ -149,7 +148,7 @@
             <button class="action btnGhost" id="btnReset" type="button">پاک‌کردن</button>
           </div>
           <div class="note">
-            اگر دریافت انجام نشد، لطفاً VPN خود را خاموش یا روشن کنید و دوباره تست کنید. این ابزار از AllOrigins برای خواندن سایت استفاده می‌کند.
+           ⚠️ <b>توجه:</b> TGJU محدودیت‌های شدیدی دارد. اگر دکمه کار نکرد، چند لحظه صبر کنید یا از VPN دیگری استفاده کنید. ما از سرور <code>corsproxy.io</code> استفاده می‌کنیم.
           </div>
         </div>
       </section>
@@ -242,7 +241,7 @@
     (function(){
       const GRAMS_PER_TROY_OUNCE = 31.1034768;
 
-      // آدرس‌ها طبق درخواست شما
+      // لینک‌های اصلی
       const TGJU = {
         gold24: "https://www.tgju.org/profile/geram24/today",
         gold18: "https://www.tgju.org/profile/geram18",
@@ -273,7 +272,7 @@
       };
 
       // ---------- Theme ----------
-      const THEME_KEY = "emk_bubble_tgju_theme_v2";
+      const THEME_KEY = "emk_bubble_tgju_theme_v3";
       function applyTheme(theme){
         document.documentElement.setAttribute("data-theme", theme);
         el.themeToggle.checked = (theme === "light");
@@ -324,23 +323,38 @@
         return (ozUsd * usdIrt) / GRAMS_PER_TROY_OUNCE;
       }
 
-      // ---------- NEW FETCH LOGIC (AllOrigins) ----------
+      // ---------- NEW FETCH LOGIC (corsproxy.io) ----------
       async function fetchHtml(targetUrl){
-        // استفاده از پروکسی allorigins برای عبور از CORS
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
-        const res = await fetch(proxyUrl);
-        if (!res.ok) throw new Error("Network error");
-        const json = await res.json();
-        return json.contents; // محتوای HTML داخل فیلد contents است
+        // استفاده از corsproxy.io که معمولا قوی تر از allorigins است
+        // فرمت: https://corsproxy.io/? + آدرس کامل
+        const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(targetUrl);
+        
+        try {
+          const res = await fetch(proxyUrl, { cache: "no-store" });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return await res.text();
+        } catch (e) {
+          console.warn("Fetch failed for", targetUrl, e);
+          return null;
+        }
       }
 
       function extractPDrCotVal(html){
         if(!html) return null;
-        // پارس کردن HTML دریافتی
-        const doc = new DOMParser().parseFromString(html, "text/html");
-        // دنبال تگ span با مشخصه data-col="info.last_trade.PDrCotVal"
-        const node = doc.querySelector('[data-col="info.last_trade.PDrCotVal"]');
-        if (node && node.textContent) return node.textContent.trim();
+        // روش اول: جستجوی رشته‌ای دقیق (بسیار سریع و مقاوم در برابر خطای پارس)
+        // فرمت سایت: <span data-col="info.last_trade.PDrCotVal">123,456</span>
+        const match = html.match(/data-col="info\.last_trade\.PDrCotVal"[^>]*>([^<]+)<\/span>/);
+        if (match && match[1]) {
+           return match[1].trim();
+        }
+
+        // روش دوم: DOMParser (اگر ساختار پیچیده‌تر باشد)
+        try {
+          const doc = new DOMParser().parseFromString(html, "text/html");
+          const node = doc.querySelector('[data-col="info.last_trade.PDrCotVal"]');
+          if (node && node.textContent) return node.textContent.trim();
+        } catch(e){}
+        
         return null;
       }
 
@@ -357,36 +371,39 @@
         const btn = el.btnFetchAll;
         btn.disabled = true;
         setStatus("در حال دریافت...");
-        try{
-          // درخواست‌ها به صورت موازی ارسال می‌شوند
-          const [h24, h18, hOzG, hOzS, hAg] = await Promise.all([
-            fetchHtml(TGJU.gold24),
-            fetchHtml(TGJU.gold18),
-            fetchHtml(TGJU.goldOz),
-            fetchHtml(TGJU.silverOz),
-            fetchHtml(TGJU.silver999),
-          ]);
+        
+        // درخواست‌ها
+        const p24 = fetchHtml(TGJU.gold24);
+        const p18 = fetchHtml(TGJU.gold18);
+        const pOzG = fetchHtml(TGJU.goldOz);
+        const pOzS = fetchHtml(TGJU.silverOz);
+        const pAg = fetchHtml(TGJU.silver999);
 
-          const v24 = extractPDrCotVal(h24);
-          const v18 = extractPDrCotVal(h18);
-          const vOzG = extractPDrCotVal(hOzG);
-          const vOzS = extractPDrCotVal(hOzS);
-          const vAg = extractPDrCotVal(hAg);
+        // منتظر همه بمان
+        const [h24, h18, hOzG, hOzS, hAg] = await Promise.all([p24, p18, pOzG, pOzS, pAg]);
 
-          if (v24) el.g24.value = v24;
-          if (v18) el.g18.value = v18;
-          if (vOzG) el.ozGoldUsd.value = vOzG;
-          if (vOzS) el.ozSilverUsd.value = vOzS;
-          if (vAg) el.gSilver.value = vAg;
+        // استخراج
+        const v24 = extractPDrCotVal(h24);
+        const v18 = extractPDrCotVal(h18);
+        const vOzG = extractPDrCotVal(hOzG);
+        const vOzS = extractPDrCotVal(hOzS);
+        const vAg = extractPDrCotVal(hAg);
 
-          setStatus("آپدیت شد ✅");
+        let successCount = 0;
+        if (v24) { el.g24.value = v24; successCount++; }
+        if (v18) { el.g18.value = v18; successCount++; }
+        if (vOzG) { el.ozGoldUsd.value = vOzG; successCount++; }
+        if (vOzS) { el.ozSilverUsd.value = vOzS; successCount++; }
+        if (vAg) { el.gSilver.value = vAg; successCount++; }
+
+        btn.disabled = false;
+        
+        if(successCount > 0){
+          setStatus(`دریافت شد (${successCount} مورد) ✅`);
           calc();
-        }catch(e){
-          console.error(e);
-          setStatus("خطا در دریافت (پروکسی/نت)");
-          alert("خطا در دریافت اطلاعات. ممکن است سایت مقصد (TGJU) موقتاً دسترسی پروکسی را بسته باشد یا نیاز به VPN داشته باشید.");
-        }finally{
-          btn.disabled = false;
+        } else {
+          setStatus("خطا در دریافت ❌");
+          alert("متاسفانه سرور TGJU درخواست را مسدود کرد. لطفاً VPN خود را خاموش/روشن کنید یا مقادیر را دستی وارد کنید.");
         }
       }
 
