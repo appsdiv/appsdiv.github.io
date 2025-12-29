@@ -1,0 +1,876 @@
+<!doctype html>
+<html lang="fa" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>محاسبه‌گر حباب طلا</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* iOS Colors - Dark Mode Default */
+      --bg-body: #000000;
+      --bg-secondary: #1C1C1E;
+      --bg-tertiary: #2C2C2E;
+      --bg-grouped: #000000;
+      --card-bg: #1C1C1E;
+      
+      --separator: rgba(84, 84, 88, 0.65);
+      --separator-non-opaque: #38383A;
+      
+      --label-primary: #FFFFFF;
+      --label-secondary: #EBEBF599; /* 60% */
+      --label-tertiary: #EBEBF54D;  /* 30% */
+      
+      --blue: #0A84FF;
+      --green: #30D158;
+      --indigo: #5E5CE6;
+      --orange: #FF9F0A;
+      --pink: #FF375F;
+      --purple: #BF5AF2;
+      --red: #FF453A;
+      --teal: #64D2FF;
+      --yellow: #FFD60A;
+      
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.12);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.24);
+      
+      --radius-card: 18px;
+      --radius-sm: 10px;
+      
+      --safe-top: env(safe-area-inset-top);
+      --safe-bottom: env(safe-area-inset-bottom);
+    }
+
+    [data-theme="light"] {
+      --bg-body: #F2F2F7;
+      --bg-secondary: #FFFFFF;
+      --bg-tertiary: #FFFFFF;
+      --bg-grouped: #F2F2F7;
+      --card-bg: #FFFFFF;
+      
+      --separator: rgba(60, 60, 67, 0.36);
+      --separator-non-opaque: #C6C6C8;
+      
+      --label-primary: #000000;
+      --label-secondary: #3C3C4399;
+      --label-tertiary: #3C3C434D;
+      
+      --blue: #007AFF;
+      --green: #34C759;
+      --indigo: #5856D6;
+      --orange: #FF9500;
+      --pink: #FF2D55;
+      --purple: #AF52DE;
+      --red: #FF3B30;
+      --teal: #5AC8FA;
+      --yellow: #FFCC00;
+      
+      --shadow-sm: 0 2px 10px rgba(0,0,0,0.05);
+      --shadow-md: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Vazirmatn", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-grouped);
+      color: var(--label-primary);
+      padding-bottom: calc(80px + var(--safe-bottom)); /* Space for bottom bar/scroll */
+      transition: background-color 0.3s ease;
+    }
+
+    /* Typography */
+    h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; margin: 0; }
+    h2 { font-size: 20px; font-weight: 600; margin: 0 0 8px; color: var(--label-primary); }
+    .section-header {
+      font-size: 13px;
+      color: var(--label-secondary);
+      text-transform: uppercase;
+      margin: 24px 16px 8px;
+      padding-right: 4px;
+    }
+    .caption { font-size: 12px; color: var(--label-secondary); }
+
+    /* Layout */
+    .container { max-width: 600px; margin: 0 auto; padding: 0 16px; }
+    
+    /* Header */
+    .app-header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(var(--bg-grouped), 0.8); /* Falls back to solid if var invalid, but handled by JS usually. using simple bg */
+      background: var(--bg-body);
+      padding-top: max(12px, var(--safe-top));
+      padding-bottom: 12px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 0.5px solid var(--separator);
+      display: flex; justify-content: space-between; align-items: flex-end;
+    }
+    [data-theme="dark"] .app-header { background: rgba(0,0,0,0.75); }
+    [data-theme="light"] .app-header { background: rgba(242,242,247,0.85); }
+
+    .header-content { padding: 0 16px; width: 100%; display: flex; justify-content: space-between; align-items: center; }
+    .header-title div { font-size: 13px; color: var(--label-secondary); margin-top: 2px; }
+
+    /* iOS Segmented Control */
+    .segment-wrapper { padding: 10px 16px; background: var(--bg-grouped); }
+    .segment {
+      display: flex;
+      background: var(--separator-non-opaque); /* dark: 38383A, light: 7676801F */
+      background: rgba(118, 118, 128, 0.24);
+      padding: 2px;
+      border-radius: 9px;
+      position: relative;
+    }
+    .segment button {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 6px 0;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--label-primary);
+      border-radius: 7px;
+      cursor: pointer;
+      z-index: 2;
+      transition: all 0.2s ease;
+    }
+    .segment button[aria-pressed="true"] {
+      font-weight: 600;
+      color: var(--label-primary);
+      background: var(--bg-secondary);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.12), 0 3px 1px rgba(0,0,0,0.04);
+    }
+
+    /* iOS List Group (Inputs) */
+    .ios-list {
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .ios-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 16px;
+      border-bottom: 0.5px solid var(--separator);
+      min-height: 48px;
+    }
+    .ios-item:last-child { border-bottom: none; }
+    
+    .ios-label { font-size: 16px; flex: 1; color: var(--label-primary); white-space: nowrap; }
+    .ios-input-wrap { flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: 6px; }
+    .ios-input {
+      border: none; background: transparent;
+      text-align: left; direction: ltr;
+      font-size: 17px; color: var(--blue);
+      font-weight: 400; width: 100%; outline: none;
+      font-family: inherit;
+    }
+    .ios-input::placeholder { color: var(--label-tertiary); }
+    .ios-unit { font-size: 15px; color: var(--label-secondary); }
+
+    /* Switches & Selects */
+    select.ios-select {
+      appearance: none; border: none; background: transparent;
+      font-size: 16px; color: var(--blue); direction: rtl;
+      padding-left: 16px; outline: none; font-family: inherit;
+    }
+    .toggle-wrapper { position: relative; display: inline-block; width: 51px; height: 31px; }
+    .toggle-input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background-color: var(--separator-non-opaque); /* Inactive */
+      background-color: rgba(120, 120, 128, 0.32);
+      transition: .4s; border-radius: 34px;
+    }
+    .toggle-slider:before {
+      position: absolute; content: ""; height: 27px; width: 27px; left: 2px; bottom: 2px;
+      background-color: white; transition: .4s; border-radius: 50%;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15), 0 3px 1px rgba(0,0,0,0.06);
+    }
+    .toggle-input:checked + .toggle-slider { background-color: var(--green); }
+    .toggle-input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+    /* Primary Action Button */
+    .action-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      margin: 24px 16px;
+    }
+    .btn {
+      border: none; padding: 14px;
+      border-radius: 12px;
+      font-size: 16px; font-weight: 600; font-family: inherit;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: transform 0.1s;
+    }
+    .btn:active { transform: scale(0.97); opacity: 0.8; }
+    
+    .btn-primary { background: var(--blue); color: white; box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3); width: 100%; }
+    .btn-secondary { background: var(--bg-secondary); color: var(--blue); }
+    .btn-danger { background: rgba(255, 69, 58, 0.15); color: var(--red); }
+    
+    .btn-fetch {
+        grid-column: span 2;
+        background: var(--bg-secondary);
+        color: var(--blue);
+        border: 1px solid rgba(10, 132, 255, 0.1);
+    }
+
+    /* Results Widgets */
+    .widget-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      padding: 0 16px; margin-bottom: 24px;
+    }
+    .widget {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      padding: 16px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      min-height: 110px;
+      position: relative;
+    }
+    .widget.full { grid-column: span 2; min-height: auto; flex-direction: row; align-items: center; }
+    
+    .w-label { font-size: 13px; font-weight: 500; color: var(--label-secondary); margin-bottom: 4px; }
+    .w-value { font-size: 22px; font-weight: 700; color: var(--label-primary); letter-spacing: -0.5px; }
+    .w-sub { font-size: 12px; color: var(--label-secondary); margin-top: auto; padding-top: 8px; }
+    
+    .badge {
+      padding: 4px 10px; border-radius: 100px;
+      font-size: 11px; font-weight: 700;
+      margin-left: auto;
+    }
+    .pos { color: var(--red); } /* Price up/Expensive = Red in finance mostly, but Bubble logic: Pos Bubble = Expensive */
+    .neg { color: var(--green); } /* Neg Bubble = Cheap/Value */
+    
+    /* Analysis Box */
+    .analysis-card {
+      margin: 0 16px 24px;
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      padding: 16px;
+      border-left: 4px solid var(--separator);
+    }
+    .analysis-card.ok { border-color: var(--green); background: linear-gradient(90deg, rgba(48, 209, 88, 0.1), var(--card-bg) 40%); }
+    .analysis-card.bad { border-color: var(--red); background: linear-gradient(90deg, rgba(255, 69, 58, 0.1), var(--card-bg) 40%); }
+    .analysis-card.mid { border-color: var(--orange); background: linear-gradient(90deg, rgba(255, 159, 10, 0.1), var(--card-bg) 40%); }
+
+    /* Progress & Live Log */
+    .progress-bar-wrap {
+      margin: 10px 16px 20px;
+      height: 4px; background: var(--separator-non-opaque);
+      border-radius: 10px; overflow: hidden;
+      position: relative;
+    }
+    .progress-fill {
+      height: 100%; width: 0%;
+      background: var(--blue);
+      border-radius: 10px;
+      transition: width 0.3s ease;
+    }
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; background: var(--bg-secondary);
+      border-radius: 20px; font-size: 11px; font-weight: 600;
+      color: var(--label-secondary);
+      margin-right: 16px;
+    }
+    
+    /* Log Terminal - Apple Style */
+    .terminal {
+      background: #000;
+      color: #0f0;
+      font-family: "Menlo", monospace;
+      font-size: 10px;
+      padding: 12px;
+      margin: 0 16px 30px;
+      border-radius: 12px;
+      max-height: 120px;
+      overflow-y: auto;
+      border: 1px solid #333;
+      display: none; /* Hidden by default */
+    }
+    .terminal.active { display: block; }
+    .logLine { display: flex; gap: 8px; margin-bottom: 4px; border-bottom: 1px solid #111; padding-bottom: 2px; }
+    .logTs { color: #666; width: 60px; }
+    .logOk { color: #30D158; }
+    .logWarn { color: #FFD60A; }
+    .logBad { color: #FF453A; }
+
+    /* Utility */
+    .hidden { display: none; }
+    .spin {
+      width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Report hidden area for copy */
+    #report { display: none; }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="header-content">
+      <div>
+        <h1>حباب طلا</h1>
+        <div class="header-title">
+          <div id="liveMode" style="display:inline-block">نسخه حرفه‌ای</div>
+          <span id="liveSpinner" class="spin" style="display:none; vertical-align:middle; margin-right:5px"></span>
+        </div>
+      </div>
+      
+      <label class="toggle-wrapper" title="Dark/Light Mode">
+        <input id="themeToggle" class="toggle-input" type="checkbox">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </header>
+
+  <div class="segment-wrapper">
+    <div class="segment" role="tablist">
+      <button id="tabGold" aria-pressed="true" type="button">طلا</button>
+      <button id="tabSilver" aria-pressed="false" type="button">نقره</button>
+      <button id="tabBars" aria-pressed="false" type="button">شمش</button>
+    </div>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <div id="progressFill" class="progressFill"></div>
+  </div>
+  <div style="padding:0 16px; display:flex; justify-content:space-between; font-size:11px; color:var(--label-secondary); margin-top:-14px; margin-bottom:12px;">
+    <span id="statusText">آماده محاسبه</span>
+    <span><span id="progressPct">0%</span> <span id="progressTimer" style="margin-right:4px; opacity:0.7"></span></span>
+  </div>
+
+  <div class="container">
+    
+    <div class="section-header">تنظیمات پایه</div>
+    <div class="ios-list">
+      <div class="ios-item">
+        <div class="ios-label">قیمت دلار</div>
+        <div class="ios-input-wrap">
+          <input id="usdIrt" type="text" inputmode="numeric" class="ios-input" placeholder="مثلاً 68500" />
+          <span class="ios-unit">تومان</span>
+        </div>
+      </div>
+      <div class="ios-item">
+        <div class="ios-label">پریمیوم مجاز</div>
+        <div class="ios-input-wrap">
+          <input id="premiumPct" type="text" inputmode="decimal" class="ios-input" placeholder="3" />
+          <span class="ios-unit">٪</span>
+        </div>
+      </div>
+      <div class="ios-item">
+        <div class="ios-label">واحد ورودی TGJU</div>
+        <div class="ios-input-wrap">
+          <select id="tgjuUnit" class="ios-select">
+            <option value="rial_to_toman">ریال (تبدیل خودکار)</option>
+            <option value="rial_keep">ریال (بدون تغییر)</option>
+            <option value="toman_keep">تومان</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div id="panelGold">
+      <div class="section-header">نرخ‌های طلا</div>
+      <div class="ios-list">
+        <div class="ios-item">
+          <div class="ios-label">انس جهانی</div>
+          <div class="ios-input-wrap">
+            <input id="ozGoldUsd" type="text" inputmode="decimal" class="ios-input" placeholder="USD" />
+            <span class="ios-unit">$</span>
+          </div>
+        </div>
+        <div class="ios-item">
+          <div class="ios-label">گرم ۲۴ عیار</div>
+          <div class="ios-input-wrap">
+            <input id="g24" type="text" inputmode="numeric" class="ios-input" placeholder="قیمت بازار" />
+            <span class="ios-unit">T</span>
+          </div>
+        </div>
+        <div class="ios-item">
+          <div class="ios-label">گرم ۱۸ عیار</div>
+          <div class="ios-input-wrap">
+            <input id="g18" type="text" inputmode="numeric" class="ios-input" placeholder="قیمت بازار" />
+            <span class="ios-unit">T</span>
+          </div>
+        </div>
+        <div class="ios-item">
+          <div class="ios-label">محاسبه خودکار ۱۸؟</div>
+          <div class="ios-input-wrap">
+            <input id="auto18" type="text" inputmode="numeric" class="ios-input" placeholder="0 یا 1" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panelSilver" class="hidden">
+      <div class="section-header">نرخ‌های نقره</div>
+      <div class="ios-list">
+        <div class="ios-item">
+          <div class="ios-label">انس نقره</div>
+          <div class="ios-input-wrap">
+            <input id="ozSilverUsd" type="text" inputmode="decimal" class="ios-input" placeholder="USD" />
+            <span class="ios-unit">$</span>
+          </div>
+        </div>
+        <div class="ios-item">
+          <div class="ios-label">گرم نقره ۹۹۹</div>
+          <div class="ios-input-wrap">
+            <input id="gSilver" type="text" inputmode="numeric" class="ios-input" placeholder="قیمت بازار" />
+            <span class="ios-unit">T</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panelBars" class="hidden">
+      <div class="section-header">وزن شمش‌ها</div>
+      <div class="ios-list">
+        <div class="ios-item">
+          <div class="ios-label">وزن شمش طلا</div>
+          <div class="ios-input-wrap">
+            <input id="goldBarW" type="text" inputmode="decimal" class="ios-input" placeholder="وزن" />
+            <span class="ios-unit">g</span>
+          </div>
+        </div>
+        <div class="ios-item">
+          <div class="ios-label">وزن شمش نقره</div>
+          <div class="ios-input-wrap">
+            <input id="silverBarW" type="text" inputmode="decimal" class="ios-input" placeholder="وزن" />
+            <span class="ios-unit">g</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button id="btnFetchAll" class="btn btn-fetch">
+        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+        دریافت نرخ‌ها
+      </button>
+      <button id="btnCalc" class="btn btn-primary">محاسبه</button>
+      <button id="btnReset" class="btn btn-secondary">پاک‌کردن</button>
+      <button id="btnCopy" class="btn btn-secondary" style="grid-column: span 2; margin-top:8px">کپی گزارش</button>
+      <button id="btnAbort" class="btn btn-danger" style="display:none; grid-column: span 2;">لغو دریافت</button>
+    </div>
+
+    <div style="text-align:center; margin-bottom:12px;">
+      <span class="status-pill" id="logToggleBtn" onclick="document.getElementById('logBody').classList.toggle('active')">
+        نمایش لاگ سیستم (<span id="logCounter">0</span>) • <span id="cacheBadge">Cache: Off</span>
+      </span>
+      <span class="hidden" id="btnClearLog"></span> <span class="hidden" id="progressStep"></span> </div>
+    <div id="logBody" class="terminal"></div>
+
+    <div class="section-header">نتیجه تحلیل</div>
+    
+    <div class="analysis-card" id="analysis">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
+        <span class="w-label">وضعیت خرید</span>
+        <span class="badge" id="analysisBadgeText" style="background:var(--bg-secondary); color:var(--label-primary)">—</span>
+      </div>
+      <div id="analysisText" style="font-size:13px; line-height:1.6; color:var(--label-primary)">
+        داده‌ها را وارد کنید.
+      </div>
+    </div>
+
+    <div class="widget-grid">
+      <div class="widget">
+        <div class="w-label">حباب ۲۴ عیار</div>
+        <div class="w-value" id="bubbleGold24">—</div>
+        <div class="w-sub" id="bubbleGold24p">—</div>
+      </div>
+      <div class="widget">
+        <div class="w-label">قیمت تئوریک (24)</div>
+        <div class="w-value" id="theoGold24" style="font-size:18px; margin-top:auto">—</div>
+      </div>
+      
+      <div class="widget">
+        <div class="w-label">حباب ۱۸ عیار</div>
+        <div class="w-value" id="bubbleGold18">—</div>
+        <div class="w-sub" id="bubbleGold18p">—</div>
+      </div>
+      <div class="widget">
+        <div class="w-label">قیمت تئوریک (18)</div>
+        <div class="w-value" id="theoGold18" style="font-size:18px; margin-top:auto">—</div>
+      </div>
+
+      <div class="widget full">
+        <div style="flex:1">
+          <div class="w-label">نقره ۹۹۹</div>
+          <div class="w-value" id="bubbleSilver">—</div>
+          <div class="w-sub" id="bubbleSilverp">—</div>
+        </div>
+        <div style="text-align:left">
+          <div class="w-label">تئوریک</div>
+          <div class="w-value" id="theoSilver" style="font-size:16px">—</div>
+        </div>
+      </div>
+
+      <div class="widget">
+        <div class="w-label">شمش طلا</div>
+        <div class="w-value" id="goldBarVal" style="font-size:14px; margin-top:auto">—</div>
+        <div class="w-sub" id="goldBarNote">—</div>
+      </div>
+      <div class="widget">
+        <div class="w-label">شمش نقره</div>
+        <div class="w-value" id="silverBarVal" style="font-size:14px; margin-top:auto">—</div>
+        <div class="w-sub" id="silverBarNote">—</div>
+      </div>
+    </div>
+    
+    <div id="report"></div>
+
+    <div style="text-align:center; padding:20px; font-size:11px; color:var(--label-tertiary);">
+      Designed for iOS • Theo Formula: (OZ × USD) ÷ 31.103
+    </div>
+
+  </div>
+
+<script>
+    (function(){
+      /* --- تنظیمات ثابت --- */
+      const GRAMS_PER_TROY_OUNCE = 31.1034768;
+      
+      // لیست دقیق آدرس‌هایی که شما خواستید
+      const TARGETS = [
+        { key: "dollar",    url: "https://www.tgju.org/profile/price_dollar_rl", label: "دلار" },
+        { key: "gold24",    url: "https://www.tgju.org/profile/geram24",        label: "گرم ۲۴ عیار" },
+        { key: "gold18",    url: "https://www.tgju.org/profile/geram18",        label: "گرم ۱۸ عیار" },
+        { key: "goldOz",    url: "https://www.tgju.org/profile/ons",            label: "انس طلا" },
+        { key: "silverOz",  url: "https://www.tgju.org/profile/silver",         label: "انس نقره" },
+        { key: "silver999", url: "https://www.tgju.org/profile/silver_999",     label: "نقره ۹۹۹" }
+      ];
+
+      /* --- دسترسی به المان‌ها --- */
+      const $ = (id)=>document.getElementById(id);
+      const el = {
+        themeToggle: $("themeToggle"),
+        tabGold: $("tabGold"), tabSilver: $("tabSilver"), tabBars: $("tabBars"),
+        panelGold: $("panelGold"), panelSilver: $("panelSilver"), panelBars: $("panelBars"),
+        statusText: $("statusText"), liveMode: $("liveMode"), liveSpinner: $("liveSpinner"),
+        progressFill: $("progressFill"), progressPct: $("progressPct"), progressTimer: $("progressTimer"),
+        logBody: $("logBody"), logCounter: $("logCounter"), cacheBadge: $("cacheBadge"),
+        tgjuUnit: $("tgjuUnit"),
+        usdIrt: $("usdIrt"), premiumPct: $("premiumPct"),
+        ozGoldUsd: $("ozGoldUsd"), g24: $("g24"), g18: $("g18"), auto18: $("auto18"),
+        ozSilverUsd: $("ozSilverUsd"), gSilver: $("gSilver"),
+        goldBarW: $("goldBarW"), silverBarW: $("silverBarW"),
+        theoGold24: $("theoGold24"), theoGold18: $("theoGold18"),
+        bubbleGold24: $("bubbleGold24"), bubbleGold18: $("bubbleGold18"),
+        bubbleGold24p: $("bubbleGold24p"), bubbleGold18p: $("bubbleGold18p"),
+        theoSilver: $("theoSilver"), bubbleSilver: $("bubbleSilver"), bubbleSilverp: $("bubbleSilverp"),
+        goldBarVal: $("goldBarVal"), silverBarVal: $("silverBarVal"),
+        goldBarNote: $("goldBarNote"), silverBarNote: $("silverBarNote"),
+        analysisBadgeText: $("analysisBadgeText"), analysisText: $("analysisText"),
+        report: $("report"),
+        btnFetchAll: $("btnFetchAll"), btnCalc: $("btnCalc"), btnCopy: $("btnCopy"),
+        btnReset: $("btnReset"), btnAbort: $("btnAbort"), btnClearLog: $("btnClearLog"),
+      };
+
+      /* --- مدیریت تم --- */
+      const THEME_KEY = "emk_bubble_theme_v8_specific";
+      function applyTheme(theme){
+        document.documentElement.setAttribute("data-theme", theme);
+        el.themeToggle.checked = (theme === "light");
+        localStorage.setItem(THEME_KEY, theme);
+      }
+      applyTheme(localStorage.getItem(THEME_KEY) || "dark");
+      el.themeToggle.addEventListener("change", ()=> applyTheme(el.themeToggle.checked ? "light" : "dark"));
+
+      /* --- مدیریت تب‌ها --- */
+      function setTab(which){
+        const map = {gold: which==="gold", silver: which==="silver", bars: which==="bars"};
+        el.tabGold.setAttribute("aria-pressed", map.gold);
+        el.tabSilver.setAttribute("aria-pressed", map.silver);
+        el.tabBars.setAttribute("aria-pressed", map.bars);
+        el.panelGold.classList.toggle("hidden", !map.gold);
+        el.panelSilver.classList.toggle("hidden", !map.silver);
+        el.panelBars.classList.toggle("hidden", !map.bars);
+      }
+      ["Gold","Silver","Bars"].forEach(t => el["tab"+t].addEventListener("click", ()=>setTab(t.toLowerCase())));
+
+      /* --- توابع کمکی --- */
+      function normalizeNumber(str){
+        if (str == null) return NaN;
+        const fa = "۰۱۲۳۴۵۶۷۸۹", ar = "٠١٢٣٤٥٦٧٨٩";
+        str = String(str).trim();
+        for (let i=0;i<10;i++){ str = str.replaceAll(fa[i], String(i)).replaceAll(ar[i], String(i)); }
+        str = str.replace(/٫/g, ".").replace(/,/g, "").replace(/،/g, "").replace(/\s|\u200c/g, "");
+        const n = Number(str); return Number.isFinite(n) ? n : NaN;
+      }
+      function fmtToman(n){ return Number.isFinite(n) ? Math.round(n).toLocaleString("fa-IR") : "—"; }
+      function fmtPct(n){ return Number.isFinite(n) ? (Math.round(n*100)/100).toLocaleString("fa-IR") + "٪" : "—"; }
+      
+      function setBubbleUI(valueEl, pctEl, bubble, pct){
+        if (!Number.isFinite(bubble) || !Number.isFinite(pct)){
+          valueEl.innerHTML = `—`; pctEl.textContent = "—"; return;
+        }
+        const cls = bubble > 0 ? "pos" : "neg"; 
+        valueEl.innerHTML = `<span class="${cls}">${fmtToman(bubble)}</span>`;
+        pctEl.innerHTML = `<span class="${cls}" dir="ltr">${(pct>0?"+":"")+pct.toFixed(1)}%</span>`;
+      }
+      function convertTgjuLocalToTomanMaybe(n){
+        if (!Number.isFinite(n)) return NaN;
+        const mode = el.tgjuUnit.value;
+        if (mode === "rial_to_toman") return n / 10;
+        return n; 
+      }
+
+      /* --- سیستم لاگ و مدیریت درخواست --- */
+      let logLines = 0;
+      function log(msg, type="info"){
+        const line = document.createElement("div");
+        line.className = "logLine";
+        const cls = type==="ok"?"logOk":type==="warn"?"logWarn":type==="bad"?"logBad":"";
+        line.innerHTML = `<span class="logTs">${new Date().toLocaleTimeString('en-US',{hour12:false,minute:"2-digit",second:"2-digit"})}</span><span class="logMsg ${cls}">${msg}</span>`;
+        el.logBody.appendChild(line);
+        logLines++; el.logCounter.textContent = logLines;
+        el.logBody.scrollTop = el.logBody.scrollHeight;
+      }
+      el.btnClearLog.addEventListener("click", ()=>{ el.logBody.innerHTML=""; logLines=0; el.logCounter.textContent="0"; });
+
+      const fetchState = { controller: null };
+
+      // لیست پروکسی‌ها (بهترین‌ها برای عبور از تحریم)
+      const PROXY_LIST = [
+        { name: "CodeTabs", type: "text", url: (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}` },
+        { name: "AllOrigins", type: "json", url: (u) => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}` },
+        { name: "CorsProxy", type: "text", url: (u) => `https://corsproxy.io/?${encodeURIComponent(u)}` }
+      ];
+
+      const timeout = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), ms));
+
+      // تابع اصلی دریافت یک آدرس
+      async function fetchOneUrl(targetUrl) {
+        for (const proxy of PROXY_LIST) {
+          try {
+            const response = await Promise.race([
+              fetch(proxy.url(targetUrl), { signal: fetchState.controller.signal, cache: "no-store" }),
+              timeout(6000)
+            ]);
+            if (!response.ok) throw new Error("HttpErr");
+
+            let html = "";
+            if (proxy.type === "json") {
+              const data = await response.json();
+              html = data.contents;
+            } else {
+              html = await response.text();
+            }
+            if (!html || html.length < 500) throw new Error("Empty");
+            
+            return html; // موفقیت
+          } catch (err) {
+            // ادامه به پروکسی بعدی
+          }
+        }
+        return null; // شکست کامل
+      }
+
+      // تابع استخراج دقیق با Regex شما
+      function extractSpecificData(html) {
+        // الگوی دقیق: data-col="info.last_trade.PDrCotVal" ... >VALUE<
+        const regex = /data-col=["']info\.last_trade\.PDrCotVal["'][^>]*>([^<]+)<\/span>/i;
+        const m = html.match(regex);
+        if (m && m[1]) return m[1].trim();
+
+        // الگوی پشتیبان (ممکن است در موبایل کلاس value باشد)
+        const regex2 = /class=["']value["'][^>]*>([^<]+)<\/span>/i; // معمولا برای انس استفاده میشه
+        const m2 = html.match(regex2);
+        if (m2 && m2[1]) return m2[1].trim();
+
+        return null;
+      }
+
+      async function runFetchSequence(){
+        el.btnFetchAll.disabled = true;
+        el.btnAbort.style.display = "inline-flex";
+        el.liveSpinner.style.display = "inline-block";
+        el.liveMode.textContent = "در حال دریافت...";
+        el.logBody.innerHTML = ""; logLines=0; el.logCounter.textContent="0";
+        
+        fetchState.controller = new AbortController();
+        const results = {};
+        
+        log("شروع دریافت ترتیبی...", "info");
+
+        for (let i = 0; i < TARGETS.length; i++) {
+          const item = TARGETS[i];
+          const pct = Math.round(((i) / TARGETS.length) * 100);
+          el.progressFill.style.width = pct + "%";
+          el.progressPct.textContent = pct + "%";
+          el.statusText.textContent = `دریافت ${item.label}...`;
+
+          // وقفه برای جلوگیری از بن شدن (1.5 ثانیه)
+          if(i > 0) await new Promise(r => setTimeout(r, 1500));
+          
+          if (fetchState.controller.signal.aborted) break;
+
+          const html = await fetchOneUrl(item.url);
+          if (html) {
+            const val = extractSpecificData(html);
+            if (val) {
+              results[item.key] = val;
+              log(`✓ ${item.label}: ${val}`, "ok");
+            } else {
+              log(`✗ ${item.label}: داده یافت نشد`, "warn");
+            }
+          } else {
+            log(`✗ ${item.label}: خطا در اتصال`, "bad");
+          }
+        }
+
+        el.progressFill.style.width = "100%";
+        el.liveSpinner.style.display = "none";
+        el.liveMode.textContent = "نسخه حرفه‌ای";
+        el.btnFetchAll.disabled = false;
+        el.btnAbort.style.display = "none";
+        el.statusText.textContent = "پایان دریافت";
+
+        // اعمال مقادیر در فیلدها
+        if(Object.keys(results).length > 0) {
+            applyResultsToInputs(results);
+            calc();
+        }
+      }
+
+      function applyResultsToInputs(res) {
+        // دلار
+        if (res.dollar) {
+           let v = normalizeNumber(res.dollar);
+           if (v > 100000) v /= 10; 
+           el.usdIrt.value = v;
+        }
+        // گرم 24 (معمولا به ریال است)
+        if (res.gold24) el.g24.value = res.gold24;
+        // گرم 18
+        if (res.gold18) el.g18.value = res.gold18;
+        // انس طلا
+        if (res.goldOz) el.ozGoldUsd.value = res.goldOz;
+        // انس نقره
+        if (res.silverOz) el.ozSilverUsd.value = res.silverOz;
+        // نقره 999
+        if (res.silver999) el.gSilver.value = res.silver999;
+      }
+
+      el.btnAbort.addEventListener("click", () => {
+        if(fetchState.controller) fetchState.controller.abort();
+        log("توقف توسط کاربر", "warn");
+        el.liveSpinner.style.display = "none";
+        el.btnFetchAll.disabled = false;
+        el.btnAbort.style.display = "none";
+      });
+
+      /* --- محاسبات --- */
+      function analyze(name, bubblePct, allowedPremium){
+        if (!Number.isFinite(bubblePct)) return null;
+        const ap = Number.isFinite(allowedPremium) ? allowedPremium : 3;
+        if (bubblePct <= -ap) return {cls:"ok", verdict:"ارزنده", text:`${name}: ${fmtPct(Math.abs(bubblePct))} زیر تئوریک`};
+        if (bubblePct > ap) return {cls:"bad", verdict:"حباب بالا", text:`${name}: ${fmtPct(bubblePct)} بالای تئوریک`};
+        return {cls:"mid", verdict:"منصفانه", text:`${name}: قیمت نرمال`};
+      }
+
+      function calc(){
+        const usdIrt = normalizeNumber(el.usdIrt.value);
+        const premiumPct = normalizeNumber(el.premiumPct.value);
+        const ozGoldUsd = normalizeNumber(el.ozGoldUsd.value);
+        const auto18 = normalizeNumber(el.auto18.value);
+        const ozSilverUsd = normalizeNumber(el.ozSilverUsd.value);
+        const goldBarW = normalizeNumber(el.goldBarW.value);
+        const silverBarW = normalizeNumber(el.silverBarW.value);
+
+        let g24raw = normalizeNumber(el.g24.value);
+        let g18raw = normalizeNumber(el.g18.value);
+        let gSilverRaw = normalizeNumber(el.gSilver.value);
+
+        const g24 = (g24raw>0)? convertTgjuLocalToTomanMaybe(g24raw) : NaN;
+        let g18 = (g18raw>0)? convertTgjuLocalToTomanMaybe(g18raw) : NaN;
+        const gSilver = (gSilverRaw>0)? convertTgjuLocalToTomanMaybe(gSilverRaw) : NaN;
+
+        const theoGold24 = (ozGoldUsd * usdIrt) / GRAMS_PER_TROY_OUNCE;
+        const theoGold18 = Number.isFinite(theoGold24) ? theoGold24 * 0.75 : NaN;
+        const theoSilver = (ozSilverUsd * usdIrt) / GRAMS_PER_TROY_OUNCE;
+
+        if ((!Number.isFinite(g18)||g18<=0) && (auto18===1) && Number.isFinite(g24)){ g18 = g24*0.75; }
+
+        el.theoGold24.textContent = fmtToman(theoGold24);
+        el.theoGold18.textContent = fmtToman(theoGold18);
+        el.theoSilver.textContent = fmtToman(theoSilver);
+
+        const bG24 = (g24-theoGold24); const bG24p = (bG24/theoGold24)*100;
+        const bG18 = (g18-theoGold18); const bG18p = (bG18/theoGold18)*100;
+        const bSil = (gSilver-theoSilver); const bSilp = (bSil/theoSilver)*100;
+
+        setBubbleUI(el.bubbleGold24, el.bubbleGold24p, bG24, bG24p);
+        setBubbleUI(el.bubbleGold18, el.bubbleGold18p, bG18, bG18p);
+        setBubbleUI(el.bubbleSilver, el.bubbleSilverp, bSil, bSilp);
+
+        // Bars
+        const gBarTheo = theoGold24*goldBarW; const gBarMkt = g24*goldBarW;
+        if(goldBarW>0){
+           el.goldBarVal.innerHTML = `<span style="opacity:0.6">بازار:</span> ${fmtToman(gBarMkt)}`;
+           el.goldBarNote.innerHTML = `<span style="opacity:0.6">تئوریک:</span> ${fmtToman(gBarTheo)}`;
+        } else { el.goldBarVal.textContent="—"; el.goldBarNote.textContent="—"; }
+
+        const sBarTheo = theoSilver*silverBarW; const sBarMkt = gSilver*silverBarW;
+        if(silverBarW>0){
+           el.silverBarVal.innerHTML = `<span style="opacity:0.6">بازار:</span> ${fmtToman(sBarMkt)}`;
+           el.silverBarNote.innerHTML = `<span style="opacity:0.6">تئوریک:</span> ${fmtToman(sBarTheo)}`;
+        } else { el.silverBarVal.textContent="—"; el.silverBarNote.textContent="—"; }
+
+        // Analysis Badge
+        const insights = [];
+        const i1 = analyze("طلای ۲۴", bG24p, premiumPct);
+        const i2 = analyze("طلای ۱۸", bG18p, premiumPct);
+        const i3 = analyze("نقره", bSilp, premiumPct);
+        if(i1) insights.push(i1); if(i2) insights.push(i2); if(i3) insights.push(i3);
+
+        const badgeBox = document.querySelector("#analysis");
+        badgeBox.className = "analysis-card"; 
+        if(!insights.length){
+          el.analysisBadgeText.textContent="—"; el.analysisText.textContent="داده کافی نیست.";
+        } else {
+          const hasBad = insights.some(x=>x.cls==="bad");
+          const hasOk = insights.some(x=>x.cls==="ok");
+          const finalCls = hasBad?"bad":(hasOk?"ok":"mid");
+          badgeBox.classList.add(finalCls);
+          el.analysisBadgeText.textContent = hasBad?"احتیاط":(hasOk?"فرصت خرید":"عادی");
+          el.analysisText.innerHTML = insights.map(x=>`<b>${x.verdict}</b>: ${x.text}`).join("<br>");
+        }
+        
+        let rep = `دلار: ${fmtToman(usdIrt)}\n`;
+        if(Number.isFinite(ozGoldUsd)) rep+=`انس طلا: ${ozGoldUsd}\nحباب ۲۴: ${fmtPct(bG24p)}\nحباب ۱۸: ${fmtPct(bG18p)}\n`;
+        if(Number.isFinite(ozSilverUsd)) rep+=`انس نقره: ${ozSilverUsd}\nحباب نقره: ${fmtPct(bSilp)}`;
+        el.report.innerText = rep;
+      }
+
+      el.btnCalc.addEventListener("click", calc);
+      el.btnReset.addEventListener("click", ()=>{
+         [el.usdIrt, el.premiumPct, el.ozGoldUsd, el.g24, el.g18, el.auto18, el.ozSilverUsd, el.gSilver, el.goldBarW, el.silverBarW].forEach(x=>x.value="");
+         calc();
+      });
+      el.btnCopy.addEventListener("click", async ()=>{
+        try{ await navigator.clipboard.writeText(el.report.innerText); alert("کپی شد"); }catch{}
+      });
+      [el.usdIrt, el.premiumPct, el.ozGoldUsd, el.g24, el.g18, el.auto18, el.ozSilverUsd, el.gSilver, el.goldBarW, el.silverBarW].forEach(i=>i.addEventListener("input", ()=>setTimeout(calc, 200)));
+
+      el.btnFetchAll.addEventListener("click", runFetchSequence);
+
+      setTab("gold");
+    })();
+  </script>
+</body>
+</html>
