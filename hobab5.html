@@ -1,0 +1,1253 @@
+<!doctype html>
+<html lang="fa" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>محاسبه‌گر حباب طلا و نقره — Apple-like UI + Progress + Live Log</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg0:#0b1220;
+      --bg1:#0a0f1a;
+      --card: rgba(255,255,255,.07);
+      --card2: rgba(255,255,255,.10);
+      --stroke: rgba(255,255,255,.10);
+      --text:#eaf1ff;
+      --muted: rgba(234,241,255,.72);
+      --muted2: rgba(234,241,255,.55);
+      --accent:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --good:#22c55e;
+
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --shadowSoft: 0 12px 36px rgba(0,0,0,.25);
+      --r: 20px;
+      --r2: 16px;
+      --r3: 14px;
+
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    [data-theme="light"]{
+      --bg0:#f6f7fb;
+      --bg1:#ffffff;
+      --card: rgba(10,18,32,.05);
+      --card2: rgba(10,18,32,.07);
+      --stroke: rgba(10,18,32,.10);
+      --text:#0b1220;
+      --muted: rgba(11,18,32,.68);
+      --muted2: rgba(11,18,32,.50);
+      --shadow: 0 18px 50px rgba(10,18,32,.10);
+      --shadowSoft: 0 10px 28px rgba(10,18,32,.08);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Vazirmatn", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 520px at 20% -10%, rgba(52,211,153,.20), transparent 55%),
+        radial-gradient(820px 520px at 105% 0%, rgba(251,191,36,.12), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      padding:14px;
+      letter-spacing:-.2px;
+    }
+
+    .wrap{max-width:1040px;margin:0 auto;display:grid;gap:12px}
+
+    /* Top Bar */
+    .topbar{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+      padding:12px 12px 6px;
+    }
+    .titleBox h1{margin:0;font-size:18px;font-weight:950;line-height:1.25}
+    .titleBox .sub{
+      margin:7px 0 0;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.9;
+    }
+
+    .topActions{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end}
+    .pill{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:9px 10px;
+      border:1px solid var(--stroke);
+      border-radius:999px;
+      background: linear-gradient(180deg, var(--card), var(--card2));
+      box-shadow: var(--shadowSoft);
+      user-select:none;
+      backdrop-filter: blur(10px);
+    }
+    .pill .label{font-size:11px;color:var(--muted)}
+    .toggle{
+      appearance:none; width:46px; height:28px; border-radius:999px;
+      background: rgba(255,255,255,.16);
+      border:1px solid var(--stroke);
+      position:relative; outline:none; cursor:pointer;
+    }
+    [data-theme="light"] .toggle{ background: rgba(10,18,32,.10); }
+    .toggle::after{
+      content:"";
+      position:absolute; top:50%; transform:translateY(-50%);
+      right:3px; width:22px; height:22px; border-radius:50%;
+      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.70));
+      box-shadow: 0 10px 18px rgba(0,0,0,.20);
+      transition: all .22s ease;
+    }
+    .toggle:checked::after{ right:21px; }
+
+    /* Segmented tabs */
+    .seg{
+      display:flex; gap:8px; flex-wrap:wrap;
+      padding:0 12px;
+    }
+    .seg button{
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      padding:9px 12px;
+      border-radius:999px;
+      font-family:inherit;
+      font-weight:950;
+      font-size:12px;
+      cursor:pointer;
+      transition: transform .12s ease, background .2s ease, border-color .2s ease;
+      backdrop-filter: blur(10px);
+    }
+    .seg button:hover{ transform: translateY(-1px); }
+    .seg button[aria-pressed="true"]{
+      background: linear-gradient(135deg, rgba(52,211,153,.18), rgba(34,197,94,.10));
+      border-color: rgba(52,211,153,.55);
+      box-shadow: 0 16px 36px rgba(34,197,94,.10);
+    }
+
+    /* Layout */
+    .grid{display:grid; grid-template-columns:1fr; gap:12px}
+    @media (min-width:960px){ .grid{grid-template-columns: 1.05fr .95fr} }
+
+    .card{
+      border:1px solid var(--stroke);
+      border-radius: var(--r);
+      background: linear-gradient(180deg, var(--card), var(--card2));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      backdrop-filter: blur(14px);
+    }
+    .cardHead{
+      padding:12px 14px 10px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom:1px solid var(--stroke);
+    }
+    .cardHead .h2{margin:0;font-size:13px;font-weight:950}
+    .cardHead .hint{margin-top:6px;font-size:11px;color:var(--muted)}
+    .tag{
+      display:inline-flex; align-items:center; gap:7px;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.05);
+      color:var(--muted);
+      font-size:11px;
+      white-space:nowrap;
+    }
+
+    /* Progress strip (Apple-like) */
+    .progressWrap{
+      padding:10px 14px 0;
+    }
+    .progressLine{
+      height:10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--stroke);
+      overflow:hidden;
+    }
+    .progressFill{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background: linear-gradient(90deg, rgba(52,211,153,.90), rgba(34,197,94,.88));
+      box-shadow: 0 14px 40px rgba(34,197,94,.22);
+      transition: width .25s ease;
+    }
+    .progressMeta{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin-top:8px;
+      color:var(--muted);
+      font-size:11px;
+      line-height:1.6;
+    }
+    .progressMeta b{color:var(--text)}
+    .chip{
+      font-size:10px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.05);
+      color:var(--muted);
+      white-space:nowrap;
+    }
+
+    .cardBody{padding:12px 14px 14px}
+
+    /* Fields */
+    .fields{display:grid; gap:10px; grid-template-columns:1fr;}
+    @media (min-width:560px){ .fields.two{grid-template-columns:1fr 1fr} }
+    .field{
+      padding:10px 11px 9px;
+      border:1px solid var(--stroke);
+      border-radius: var(--r2);
+      background: rgba(255,255,255,.04);
+    }
+    label{display:block;font-size:11px;color:var(--muted);margin-bottom:7px}
+    input{
+      width:100%;
+      border:0; outline:none;
+      background:transparent;
+      color:var(--text);
+      font-size:14px;
+      font-weight:950;
+      padding:2px 0 0;
+      text-align:left; direction:ltr;
+      letter-spacing:.1px;
+    }
+    .unitRow{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin-top:7px;
+      font-size:11px; color:var(--muted);
+    }
+    select{
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.05);
+      color:var(--text);
+      border-radius: 12px;
+      padding:9px 10px;
+      font-family:inherit;
+      font-weight:900;
+      font-size:12px;
+      outline:none;
+    }
+    .miniRow{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+    .mini{
+      display:flex; align-items:center; gap:10px;
+      padding:9px 10px;
+      border:1px solid var(--stroke);
+      border-radius: var(--r2);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      font-size:11px;
+    }
+
+    /* Buttons */
+    .actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+    button.action{
+      border:0; cursor:pointer;
+      border-radius: 14px;
+      padding:12px 12px;
+      font-family:inherit;
+      font-weight:950;
+      font-size:13px;
+      transition: transform .12s ease, filter .2s ease, opacity .2s ease;
+    }
+    button.action:active{transform:scale(.99)}
+    .btnPrimary{
+      background: linear-gradient(135deg, rgba(52,211,153,.95), rgba(34,197,94,.88));
+      color:#052014;
+      box-shadow: 0 18px 46px rgba(34,197,94,.18);
+    }
+    .btnGhost{
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      border:1px solid var(--stroke);
+    }
+    .btnFetch{
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      border:1px solid var(--stroke);
+    }
+    .btnDanger{
+      background: linear-gradient(135deg, rgba(251,113,133,.22), rgba(251,113,133,.12));
+      color:var(--text);
+      border:1px solid rgba(251,113,133,.35);
+    }
+    .btnFetch[disabled], .btnPrimary[disabled]{opacity:.55; cursor:not-allowed}
+
+    .note{
+      margin-top:10px;
+      font-size:11px;
+      color:var(--muted);
+      line-height:1.9;
+    }
+
+    /* Results */
+    .kpiRow{display:grid; gap:10px; grid-template-columns:1fr}
+    @media (min-width:560px){ .kpiRow{grid-template-columns:1fr 1fr} }
+    .kpi{
+      padding:12px 12px;
+      border-radius: var(--r2);
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.04);
+    }
+    .kpi .k{font-size:11px;color:var(--muted);margin-bottom:7px}
+    .kpi .v{font-size:18px;font-weight:980;letter-spacing:-.3px}
+    .kpi .s{font-size:11px;color:var(--muted);margin-top:7px}
+
+    .hr{height:1px; background: var(--stroke); margin:10px 0}
+    .pos{color:var(--warn); font-weight:980}
+    .neg{color:var(--accent); font-weight:980}
+    .na{color:var(--muted); font-weight:900}
+
+    .analysisBox{
+      padding:12px;
+      border-radius: var(--r2);
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.04);
+      font-size:11px;
+      line-height:2.0;
+      color:var(--muted);
+      margin-top:10px;
+    }
+    .analysisBox b{color:var(--text)}
+    .analysisBadge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.05);
+      font-size:11px;
+      margin-bottom:10px;
+      user-select:none;
+    }
+    .ok{color:var(--good); font-weight:980}
+    .bad{color:var(--bad); font-weight:980}
+    .mid{color:var(--warn); font-weight:980}
+
+    .report{
+      padding:12px;
+      border-radius: var(--r2);
+      border:1px dashed var(--stroke);
+      background: rgba(255,255,255,.03);
+      font-size:11px;
+      line-height:2.0;
+      color:var(--muted);
+      word-break:break-word;
+      margin-top:10px;
+    }
+    .report code{
+      font-family: var(--mono);
+      color:var(--text);
+      background: rgba(255,255,255,.06);
+      padding:2px 6px;
+      border-radius:10px;
+      border:1px solid var(--stroke);
+      direction:ltr;
+      display:inline-block;
+    }
+
+    .footer{
+      text-align:center;
+      color:var(--muted2);
+      font-size:10px;
+      padding:2px 0 0;
+    }
+
+    /* Live Log panel */
+    .logPanel{
+      margin-top:10px;
+      border:1px solid var(--stroke);
+      border-radius: var(--r2);
+      background: rgba(255,255,255,.03);
+      overflow:hidden;
+    }
+    .logHead{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:10px 12px;
+      border-bottom:1px solid var(--stroke);
+      color:var(--muted);
+      font-size:11px;
+    }
+    .logHead .left{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .logHead .right{display:flex; gap:8px; align-items:center}
+    .logBody{
+      max-height: 180px;
+      overflow:auto;
+      padding:10px 12px;
+      font-family: var(--mono);
+      font-size:11px;
+      line-height:1.9;
+      color:var(--muted);
+    }
+    .logLine{display:flex; gap:10px; align-items:flex-start}
+    .logTs{opacity:.8; direction:ltr; white-space:nowrap}
+    .logMsg{flex:1; word-break:break-word}
+    .logOk{color: rgba(34,197,94,.95)}
+    .logWarn{color: rgba(251,191,36,.95)}
+    .logBad{color: rgba(251,113,133,.95)}
+
+    /* Small spinner */
+    .spin{
+      width:14px;height:14px;border-radius:50%;
+      border:2px solid rgba(255,255,255,.22);
+      border-top-color: rgba(52,211,153,.95);
+      animation: sp 1s linear infinite;
+    }
+    [data-theme="light"] .spin{
+      border-color: rgba(10,18,32,.18);
+      border-top-color: rgba(34,197,94,.95);
+    }
+    @keyframes sp{ to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="titleBox">
+        <h1>حباب طلا و نقره — نسخه‌ی حرفه‌ای</h1>
+        <p class="sub">✅ دریافت دیتا بهینه شد (Race بین پروکسی‌ها + Cache کوتاه) • ✅ پروگرس‌بار و لاگ لحظه‌ای اضافه شد • ✅ UI مرتب‌تر و خواناتر.</p>
+      </div>
+
+      <div class="topActions">
+        <div class="pill" title="تغییر تم">
+          <span class="label">تم</span>
+          <input id="themeToggle" class="toggle" type="checkbox" aria-label="تغییر تم" />
+        </div>
+        <div class="pill" title="وضعیت فعلی">
+          <span class="label">وضعیت</span>
+          <b id="statusText">آماده</b>
+        </div>
+      </div>
+    </header>
+
+    <div class="seg" role="tablist" aria-label="تب‌ها">
+      <button id="tabGold" aria-pressed="true" type="button">طلا</button>
+      <button id="tabSilver" aria-pressed="false" type="button">نقره</button>
+      <button id="tabBars" aria-pressed="false" type="button">شمش‌ها</button>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT: Inputs -->
+      <section class="card">
+        <div class="cardHead">
+          <div>
+            <div class="h2">ورودی‌ها + دریافت خودکار</div>
+            <div class="hint">روی «دریافت کامل از TGJU» بزن تا همه فیلدها پر بشن.</div>
+          </div>
+          <span class="tag"><span id="liveSpinner" style="display:none" class="spin" aria-hidden="true"></span> <strong id="liveMode">Live</strong></span>
+        </div>
+
+        <!-- Progress -->
+        <div class="progressWrap" aria-live="polite">
+          <div class="progressLine" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div id="progressFill" class="progressFill"></div>
+          </div>
+          <div class="progressMeta">
+            <div>پیشرفت: <b id="progressPct">۰٪</b> • <span id="progressStep" style="color:var(--muted)">—</span></div>
+            <span class="chip" id="progressTimer">۰.۰s</span>
+          </div>
+        </div>
+
+        <div class="cardBody">
+          <div class="fields two">
+            <div class="field">
+              <label for="usdIrt">قیمت دلار (تومان) *</label>
+              <input id="usdIrt" inputmode="numeric" placeholder="TGJU: price_dollar_rl" />
+              <div class="unitRow"><span>تومان</span><span class="chip">خودکار (÷۱۰ اگر ریال بود)</span></div>
+            </div>
+
+            <div class="field">
+              <label for="premiumPct">پریمیوم قابل قبول (٪)</label>
+              <input id="premiumPct" inputmode="decimal" placeholder="مثال: 3" />
+              <div class="unitRow"><span>پیش‌فرض: ۳٪</span><span class="chip">تحلیل خرید</span></div>
+            </div>
+          </div>
+
+          <div class="miniRow">
+            <div class="mini">
+              <span>واحد قیمت‌های TGJU (داخلی):</span>
+              <select id="tgjuUnit">
+                <option value="rial_to_toman" selected>ریال → تبدیل به تومان (÷۱۰)</option>
+                <option value="rial_keep">ریال (بدون تبدیل)</option>
+                <option value="toman_keep">تومان (بدون تبدیل)</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="panelGold" style="margin-top:10px">
+            <div class="fields two">
+              <div class="field">
+                <label for="ozGoldUsd">انس جهانی طلا (USD/oz) *</label>
+                <input id="ozGoldUsd" inputmode="decimal" placeholder='TGJU: ons (مثل 4,492.25)' />
+                <div class="unitRow"><span>دلار/انس</span><span class="chip">خودکار</span></div>
+              </div>
+              <div class="field">
+                <label for="g24">قیمت هر گرم ۲۴ عیار (ایران)</label>
+                <input id="g24" inputmode="numeric" placeholder="TGJU: geram24" />
+                <div class="unitRow"><span>تومان/گرم</span><span class="chip">خودکار</span></div>
+              </div>
+
+              <div class="field">
+                <label for="g18">قیمت هر گرم ۱۸ عیار (ایران)</label>
+                <input id="g18" inputmode="numeric" placeholder="TGJU: geram18" />
+                <div class="unitRow"><span>تومان/گرم</span><span class="chip">خودکار</span></div>
+              </div>
+              <div class="field">
+                <label for="auto18">تخمین ۱۸ از روی ۲۴؟</label>
+                <input id="auto18" inputmode="numeric" placeholder="۰ = خاموش | ۱ = روشن" />
+                <div class="unitRow"><span>پیش‌فرض: ۰</span><span class="chip">18≈24×0.75</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="panelSilver" style="display:none; margin-top:10px">
+            <div class="fields two">
+              <div class="field">
+                <label for="ozSilverUsd">انس جهانی نقره (USD/oz) *</label>
+                <input id="ozSilverUsd" inputmode="decimal" placeholder='TGJU: silver (مثل 77.7445)' />
+                <div class="unitRow"><span>دلار/انس</span><span class="chip">خودکار</span></div>
+              </div>
+              <div class="field">
+                <label for="gSilver">قیمت هر گرم نقره ۹۹۹ (ایران)</label>
+                <input id="gSilver" inputmode="numeric" placeholder="TGJU: silver_999" />
+                <div class="unitRow"><span>تومان/گرم</span><span class="chip">خودکار</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="panelBars" style="display:none; margin-top:10px">
+            <div class="fields two">
+              <div class="field">
+                <label for="goldBarW">وزن شمش طلای ۲۴ (گرم)</label>
+                <input id="goldBarW" inputmode="decimal" placeholder="مثال: 10" />
+                <div class="unitRow"><span>گرم</span><span class="chip">24K Bar</span></div>
+              </div>
+              <div class="field">
+                <label for="silverBarW">وزن شمش نقره (گرم)</label>
+                <input id="silverBarW" inputmode="decimal" placeholder="مثال: 100" />
+                <div class="unitRow"><span>گرم</span><span class="chip">Silver Bar</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="action btnFetch" id="btnFetchAll" type="button">دریافت کامل از TGJU</button>
+            <button class="action btnPrimary" id="btnCalc" type="button">محاسبه</button>
+            <button class="action btnGhost" id="btnCopy" type="button">کپی خروجی</button>
+            <button class="action btnDanger" id="btnAbort" type="button" style="display:none">توقف دریافت</button>
+            <button class="action btnGhost" id="btnReset" type="button">پاک‌کردن</button>
+          </div>
+
+          <!-- Live log -->
+          <div class="logPanel" aria-label="لاگ لحظه‌ای دریافت دیتا">
+            <div class="logHead">
+              <div class="left">
+                <b style="color:var(--text)">Live Log</b>
+                <span class="chip" id="logCounter">۰ خط</span>
+                <span class="chip" id="cacheBadge">Cache: Off</span>
+              </div>
+              <div class="right">
+                <button class="action btnGhost" id="btnClearLog" type="button" style="padding:9px 10px;font-size:12px">پاک‌کردن لاگ</button>
+              </div>
+            </div>
+            <div class="logBody" id="logBody"></div>
+          </div>
+
+          <div class="note">
+           ⚠️ اگر داده‌ها خالی ماند: ممکن است پروکسی/مبدا موقتاً محدود شده باشد یا HTML سایت تغییر کرده باشد.
+            <br>✅ این نسخه برای سرعت، برای هر URL بین چند پروکسی <b>Race</b> می‌گذارد و اولین پاسخ معتبر را می‌گیرد.
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Results -->
+      <section class="card">
+        <div class="cardHead">
+          <div>
+            <div class="h2">نتایج + تحلیل خرید</div>
+            <div class="hint">حباب = قیمت بازار − تئوریک جهانی</div>
+          </div>
+          <span class="tag">Theo = (OZ×USD) / 31.1034768</span>
+        </div>
+
+        <div class="cardBody">
+          <div class="kpiRow">
+            <div class="kpi">
+              <div class="k">تئوریک هر گرم طلا ۲۴</div>
+              <div class="v" id="theoGold24">—</div>
+              <div class="s">Theo = (OZ × USD) / 31.1034768</div>
+            </div>
+            <div class="kpi">
+              <div class="k">تئوریک هر گرم طلا ۱۸</div>
+              <div class="v" id="theoGold18">—</div>
+              <div class="s">Gold18 = Gold24 × 0.75</div>
+            </div>
+          </div>
+
+          <div class="kpiRow" style="margin-top:10px">
+            <div class="kpi">
+              <div class="k">حباب طلا ۲۴</div>
+              <div class="v" id="bubbleGold24">—</div>
+              <div class="s" id="bubbleGold24p">—</div>
+            </div>
+            <div class="kpi">
+              <div class="k">حباب طلا ۱۸</div>
+              <div class="v" id="bubbleGold18">—</div>
+              <div class="s" id="bubbleGold18p">—</div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="kpiRow">
+            <div class="kpi">
+              <div class="k">تئوریک هر گرم نقره</div>
+              <div class="v" id="theoSilver">—</div>
+              <div class="s">Theo = (OZ × USD) / 31.1034768</div>
+            </div>
+            <div class="kpi">
+              <div class="k">حباب نقره ۹۹۹</div>
+              <div class="v" id="bubbleSilver">—</div>
+              <div class="s" id="bubbleSilverp">—</div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="kpiRow">
+            <div class="kpi">
+              <div class="k">شمش طلای ۲۴ (تئوریک/بازار)</div>
+              <div class="v" id="goldBarVal">—</div>
+              <div class="s" id="goldBarNote">—</div>
+            </div>
+            <div class="kpi">
+              <div class="k">شمش نقره (تئوریک/بازار)</div>
+              <div class="v" id="silverBarVal">—</div>
+              <div class="s" id="silverBarNote">—</div>
+            </div>
+          </div>
+
+          <div class="analysisBox" id="analysis">
+            <div class="analysisBadge">تحلیل: <span id="analysisBadgeText" class="na">—</span></div>
+            <div id="analysisText">ورودی‌ها را وارد کن تا تحلیل خرید نمایش داده شود.</div>
+          </div>
+
+          <div class="report" id="report">خروجی خلاصه اینجا می‌آید…</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="footer">
+      <span style="direction:ltr;display:inline-block">
+        Theo = (OZ_USD × USD_Toman) / 31.1034768 • Bubble = Market − Theo
+      </span>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const GRAMS_PER_TROY_OUNCE = 31.1034768;
+
+      const TGJU = {
+        dollar:    { url: "https://www.tgju.org/profile/price_dollar_rl", label:"دلار" },
+        gold24:    { url: "https://www.tgju.org/profile/geram24/today",   label:"گرم ۲۴" },
+        gold18:    { url: "https://www.tgju.org/profile/geram18",         label:"گرم ۱۸" },
+        goldOz:    { url: "https://www.tgju.org/profile/ons",             label:"انس طلا" },
+        silverOz:  { url: "https://www.tgju.org/profile/silver",          label:"انس نقره" },
+        silver999: { url: "https://www.tgju.org/profile/silver_999",      label:"نقره ۹۹۹" },
+      };
+
+      const $ = (id)=>document.getElementById(id);
+      const el = {
+        themeToggle: $("themeToggle"),
+        tabGold: $("tabGold"), tabSilver: $("tabSilver"), tabBars: $("tabBars"),
+        panelGold: $("panelGold"), panelSilver: $("panelSilver"), panelBars: $("panelBars"),
+
+        statusText: $("statusText"),
+        liveMode: $("liveMode"),
+        liveSpinner: $("liveSpinner"),
+
+        progressFill: $("progressFill"),
+        progressPct: $("progressPct"),
+        progressStep: $("progressStep"),
+        progressTimer: $("progressTimer"),
+
+        logBody: $("logBody"),
+        logCounter: $("logCounter"),
+        cacheBadge: $("cacheBadge"),
+
+        tgjuUnit: $("tgjuUnit"),
+        usdIrt: $("usdIrt"), premiumPct: $("premiumPct"),
+        ozGoldUsd: $("ozGoldUsd"), g24: $("g24"), g18: $("g18"), auto18: $("auto18"),
+        ozSilverUsd: $("ozSilverUsd"), gSilver: $("gSilver"),
+        goldBarW: $("goldBarW"), silverBarW: $("silverBarW"),
+
+        theoGold24: $("theoGold24"), theoGold18: $("theoGold18"),
+        bubbleGold24: $("bubbleGold24"), bubbleGold18: $("bubbleGold18"),
+        bubbleGold24p: $("bubbleGold24p"), bubbleGold18p: $("bubbleGold18p"),
+        theoSilver: $("theoSilver"), bubbleSilver: $("bubbleSilver"), bubbleSilverp: $("bubbleSilverp"),
+        goldBarVal: $("goldBarVal"), silverBarVal: $("silverBarVal"),
+        goldBarNote: $("goldBarNote"), silverBarNote: $("silverBarNote"),
+
+        analysisBadgeText: $("analysisBadgeText"), analysisText: $("analysisText"),
+        report: $("report"),
+
+        btnFetchAll: $("btnFetchAll"),
+        btnCalc: $("btnCalc"),
+        btnCopy: $("btnCopy"),
+        btnReset: $("btnReset"),
+        btnAbort: $("btnAbort"),
+        btnClearLog: $("btnClearLog"),
+      };
+
+      /* =========================
+         Theme (Apple-like simple)
+      ========================== */
+      const THEME_KEY = "emk_bubble_theme_v4";
+      function applyTheme(theme){
+        document.documentElement.setAttribute("data-theme", theme);
+        el.themeToggle.checked = (theme === "light");
+        localStorage.setItem(THEME_KEY, theme);
+      }
+      // default: follow system first time
+      const saved = localStorage.getItem(THEME_KEY);
+      if(saved){
+        applyTheme(saved);
+      } else {
+        const prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+        applyTheme(prefersLight ? "light" : "dark");
+      }
+      el.themeToggle.addEventListener("change", ()=>applyTheme(el.themeToggle.checked ? "light" : "dark"));
+
+      /* =========================
+         Tabs
+      ========================== */
+      function setTab(which){
+        const map = {gold: which==="gold", silver: which==="silver", bars: which==="bars"};
+        el.tabGold.setAttribute("aria-pressed", map.gold);
+        el.tabSilver.setAttribute("aria-pressed", map.silver);
+        el.tabBars.setAttribute("aria-pressed", map.bars);
+        el.panelGold.style.display = map.gold ? "" : "none";
+        el.panelSilver.style.display = map.silver ? "" : "none";
+        el.panelBars.style.display = map.bars ? "" : "none";
+      }
+      ["Gold","Silver","Bars"].forEach(t => el["tab"+t].addEventListener("click", ()=>setTab(t.toLowerCase())));
+
+      /* =========================
+         Format helpers
+      ========================== */
+      function normalizeNumber(str){
+        if (str == null) return NaN;
+        const fa = "۰۱۲۳۴۵۶۷۸۹", ar = "٠١٢٣٤٥٦٧٨٩";
+        str = String(str).trim();
+        for (let i=0;i<10;i++){
+          str = str.replaceAll(fa[i], String(i)).replaceAll(ar[i], String(i));
+        }
+        str = str.replace(/٫/g, ".").replace(/,/g, "").replace(/،/g, "").replace(/\s|\u200c/g, "");
+        const n = Number(str);
+        return Number.isFinite(n) ? n : NaN;
+      }
+      function fmtToman(n){ return Number.isFinite(n) ? Math.round(n).toLocaleString("fa-IR") + " تومان" : "—"; }
+      function fmtTomanPerGram(n){ return Number.isFinite(n) ? Math.round(n).toLocaleString("fa-IR") + " تومان/گرم" : "—"; }
+      function fmtPct(n){ return Number.isFinite(n) ? (Math.round(n*100)/100).toLocaleString("fa-IR") + "٪" : "—"; }
+      function signClass(n){ if(!Number.isFinite(n))return "na"; return n>=0?"pos":"neg"; }
+      function setStatus(t){ el.statusText.textContent = t; }
+
+      function setBubbleUI(valueEl, pctEl, bubble, pct){
+        if (!Number.isFinite(bubble) || !Number.isFinite(pct)){
+          valueEl.innerHTML = `<span class="na">—</span>`;
+          pctEl.textContent = "—";
+          return;
+        }
+        valueEl.innerHTML = `<span class="${signClass(bubble)}">${fmtToman(bubble)}</span>`;
+        pctEl.innerHTML = `درصد اختلاف: <span class="${signClass(bubble)}">${fmtPct(pct)}</span>`;
+      }
+
+      function safeTheo(ozUsd, usdIrt){
+        if (!Number.isFinite(ozUsd) || ozUsd<=0 || !Number.isFinite(usdIrt) || usdIrt<=0) return NaN;
+        return (ozUsd * usdIrt) / GRAMS_PER_TROY_OUNCE;
+      }
+
+      function convertTgjuLocalToTomanMaybe(n){
+        if (!Number.isFinite(n)) return NaN;
+        const mode = el.tgjuUnit.value;
+        if (mode === "rial_to_toman") return n / 10;
+        if (mode === "rial_keep") return n;
+        if (mode === "toman_keep") return n;
+        return n / 10;
+      }
+
+      /* =========================
+         Live Log + Progress
+      ========================== */
+      let logLines = 0;
+      function ts(){
+        const d = new Date();
+        const hh = String(d.getHours()).padStart(2,"0");
+        const mm = String(d.getMinutes()).padStart(2,"0");
+        const ss = String(d.getSeconds()).padStart(2,"0");
+        const ms = String(d.getMilliseconds()).padStart(3,"0");
+        return `${hh}:${mm}:${ss}.${ms}`;
+      }
+      function log(msg, type="info"){
+        const line = document.createElement("div");
+        line.className = "logLine";
+        const cls = type==="ok" ? "logOk" : type==="warn" ? "logWarn" : type==="bad" ? "logBad" : "";
+        line.innerHTML = `<span class="logTs">${ts()}</span><span class="logMsg ${cls}">${msg}</span>`;
+        el.logBody.appendChild(line);
+        logLines++;
+        el.logCounter.textContent = `${logLines.toLocaleString("fa-IR")} خط`;
+        // auto-scroll to bottom
+        el.logBody.scrollTop = el.logBody.scrollHeight;
+      }
+      function clearLog(){
+        el.logBody.innerHTML = "";
+        logLines = 0;
+        el.logCounter.textContent = `۰ خط`;
+      }
+      el.btnClearLog.addEventListener("click", clearLog);
+
+      function setProgress(pct, stepText){
+        const p = Math.max(0, Math.min(100, pct));
+        el.progressFill.style.width = p + "%";
+        el.progressPct.textContent = p.toLocaleString("fa-IR") + "٪";
+        el.progressStep.textContent = stepText || "—";
+        // aria
+        const bar = el.progressFill.parentElement;
+        bar.setAttribute("aria-valuenow", String(p));
+      }
+
+      function timerStart(){
+        const t0 = performance.now();
+        const tick = ()=>{
+          if(!fetchState.running) return;
+          const s = (performance.now() - t0) / 1000;
+          el.progressTimer.textContent = s.toFixed(1) + "s";
+          fetchState.raf = requestAnimationFrame(tick);
+        };
+        fetchState.raf = requestAnimationFrame(tick);
+      }
+
+      function timerStop(){
+        if(fetchState.raf) cancelAnimationFrame(fetchState.raf);
+        fetchState.raf = null;
+      }
+
+      /* =========================
+         Optimized fetch (Race proxies + Cache)
+      ========================== */
+      const CACHE_KEY = "emk_tgju_cache_v1";
+      const CACHE_TTL_MS = 25 * 1000; // cache for 25 seconds
+      function getCache(){
+        try{
+          const raw = sessionStorage.getItem(CACHE_KEY);
+          if(!raw) return null;
+          const obj = JSON.parse(raw);
+          if(!obj || !obj.t || !obj.data) return null;
+          if(Date.now() - obj.t > CACHE_TTL_MS) return null;
+          return obj.data;
+        }catch{ return null; }
+      }
+      function setCache(data){
+        try{
+          sessionStorage.setItem(CACHE_KEY, JSON.stringify({t: Date.now(), data}));
+        }catch{}
+      }
+
+      const PROXIES = [
+        { name:"corsproxy", mk:(u)=>"https://corsproxy.io/?" + encodeURIComponent(u) },
+        { name:"allorigins", mk:(u)=>"https://api.allorigins.win/raw?url=" + encodeURIComponent(u) },
+        // Jina can be very fast for HTML text mirror:
+        { name:"jina", mk:(u)=>"https://r.jina.ai/http://" + u.replace(/^https?:\/\//, "") },
+        { name:"jina-https", mk:(u)=>"https://r.jina.ai/https://" + u.replace(/^https?:\/\//, "") },
+      ];
+
+      function withTimeout(promise, ms, label="timeout"){
+        let to;
+        const t = new Promise((_, rej)=> to=setTimeout(()=>rej(new Error(label)), ms));
+        return Promise.race([promise.finally(()=>clearTimeout(to)), t]);
+      }
+
+      async function fetchText(url, controller){
+        const tasks = PROXIES.map(px=>{
+          const proxied = px.mk(url);
+          const started = performance.now();
+          const req = fetch(proxied, { cache:"no-store", signal: controller.signal })
+            .then(async res=>{
+              if(!res.ok) throw new Error(`HTTP ${res.status}`);
+              const txt = await res.text();
+              // guard against short/blocked/redirect pages
+              if(!txt || txt.length < 800) throw new Error("short/blocked");
+              return { txt, via:px.name, ms: Math.round(performance.now()-started) };
+            });
+          // per-proxy timeout (fast fail)
+          return withTimeout(req, 4500, "proxy-timeout");
+        });
+
+        // Promise.any => first success
+        try{
+          const out = await Promise.any(tasks);
+          return out;
+        }catch(e){
+          return null;
+        }
+      }
+
+      /* =========================
+         Robust extraction
+      ========================== */
+      function extractPDrCotVal(html){
+        if(!html) return null;
+
+        // 1) DOM parse
+        try{
+          const doc = new DOMParser().parseFromString(html, "text/html");
+          const node = doc.querySelector('span[data-col="info.last_trade.PDrCotVal"]');
+          if (node && node.textContent) return node.textContent.trim();
+        }catch(e){}
+
+        // 2) Regex on raw
+        let m = html.match(/data-col\s*=\s*["']info\.last_trade\.PDrCotVal["'][\s\S]*?>([^<]+)<\/span>/i);
+        if (m && m[1]) return m[1].trim();
+
+        // 3) Special: "نرخ فعلی"
+        m = html.match(/نرخ\s*فعلی\s*[:：]{1,3}\s*([0-9][0-9.,]*)/i);
+        if (m && m[1]) return m[1].trim();
+
+        // 4) fallback: common price/value span
+        m = html.match(/<span[^>]*class=["'][^"']*(?:price|value)[^"']*["'][^>]*>\s*([0-9][0-9.,]*)\s*<\/span>/i);
+        if (m && m[1]) return m[1].trim();
+
+        return null;
+      }
+
+      /* =========================
+         Fetch State + Abort
+      ========================== */
+      const fetchState = {
+        running:false,
+        controller:null,
+        raf:null
+      };
+
+      function startFetchUI(){
+        fetchState.running = true;
+        el.btnFetchAll.disabled = true;
+        el.btnAbort.style.display = "";
+        el.liveSpinner.style.display = "";
+        el.liveMode.textContent = "Fetching…";
+        setProgress(0, "شروع دریافت…");
+        timerStart();
+      }
+      function endFetchUI(){
+        fetchState.running = false;
+        el.btnFetchAll.disabled = false;
+        el.btnAbort.style.display = "none";
+        el.liveSpinner.style.display = "none";
+        el.liveMode.textContent = "Live";
+        timerStop();
+      }
+      function abortFetch(){
+        try{ fetchState.controller && fetchState.controller.abort(); }catch{}
+      }
+      el.btnAbort.addEventListener("click", ()=>{
+        log("درخواست توقف توسط کاربر.", "warn");
+        setStatus("متوقف شد");
+        abortFetch();
+      });
+
+      /* =========================
+         Fetch All (with progress + log)
+      ========================== */
+      async function fetchAllFromTgju(){
+        // If fresh cache exists, use it
+        const cached = getCache();
+        if(cached){
+          el.cacheBadge.textContent = "Cache: On";
+          clearLog();
+          log("از کش کوتاه‌مدت استفاده شد (برای سرعت).", "ok");
+          applyFetchedValues(cached, /*fromCache*/true);
+          setStatus("داده‌ها از کش پر شدند ✅");
+          calc();
+          return;
+        }
+        el.cacheBadge.textContent = "Cache: Off";
+
+        clearLog();
+        fetchState.controller = new AbortController();
+
+        startFetchUI();
+        setStatus("در حال دریافت (۶ مورد)…");
+        log("شروع دریافت دیتا از TGJU…", "info");
+
+        const entries = [
+          ["dollar", TGJU.dollar],
+          ["gold24", TGJU.gold24],
+          ["gold18", TGJU.gold18],
+          ["goldOz", TGJU.goldOz],
+          ["silverOz", TGJU.silverOz],
+          ["silver999", TGJU.silver999],
+        ];
+
+        const total = entries.length;
+        let done = 0;
+
+        const results = {}; // key -> { valueText, via, ms, ok }
+        const missing = [];
+
+        for (const [key, item] of entries){
+          if(fetchState.controller.signal.aborted){
+            endFetchUI();
+            log("دریافت متوقف شد. برخی فیلدها ممکن است ناقص باشند.", "warn");
+            return;
+          }
+
+          done++;
+          const pct = Math.round(((done-1)/total)*100);
+          setProgress(pct, `در حال دریافت: ${item.label}`);
+          log(`↳ ${item.label}: ارسال درخواست…`, "info");
+
+          const out = await fetchText(item.url, fetchState.controller);
+
+          if(!out){
+            results[key] = { ok:false };
+            missing.push(item.label);
+            log(`✗ ${item.label}: دریافت ناموفق (همه پروکسی‌ها شکست خوردند).`, "bad");
+            continue;
+          }
+
+          const rawVal = extractPDrCotVal(out.txt);
+          if(!rawVal){
+            results[key] = { ok:false, via:out.via, ms:out.ms };
+            missing.push(item.label);
+            log(`✗ ${item.label}: HTML آمد ولی مقدار پیدا نشد. (via:${out.via}, ${out.ms}ms)`, "bad");
+            continue;
+          }
+
+          results[key] = { ok:true, valueText: rawVal, via:out.via, ms:out.ms };
+          log(`✓ ${item.label}: مقدار پیدا شد (${rawVal}) — via:${out.via} • ${out.ms}ms`, "ok");
+
+          // bump progress smoothly after each item
+          setProgress(Math.round((done/total)*100), `دریافت شد: ${item.label}`);
+        }
+
+        // Apply
+        applyFetchedValues(results, /*fromCache*/false);
+
+        // store cache only if at least one ok
+        const okCount = Object.values(results).filter(x=>x && x.ok).length;
+        if(okCount>0){
+          setCache(results);
+          log("کش کوتاه‌مدت ذخیره شد (25s).", "ok");
+        }
+
+        endFetchUI();
+
+        if(okCount>0){
+          setStatus(`دریافت شد (${okCount} مورد) ✅` + (missing.length ? ` | ناقص: ${missing.join("، ")}` : ""));
+          calc();
+        } else {
+          setStatus("خطا در دریافت ❌");
+          alert("هیچ داده‌ای یافت نشد. پروکسی مسدود شده یا ساختار سایت تغییر کرده است.");
+        }
+      }
+
+      function applyFetchedValues(results, fromCache=false){
+        // results: key -> {ok, valueText}
+        const get = (k)=> (results && results[k] && results[k].ok) ? results[k].valueText : null;
+
+        const vDollar = get("dollar");
+        const v24     = get("gold24");
+        const v18     = get("gold18");
+        const vOzG    = get("goldOz");
+        const vOzS    = get("silverOz");
+        const vAg     = get("silver999");
+
+        let successCount = 0;
+        const missing = [];
+
+        if(vDollar){
+          let val = normalizeNumber(vDollar);
+          // اگر رقم خیلی بزرگ بود یعنی ریال است → تومان
+          if(val > 100000) val = val / 10;
+          el.usdIrt.value = val;
+          successCount++;
+        } else missing.push("دلار");
+
+        if(v24){ el.g24.value = v24; successCount++; } else missing.push("گرم ۲۴");
+        if(v18){ el.g18.value = v18; successCount++; } else missing.push("گرم ۱۸");
+
+        if(vOzG){ el.ozGoldUsd.value = vOzG; successCount++; } else missing.push("انس طلا");
+        if(vOzS){ el.ozSilverUsd.value = vOzS; successCount++; } else missing.push("انس نقره");
+
+        if(vAg){ el.gSilver.value = vAg; successCount++; } else missing.push("نقره ۹۹۹");
+
+        if(fromCache){
+          log(`پر شدن فیلدها از کش انجام شد: ${successCount} مورد.`, "ok");
+        } else {
+          log(`پر شدن فیلدها انجام شد: ${successCount} مورد.`, successCount? "ok":"bad");
+        }
+
+        // Also show progress completed
+        setProgress(100, missing.length ? `اتمام با نقص: ${missing.join("، ")}` : "اتمام دریافت");
+      }
+
+      /* =========================
+         Core calculation + analysis
+      ========================== */
+      function analyze(name, bubblePct, allowedPremium){
+        if (!Number.isFinite(bubblePct)) return null;
+        const ap = Number.isFinite(allowedPremium) ? allowedPremium : 3;
+        if (bubblePct <= -ap) return {cls:"ok", verdict:"ارزش خرید بهتر", text:`${name}: بازار ${fmtPct(bubblePct)} پایین‌تر از تئوریک.`};
+        if (bubblePct > ap) return {cls:"bad", verdict:"گران / احتیاط", text:`${name}: بازار ${fmtPct(bubblePct)} بالاتر از تئوریک.`};
+        return {cls:"mid", verdict:"منصفانه", text:`${name}: اختلاف ${fmtPct(bubblePct)} و نرمال.`};
+      }
+
+      function calc(){
+        const usdIrt = normalizeNumber(el.usdIrt.value);
+        const premiumPct = normalizeNumber(el.premiumPct.value);
+        const allowedPremium = Number.isFinite(premiumPct) ? premiumPct : 3;
+
+        const ozGoldUsd = normalizeNumber(el.ozGoldUsd.value);
+        let g24raw = normalizeNumber(el.g24.value);
+        let g18raw = normalizeNumber(el.g18.value);
+        const auto18 = normalizeNumber(el.auto18.value);
+
+        const ozSilverUsd = normalizeNumber(el.ozSilverUsd.value);
+        let gSilverRaw = normalizeNumber(el.gSilver.value);
+
+        const goldBarW = normalizeNumber(el.goldBarW.value);
+        const silverBarW = normalizeNumber(el.silverBarW.value);
+
+        const g24 = (Number.isFinite(g24raw) && g24raw>0) ? convertTgjuLocalToTomanMaybe(g24raw) : NaN;
+        let g18 = (Number.isFinite(g18raw) && g18raw>0) ? convertTgjuLocalToTomanMaybe(g18raw) : NaN;
+        const gSilver = (Number.isFinite(gSilverRaw) && gSilverRaw>0) ? convertTgjuLocalToTomanMaybe(gSilverRaw) : NaN;
+
+        const theoGold24 = safeTheo(ozGoldUsd, usdIrt);
+        const theoGold18 = Number.isFinite(theoGold24) ? theoGold24 * 0.75 : NaN;
+        const theoSilver = safeTheo(ozSilverUsd, usdIrt);
+
+        if ((!Number.isFinite(g18) || g18<=0) && (auto18===1) && Number.isFinite(g24) && g24>0){
+          g18 = g24 * 0.75;
+        }
+
+        el.theoGold24.textContent = fmtTomanPerGram(theoGold24);
+        el.theoGold18.textContent = fmtTomanPerGram(theoGold18);
+        el.theoSilver.textContent  = fmtTomanPerGram(theoSilver);
+
+        const bG24 = (Number.isFinite(g24) && Number.isFinite(theoGold24)) ? (g24 - theoGold24) : NaN;
+        const bG24p = (Number.isFinite(bG24) && Number.isFinite(theoGold24)) ? (bG24 / theoGold24) * 100 : NaN;
+
+        const bG18 = (Number.isFinite(g18) && Number.isFinite(theoGold18)) ? (g18 - theoGold18) : NaN;
+        const bG18p = (Number.isFinite(bG18) && Number.isFinite(theoGold18)) ? (bG18 / theoGold18) * 100 : NaN;
+
+        const bSil = (Number.isFinite(gSilver) && Number.isFinite(theoSilver)) ? (gSilver - theoSilver) : NaN;
+        const bSilp = (Number.isFinite(bSil) && Number.isFinite(theoSilver)) ? (bSil / theoSilver) * 100 : NaN;
+
+        setBubbleUI(el.bubbleGold24, el.bubbleGold24p, bG24, bG24p);
+        setBubbleUI(el.bubbleGold18, el.bubbleGold18p, bG18, bG18p);
+        setBubbleUI(el.bubbleSilver, el.bubbleSilverp, bSil, bSilp);
+
+        const gBarTheo = (Number.isFinite(theoGold24) && goldBarW>0) ? (theoGold24 * goldBarW) : NaN;
+        const gBarMkt = (Number.isFinite(g24) && goldBarW>0) ? (g24 * goldBarW) : NaN;
+        const sBarTheo = (Number.isFinite(theoSilver) && silverBarW>0) ? (theoSilver * silverBarW) : NaN;
+        const sBarMkt = (Number.isFinite(gSilver) && silverBarW>0) ? (gSilver * silverBarW) : NaN;
+
+        if (Number.isFinite(goldBarW) && goldBarW>0){
+          el.goldBarVal.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px">
+            <div><span class="na">تئوریک:</span> <b>${fmtToman(gBarTheo)}</b></div>
+            <div><span class="na">بازار:</span> ${Number.isFinite(gBarMkt)?`<b>${fmtToman(gBarMkt)}</b>`:'—'}</div>
+          </div>`;
+          el.goldBarNote.innerHTML = (Number.isFinite(gBarMkt) && Number.isFinite(gBarTheo)) ? `اختلاف: <span class="${signClass(bG24p)}">${fmtPct(bG24p)}</span>` : "—";
+        } else { el.goldBarVal.textContent="—"; el.goldBarNote.textContent="—"; }
+
+        if (Number.isFinite(silverBarW) && silverBarW>0){
+          el.silverBarVal.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px">
+            <div><span class="na">تئوریک:</span> <b>${fmtToman(sBarTheo)}</b></div>
+            <div><span class="na">بازار:</span> ${Number.isFinite(sBarMkt)?`<b>${fmtToman(sBarMkt)}</b>`:'—'}</div>
+          </div>`;
+          el.silverBarNote.innerHTML = (Number.isFinite(sBarMkt) && Number.isFinite(sBarTheo)) ? `اختلاف: <span class="${signClass(bSilp)}">${fmtPct(bSilp)}</span>` : "—";
+        } else { el.silverBarVal.textContent="—"; el.silverBarNote.textContent="—"; }
+
+        setStatus((Number.isFinite(usdIrt) && usdIrt>0) ? "محاسبه شد" : "دلار را وارد کن");
+
+        const insights = [];
+        const i1 = analyze("طلای ۲۴", bG24p, allowedPremium);
+        const i2 = analyze("طلای ۱۸", bG18p, allowedPremium);
+        const i3 = analyze("نقره ۹۹۹", bSilp, allowedPremium);
+        if (i1) insights.push(i1); if (i2) insights.push(i2); if (i3) insights.push(i3);
+
+        if (insights.length===0){
+          el.analysisBadgeText.className="na";
+          el.analysisBadgeText.textContent="نامشخص";
+          el.analysisText.textContent="ورودی‌ها را کامل کن.";
+        } else {
+          const hasBad = insights.some(x=>x.cls==="bad");
+          const hasOk = insights.some(x=>x.cls==="ok");
+          el.analysisBadgeText.className = hasBad?"bad":(hasOk?"ok":"mid");
+          el.analysisBadgeText.textContent = hasBad?"احتیاط":(hasOk?"بهتر":"منصفانه");
+          el.analysisText.innerHTML =
+            insights.map(x=>`• <b class="${x.cls}">${x.verdict}</b> — ${x.text}`).join("<br>")
+            + `<br><small style="opacity:0.7;display:block;margin-top:6px">این تحلیل صرفاً ریاضی است (بدون درنظرگرفتن کارمزد/اجرت/مالیات/اسپرد).</small>`;
+        }
+
+        const L = ["خروجی خلاصه:"];
+        if(Number.isFinite(usdIrt)) L.push(`دلار: ${usdIrt.toLocaleString("fa-IR")}`);
+        if(Number.isFinite(ozGoldUsd)) L.push(`\n[طلا]\nانس: ${el.ozGoldUsd.value}\nحباب ۲۴: ${fmtToman(bG24)} (${fmtPct(bG24p)})\nحباب ۱۸: ${fmtToman(bG18)} (${fmtPct(bG18p)})`);
+        if(Number.isFinite(ozSilverUsd)) L.push(`\n[نقره]\nانس: ${el.ozSilverUsd.value}\nحباب نقره: ${fmtToman(bSil)} (${fmtPct(bSilp)})`);
+        el.report.innerText = L.join("\n");
+      }
+
+      async function copyReport(){
+        try{
+          await navigator.clipboard.writeText(el.report.innerText);
+          setStatus("کپی شد ✅");
+          log("خروجی کپی شد.", "ok");
+        }catch{
+          setStatus("کپی نشد ❌");
+          log("کپی به کلیپ‌بورد ناموفق بود (اجازه مرورگر).", "bad");
+        }
+      }
+
+      function reset(){
+        [el.usdIrt, el.premiumPct, el.ozGoldUsd, el.g24, el.g18, el.auto18, el.ozSilverUsd, el.gSilver, el.goldBarW, el.silverBarW].forEach(x=>x.value="");
+        setProgress(0, "—");
+        el.progressTimer.textContent = "۰.۰s";
+        calc();
+      }
+
+      /* =========================
+         Events
+      ========================== */
+      let t;
+      const inputs = [el.tgjuUnit, el.usdIrt, el.premiumPct, el.ozGoldUsd, el.g24, el.g18, el.auto18, el.ozSilverUsd, el.gSilver, el.goldBarW, el.silverBarW];
+      inputs.forEach(i=>i.addEventListener("input", ()=>{
+        clearTimeout(t);
+        t = setTimeout(calc, 220);
+      }));
+
+      el.btnFetchAll.addEventListener("click", fetchAllFromTgju);
+      el.btnCalc.addEventListener("click", calc);
+      el.btnCopy.addEventListener("click", copyReport);
+      el.btnReset.addEventListener("click", ()=>{
+        clearLog();
+        reset();
+        setStatus("پاک شد");
+        log("همه فیلدها پاک شدند.", "warn");
+      });
+
+      // Init
+      reset();
+      setTab("gold");
+      log("آماده. برای تست، «دریافت کامل از TGJU» را بزن.", "info");
+    })();
+  </script>
+</body>
+</html>
