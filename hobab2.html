@@ -1,0 +1,1001 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>محاسبه‌گر حباب طلا و نقره + دریافت خودکار TGJU</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.08);
+      --text:#e8eefc;
+      --muted:rgba(232,238,252,.72);
+      --line:rgba(255,255,255,.10);
+      --accent:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --good:#22c55e;
+      --shadow: 0 14px 45px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+    [data-theme="light"]{
+      --bg:#f7f8fc;
+      --card:rgba(10,18,32,.05);
+      --card2:rgba(10,18,32,.07);
+      --text:#0b1220;
+      --muted:rgba(11,18,32,.68);
+      --line:rgba(11,18,32,.12);
+      --shadow: 0 12px 40px rgba(10,18,32,.10);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Vazirmatn", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(52,211,153,.22), transparent 55%),
+        radial-gradient(900px 500px at 110% 10%, rgba(251,191,36,.16), transparent 50%),
+        radial-gradient(1000px 600px at 50% 120%, rgba(96,165,250,.16), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      padding:14px;
+    }
+
+    .wrap{max-width:980px;margin:0 auto;display:grid;gap:12px}
+    header{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+      padding:14px 14px 4px;
+    }
+    h1{margin:0;font-size:18px;line-height:1.35;font-weight:950;letter-spacing:-.2px}
+    .sub{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.8}
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px; border:1px solid var(--line);
+      border-radius:999px; background:var(--card);
+      box-shadow: var(--shadow);
+      user-select:none;
+      white-space:nowrap;
+    }
+    .toggle{
+      appearance:none; width:44px; height:26px; border-radius:999px;
+      background:rgba(255,255,255,.18); border:1px solid var(--line);
+      position:relative; outline:none; cursor:pointer;
+    }
+    [data-theme="light"] .toggle{ background:rgba(10,18,32,.12); }
+    .toggle::after{
+      content:""; position:absolute; top:50%; transform:translateY(-50%);
+      right:3px; width:20px; height:20px; border-radius:50%;
+      background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.72));
+      box-shadow:0 8px 18px rgba(0,0,0,.25);
+      transition: all .22s ease;
+    }
+    [data-theme="light"] .toggle::after{
+      background:linear-gradient(180deg, rgba(11,18,32,.14), rgba(11,18,32,.06));
+      box-shadow:0 8px 18px rgba(10,18,32,.10);
+    }
+    .toggle:checked::after{ right:21px; }
+
+    /* Mobile-first: single column */
+    .grid{display:grid; grid-template-columns:1fr; gap:12px}
+    @media (min-width:920px){
+      .grid{grid-template-columns: 1.05fr .95fr}
+    }
+
+    .card{
+      background:linear-gradient(180deg, var(--card), var(--card2));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .cardHead{
+      padding:12px 14px 10px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom:1px solid var(--line);
+    }
+    .cardHead h2{margin:0;font-size:14px;font-weight:950}
+    .cardHead .hint{color:var(--muted); font-size:11px; line-height:1.6}
+    .cardBody{padding:12px 14px 14px}
+
+    .seg{
+      display:flex; gap:8px; flex-wrap:wrap;
+      padding:10px 14px 0;
+    }
+    .seg button{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      padding:8px 10px;
+      border-radius:999px;
+      font-family:inherit;
+      font-weight:950;
+      font-size:12px;
+      cursor:pointer;
+    }
+    .seg button[aria-pressed="true"]{
+      border-color:rgba(52,211,153,.55);
+      box-shadow:0 10px 24px rgba(34,197,94,.12);
+    }
+
+    .fields{display:grid; gap:10px; grid-template-columns:1fr;}
+    @media (min-width:560px){ .fields.two{grid-template-columns:1fr 1fr} }
+
+    label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px}
+    .field{
+      padding:10px 10px 9px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(255,255,255,.04);
+      position:relative;
+    }
+    [data-theme="light"] .field{ background:rgba(10,18,32,.03); }
+
+    input{
+      width:100%;
+      border:0; outline:none; background:transparent;
+      color:var(--text);
+      font-size:14px; font-weight:950;
+      padding:2px 0 0;
+      text-align:left; direction:ltr;
+    }
+    .unitRow{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin-top:6px; font-size:11px; color:var(--muted);
+    }
+    .chip{
+      font-size:10px; padding:4px 8px; border-radius:999px;
+      border:1px solid var(--line); background:rgba(255,255,255,.05);
+      color:var(--muted); white-space:nowrap;
+    }
+
+    .miniRow{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+    .mini{
+      display:flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(255,255,255,.03);
+      color:var(--muted);
+      font-size:11px;
+      line-height:1.6;
+    }
+    select{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.05);
+      color:var(--text);
+      border-radius:12px;
+      padding:8px 10px;
+      font-family:inherit;
+      font-weight:900;
+      font-size:12px;
+      outline:none;
+    }
+
+    .actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+    button.action{
+      border:0; cursor:pointer; border-radius:14px;
+      padding:11px 12px; font-family:inherit; font-weight:950;
+      font-size:13px;
+      transition:transform .12s ease;
+    }
+    button.action:active{transform:scale(.99)}
+    .btnPrimary{
+      background:linear-gradient(135deg, rgba(52,211,153,.95), rgba(34,197,94,.88));
+      color:#062016;
+      box-shadow:0 12px 28px rgba(34,197,94,.20);
+    }
+    .btnGhost{
+      background:transparent; color:var(--text);
+      border:1px solid var(--line);
+    }
+    .btnFetch{
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+    .btnFetch[disabled]{opacity:.55; cursor:not-allowed}
+
+    .note{margin-top:9px;font-size:11px;color:var(--muted);line-height:1.8}
+    .note b{color:var(--text)}
+
+    .results{display:grid; gap:10px}
+    .kpiRow{display:grid; gap:10px; grid-template-columns:1fr}
+    @media (min-width:560px){ .kpiRow{grid-template-columns:1fr 1fr} }
+
+    .kpi{
+      padding:11px; border-radius:16px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+    }
+    [data-theme="light"] .kpi{ background:rgba(10,18,32,.03); }
+    .kpi .k{font-size:11px;color:var(--muted);margin-bottom:6px}
+    .kpi .v{font-size:17px;font-weight:980;letter-spacing:-.3px}
+    .kpi .s{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.65}
+
+    .tag{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px; border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.05);
+      color:var(--muted);
+      font-size:11px;
+    }
+    .pos{color:var(--warn); font-weight:980}
+    .neg{color:var(--accent); font-weight:980}
+    .na{color:var(--muted); font-weight:900}
+
+    .hr{height:1px; background:var(--line); margin:10px 0}
+
+    .report{
+      padding:11px;
+      border-radius:16px;
+      border:1px dashed var(--line);
+      background:rgba(255,255,255,.03);
+      font-size:11px; line-height:1.95; color:var(--muted);
+      word-break:break-word;
+    }
+    .report code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      color:var(--text);
+      background:rgba(255,255,255,.06);
+      padding:2px 6px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      direction:ltr;
+      display:inline-block;
+    }
+
+    .analysisBox{
+      padding:11px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      font-size:11px; line-height:1.95; color:var(--muted);
+    }
+    .analysisBox b{color:var(--text)}
+    .analysisBadge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px; border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.05);
+      font-size:11px;
+      margin-bottom:8px;
+    }
+    .ok{color:var(--good); font-weight:980}
+    .bad{color:var(--bad); font-weight:980}
+    .mid{color:var(--warn); font-weight:980}
+
+    .footer{ text-align:center; color:var(--muted); font-size:10px; padding:2px 0 0; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>حباب طلا و نقره + شمش‌ها (با دریافت خودکار از TGJU)</h1>
+        <p class="sub">
+          ✅ مقادیر TGJU برای بازار داخلی معمولاً <b>ریال</b> هستند (در خود صفحه هم نوشته “ریال”). این ابزار به‌صورت پیش‌فرض آن‌ها را به <b>تومان</b> تبدیل می‌کند (÷۱۰).
+          <br>✅ ورودی‌ها می‌توانند شامل <b>,</b> یا <b>،</b> باشند. اگر قیمت ۱۸ یا ۲۴ را وارد نکنی، بقیه محاسبه می‌شوند.
+        </p>
+      </div>
+      <div class="pill">
+        <span style="font-size:11px;color:var(--muted)">تم</span>
+        <input id="themeToggle" class="toggle" type="checkbox" aria-label="تغییر تم" />
+      </div>
+    </header>
+
+    <div class="seg" role="tablist">
+      <button id="tabGold" aria-pressed="true" type="button">طلا</button>
+      <button id="tabSilver" aria-pressed="false" type="button">نقره</button>
+      <button id="tabBars" aria-pressed="false" type="button">شمش‌ها</button>
+    </div>
+
+    <div class="grid">
+      <!-- Inputs -->
+      <section class="card">
+        <div class="cardHead">
+          <div>
+            <h2>ورودی‌ها + دریافت خودکار</h2>
+            <div class="hint">برای دریافت آنلاین، روی «دریافت از TGJU» بزن. اگر نشد، دستی وارد کن.</div>
+          </div>
+          <span class="tag">وضعیت: <strong id="statusText">آماده</strong></span>
+        </div>
+
+        <div class="cardBody">
+          <div class="fields two">
+            <div class="field">
+              <label for="usdIrt">قیمت دلار (تومان / USD) *</label>
+              <input id="usdIrt" inputmode="numeric" placeholder="مثال: 85,000" />
+              <div class="unitRow">
+                <span>تومان</span>
+                <span class="chip">برای تئوریک</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="premiumPct">پریمیوم قابل قبول برای «منطقی» (٪)</label>
+              <input id="premiumPct" inputmode="decimal" placeholder="مثال: 3" />
+              <div class="unitRow">
+                <span>پیش‌فرض: ۳٪</span>
+                <span class="chip">تحلیل خرید</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="miniRow">
+            <div class="mini">
+              <span>واحد قیمت‌های TGJU (داخلی):</span>
+              <select id="tgjuUnit">
+                <option value="rial_to_toman" selected>ریال → تبدیل به تومان (÷۱۰)</option>
+                <option value="rial_keep">ریال (بدون تبدیل)</option>
+                <option value="toman_keep">تومان (بدون تبدیل)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- GOLD -->
+          <div id="panelGold" style="margin-top:10px">
+            <div class="fields two">
+              <div class="field">
+                <label for="ozGoldUsd">انس جهانی طلا (USD/oz) *</label>
+                <input id="ozGoldUsd" inputmode="decimal" placeholder="مثال: 2,492.25" />
+                <div class="unitRow">
+                  <span>دلار/انس</span>
+                  <span class="chip">TGJU: /profile/ons</span>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="g24">قیمت هر گرم ۲۴ عیار (ایران)</label>
+                <input id="g24" inputmode="numeric" placeholder="TGJU: 210,869,000 (ریال)" />
+                <div class="unitRow">
+                  <span>تومان/گرم (در محاسبه)</span>
+                  <span class="chip">TGJU: /profile/geram24/today</span>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="g18">قیمت هر گرم ۱۸ عیار (ایران)</label>
+                <input id="g18" inputmode="numeric" placeholder="TGJU: 158,154,000 (ریال)" />
+                <div class="unitRow">
+                  <span>تومان/گرم (در محاسبه)</span>
+                  <span class="chip">TGJU: /profile/geram18</span>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="auto18">اگر قیمت ۱۸ وارد نشد، از روی ۲۴ تخمین بزن؟</label>
+                <input id="auto18" inputmode="numeric" placeholder="۰ = خاموش | ۱ = روشن" />
+                <div class="unitRow">
+                  <span>پیش‌فرض: ۰</span>
+                  <span class="chip">18≈24×0.75</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SILVER -->
+          <div id="panelSilver" style="display:none; margin-top:10px">
+            <div class="fields two">
+              <div class="field">
+                <label for="ozSilverUsd">انس جهانی نقره (USD/oz) *</label>
+                <input id="ozSilverUsd" inputmode="decimal" placeholder="TGJU: 77.7445" />
+                <div class="unitRow">
+                  <span>دلار/انس</span>
+                  <span class="chip">TGJU: /profile/silver</span>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="gSilver">قیمت هر گرم نقره ۹۹۹ (ایران)</label>
+                <input id="gSilver" inputmode="numeric" placeholder="TGJU: 4,599,500 (ریال)" />
+                <div class="unitRow">
+                  <span>تومان/گرم (در محاسبه)</span>
+                  <span class="chip">TGJU: /profile/silver_999</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BARS -->
+          <div id="panelBars" style="display:none; margin-top:10px">
+            <div class="fields two">
+              <div class="field">
+                <label for="goldBarW">وزن شمش طلای ۲۴ (گرم)</label>
+                <input id="goldBarW" inputmode="decimal" placeholder="مثال: 10" />
+                <div class="unitRow"><span>گرم</span><span class="chip">24K Bar</span></div>
+              </div>
+
+              <div class="field">
+                <label for="silverBarW">وزن شمش نقره (گرم)</label>
+                <input id="silverBarW" inputmode="decimal" placeholder="مثال: 100" />
+                <div class="unitRow"><span>گرم</span><span class="chip">Silver Bar</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="action btnFetch" id="btnFetchAll" type="button">دریافت از TGJU (همه)</button>
+            <button class="action btnPrimary" id="btnCalc" type="button">محاسبه</button>
+            <button class="action btnGhost" id="btnCopy" type="button">کپی خروجی</button>
+            <button class="action btnGhost" id="btnReset" type="button">پاک‌کردن</button>
+          </div>
+
+          <div class="note">
+            اگر «دریافت از TGJU» در مرورگر شما جواب نداد، معمولاً به‌خاطر محدودیت‌های CORS است.
+            این نسخه برای دور زدن CORS از یک خواننده‌ی HTML عمومی (<b>r.jina.ai</b>) استفاده می‌کند؛ اگر باز هم مسدود بود، دستی وارد کن.
+          </div>
+        </div>
+      </section>
+
+      <!-- Results -->
+      <section class="card">
+        <div class="cardHead">
+          <div>
+            <h2>نتایج + تحلیل خرید</h2>
+            <div class="hint">حباب = قیمت بازار − تئوریک جهانی</div>
+          </div>
+          <span class="tag"><strong id="liveMode">Live</strong></span>
+        </div>
+
+        <div class="cardBody">
+          <div class="results">
+            <div class="kpiRow">
+              <div class="kpi">
+                <div class="k">تئوریک هر گرم طلا ۲۴</div>
+                <div class="v" id="theoGold24">—</div>
+                <div class="s">Theo = (OZ × USD) / 31.1034768</div>
+              </div>
+              <div class="kpi">
+                <div class="k">تئوریک هر گرم طلا ۱۸</div>
+                <div class="v" id="theoGold18">—</div>
+                <div class="s">Gold18 = Gold24 × 0.75</div>
+              </div>
+            </div>
+
+            <div class="kpiRow">
+              <div class="kpi">
+                <div class="k">حباب طلا ۲۴</div>
+                <div class="v" id="bubbleGold24">—</div>
+                <div class="s" id="bubbleGold24p">—</div>
+              </div>
+              <div class="kpi">
+                <div class="k">حباب طلا ۱۸</div>
+                <div class="v" id="bubbleGold18">—</div>
+                <div class="s" id="bubbleGold18p">—</div>
+              </div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="kpiRow">
+              <div class="kpi">
+                <div class="k">تئوریک هر گرم نقره</div>
+                <div class="v" id="theoSilver">—</div>
+                <div class="s">Theo = (OZ × USD) / 31.1034768</div>
+              </div>
+              <div class="kpi">
+                <div class="k">حباب نقره ۹۹۹</div>
+                <div class="v" id="bubbleSilver">—</div>
+                <div class="s" id="bubbleSilverp">—</div>
+              </div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="kpiRow">
+              <div class="kpi">
+                <div class="k">شمش طلای ۲۴ (تئوریک/بازار)</div>
+                <div class="v" id="goldBarVal">—</div>
+                <div class="s" id="goldBarNote">—</div>
+              </div>
+              <div class="kpi">
+                <div class="k">شمش نقره (تئوریک/بازار)</div>
+                <div class="v" id="silverBarVal">—</div>
+                <div class="s" id="silverBarNote">—</div>
+              </div>
+            </div>
+
+            <div class="analysisBox" id="analysis">
+              <div class="analysisBadge">تحلیل: <span id="analysisBadgeText" class="na">—</span></div>
+              <div id="analysisText">ورودی‌ها را وارد کن تا تحلیل خرید نمایش داده شود.</div>
+            </div>
+
+            <div class="report" id="report">خروجی خلاصه اینجا می‌آید…</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="footer">
+      <span style="direction:ltr;display:inline-block">
+        Theo = (OZ_USD × USD_Toman) / 31.1034768 • Bubble = Market − Theo
+      </span>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const GRAMS_PER_TROY_OUNCE = 31.1034768;
+
+      const TGJU = {
+        gold24: "https://www.tgju.org/profile/geram24/today",
+        gold18: "https://www.tgju.org/profile/geram18",
+        goldOz: "https://www.tgju.org/profile/ons",
+        silverOz: "https://www.tgju.org/profile/silver",
+        silver999: "https://www.tgju.org/profile/silver_999",
+      };
+
+      const $ = (id)=>document.getElementById(id);
+
+      const el = {
+        themeToggle: $("themeToggle"),
+        tabGold: $("tabGold"),
+        tabSilver: $("tabSilver"),
+        tabBars: $("tabBars"),
+        panelGold: $("panelGold"),
+        panelSilver: $("panelSilver"),
+        panelBars: $("panelBars"),
+
+        statusText: $("statusText"),
+        liveMode: $("liveMode"),
+
+        tgjuUnit: $("tgjuUnit"),
+
+        usdIrt: $("usdIrt"),
+        premiumPct: $("premiumPct"),
+
+        ozGoldUsd: $("ozGoldUsd"),
+        g24: $("g24"),
+        g18: $("g18"),
+        auto18: $("auto18"),
+
+        ozSilverUsd: $("ozSilverUsd"),
+        gSilver: $("gSilver"),
+
+        goldBarW: $("goldBarW"),
+        silverBarW: $("silverBarW"),
+
+        theoGold24: $("theoGold24"),
+        theoGold18: $("theoGold18"),
+        bubbleGold24: $("bubbleGold24"),
+        bubbleGold18: $("bubbleGold18"),
+        bubbleGold24p: $("bubbleGold24p"),
+        bubbleGold18p: $("bubbleGold18p"),
+
+        theoSilver: $("theoSilver"),
+        bubbleSilver: $("bubbleSilver"),
+        bubbleSilverp: $("bubbleSilverp"),
+
+        goldBarVal: $("goldBarVal"),
+        silverBarVal: $("silverBarVal"),
+        goldBarNote: $("goldBarNote"),
+        silverBarNote: $("silverBarNote"),
+
+        analysisBadgeText: $("analysisBadgeText"),
+        analysisText: $("analysisText"),
+
+        report: $("report"),
+
+        btnFetchAll: $("btnFetchAll"),
+        btnCalc: $("btnCalc"),
+        btnCopy: $("btnCopy"),
+        btnReset: $("btnReset"),
+      };
+
+      // ---------- Theme ----------
+      const THEME_KEY = "emk_bubble_tgju_theme";
+      function applyTheme(theme){
+        document.documentElement.setAttribute("data-theme", theme);
+        el.themeToggle.checked = (theme === "light");
+        localStorage.setItem(THEME_KEY, theme);
+      }
+      applyTheme(localStorage.getItem(THEME_KEY) || "dark");
+      el.themeToggle.addEventListener("change", ()=>applyTheme(el.themeToggle.checked ? "light" : "dark"));
+
+      // ---------- Tabs ----------
+      function setTab(which){
+        const map = {gold: which==="gold", silver: which==="silver", bars: which==="bars"};
+        el.tabGold.setAttribute("aria-pressed", map.gold);
+        el.tabSilver.setAttribute("aria-pressed", map.silver);
+        el.tabBars.setAttribute("aria-pressed", map.bars);
+        el.panelGold.style.display = map.gold ? "" : "none";
+        el.panelSilver.style.display = map.silver ? "" : "none";
+        el.panelBars.style.display = map.bars ? "" : "none";
+      }
+      el.tabGold.addEventListener("click", ()=>setTab("gold"));
+      el.tabSilver.addEventListener("click", ()=>setTab("silver"));
+      el.tabBars.addEventListener("click", ()=>setTab("bars"));
+
+      // ---------- Number parsing (accept "," and "،") ----------
+      function normalizeNumber(str){
+        if (str == null) return NaN;
+
+        // تبدیل اعداد فارسی/عربی به انگلیسی
+        const fa = "۰۱۲۳۴۵۶۷۸۹";
+        const ar = "٠١٢٣٤٥٦٧٨٩";
+        str = String(str).trim();
+        for (let i=0;i<10;i++){
+          str = str.replaceAll(fa[i], String(i)).replaceAll(ar[i], String(i));
+        }
+
+        // حذف جداکننده‌ها + تبدیل اعشار فارسی/عربی
+        str = str
+          .replace(/٫/g, ".")
+          .replace(/,/g, "")
+          .replace(/،/g, "")
+          .replace(/\s|\u200c|\u200f|\u202a|\u202b|\u202c|\u202d|\u202e/g, "");
+
+        const n = Number(str);
+        return Number.isFinite(n) ? n : NaN;
+      }
+
+      function fmtToman(n){
+        if (!Number.isFinite(n)) return "—";
+        return Math.round(n).toLocaleString("fa-IR") + " تومان";
+      }
+      function fmtTomanPerGram(n){
+        if (!Number.isFinite(n)) return "—";
+        return Math.round(n).toLocaleString("fa-IR") + " تومان/گرم";
+      }
+      function fmtPct(n){
+        if (!Number.isFinite(n)) return "—";
+        const v = Math.round(n*100)/100;
+        return v.toLocaleString("fa-IR") + "٪";
+      }
+      function signClass(n){
+        if (!Number.isFinite(n)) return "na";
+        return (n >= 0) ? "pos" : "neg";
+      }
+      function setStatus(t){ el.statusText.textContent = t; }
+
+      function setBubbleUI(valueEl, pctEl, bubble, pct){
+        if (!Number.isFinite(bubble) || !Number.isFinite(pct)){
+          valueEl.innerHTML = `<span class="na">—</span>`;
+          pctEl.textContent = "—";
+          return;
+        }
+        valueEl.innerHTML = `<span class="${signClass(bubble)}">${fmtToman(bubble)}</span>`;
+        pctEl.innerHTML = `درصد اختلاف: <span class="${signClass(bubble)}">${fmtPct(pct)}</span>`;
+      }
+
+      function safeTheo(ozUsd, usdIrt){
+        if (!Number.isFinite(ozUsd) || ozUsd<=0) return NaN;
+        if (!Number.isFinite(usdIrt) || usdIrt<=0) return NaN;
+        return (ozUsd * usdIrt) / GRAMS_PER_TROY_OUNCE;
+      }
+
+      // ---------- TGJU fetch (with CORS-friendly reader) ----------
+      // Direct fetch to tgju.org is often blocked by CORS in browsers.
+      // This uses r.jina.ai to fetch and return HTML as text.
+      async function fetchHtml(url){
+        const via = "https://r.jina.ai/http://"+url.replace(/^https?:\/\//,"");
+        const res = await fetch(via, { cache: "no-store" });
+        if (!res.ok) throw new Error("Fetch failed: "+res.status);
+        return await res.text();
+      }
+
+      function extractPDrCotVal(html){
+        // We try: [data-col="info.last_trade.PDrCotVal"]
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const node = doc.querySelector('[data-col="info.last_trade.PDrCotVal"]');
+        if (node && node.textContent) return node.textContent.trim();
+
+        // fallback: regex
+        const m = html.match(/data-col="info\.last_trade\.PDrCotVal"[^>]*>\s*([^<\s]+[\d.,،]*)\s*</);
+        return m ? m[1].trim() : null;
+      }
+
+      function convertTgjuLocalToTomanMaybe(n){
+        // n here is numeric parsed from page (usually Rial for local market)
+        if (!Number.isFinite(n)) return NaN;
+        const mode = el.tgjuUnit.value;
+        if (mode === "rial_to_toman") return n / 10;
+        if (mode === "rial_keep") return n;       // user will treat as "toman" later? (not recommended)
+        if (mode === "toman_keep") return n;      // already toman
+        return n / 10;
+      }
+
+      async function fetchAllFromTgju(){
+        const btn = el.btnFetchAll;
+        btn.disabled = true;
+        setStatus("در حال دریافت از TGJU…");
+
+        try{
+          const [h24, h18, hOzG, hOzS, hAg] = await Promise.all([
+            fetchHtml(TGJU.gold24),
+            fetchHtml(TGJU.gold18),
+            fetchHtml(TGJU.goldOz),
+            fetchHtml(TGJU.silverOz),
+            fetchHtml(TGJU.silver999),
+          ]);
+
+          const v24 = extractPDrCotVal(h24);
+          const v18 = extractPDrCotVal(h18);
+          const vOzG = extractPDrCotVal(hOzG);
+          const vOzS = extractPDrCotVal(hOzS);
+          const vAg = extractPDrCotVal(hAg);
+
+          // Put raw text in inputs (keep separators)
+          if (v24) el.g24.value = v24;
+          if (v18) el.g18.value = v18;
+          if (vOzG) el.ozGoldUsd.value = vOzG;
+          if (vOzS) el.ozSilverUsd.value = vOzS;
+          if (vAg) el.gSilver.value = vAg;
+
+          setStatus("آپدیت شد ✅");
+          calc(); // recalc after fetching
+        }catch(e){
+          setStatus("دریافت ناموفق (دستی وارد کن)");
+        }finally{
+          btn.disabled = false;
+        }
+      }
+
+      // ---------- Analysis ----------
+      function analyze(name, bubblePct, allowedPremium){
+        if (!Number.isFinite(bubblePct)) return null;
+        const ap = Number.isFinite(allowedPremium) ? allowedPremium : 3;
+
+        if (bubblePct <= -ap){
+          return {cls:"ok", verdict:"ارزش خرید بهتر",
+            text:`${name}: بازار حدود ${fmtPct(bubblePct)} پایین‌تر از تئوریک است. از نظر عددی جذاب‌تر است (با فرض اصالت/نقدشوندگی).`};
+        }
+        if (bubblePct > ap){
+          return {cls:"bad", verdict:"گران / احتیاط",
+            text:`${name}: بازار حدود ${fmtPct(bubblePct)} بالاتر از تئوریک است. مگر دلیل منطقی داشته باشد (کارمزد/مالیات/پریمیوم شمش/کمبود عرضه).`};
+        }
+        return {cls:"mid", verdict:"منصفانه",
+          text:`${name}: اختلاف حدود ${fmtPct(bubblePct)} و داخل ±${ap.toLocaleString("fa-IR")}٪ است. نزدیک ارزش منصفانه.`};
+      }
+
+      // ---------- Main calc ----------
+      function calc(){
+        const usdIrt = normalizeNumber(el.usdIrt.value);
+        const premiumPct = normalizeNumber(el.premiumPct.value);
+        const allowedPremium = Number.isFinite(premiumPct) ? premiumPct : 3;
+
+        // Gold inputs
+        const ozGoldUsd = normalizeNumber(el.ozGoldUsd.value);
+        let g24raw = normalizeNumber(el.g24.value);
+        let g18raw = normalizeNumber(el.g18.value);
+        const auto18 = normalizeNumber(el.auto18.value);
+
+        // Silver inputs
+        const ozSilverUsd = normalizeNumber(el.ozSilverUsd.value);
+        let gSilverRaw = normalizeNumber(el.gSilver.value);
+
+        // Bars
+        const goldBarW = normalizeNumber(el.goldBarW.value);
+        const silverBarW = normalizeNumber(el.silverBarW.value);
+
+        // Convert TGJU local prices to toman if needed
+        // (Only for local-market fields: g24, g18, gSilver)
+        const g24 = (Number.isFinite(g24raw) && g24raw>0) ? convertTgjuLocalToTomanMaybe(g24raw) : NaN;
+        let g18 = (Number.isFinite(g18raw) && g18raw>0) ? convertTgjuLocalToTomanMaybe(g18raw) : NaN;
+        const gSilver = (Number.isFinite(gSilverRaw) && gSilverRaw>0) ? convertTgjuLocalToTomanMaybe(gSilverRaw) : NaN;
+
+        // Theo
+        const theoGold24 = safeTheo(ozGoldUsd, usdIrt);
+        const theoGold18 = Number.isFinite(theoGold24) ? theoGold24 * 0.75 : NaN;
+        const theoSilver = safeTheo(ozSilverUsd, usdIrt);
+
+        // Auto18 from g24 if enabled and g18 missing
+        if ((!Number.isFinite(g18) || g18<=0) && (auto18===1) && Number.isFinite(g24) && g24>0){
+          g18 = g24 * 0.75;
+        }
+
+        // Outputs: Theo
+        el.theoGold24.textContent = fmtTomanPerGram(theoGold24);
+        el.theoGold18.textContent = fmtTomanPerGram(theoGold18);
+        el.theoSilver.textContent  = fmtTomanPerGram(theoSilver);
+
+        // Bubbles only if both theo and market exist
+        const bubbleGold24 = (Number.isFinite(g24) && Number.isFinite(theoGold24)) ? (g24 - theoGold24) : NaN;
+        const bubbleGold24Pct = (Number.isFinite(bubbleGold24) && Number.isFinite(theoGold24)) ? (bubbleGold24 / theoGold24) * 100 : NaN;
+
+        const bubbleGold18 = (Number.isFinite(g18) && Number.isFinite(theoGold18)) ? (g18 - theoGold18) : NaN;
+        const bubbleGold18Pct = (Number.isFinite(bubbleGold18) && Number.isFinite(theoGold18)) ? (bubbleGold18 / theoGold18) * 100 : NaN;
+
+        const bubbleSilver = (Number.isFinite(gSilver) && Number.isFinite(theoSilver)) ? (gSilver - theoSilver) : NaN;
+        const bubbleSilverPct = (Number.isFinite(bubbleSilver) && Number.isFinite(theoSilver)) ? (bubbleSilver / theoSilver) * 100 : NaN;
+
+        setBubbleUI(el.bubbleGold24, el.bubbleGold24p, bubbleGold24, bubbleGold24Pct);
+        setBubbleUI(el.bubbleGold18, el.bubbleGold18p, bubbleGold18, bubbleGold18Pct);
+        setBubbleUI(el.bubbleSilver,  el.bubbleSilverp,  bubbleSilver,  bubbleSilverPct);
+
+        // Bars
+        const goldBarTheo = (Number.isFinite(theoGold24) && Number.isFinite(goldBarW) && goldBarW>0) ? (theoGold24 * goldBarW) : NaN;
+        const goldBarMarket = (Number.isFinite(g24) && Number.isFinite(goldBarW) && goldBarW>0) ? (g24 * goldBarW) : NaN;
+
+        const silverBarTheo = (Number.isFinite(theoSilver) && Number.isFinite(silverBarW) && silverBarW>0) ? (theoSilver * silverBarW) : NaN;
+        const silverBarMarket = (Number.isFinite(gSilver) && Number.isFinite(silverBarW) && silverBarW>0) ? (gSilver * silverBarW) : NaN;
+
+        if (Number.isFinite(goldBarW) && goldBarW>0){
+          el.goldBarVal.innerHTML = `
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div><span class="na">تئوریک:</span> <b>${fmtToman(goldBarTheo)}</b></div>
+              <div>${Number.isFinite(goldBarMarket) ? `<span class="na">بازار:</span> <b>${fmtToman(goldBarMarket)}</b>` : `<span class="na">بازار:</span> —`}</div>
+            </div>`;
+          if (Number.isFinite(goldBarMarket) && Number.isFinite(goldBarTheo)){
+            const bp = ((goldBarMarket - goldBarTheo)/goldBarTheo)*100;
+            el.goldBarNote.innerHTML = `اختلاف شمش طلا: <span class="${signClass(bp)}">${fmtPct(bp)}</span>`;
+          } else el.goldBarNote.textContent = "برای اختلاف، قیمت گرم ۲۴ بازار را هم داشته باش.";
+        } else {
+          el.goldBarVal.textContent = "—";
+          el.goldBarNote.textContent = "—";
+        }
+
+        if (Number.isFinite(silverBarW) && silverBarW>0){
+          el.silverBarVal.innerHTML = `
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div><span class="na">تئوریک:</span> <b>${fmtToman(silverBarTheo)}</b></div>
+              <div>${Number.isFinite(silverBarMarket) ? `<span class="na">بازار:</span> <b>${fmtToman(silverBarMarket)}</b>` : `<span class="na">بازار:</span> —`}</div>
+            </div>`;
+          if (Number.isFinite(silverBarMarket) && Number.isFinite(silverBarTheo)){
+            const bp = ((silverBarMarket - silverBarTheo)/silverBarTheo)*100;
+            el.silverBarNote.innerHTML = `اختلاف شمش نقره: <span class="${signClass(bp)}">${fmtPct(bp)}</span>`;
+          } else el.silverBarNote.textContent = "برای اختلاف، قیمت گرم نقره بازار را هم داشته باش.";
+        } else {
+          el.silverBarVal.textContent = "—";
+          el.silverBarNote.textContent = "—";
+        }
+
+        // Status
+        setStatus((Number.isFinite(usdIrt) && usdIrt>0) ? "محاسبه شد" : "دلار را وارد کن");
+
+        // Analysis
+        const insights = [];
+        const a1 = analyze("طلای ۲۴", bubbleGold24Pct, allowedPremium);
+        const a2 = analyze("طلای ۱۸", bubbleGold18Pct, allowedPremium);
+        const a3 = analyze("نقره ۹۹۹", bubbleSilverPct, allowedPremium);
+        if (a1) insights.push(a1);
+        if (a2) insights.push(a2);
+        if (a3) insights.push(a3);
+
+        if (insights.length === 0){
+          el.analysisBadgeText.className = "na";
+          el.analysisBadgeText.textContent = "نامشخص";
+          el.analysisText.textContent = "برای تحلیل خرید، حداقل یکی از قیمت‌های بازار (۲۴/۱۸/نقره) را وارد کن.";
+        } else {
+          const hasBad = insights.some(x=>x.cls==="bad");
+          const hasOk  = insights.some(x=>x.cls==="ok");
+          const badgeCls = hasBad ? "bad" : (hasOk ? "ok" : "mid");
+          const badgeTxt = hasBad ? "احتیاط" : (hasOk ? "بهتر" : "منصفانه");
+          el.analysisBadgeText.className = badgeCls;
+          el.analysisBadgeText.textContent = badgeTxt;
+          el.analysisText.innerHTML =
+            insights.map(x=>`• <b class="${x.cls}">${x.verdict}</b> — ${x.text}`).join("<br><br>") +
+            `<br><br><b>یادآوری:</b> این تحلیل عددی است؛ اسپرد خرید/فروش، کارمزد، مالیات، اصالت و نقدشوندگی را هم لحاظ کن.`;
+        }
+
+        // Report
+        const L = [];
+        L.push("خروجی خلاصه (قابل کپی):");
+        if (Number.isFinite(usdIrt)) L.push(`- دلار: ${Math.round(usdIrt).toLocaleString("fa-IR")} تومان`);
+        L.push(`- حد منطقی پریمیوم: ±${(Math.round(allowedPremium*100)/100).toLocaleString("fa-IR")}٪`);
+        L.push("");
+
+        if (Number.isFinite(ozGoldUsd)) {
+          L.push("[طلا]");
+          L.push(`- انس طلا: ${ozGoldUsd}`);
+          if (Number.isFinite(theoGold24)) L.push(`- تئوریک ۲۴: ${Math.round(theoGold24).toLocaleString("fa-IR")} تومان/گرم`);
+          if (Number.isFinite(theoGold18)) L.push(`- تئوریک ۱۸: ${Math.round(theoGold18).toLocaleString("fa-IR")} تومان/گرم`);
+          if (Number.isFinite(g24)) L.push(`- بازار ۲۴: ${Math.round(g24).toLocaleString("fa-IR")} تومان/گرم`);
+          if (Number.isFinite(bubbleGold24Pct)) L.push(`- حباب ۲۴: ${Math.round(bubbleGold24).toLocaleString("fa-IR")} تومان (${(Math.round(bubbleGold24Pct*100)/100).toLocaleString("fa-IR")}٪)`);
+          if (Number.isFinite(g18)) L.push(`- بازار ۱۸: ${Math.round(g18).toLocaleString("fa-IR")} تومان/گرم`);
+          if (Number.isFinite(bubbleGold18Pct)) L.push(`- حباب ۱۸: ${Math.round(bubbleGold18).toLocaleString("fa-IR")} تومان (${(Math.round(bubbleGold18Pct*100)/100).toLocaleString("fa-IR")}٪)`);
+          L.push("");
+        }
+
+        if (Number.isFinite(ozSilverUsd)) {
+          L.push("[نقره]");
+          L.push(`- انس نقره: ${ozSilverUsd}`);
+          if (Number.isFinite(theoSilver)) L.push(`- تئوریک نقره: ${Math.round(theoSilver).toLocaleString("fa-IR")} تومان/گرم`);
+          if (Number.isFinite(gSilver)) L.push(`- بازار نقره ۹۹۹: ${Math.round(gSilver).toLocaleString("fa-IR")} تومان/گرم`);
+          if (Number.isFinite(bubbleSilverPct)) L.push(`- حباب نقره: ${Math.round(bubbleSilver).toLocaleString("fa-IR")} تومان (${(Math.round(bubbleSilverPct*100)/100).toLocaleString("fa-IR")}٪)`);
+          L.push("");
+        }
+
+        if (Number.isFinite(goldBarW) && goldBarW>0){
+          L.push("[شمش‌ها]");
+          if (Number.isFinite(goldBarTheo)) L.push(`- شمش طلا ۲۴ | وزن ${goldBarW}g | تئوریک: ${Math.round(goldBarTheo).toLocaleString("fa-IR")} تومان${Number.isFinite(goldBarMarket)?` | بازار: ${Math.round(goldBarMarket).toLocaleString("fa-IR")} تومان`:``}`);
+          if (Number.isFinite(silverBarTheo)) L.push(`- شمش نقره | وزن ${silverBarW}g | تئوریک: ${Math.round(silverBarTheo).toLocaleString("fa-IR")} تومان${Number.isFinite(silverBarMarket)?` | بازار: ${Math.round(silverBarMarket).toLocaleString("fa-IR")} تومان`:``}`);
+          L.push("");
+        }
+
+        L.push("فرمول‌ها:");
+        L.push("Theo = (OZ_USD × USD_Toman) / 31.1034768");
+        L.push("Gold18 = Gold24 × 0.75");
+        L.push("Bubble = Market − Theo");
+
+        el.report.innerHTML = L.join("\n")
+          .split("\n")
+          .map(line => (line.startsWith("Theo =") || line.startsWith("Gold18 =") || line.startsWith("Bubble ="))
+            ? `<code>${line}</code>` : line)
+          .join("<br>");
+      }
+
+      // ---------- Copy / Reset ----------
+      async function copyReport(){
+        const text = el.report.innerText.replace(/\u200f/g,"").trim();
+        if (!text || text.includes("اینجا می‌آید")){
+          setStatus("چیزی برای کپی نیست");
+          return;
+        }
+        try{
+          await navigator.clipboard.writeText(text);
+          setStatus("کپی شد ✅");
+          setTimeout(()=>setStatus("آماده"), 1200);
+        }catch(e){
+          setStatus("کپی نشد");
+        }
+      }
+
+      function reset(){
+        [
+          el.usdIrt, el.premiumPct,
+          el.ozGoldUsd, el.g24, el.g18, el.auto18,
+          el.ozSilverUsd, el.gSilver,
+          el.goldBarW, el.silverBarW
+        ].forEach(x=>x.value="");
+
+        setStatus("آماده");
+        el.theoGold24.textContent = "—";
+        el.theoGold18.textContent = "—";
+        el.theoSilver.textContent  = "—";
+        el.bubbleGold24.innerHTML = `<span class="na">—</span>`;
+        el.bubbleGold18.innerHTML = `<span class="na">—</span>`;
+        el.bubbleSilver.innerHTML = `<span class="na">—</span>`;
+        el.bubbleGold24p.textContent = "—";
+        el.bubbleGold18p.textContent = "—";
+        el.bubbleSilverp.textContent  = "—";
+        el.goldBarVal.textContent = "—";
+        el.silverBarVal.textContent = "—";
+        el.goldBarNote.textContent = "—";
+        el.silverBarNote.textContent = "—";
+        el.analysisBadgeText.className = "na";
+        el.analysisBadgeText.textContent = "—";
+        el.analysisText.textContent = "ورودی‌ها را وارد کن تا تحلیل خرید نمایش داده شود.";
+        el.report.textContent = "خروجی خلاصه اینجا می‌آید…";
+      }
+
+      // ---------- Live debounce ----------
+      let t=null;
+      function debounceCalc(){
+        clearTimeout(t);
+        t=setTimeout(calc, 220);
+      }
+
+      const inputs = [
+        el.tgjuUnit,
+        el.usdIrt, el.premiumPct,
+        el.ozGoldUsd, el.g24, el.g18, el.auto18,
+        el.ozSilverUsd, el.gSilver,
+        el.goldBarW, el.silverBarW
+      ];
+      ["input","change"].forEach(ev=>{
+        inputs.forEach(inp=>inp.addEventListener(ev, debounceCalc));
+      });
+
+      // Buttons
+      el.btnFetchAll.addEventListener("click", fetchAllFromTgju);
+      el.btnCalc.addEventListener("click", calc);
+      el.btnCopy.addEventListener("click", copyReport);
+      el.btnReset.addEventListener("click", reset);
+
+      // Init
+      reset();
+      setTab("gold");
+    })();
+  </script>
+</body>
+</html>
