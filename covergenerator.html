@@ -1,0 +1,1586 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>کاور ساز وبلاگ | Export PNG/WebP</title>
+
+  <!-- Vazirmatn -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #0b1220;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.08);
+      --border: rgba(255,255,255,.10);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.70);
+      --accent: #46d3ff;
+    }
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+    body{
+      margin:0;
+      font-family: "Vazirmatn", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 20% 0%, rgba(70,211,255,.18), transparent 60%),
+        radial-gradient(900px 520px at 90% 30%, rgba(47,227,139,.14), transparent 60%),
+        var(--bg);
+      color: var(--text);
+      overflow: hidden; /* ✅ فقط سایدبار اسکرول می‌شود */
+    }
+
+    .app{
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 14px;
+      padding: 14px;
+      overflow: hidden;
+    }
+
+    .panel{
+      background: linear-gradient(180deg, var(--panel), rgba(255,255,255,.03));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 18px 60px rgba(0,0,0,.35);
+      min-height: 0;
+    }
+
+    .panel-header{
+      padding: 14px 14px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--panel2), transparent);
+      flex: 0 0 auto;
+    }
+
+    .title{ display:flex; flex-direction:column; gap:2px; }
+    .title strong{ font-size: 14px; letter-spacing: .2px; }
+    .title span{ font-size: 12px; color: var(--muted); }
+
+    .btn{
+      appearance:none;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 9px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight: 900;
+      font-size: 12px;
+      transition: .15s ease;
+      user-select: none;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.085); }
+    .btn.primary{
+      border-color: rgba(70,211,255,.35);
+      background: rgba(70,211,255,.12);
+    }
+
+    /* ✅ Controls panel: فقط این بخش اسکرول می‌شود */
+    .controls-panel{
+      display:flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .controls{
+      padding: 12px 14px 14px;
+      display: grid;
+      gap: 12px;
+      overflow: auto;      /* ✅ فقط سایدبار */
+      min-height: 0;
+    }
+
+    .group{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      border-radius: 14px;
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .group h3{
+      margin: 0;
+      font-size: 13px;
+      color: rgba(255,255,255,.86);
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    label{
+      display:grid;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    input[type="text"], textarea, select, input[type="number"]{
+      width:100%;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 10px;
+      outline: none;
+      font-family: inherit;
+    }
+    textarea{ min-height: 92px; resize: vertical; line-height: 1.6; }
+
+    .row{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .range{
+      display:grid;
+      grid-template-columns: 1fr 78px;
+      gap: 10px;
+      align-items:center;
+    }
+    input[type="range"]{ width:100%; }
+
+    .chip{
+      font-size: 11px;
+      color: rgba(255,255,255,.82);
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.05);
+      padding: 6px 10px;
+      border-radius: 999px;
+      text-align:center;
+      user-select:none;
+    }
+
+    /* ✅ Preview ثابت */
+    .preview-panel{
+      display:flex;
+      flex-direction: column;
+      height: calc(100vh - 28px);
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .canvas-wrap{
+      padding: 14px;
+      flex: 1 1 auto;
+      display:flex;
+      min-height: 0;
+    }
+    canvas{
+      width: 100%;
+      height: auto;
+      align-self: center;
+      display:block;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 30px 90px rgba(0,0,0,.55);
+      background: rgba(0,0,0,.15);
+    }
+
+    .hint{
+      padding: 0 14px 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+      flex: 0 0 auto;
+    }
+
+    .inline-actions{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+
+    .file{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+    }
+    .file input[type="file"]{
+      width:100%;
+      padding: 8px;
+      background: rgba(0,0,0,.18);
+      border:1px dashed rgba(255,255,255,.18);
+      border-radius: 12px;
+      color: var(--muted);
+    }
+
+    .small{
+      font-size: 11px;
+      color: rgba(255,255,255,.62);
+      line-height: 1.7;
+    }
+
+    /* ✅ موبایل */
+    @media (max-width: 980px){
+      body{ overflow:auto; }
+      .app{ height:auto; grid-template-columns: 1fr; overflow:visible; }
+      .preview-panel{ height:auto; }
+      .controls{ overflow: visible; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- LEFT: Controls -->
+    <section class="panel controls-panel">
+      <div class="panel-header">
+        <div class="title">
+          <strong>کاورساز وبلاگ</strong>
+          <span>PNG/WebP + Layout + Guides</span>
+        </div>
+        <button class="btn primary" id="downloadBtn">دانلود خروجی</button>
+      </div>
+
+      <div class="controls">
+
+        <div class="group">
+          <h3>ابعاد</h3>
+          <div class="row">
+            <label>عرض <input type="number" id="w" min="320" step="1" value="1366"></label>
+            <label>ارتفاع <input type="number" id="h" min="240" step="1" value="768"></label>
+          </div>
+          <div class="inline-actions">
+            <button class="btn" id="applySize">اعمال</button>
+            <button class="btn" id="fitToBg">ابعاد = تصویر پس‌زمینه</button>
+          </div>
+        </div>
+
+        <div class="group">
+          <h3>چیدمان آماده (Layouts)</h3>
+          <label>
+            انتخاب چیدمان
+            <select id="layout">
+              <option value="center" selected>Text Center (وسط)</option>
+              <option value="left">Text Left (چپ واقعی)</option>
+              <option value="rtlStart">Text Start (RTL) — راست/شروع</option>
+              <option value="badge">Title + Subtitle + Badge</option>
+            </select>
+          </label>
+
+          <div class="row">
+            <label>Badge (فقط Layout چهارم)
+              <input type="text" id="badgeText" value="استاندارد / Standard">
+            </label>
+            <label>رنگ Badge
+              <input type="text" id="badgeFill" value="rgba(255,255,255,.12)">
+            </label>
+          </div>
+
+          <div class="row">
+            <label>رنگ متن Badge
+              <input type="text" id="badgeTextColor" value="rgba(255,255,255,.92)">
+            </label>
+            <label>رنگ کادر Badge
+              <input type="text" id="badgeBorder" value="rgba(255,255,255,.22)">
+            </label>
+          </div>
+        </div>
+
+        <div class="group">
+          <h3>تم و پس‌زمینه</h3>
+          <label>
+            تم
+            <select id="theme">
+              <option value="b233">B233 Neon (شبیه نمونه)</option>
+              <option value="iosflat">iOS Flat</option>
+              <option value="darkglass">Dark Glass</option>
+              <option value="sunset">Sunset Warm</option>
+              <option value="mono">Mono Minimal</option>
+            </select>
+          </label>
+
+          <div class="row">
+            <label>حالت پس‌زمینه
+              <select id="bgMode">
+                <option value="theme">تولید با تم</option>
+                <option value="image">تصویر آپلودی</option>
+              </select>
+            </label>
+            <label>وینیت
+              <div class="range">
+                <input type="range" id="vignette" min="0" max="100" value="35">
+                <div class="chip" id="vignetteVal">35</div>
+              </div>
+            </label>
+          </div>
+
+          <div class="file">
+            <input type="file" id="bgFile" accept="image/*">
+          </div>
+        </div>
+
+        <div class="group">
+          <h3>متن‌ها</h3>
+
+          <label>Subtitle (اختیاری)
+            <input type="text" id="t1" value="استاندارد">
+          </label>
+
+          <div class="row">
+            <label>Title
+              <input type="text" id="t2" value="ASTM B233">
+            </label>
+            <label>مقیاس Title
+              <div class="range">
+                <input type="range" id="t2Scale" min="90" max="160" value="125">
+                <div class="chip" id="t2ScaleVal">125%</div>
+              </div>
+            </label>
+          </div>
+
+          <label>Body (چندخطی)
+            <textarea id="t3">برای راد آلومینیوم
+الکتریکی
+آنچه باید بدانید</textarea>
+          </label>
+
+          <div class="row">
+            <label>سایز فونت پایه
+              <div class="range">
+                <input type="range" id="fontSize" min="24" max="92" value="54">
+                <div class="chip" id="fontSizeVal">54</div>
+              </div>
+            </label>
+            <label>فاصله خطوط
+              <div class="range">
+                <input type="range" id="lineHeight" min="105" max="170" value="128">
+                <div class="chip" id="lineHeightVal">1.28</div>
+              </div>
+            </label>
+          </div>
+
+          <div class="row">
+            <label>جابجایی عمودی متن
+              <div class="range">
+                <input type="range" id="textY" min="-140" max="140" value="0">
+                <div class="chip" id="textYVal">0</div>
+              </div>
+            </label>
+            <label>رنگ متن
+              <input type="text" id="textColor" value="#ffffff">
+            </label>
+          </div>
+
+          <div class="row">
+            <label>Stroke
+              <select id="strokeOn">
+                <option value="1" selected>روشن</option>
+                <option value="0">خاموش</option>
+              </select>
+            </label>
+            <label>Shadow
+              <select id="shadowOn">
+                <option value="1" selected>روشن</option>
+                <option value="0">خاموش</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="group">
+          <h3>کارت + نوار</h3>
+          <div class="row">
+            <label>مقیاس کارت
+              <div class="range">
+                <input type="range" id="cardScale" min="70" max="125" value="100">
+                <div class="chip" id="cardScaleVal">100%</div>
+              </div>
+            </label>
+            <label>جابجایی عمودی کارت
+              <div class="range">
+                <input type="range" id="cardY" min="-140" max="140" value="0">
+                <div class="chip" id="cardYVal">0</div>
+              </div>
+            </label>
+          </div>
+
+          <div class="row">
+            <label>گردی گوشه‌ها
+              <div class="range">
+                <input type="range" id="radius" min="6" max="40" value="18">
+                <div class="chip" id="radiusVal">18</div>
+              </div>
+            </label>
+            <label>Glow
+              <div class="range">
+                <input type="range" id="glow" min="0" max="60" value="26">
+                <div class="chip" id="glowVal">26</div>
+              </div>
+            </label>
+          </div>
+
+          <div class="row">
+            <label>نوار راست
+              <select id="stripeOn">
+                <option value="1" selected>روشن</option>
+                <option value="0">خاموش</option>
+              </select>
+            </label>
+            <label>رنگ نوار
+              <input type="text" id="stripeColor" value="#ffe500">
+            </label>
+          </div>
+        </div>
+
+        <div class="group">
+          <h3>راهنما (Safe Area + Grid)</h3>
+
+          <div class="row">
+            <label>Safe Area
+              <select id="safeOn">
+                <option value="0">خاموش</option>
+                <option value="1" selected>روشن</option>
+              </select>
+            </label>
+            <label>Grid
+              <select id="gridOn">
+                <option value="0" selected>خاموش</option>
+                <option value="1">روشن</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="row">
+            <label>حاشیه امن (px)
+              <div class="range">
+                <input type="range" id="safeInset" min="0" max="160" value="64">
+                <div class="chip" id="safeInsetVal">64</div>
+              </div>
+            </label>
+            <label>گام گرید (px)
+              <div class="range">
+                <input type="range" id="gridSize" min="16" max="160" value="64">
+                <div class="chip" id="gridSizeVal">64</div>
+              </div>
+            </label>
+          </div>
+
+          <div class="row">
+            <label>شفافیت گرید
+              <div class="range">
+                <input type="range" id="gridOpacity" min="5" max="60" value="18">
+                <div class="chip" id="gridOpacityVal">18%</div>
+              </div>
+            </label>
+            <label>راهنما در خروجی؟
+              <select id="guidesExport">
+                <option value="0" selected>نه (فقط پیش‌نمایش)</option>
+                <option value="1">بله (داخل خروجی)</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="group">
+          <h3>لوگو (رفع مشکل نمایش کامل)</h3>
+
+          <div class="row">
+            <label>حالت لوگو
+              <select id="logoMode">
+                <option value="dots" selected>لوگوی نقطه‌ای</option>
+                <option value="upload">آپلود لوگو</option>
+                <option value="off">خاموش</option>
+              </select>
+            </label>
+            <label>متن برند (اختیاری)
+              <input type="text" id="brandText" value="Elka Mehr Kimiya">
+            </label>
+          </div>
+
+          <div class="file">
+            <input type="file" id="logoFile" accept="image/*">
+          </div>
+
+          <div class="row">
+            <label>Logo Fit
+              <select id="logoFit">
+                <option value="contain" selected>Contain (کامل)</option>
+                <option value="cover">Cover (پرکردن/ممکن است برش بخورد)</option>
+              </select>
+            </label>
+            <label>Padding
+              <div class="range">
+                <input type="range" id="logoPad" min="0" max="40" value="0">
+                <div class="chip" id="logoPadVal">0px</div>
+              </div>
+            </label>
+          </div>
+
+          <div class="row">
+            <label>سایز لوگو
+              <div class="range">
+                <input type="range" id="logoSize" min="48" max="280" value="150">
+                <div class="chip" id="logoSizeVal">150</div>
+              </div>
+            </label>
+            <label>شفافیت لوگو
+              <div class="range">
+                <input type="range" id="logoOpacity" min="10" max="100" value="100">
+                <div class="chip" id="logoOpacityVal">100%</div>
+              </div>
+            </label>
+          </div>
+
+          <div class="small">✅ مشکل قبلی به‌خاطر «Cover» بود که لوگو را می‌بُرید. حالا پیش‌فرض «Contain» است.</div>
+        </div>
+
+        <div class="group">
+          <h3>خروجی (PNG / WebP)</h3>
+
+          <div class="row">
+            <label>فرمت
+              <select id="exportFormat">
+                <option value="png" selected>PNG (کامل)</option>
+                <option value="pngCompressed">PNG فشرده (کاهش رنگ)</option>
+                <option value="webp">WebP</option>
+              </select>
+            </label>
+
+            <label>کیفیت WebP
+              <div class="range">
+                <input type="range" id="webpQuality" min="40" max="100" value="92">
+                <div class="chip" id="webpQualityVal">92%</div>
+              </div>
+            </label>
+          </div>
+
+          <div class="row">
+            <label>فشرده‌سازی PNG (سطوح رنگ)
+              <div class="range">
+                <input type="range" id="pngLevels" min="8" max="64" value="48">
+                <div class="chip" id="pngLevelsVal">48</div>
+              </div>
+            </label>
+
+            <label>Dither (کم‌کردن banding)
+              <select id="pngDither">
+                <option value="1" selected>روشن</option>
+                <option value="0">خاموش</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="small">
+            PNG فشرده = کاهش رنگ برای کم‌حجم‌تر شدن (ممکن است کمی تغییر رنگ/گرادیان ایجاد شود).  
+          </div>
+        </div>
+
+        <div class="group">
+          <h3>ابزارها</h3>
+          <div class="inline-actions">
+            <button class="btn" id="resetBtn">ریست</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- RIGHT: Preview -->
+    <section class="panel preview-panel">
+      <div class="panel-header">
+        <div class="title">
+          <strong>پیش‌نمایش زنده</strong>
+          <span id="sizeLabel">1366×768</span>
+        </div>
+        <div class="inline-actions">
+          <span class="chip" id="layoutLabel">Layout: Center</span>
+        </div>
+      </div>
+
+      <div class="canvas-wrap">
+        <canvas id="cv"></canvas>
+      </div>
+
+      <div class="hint">
+        • فقط سایدبار اسکرول می‌شود. <br/>
+        • Logo Fit را روی <b>Contain</b> بگذار تا لوگو کامل نمایش داده شود. <br/>
+        • PNG فشرده = کاهش رنگ (برای حجم کمتر).
+      </div>
+    </section>
+
+  </div>
+
+<script>
+(() => {
+  const THEMES = {
+    b233: {
+      name: "B233 Neon",
+      bg: { type: "radial", a: "#0b2fb0", b: "#0aa2ff", c: "#1bd06f" },
+      card: {
+        fillA: "#012a91", fillB: "#001e68",
+        border: "rgba(140,240,255,.85)",
+        glow: "rgba(80,230,255,.95)",
+        innerLine: "rgba(255,255,255,.10)"
+      },
+      text: { color: "#ffffff", stroke: "rgba(0,0,0,.78)" }
+    },
+    iosflat: {
+      name: "iOS Flat",
+      bg: { type: "linear", a: "#0f172a", b: "#111827", c: "#0b1220" },
+      card: {
+        fillA: "rgba(255,255,255,.08)",
+        fillB: "rgba(255,255,255,.05)",
+        border: "rgba(255,255,255,.18)",
+        glow: "rgba(255,255,255,.12)",
+        innerLine: "rgba(255,255,255,.08)"
+      },
+      text: { color: "rgba(255,255,255,.95)", stroke: "rgba(0,0,0,.55)" }
+    },
+    darkglass: {
+      name: "Dark Glass",
+      bg: { type: "radial", a: "#0b1220", b: "#1b2b4a", c: "#0b1220" },
+      card: {
+        fillA: "rgba(10,18,32,.55)",
+        fillB: "rgba(10,18,32,.35)",
+        border: "rgba(70,211,255,.35)",
+        glow: "rgba(70,211,255,.45)",
+        innerLine: "rgba(255,255,255,.10)"
+      },
+      text: { color: "rgba(255,255,255,.92)", stroke: "rgba(0,0,0,.72)" }
+    },
+    sunset: {
+      name: "Sunset Warm",
+      bg: { type: "linear", a: "#2b1055", b: "#b21f66", c: "#f15a24" },
+      card: {
+        fillA: "rgba(10,10,20,.55)",
+        fillB: "rgba(10,10,20,.35)",
+        border: "rgba(255,215,120,.55)",
+        glow: "rgba(255,160,90,.55)",
+        innerLine: "rgba(255,255,255,.10)"
+      },
+      text: { color: "rgba(255,255,255,.95)", stroke: "rgba(0,0,0,.78)" }
+    },
+    mono: {
+      name: "Mono Minimal",
+      bg: { type: "linear", a: "#0b0f16", b: "#0b0f16", c: "#0b0f16" },
+      card: {
+        fillA: "rgba(255,255,255,.06)",
+        fillB: "rgba(255,255,255,.04)",
+        border: "rgba(255,255,255,.16)",
+        glow: "rgba(255,255,255,.10)",
+        innerLine: "rgba(255,255,255,.08)"
+      },
+      text: { color: "rgba(255,255,255,.92)", stroke: "rgba(0,0,0,.65)" }
+    }
+  };
+
+  const $ = (id) => document.getElementById(id);
+
+  const state = {
+    W: 1366, H: 768,
+    theme: "b233",
+    bgMode: "theme",
+    vignette: 35,
+    bgImage: null,
+    bgImageSize: null,
+    logoImage: null,
+
+    layout: "center",
+    badgeText: "استاندارد / Standard",
+    badgeFill: "rgba(255,255,255,.12)",
+    badgeTextColor: "rgba(255,255,255,.92)",
+    badgeBorder: "rgba(255,255,255,.22)",
+
+    t1: "استاندارد",
+    t2: "ASTM B233",
+    t3: "برای راد آلومینیوم\nالکتریکی\nآنچه باید بدانید",
+    t2Scale: 1.25,
+    fontSize: 54,
+    lineHeight: 1.28,
+    textY: 0,
+    textColor: "#ffffff",
+    strokeOn: true,
+    shadowOn: true,
+
+    cardScale: 1.0,
+    cardY: 0,
+    radius: 18,
+    glow: 26,
+
+    stripeOn: true,
+    stripeColor: "#ffe500",
+
+    safeOn: true,
+    safeInset: 64,
+    gridOn: false,
+    gridSize: 64,
+    gridOpacity: 0.18,
+    guidesExport: false,
+
+    logoMode: "dots",
+    logoFit: "contain",
+    logoPad: 0,
+    brandText: "Elka Mehr Kimiya",
+    logoSize: 150,
+    logoOpacity: 1.0,
+
+    exportFormat: "png",
+    webpQuality: 0.92,
+
+    pngLevels: 48,
+    pngDither: true,
+  };
+
+  const cv = $("cv");
+  const ctx = cv.getContext("2d");
+
+  function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+  function setPreviewCanvasSize(){
+    const dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(state.W * dpr);
+    cv.height = Math.round(state.H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    $("sizeLabel").textContent = `${state.W}×${state.H}`;
+  }
+
+  function roundRectPath(c, x, y, w, h, r){
+    const rr = clamp(r, 0, Math.min(w, h) / 2);
+    c.beginPath();
+    c.moveTo(x + rr, y);
+    c.arcTo(x + w, y, x + w, y + h, rr);
+    c.arcTo(x + w, y + h, x, y + h, rr);
+    c.arcTo(x, y + h, x, y, rr);
+    c.arcTo(x, y, x + w, y, rr);
+    c.closePath();
+  }
+
+  function coverDrawImage(c, img, x, y, w, h){
+    const iw = img.naturalWidth || img.width;
+    const ih = img.naturalHeight || img.height;
+    const scale = Math.max(w / iw, h / ih);
+    const sw = w / scale;
+    const sh = h / scale;
+    const sx = (iw - sw) / 2;
+    const sy = (ih - sh) / 2;
+    c.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+  }
+
+  function containDrawImage(c, img, x, y, w, h, pad=0){
+    const iw = img.naturalWidth || img.width;
+    const ih = img.naturalHeight || img.height;
+    const ww = Math.max(1, w - pad*2);
+    const hh = Math.max(1, h - pad*2);
+    const scale = Math.min(ww / iw, hh / ih);
+    const dw = iw * scale;
+    const dh = ih * scale;
+    const dx = x + (w - dw)/2;
+    const dy = y + (h - dh)/2;
+    c.drawImage(img, dx, dy, dw, dh);
+  }
+
+  function makeBgGradient(c, theme){
+    const bg = theme.bg;
+    if (bg.type === "radial"){
+      const g = c.createRadialGradient(state.W*0.25, state.H*0.15, 10, state.W*0.65, state.H*0.55, Math.max(state.W, state.H));
+      g.addColorStop(0, bg.b);
+      g.addColorStop(0.45, bg.a);
+      g.addColorStop(1, bg.c);
+      return g;
+    }
+    const g = c.createLinearGradient(0, 0, state.W, state.H);
+    g.addColorStop(0, bg.a);
+    g.addColorStop(0.55, bg.b);
+    g.addColorStop(1, bg.c);
+    return g;
+  }
+
+  function drawVignette(c, strength01){
+    if (strength01 <= 0) return;
+    const g = c.createRadialGradient(state.W/2, state.H/2, Math.min(state.W,state.H)*0.20, state.W/2, state.H/2, Math.max(state.W,state.H)*0.62);
+    g.addColorStop(0, "rgba(0,0,0,0)");
+    g.addColorStop(1, `rgba(0,0,0,${0.85*strength01})`);
+    c.fillStyle = g;
+    c.fillRect(0,0,state.W,state.H);
+  }
+
+  function wrapLine(c, text, maxWidth){
+    const words = (text || "").trim().split(/\s+/).filter(Boolean);
+    if (!words.length) return [""];
+    const lines = [];
+    let line = words[0];
+    for (let i=1;i<words.length;i++){
+      const test = line + " " + words[i];
+      if (c.measureText(test).width <= maxWidth) line = test;
+      else { lines.push(line); line = words[i]; }
+    }
+    lines.push(line);
+    return lines;
+  }
+
+  function drawTextWithStyle(c, text, x, y, options){
+    const {
+      fontSize=48, weight=800, color="#fff",
+      strokeOn=true, strokeWidth=4, strokeColor="rgba(0,0,0,.75)",
+      shadowOn=true, shadowBlur=10, shadowColor="rgba(0,0,0,.35)",
+      align="center"
+    } = options;
+
+    c.save();
+    c.direction = "rtl";
+    c.textAlign = align;
+    c.textBaseline = "middle";
+    c.font = `${weight} ${fontSize}px Vazirmatn`;
+
+    if (shadowOn){
+      c.shadowColor = shadowColor;
+      c.shadowBlur = shadowBlur;
+      c.shadowOffsetX = 0;
+      c.shadowOffsetY = 2;
+    } else {
+      c.shadowBlur = 0;
+    }
+
+    if (strokeOn){
+      c.lineJoin = "round";
+      c.miterLimit = 2;
+      c.lineWidth = strokeWidth;
+      c.strokeStyle = strokeColor;
+      c.strokeText(text, x, y);
+    }
+
+    c.fillStyle = color;
+    c.fillText(text, x, y);
+    c.restore();
+  }
+
+  function drawDotsLogo(c, centerX, baseY, size, opacity){
+    c.save();
+    c.globalAlpha = opacity;
+    const rings = 9;
+    const dotsPerRing = 10;
+    const maxR = size * 0.42;
+
+    for (let r=1;r<=rings;r++){
+      const rr = (r / rings) * maxR;
+      const count = Math.round(dotsPerRing + r*2);
+      for (let i=0;i<count;i++){
+        const ang = (i / count) * Math.PI * 2 + r*0.35;
+        const x = centerX + Math.cos(ang) * rr;
+        const y = baseY + Math.sin(ang) * rr * 0.65;
+        const dot = clamp((size * 0.06) * (1 - r/(rings+2)), 2.2, 6.8);
+        const isWarm = (i + r) % 3 === 0;
+        c.fillStyle = isWarm ? "rgba(255,140,60,.95)" : "rgba(60,140,255,.95)";
+        c.beginPath();
+        c.arc(x, y, dot, 0, Math.PI*2);
+        c.fill();
+      }
+    }
+    c.restore();
+  }
+
+  function drawBadge(c, text, x, y, maxW){
+    if (!text) return 0;
+    c.save();
+    c.direction = "rtl";
+    c.font = `800 ${Math.round(state.fontSize*0.36)}px Vazirmatn`;
+    const padX = 16, padY = 9;
+    const w = Math.min(maxW, c.measureText(text).width + padX*2);
+    const h = Math.round(state.fontSize*0.36) + padY*2;
+    const r = Math.round(h/2);
+
+    c.fillStyle = state.badgeFill;
+    c.strokeStyle = state.badgeBorder;
+    c.lineWidth = 1.5;
+    roundRectPath(c, x, y, w, h, r);
+    c.fill();
+    c.stroke();
+
+    c.shadowBlur = 0;
+    c.fillStyle = state.badgeTextColor;
+    c.textAlign = "center";
+    c.textBaseline = "middle";
+    c.fillText(text, x + w/2, y + h/2);
+
+    c.restore();
+    return h + 14;
+  }
+
+  function drawGridAndSafeArea(c, exporting){
+    const showGuides = exporting ? state.guidesExport : true;
+    if (!showGuides) return;
+
+    if (state.safeOn){
+      const inset = clamp(state.safeInset, 0, Math.min(state.W, state.H)/3);
+      c.save();
+      c.setLineDash([10, 8]);
+      c.lineWidth = 2;
+      c.strokeStyle = "rgba(255,255,255,.35)";
+      c.strokeRect(inset, inset, state.W - inset*2, state.H - inset*2);
+
+      c.setLineDash([]);
+      c.strokeStyle = "rgba(255,255,255,.45)";
+      c.lineWidth = 3;
+      const m = 18;
+      c.beginPath(); c.moveTo(inset, inset+m); c.lineTo(inset, inset); c.lineTo(inset+m, inset); c.stroke();
+      c.beginPath(); c.moveTo(state.W-inset-m, inset); c.lineTo(state.W-inset, inset); c.lineTo(state.W-inset, inset+m); c.stroke();
+      c.beginPath(); c.moveTo(inset, state.H-inset-m); c.lineTo(inset, state.H-inset); c.lineTo(inset+m, state.H-inset); c.stroke();
+      c.beginPath(); c.moveTo(state.W-inset-m, state.H-inset); c.lineTo(state.W-inset, state.H-inset); c.lineTo(state.W-inset, state.H-inset-m); c.stroke();
+
+      c.restore();
+    }
+
+    if (state.gridOn){
+      const step = clamp(state.gridSize, 12, 240);
+      c.save();
+      c.globalAlpha = clamp(state.gridOpacity, 0.05, 0.7);
+      c.strokeStyle = "rgba(255,255,255,.35)";
+      c.lineWidth = 1;
+
+      for (let x=0; x<=state.W; x+=step){
+        c.beginPath(); c.moveTo(x+0.5, 0); c.lineTo(x+0.5, state.H); c.stroke();
+      }
+      for (let y=0; y<=state.H; y+=step){
+        c.beginPath(); c.moveTo(0, y+0.5); c.lineTo(state.W, y+0.5); c.stroke();
+      }
+      c.restore();
+    }
+  }
+
+  function render(targetCtx, exporting=false){
+    const theme = THEMES[state.theme];
+    const W = state.W, H = state.H;
+
+    targetCtx.clearRect(0,0,W,H);
+
+    if (state.bgMode === "image" && state.bgImage){
+      coverDrawImage(targetCtx, state.bgImage, 0, 0, W, H);
+      targetCtx.fillStyle = "rgba(0,0,0,.18)";
+      targetCtx.fillRect(0,0,W,H);
+    } else {
+      targetCtx.fillStyle = makeBgGradient(targetCtx, theme);
+      targetCtx.fillRect(0,0,W,H);
+    }
+
+    targetCtx.fillStyle = "rgba(255,255,255,.03)";
+    targetCtx.fillRect(0,0,W,H);
+
+    drawVignette(targetCtx, clamp(state.vignette/100, 0, 1));
+
+    const baseCardW = W * 0.56;
+    const baseCardH = H * 0.74;
+    const cardW = clamp(baseCardW * state.cardScale, W*0.38, W*0.88);
+    const cardH = clamp(baseCardH * state.cardScale, H*0.40, H*0.90);
+    const cardX = (W - cardW) / 2;
+    const cardY = (H - cardH) / 2 + state.cardY;
+    const rad = state.radius;
+
+    if (state.glow > 0){
+      targetCtx.save();
+      targetCtx.shadowColor = theme.card.glow;
+      targetCtx.shadowBlur = state.glow * 2.2;
+      targetCtx.globalAlpha = 0.9;
+      targetCtx.fillStyle = theme.card.glow;
+      roundRectPath(targetCtx, cardX, cardY, cardW, cardH, rad);
+      targetCtx.fill();
+      targetCtx.restore();
+    }
+
+    const cg = targetCtx.createLinearGradient(cardX, cardY, cardX, cardY + cardH);
+    cg.addColorStop(0, theme.card.fillA);
+    cg.addColorStop(1, theme.card.fillB);
+
+    targetCtx.fillStyle = cg;
+    roundRectPath(targetCtx, cardX, cardY, cardW, cardH, rad);
+    targetCtx.fill();
+
+    targetCtx.save();
+    targetCtx.lineWidth = 3;
+    targetCtx.strokeStyle = theme.card.border;
+    roundRectPath(targetCtx, cardX, cardY, cardW, cardH, rad);
+    targetCtx.stroke();
+    targetCtx.restore();
+
+    targetCtx.save();
+    targetCtx.globalAlpha = 0.8;
+    targetCtx.strokeStyle = theme.card.innerLine;
+    targetCtx.lineWidth = 2;
+    roundRectPath(targetCtx, cardX+8, cardY+8, cardW-16, cardH-16, Math.max(6, rad-8));
+    targetCtx.stroke();
+    targetCtx.restore();
+
+    const stripeOn = state.stripeOn;
+    const stripeW = clamp(cardW * 0.028, 10, 26);
+    const stripeInset = clamp(cardW * 0.055, 18, 56);
+    const stripeX = cardX + cardW - stripeInset - stripeW;
+    const stripeY = cardY + cardH * 0.10;
+    const stripeH = cardH * 0.80;
+
+    if (stripeOn){
+      targetCtx.fillStyle = "rgba(0,0,0,.70)";
+      targetCtx.fillRect(stripeX - 6, stripeY, 6, stripeH);
+      targetCtx.fillStyle = state.stripeColor;
+      targetCtx.fillRect(stripeX, stripeY, stripeW, stripeH);
+    }
+
+    const pad = clamp(cardW * 0.085, 34, 78);
+    const textLeft = cardX + pad;
+    const textRight = stripeOn ? (stripeX - 14) : (cardX + cardW - pad);
+    const textW = Math.max(120, textRight - textLeft);
+
+    // ✅ layout alignment
+    let align = "center";
+    let anchorX = textLeft + textW/2;
+
+    if (state.layout === "left"){
+      align = "left";
+      anchorX = textLeft;
+    } else if (state.layout === "rtlStart"){
+      align = "right";
+      anchorX = textRight;
+    } else {
+      align = "center";
+      anchorX = textLeft + textW/2;
+    }
+
+    const baseSize = state.fontSize;
+    const lh = state.lineHeight;
+    const tColor = state.textColor || theme.text.color;
+    const strokeColor = theme.text.stroke;
+
+    const lines = [];
+    targetCtx.save();
+    targetCtx.direction = "rtl";
+    targetCtx.textBaseline = "middle";
+
+    if (state.layout === "badge"){
+      const tTitle = (state.t2 || "").trim();
+      const tSub = (state.t1 || "").trim();
+      const bodyParas = (state.t3 || "").split("\n").map(s=>s.trim()).filter(Boolean);
+
+      const topY = cardY + pad + 8 + state.textY;
+      const badgeH = drawBadge(targetCtx, (state.badgeText||"").trim(), textLeft, topY, textW);
+      let cursorY = topY + badgeH;
+
+      const sTitle = Math.round(baseSize * state.t2Scale);
+      targetCtx.font = `900 ${sTitle}px Vazirmatn`;
+      wrapLine(targetCtx, tTitle, textW).forEach((w, idx)=>{
+        lines.push({ text:w, size:sTitle, weight:900, gapAfter: (idx? Math.round(baseSize*0.18) : Math.round(baseSize*0.30)) });
+      });
+
+      const sSub = Math.round(baseSize * 0.62);
+      if (tSub){
+        targetCtx.font = `800 ${sSub}px Vazirmatn`;
+        wrapLine(targetCtx, tSub, textW).forEach((w, idx)=>{
+          lines.push({ text:w, size:sSub, weight:800, gapAfter: (idx? Math.round(baseSize*0.18) : Math.round(baseSize*0.35)) });
+        });
+      }
+
+      const sBody = Math.round(baseSize*0.80);
+      bodyParas.forEach((p, pi)=>{
+        targetCtx.font = `800 ${sBody}px Vazirmatn`;
+        wrapLine(targetCtx, p, textW).forEach((w)=>{
+          lines.push({ text:w, size:sBody, weight:800, gapAfter: Math.round(sBody*(lh-1)) });
+        });
+        if (pi !== bodyParas.length-1) lines.push({ text:"", size: Math.round(sBody*0.25), weight:400, gapAfter:0 });
+      });
+
+      for (const ln of lines){
+        const y = cursorY + (ln.size*lh)/2;
+        if (ln.text){
+          drawTextWithStyle(targetCtx, ln.text, anchorX, y, {
+            fontSize: ln.size, weight: ln.weight,
+            color: tColor,
+            strokeOn: !!state.strokeOn,
+            strokeWidth: clamp(Math.round(ln.size*0.07), 3, 8),
+            strokeColor,
+            shadowOn: !!state.shadowOn,
+            shadowBlur: clamp(Math.round(ln.size*0.16), 6, 18),
+            shadowColor: "rgba(0,0,0,.35)",
+            align
+          });
+        }
+        cursorY += ln.size * lh + (ln.gapAfter || 0);
+      }
+
+      targetCtx.restore();
+    } else {
+      const t1 = (state.t1 || "").trim();
+      const t2 = (state.t2 || "").trim();
+      const t3raw = (state.t3 || "").split("\n").map(s => s.trim()).filter(Boolean);
+
+      if (t1){
+        lines.push({ text: t1, size: Math.round(baseSize*0.90), weight: 800, gapAfter: Math.round(baseSize*0.35) });
+      }
+
+      if (t2){
+        const s2 = Math.round(baseSize * state.t2Scale);
+        targetCtx.font = `900 ${s2}px Vazirmatn`;
+        wrapLine(targetCtx, t2, textW).forEach((w, idx)=>{
+          lines.push({ text:w, size:s2, weight:900, gapAfter: (idx===0? Math.round(baseSize*0.35) : Math.round(baseSize*0.18)) });
+        });
+      }
+
+      const bodySize = Math.round(baseSize*0.95);
+      t3raw.forEach((para, pi)=>{
+        targetCtx.font = `800 ${bodySize}px Vazirmatn`;
+        wrapLine(targetCtx, para, textW).forEach((w)=>{
+          lines.push({ text:w, size:bodySize, weight:800, gapAfter: Math.round(bodySize*(lh-1)) });
+        });
+        if (pi !== t3raw.length-1) lines.push({ text:"", size: Math.round(bodySize*0.25), weight:400, gapAfter:0 });
+      });
+
+      let totalH = 0;
+      for (const ln of lines){
+        totalH += ln.size * lh + (ln.gapAfter || 0);
+      }
+      totalH = Math.max(0, totalH - (lines.length ? (lines[lines.length-1].gapAfter||0) : 0));
+
+      const centerY = cardY + cardH/2 + state.textY;
+      let cursorY = centerY - totalH/2;
+
+      for (const ln of lines){
+        const y = cursorY + (ln.size*lh)/2;
+        if (ln.text){
+          drawTextWithStyle(targetCtx, ln.text, anchorX, y, {
+            fontSize: ln.size, weight: ln.weight,
+            color: tColor,
+            strokeOn: !!state.strokeOn,
+            strokeWidth: clamp(Math.round(ln.size*0.07), 3, 8),
+            strokeColor,
+            shadowOn: !!state.shadowOn,
+            shadowBlur: clamp(Math.round(ln.size*0.16), 6, 18),
+            shadowColor: "rgba(0,0,0,.35)",
+            align
+          });
+        }
+        cursorY += ln.size * lh + (ln.gapAfter || 0);
+      }
+
+      targetCtx.restore();
+    }
+
+    // logo
+    const logoBaseY = cardY + cardH + clamp(H*0.065, 26, 64);
+    const logoCenterX = W/2;
+
+    if (state.logoMode === "dots"){
+      drawDotsLogo(targetCtx, logoCenterX, logoBaseY, state.logoSize, state.logoOpacity);
+    } else if (state.logoMode === "upload" && state.logoImage){
+      targetCtx.save();
+      targetCtx.globalAlpha = state.logoOpacity;
+      const s = state.logoSize;
+      const x = logoCenterX - s/2;
+      const y = logoBaseY - s/2;
+
+      if (state.logoFit === "cover"){
+        coverDrawImage(targetCtx, state.logoImage, x, y, s, s);
+      } else {
+        containDrawImage(targetCtx, state.logoImage, x, y, s, s, state.logoPad);
+      }
+
+      targetCtx.restore();
+    }
+
+    const brand = (state.brandText || "").trim();
+    if (brand && state.logoMode !== "off"){
+      drawTextWithStyle(targetCtx, brand, W/2, logoBaseY + clamp(state.logoSize*0.60, 36, 86), {
+        fontSize: clamp(Math.round(baseSize*0.42), 14, 26),
+        weight: 700,
+        color: "rgba(0,0,0,.25)",
+        strokeOn: false,
+        shadowOn: true,
+        shadowBlur: 10,
+        shadowColor: "rgba(0,0,0,.35)",
+        align: "center"
+      });
+    }
+
+    drawGridAndSafeArea(targetCtx, exporting);
+  }
+
+  function renderPreview(){
+    setPreviewCanvasSize();
+    render(ctx, false);
+    const map = { center:"Center", left:"Left", rtlStart:"RTL-Start", badge:"Badge" };
+    $("layoutLabel").textContent = `Layout: ${map[state.layout] || state.layout}`;
+  }
+
+  function loadImageFromFile(file){
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  function syncChip(id, text){ $(id).textContent = text; }
+
+  // ✅ PNG “compression” via color reduction (+ optional dithering)
+  function quantizeImageData(imgData, levels, ditherOn){
+    // levels: 8..64 (per channel levels)
+    const data = imgData.data;
+    const w = imgData.width;
+    const h = imgData.height;
+
+    const lv = clamp(levels|0, 2, 128);
+    const step = 255 / (lv - 1);
+
+    // 4x4 Bayer matrix (0..15)
+    const bayer4 = [
+      [ 0,  8,  2, 10],
+      [12,  4, 14,  6],
+      [ 3, 11,  1,  9],
+      [15,  7, 13,  5],
+    ];
+
+    for (let y=0; y<h; y++){
+      for (let x=0; x<w; x++){
+        const i = (y*w + x) * 4;
+
+        let off = 0;
+        if (ditherOn){
+          // (-0.5 .. +0.5) * step * 0.65
+          const t = (bayer4[y&3][x&3] / 15) - 0.5;
+          off = t * step * 0.65;
+        }
+
+        // quantize RGB (alpha untouched)
+        for (let c=0; c<3; c++){
+          const v = data[i+c] + off;
+          const q = Math.round(v / step) * step;
+          data[i+c] = clamp(q, 0, 255);
+        }
+      }
+    }
+    return imgData;
+  }
+
+  function bind(){
+    $("applySize").addEventListener("click", () => {
+      state.W = clamp(parseInt($("w").value || "1366", 10), 320, 6000);
+      state.H = clamp(parseInt($("h").value || "768", 10), 240, 6000);
+      renderPreview();
+    });
+
+    $("fitToBg").addEventListener("click", () => {
+      if (!state.bgImageSize) return;
+      state.W = state.bgImageSize.w;
+      state.H = state.bgImageSize.h;
+      $("w").value = state.W;
+      $("h").value = state.H;
+      renderPreview();
+    });
+
+    $("layout").addEventListener("change", (e) => { state.layout = e.target.value; renderPreview(); });
+
+    $("badgeText").addEventListener("input", (e) => { state.badgeText = e.target.value; renderPreview(); });
+    $("badgeFill").addEventListener("input", (e) => { state.badgeFill = e.target.value; renderPreview(); });
+    $("badgeTextColor").addEventListener("input", (e) => { state.badgeTextColor = e.target.value; renderPreview(); });
+    $("badgeBorder").addEventListener("input", (e) => { state.badgeBorder = e.target.value; renderPreview(); });
+
+    $("theme").addEventListener("change", (e) => { state.theme = e.target.value; renderPreview(); });
+    $("bgMode").addEventListener("change", (e) => { state.bgMode = e.target.value; renderPreview(); });
+
+    $("vignette").addEventListener("input", (e) => {
+      state.vignette = parseInt(e.target.value, 10);
+      syncChip("vignetteVal", state.vignette);
+      renderPreview();
+    });
+
+    $("bgFile").addEventListener("change", async (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      const img = await loadImageFromFile(f);
+      state.bgImage = img;
+      state.bgImageSize = { w: img.naturalWidth, h: img.naturalHeight };
+      state.bgMode = "image";
+      $("bgMode").value = "image";
+      renderPreview();
+    });
+
+    const rer = () => renderPreview();
+    $("t1").addEventListener("input", (e) => { state.t1 = e.target.value; rer(); });
+    $("t2").addEventListener("input", (e) => { state.t2 = e.target.value; rer(); });
+    $("t3").addEventListener("input", (e) => { state.t3 = e.target.value; rer(); });
+
+    $("t2Scale").addEventListener("input", (e) => {
+      state.t2Scale = parseInt(e.target.value, 10) / 100;
+      syncChip("t2ScaleVal", `${parseInt(e.target.value,10)}%`);
+      rer();
+    });
+
+    $("fontSize").addEventListener("input", (e) => {
+      state.fontSize = parseInt(e.target.value,10);
+      syncChip("fontSizeVal", state.fontSize);
+      rer();
+    });
+
+    $("lineHeight").addEventListener("input", (e) => {
+      state.lineHeight = parseInt(e.target.value,10) / 100;
+      syncChip("lineHeightVal", state.lineHeight.toFixed(2));
+      rer();
+    });
+
+    $("textY").addEventListener("input", (e) => {
+      state.textY = parseInt(e.target.value,10);
+      syncChip("textYVal", state.textY);
+      rer();
+    });
+
+    $("textColor").addEventListener("input", (e) => { state.textColor = e.target.value; rer(); });
+    $("strokeOn").addEventListener("change", (e) => { state.strokeOn = e.target.value === "1"; rer(); });
+    $("shadowOn").addEventListener("change", (e) => { state.shadowOn = e.target.value === "1"; rer(); });
+
+    $("cardScale").addEventListener("input", (e) => {
+      const v = parseInt(e.target.value,10);
+      state.cardScale = v/100;
+      syncChip("cardScaleVal", `${v}%`);
+      rer();
+    });
+
+    $("cardY").addEventListener("input", (e) => {
+      state.cardY = parseInt(e.target.value,10);
+      syncChip("cardYVal", state.cardY);
+      rer();
+    });
+
+    $("radius").addEventListener("input", (e) => {
+      state.radius = parseInt(e.target.value,10);
+      syncChip("radiusVal", state.radius);
+      rer();
+    });
+
+    $("glow").addEventListener("input", (e) => {
+      state.glow = parseInt(e.target.value,10);
+      syncChip("glowVal", state.glow);
+      rer();
+    });
+
+    $("stripeOn").addEventListener("change", (e) => { state.stripeOn = e.target.value === "1"; rer(); });
+    $("stripeColor").addEventListener("input", (e) => { state.stripeColor = e.target.value; rer(); });
+
+    $("safeOn").addEventListener("change", (e) => { state.safeOn = e.target.value === "1"; rer(); });
+    $("gridOn").addEventListener("change", (e) => { state.gridOn = e.target.value === "1"; rer(); });
+
+    $("safeInset").addEventListener("input", (e) => {
+      state.safeInset = parseInt(e.target.value,10);
+      syncChip("safeInsetVal", state.safeInset);
+      rer();
+    });
+
+    $("gridSize").addEventListener("input", (e) => {
+      state.gridSize = parseInt(e.target.value,10);
+      syncChip("gridSizeVal", state.gridSize);
+      rer();
+    });
+
+    $("gridOpacity").addEventListener("input", (e) => {
+      state.gridOpacity = parseInt(e.target.value,10)/100;
+      syncChip("gridOpacityVal", `${parseInt(e.target.value,10)}%`);
+      rer();
+    });
+
+    $("guidesExport").addEventListener("change", (e) => { state.guidesExport = e.target.value === "1"; rer(); });
+
+    // logo controls
+    $("logoMode").addEventListener("change", (e) => { state.logoMode = e.target.value; rer(); });
+    $("brandText").addEventListener("input", (e) => { state.brandText = e.target.value; rer(); });
+
+    $("logoFile").addEventListener("change", async (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      const img = await loadImageFromFile(f);
+      state.logoImage = img;
+      state.logoMode = "upload";
+      $("logoMode").value = "upload";
+      rer();
+    });
+
+    $("logoFit").addEventListener("change", (e) => { state.logoFit = e.target.value; rer(); });
+
+    $("logoPad").addEventListener("input", (e) => {
+      state.logoPad = parseInt(e.target.value,10);
+      syncChip("logoPadVal", `${state.logoPad}px`);
+      rer();
+    });
+
+    $("logoSize").addEventListener("input", (e) => {
+      state.logoSize = parseInt(e.target.value,10);
+      syncChip("logoSizeVal", state.logoSize);
+      rer();
+    });
+
+    $("logoOpacity").addEventListener("input", (e) => {
+      state.logoOpacity = parseInt(e.target.value,10)/100;
+      syncChip("logoOpacityVal", `${parseInt(e.target.value,10)}%`);
+      rer();
+    });
+
+    // export controls
+    $("exportFormat").addEventListener("change", (e) => { state.exportFormat = e.target.value; rer(); });
+
+    $("webpQuality").addEventListener("input", (e) => {
+      state.webpQuality = parseInt(e.target.value,10)/100;
+      syncChip("webpQualityVal", `${parseInt(e.target.value,10)}%`);
+      rer();
+    });
+
+    $("pngLevels").addEventListener("input", (e) => {
+      state.pngLevels = parseInt(e.target.value,10);
+      syncChip("pngLevelsVal", state.pngLevels);
+      rer();
+    });
+
+    $("pngDither").addEventListener("change", (e) => {
+      state.pngDither = e.target.value === "1";
+      rer();
+    });
+
+    // reset
+    $("resetBtn").addEventListener("click", () => {
+      Object.assign(state, {
+        W:1366, H:768,
+        theme:"b233", bgMode:"theme", vignette:35,
+        layout:"center",
+        badgeText:"استاندارد / Standard",
+        badgeFill:"rgba(255,255,255,.12)",
+        badgeTextColor:"rgba(255,255,255,.92)",
+        badgeBorder:"rgba(255,255,255,.22)",
+        t1:"استاندارد", t2:"ASTM B233", t3:"برای راد آلومینیوم\nالکتریکی\nآنچه باید بدانید",
+        t2Scale:1.25, fontSize:54, lineHeight:1.28, textY:0,
+        textColor:"#ffffff", strokeOn:true, shadowOn:true,
+        cardScale:1.0, cardY:0, radius:18, glow:26,
+        stripeOn:true, stripeColor:"#ffe500",
+        safeOn:true, safeInset:64, gridOn:false, gridSize:64, gridOpacity:0.18, guidesExport:false,
+        logoMode:"dots", logoFit:"contain", logoPad:0, brandText:"Elka Mehr Kimiya", logoSize:150, logoOpacity:1.0,
+        exportFormat:"png", webpQuality:0.92,
+        pngLevels:48, pngDither:true
+      });
+
+      $("w").value=state.W; $("h").value=state.H;
+      $("theme").value=state.theme;
+      $("bgMode").value=state.bgMode;
+      $("vignette").value=state.vignette; syncChip("vignetteVal", state.vignette);
+
+      $("layout").value=state.layout;
+
+      $("badgeText").value=state.badgeText;
+      $("badgeFill").value=state.badgeFill;
+      $("badgeTextColor").value=state.badgeTextColor;
+      $("badgeBorder").value=state.badgeBorder;
+
+      $("t1").value=state.t1; $("t2").value=state.t2; $("t3").value=state.t3;
+      $("t2Scale").value=Math.round(state.t2Scale*100); syncChip("t2ScaleVal", `${Math.round(state.t2Scale*100)}%`);
+      $("fontSize").value=state.fontSize; syncChip("fontSizeVal", state.fontSize);
+      $("lineHeight").value=Math.round(state.lineHeight*100); syncChip("lineHeightVal", state.lineHeight.toFixed(2));
+      $("textY").value=state.textY; syncChip("textYVal", state.textY);
+      $("textColor").value=state.textColor;
+      $("strokeOn").value="1"; $("shadowOn").value="1";
+
+      $("cardScale").value=100; syncChip("cardScaleVal","100%");
+      $("cardY").value=0; syncChip("cardYVal","0");
+      $("radius").value=state.radius; syncChip("radiusVal", state.radius);
+      $("glow").value=state.glow; syncChip("glowVal", state.glow);
+
+      $("stripeOn").value="1";
+      $("stripeColor").value=state.stripeColor;
+
+      $("safeOn").value="1";
+      $("gridOn").value="0";
+      $("safeInset").value=state.safeInset; syncChip("safeInsetVal", state.safeInset);
+      $("gridSize").value=state.gridSize; syncChip("gridSizeVal", state.gridSize);
+      $("gridOpacity").value=Math.round(state.gridOpacity*100); syncChip("gridOpacityVal", `${Math.round(state.gridOpacity*100)}%`);
+      $("guidesExport").value="0";
+
+      $("logoMode").value=state.logoMode;
+      $("logoFit").value=state.logoFit;
+      $("logoPad").value=state.logoPad; syncChip("logoPadVal", `${state.logoPad}px`);
+      $("brandText").value=state.brandText;
+      $("logoSize").value=state.logoSize; syncChip("logoSizeVal", state.logoSize);
+      $("logoOpacity").value=100; syncChip("logoOpacityVal","100%");
+
+      $("exportFormat").value=state.exportFormat;
+      $("webpQuality").value=Math.round(state.webpQuality*100); syncChip("webpQualityVal", `${Math.round(state.webpQuality*100)}%`);
+      $("pngLevels").value=state.pngLevels; syncChip("pngLevelsVal", state.pngLevels);
+      $("pngDither").value="1";
+
+      renderPreview();
+    });
+
+    // download
+    $("downloadBtn").addEventListener("click", async () => {
+      const out = document.createElement("canvas");
+      out.width = state.W;
+      out.height = state.H;
+      const octx = out.getContext("2d");
+      octx.setTransform(1,0,0,1,0,0);
+      render(octx, true);
+
+      const nameSafe = (state.t2 || state.t1 || "cover").toString()
+        .replace(/[^\u0600-\u06FFa-zA-Z0-9-_ ]/g, "")
+        .trim().replace(/\s+/g, "-")
+        .slice(0, 60) || "cover";
+
+      const fmt = state.exportFormat;
+
+      if (fmt === "webp"){
+        out.toBlob((blob) => {
+          if (!blob) return;
+          const a = document.createElement("a");
+          a.download = `${nameSafe}-${state.W}x${state.H}.webp`;
+          a.href = URL.createObjectURL(blob);
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+        }, "image/webp", clamp(state.webpQuality, 0.4, 1));
+        return;
+      }
+
+      if (fmt === "pngCompressed"){
+        // render -> getImageData -> quantize -> putImageData -> toBlob
+        const tmp = document.createElement("canvas");
+        tmp.width = state.W;
+        tmp.height = state.H;
+        const tctx = tmp.getContext("2d");
+        tctx.drawImage(out, 0, 0);
+
+        const imgData = tctx.getImageData(0,0,tmp.width,tmp.height);
+        quantizeImageData(imgData, state.pngLevels, state.pngDither);
+        tctx.putImageData(imgData, 0, 0);
+
+        tmp.toBlob((blob) => {
+          if (!blob) return;
+          const a = document.createElement("a");
+          a.download = `${nameSafe}-${state.W}x${state.H}-compressed.png`;
+          a.href = URL.createObjectURL(blob);
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+        }, "image/png");
+        return;
+      }
+
+      // normal PNG
+      out.toBlob((blob) => {
+        if (!blob) return;
+        const a = document.createElement("a");
+        a.download = `${nameSafe}-${state.W}x${state.H}.png`;
+        a.href = URL.createObjectURL(blob);
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      }, "image/png");
+    });
+
+    window.addEventListener("resize", () => renderPreview());
+  }
+
+  bind();
+  renderPreview();
+  if (document.fonts && document.fonts.ready){
+    document.fonts.ready.then(() => renderPreview());
+  }
+})();
+</script>
+</body>
+</html>
