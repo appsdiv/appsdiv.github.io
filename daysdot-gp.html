@@ -1,0 +1,997 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Year Dots (iOS Grouped)</title>
+
+  <!-- Vazirmatn (only used when Jalali/Persian UI is active) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --cols: 15;
+      --rows: 25;
+      --dot: 14px;
+      --gap: 12px;
+
+      --radius: 22px;
+
+      --ui-font: system-ui, -apple-system, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Arial, sans-serif;
+      --fa-font: "Vazirmatn", system-ui, -apple-system, "SF Pro Text", "Segoe UI", Roboto, Arial, sans-serif;
+
+      /* iOS palette (Dark) */
+      --bg: #000000;          /* grouped background */
+      --sheet: #1c1c1e;       /* system background */
+      --cell: #2c2c2e;        /* tertiary background */
+      --separator: rgba(84,84,88,.60);
+      --separator-inset: rgba(84,84,88,.60);
+
+      --label: rgba(255,255,255,.92);
+      --secondary: rgba(255,255,255,.60);
+      --tertiary: rgba(255,255,255,.42);
+
+      --accent: rgb(136,144,240);
+      --accent-soft: rgba(136,144,240,.12);
+
+      --dot-on: var(--accent);
+      --dot-off: rgba(255,255,255,.14);
+      --dot-pad: rgba(255,255,255,0);
+
+      --control: rgba(255,255,255,.10);
+      --control-active: rgba(255,255,255,.16);
+      --control-border: rgba(255,255,255,.10);
+
+      --danger: #ff4b4b;
+    }
+
+    html[data-theme="light"]{
+      --bg: #f2f2f7;
+      --sheet: #ffffff;
+      --cell: #ffffff;
+
+      --separator: rgba(60,60,67,.18);
+      --separator-inset: rgba(60,60,67,.18);
+
+      --label: rgba(0,0,0,.88);
+      --secondary: rgba(0,0,0,.55);
+      --tertiary: rgba(0,0,0,.38);
+
+      --accent: rgb(96,110,255);
+      --accent-soft: rgba(96,110,255,.10);
+
+      --dot-on: var(--accent);
+      --dot-off: rgba(0,0,0,.12);
+      --dot-pad: rgba(0,0,0,0);
+
+      --control: rgba(60,60,67,.08);
+      --control-active: rgba(60,60,67,.12);
+      --control-border: rgba(60,60,67,.12);
+
+      --danger: #e11d48;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      background: var(--bg);
+      color: var(--label);
+      font-family: var(--ui-font);
+      display:grid;
+      place-items:center;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    html[data-lang="fa"] body{ font-family: var(--fa-font); }
+
+    .stage{
+      width: 100vw;
+      height: 100vh;
+      padding:
+        max(12px, env(safe-area-inset-top))
+        max(12px, env(safe-area-inset-right))
+        max(12px, env(safe-area-inset-bottom))
+        max(12px, env(safe-area-inset-left));
+      display:grid;
+      place-items:center;
+      background: var(--bg);
+    }
+
+    .frame{
+      width: min(94vw, 460px);
+      height: min(96vh, 980px);
+      display:grid;
+      place-items:center;
+    }
+
+    .sheet{
+      width:100%;
+      height:100%;
+      border-radius: var(--radius);
+      background: var(--sheet);
+      border: 1px solid var(--separator);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .topbar{
+      padding: 18px 18px 10px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+      position:relative;
+    }
+
+    .year{
+      font-weight: 800;
+      letter-spacing: .08em;
+      font-size: clamp(18px, 2.6vw, 26px);
+      color: var(--label);
+      opacity:.95;
+    }
+
+    .btn{
+      position:absolute;
+      top: 12px;
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid var(--control-border);
+      background: var(--control);
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .12s ease;
+      right: 14px;
+    }
+    .btn:active{ transform: scale(.98); }
+
+    .icon{
+      width: 20px;
+      height: 20px;
+      opacity:.88;
+      color: var(--label);
+    }
+
+    .divider{
+      height:1px;
+      width:100%;
+      background: var(--separator);
+    }
+
+    .controls{
+      padding: 10px 14px 8px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+
+    .navBtn{
+      width: 38px;
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid var(--control-border);
+      background: var(--control);
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .12s ease;
+    }
+    .navBtn:active{ transform: scale(.98); }
+    .navIcon{ width:18px; height:18px; opacity:.88; color: var(--label); }
+
+    .seg{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .pill{
+      display:flex;
+      align-items:center;
+      gap: 4px;
+      padding: 4px;
+      border-radius: 999px;
+      border: 1px solid var(--control-border);
+      background: var(--control);
+    }
+
+    .pill button{
+      border:0;
+      background: transparent;
+      color: var(--secondary);
+      font-weight: 900;
+      font-size: 12px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      cursor:pointer;
+      -webkit-tap-highlight-color: transparent;
+      letter-spacing: .02em;
+      white-space: nowrap;
+    }
+    .pill button.active{
+      background: var(--control-active);
+      color: var(--label);
+    }
+
+    .content{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      padding: 10px 16px 16px 16px;
+      min-height: 0;
+    }
+
+    .grid-zone{
+      flex: 1;
+      display:flex;
+      align-items:stretch;
+      justify-content:center;
+      padding-top: 8px;
+      padding-left: 10px;
+      padding-right: 10px;
+      min-height: 0;
+    }
+
+    .grid-wrap{
+      width: 100%;
+      max-width: 420px;
+      height: 100%;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      min-height: 0;
+    }
+
+    /* Year view dots */
+    .yearView{ width: 100%; display:flex; justify-content:center; }
+
+    .dots{
+      display:grid;
+      grid-template-columns: repeat(var(--cols), var(--dot));
+      grid-auto-rows: var(--dot);
+      column-gap: var(--gap);
+      row-gap: var(--gap);
+      padding: 10px 6px 8px 6px;
+    }
+
+    .dot{
+      width: var(--dot);
+      height: var(--dot);
+      border-radius: 999px;
+      background: var(--dot-on);
+    }
+    .dot.is-off{ background: var(--dot-off); }
+    .dot.is-pad{ background: var(--dot-pad); }
+
+    /* ✅ iOS Grouped Table (Months) */
+    .monthList{
+      width: 100%;
+      height: 100%;
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 10px 0 10px 0;
+      scroll-behavior: smooth;
+    }
+
+    .group{
+      border-radius: 14px;
+      overflow:hidden;
+      border: 1px solid var(--separator);
+      background: var(--cell);
+      margin: 0 0 14px 0;
+    }
+
+    .row{
+      position:relative;
+      padding: 12px 12px 10px 12px;
+      background: var(--cell);
+    }
+
+    /* iOS separators: full width, inset from left like Settings */
+    .row:not(:last-child)::after{
+      content:"";
+      position:absolute;
+      left: 12px;
+      right: 0;
+      bottom: 0;
+      height: 1px;
+      background: var(--separator-inset);
+    }
+
+    .rowHead{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .rowTitle{
+      font-weight: 900;
+      font-size: 14px;
+      color: var(--label);
+      letter-spacing: .01em;
+    }
+
+    .rowMeta{
+      font-size: 12px;
+      color: var(--secondary);
+      font-weight: 800;
+      white-space:nowrap;
+    }
+
+    /* Current month: subtle flat tint (no side bar) */
+    .row.current{
+      background: color-mix(in srgb, var(--accent-soft) 55%, var(--cell));
+    }
+    @supports not (color: color-mix(in srgb, white 50%, black)) {
+      .row.current{ background: var(--cell); }
+    }
+
+    /* Bottom stats (iOS-like wording) */
+    .stats{
+      margin-top:auto;
+      padding: 18px 0 6px 0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      font-size: 16px;
+      letter-spacing: .01em;
+    }
+    .stats .left{ color: var(--danger); font-weight: 900; }
+    .stats .sep{ color: var(--separator); transform: translateY(-1px); }
+    .stats .pct{ color: var(--secondary); font-weight: 900; }
+
+    /* Year change animation (subtle) */
+    .anim-next{ animation: slideNext .16s ease both; }
+    .anim-prev{ animation: slidePrev .16s ease both; }
+    @keyframes slideNext{ from{ transform: translateX(10px); opacity:.75; } to{ transform: translateX(0); opacity:1; } }
+    @keyframes slidePrev{ from{ transform: translateX(-10px); opacity:.75; } to{ transform: translateX(0); opacity:1; } }
+  </style>
+</head>
+
+<body>
+  <div class="stage">
+    <div class="frame">
+      <div class="sheet" id="sheet" role="application" aria-label="Year dots view">
+        <div class="topbar">
+          <div class="year" id="yearLabel">2025</div>
+
+          <button class="btn" id="themeBtn" aria-label="Toggle theme" title="Toggle theme">
+            <svg class="icon" id="themeIcon" viewBox="0 0 24 24" fill="none"></svg>
+          </button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="controls" aria-label="Controls">
+          <button class="navBtn" id="prevYearBtn" aria-label="Previous year">
+            <svg class="navIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M14.5 5.5 8 12l6.5 6.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="seg">
+            <div class="pill" aria-label="View mode">
+              <button id="viewYearBtn" class="active" type="button">YEAR</button>
+              <button id="viewMonthBtn" type="button">MONTHS</button>
+            </div>
+
+            <div class="pill" aria-label="Calendar">
+              <button id="calGBtn" class="active" type="button">G</button>
+              <button id="calJBtn" type="button">J</button>
+            </div>
+          </div>
+
+          <button class="navBtn" id="nextYearBtn" aria-label="Next year">
+            <svg class="navIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M9.5 5.5 16 12l-6.5 6.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="content">
+          <div class="grid-zone" id="gestureZone">
+            <div class="grid-wrap" id="gridWrap"></div>
+          </div>
+
+          <div class="stats" aria-label="Progress">
+            <span class="left" id="daysLeft"></span>
+            <span class="sep">·</span>
+            <span class="pct" id="pct"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /*********************************************************
+     * Settings (localStorage)
+     *********************************************************/
+    const STORE_KEY = "yearDotsSettings_iosGrouped_v1";
+    const DEFAULTS = {
+      theme: null,              // 'dark' | 'light' | null (auto)
+      calendar: "gregorian",    // 'gregorian' | 'jalali'
+      view: "year",             // 'year' | 'months'
+      years: { gregorian: null, jalali: null }
+    };
+
+    function safeParse(json, fallback){ try{ return JSON.parse(json); } catch { return fallback; } }
+    function deepClone(obj){ return JSON.parse(JSON.stringify(obj)); }
+
+    function loadSettings(){
+      const raw = localStorage.getItem(STORE_KEY);
+      const saved = raw ? safeParse(raw, null) : null;
+      const s = deepClone(DEFAULTS);
+
+      if (saved && typeof saved === "object"){
+        if (saved.theme === "dark" || saved.theme === "light" || saved.theme === null) s.theme = saved.theme;
+        if (saved.calendar === "gregorian" || saved.calendar === "jalali") s.calendar = saved.calendar;
+        if (saved.view === "year" || saved.view === "months") s.view = saved.view;
+        if (saved.years && typeof saved.years === "object"){
+          if (Number.isInteger(saved.years.gregorian)) s.years.gregorian = saved.years.gregorian;
+          if (Number.isInteger(saved.years.jalali)) s.years.jalali = saved.years.jalali;
+        }
+      }
+      return s;
+    }
+
+    function saveSettings(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(STATE)); } catch {} }
+    let STATE = loadSettings();
+
+    /*********************************************************
+     * Theme
+     *********************************************************/
+    const icons = {
+      sun: () => `
+        <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" stroke="currentColor" stroke-width="2.2"/>
+        <path d="M12 2.6v2.4M12 19v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.6 12h2.4M19 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"
+              stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+      `,
+      moon: () => `
+        <path d="M20 14.2A7.6 7.6 0 0 1 9.8 4a6.4 6.4 0 1 0 10.2 10.2Z"
+              stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+      `
+    };
+
+    function autoTheme(){
+      return window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+    }
+
+    function applyTheme(){
+      const theme = (STATE.theme === "dark" || STATE.theme === "light") ? STATE.theme : autoTheme();
+      document.documentElement.dataset.theme = theme;
+      document.getElementById("themeIcon").innerHTML = (theme === "dark") ? icons.sun() : icons.moon();
+    }
+
+    function toggleTheme(){
+      const current = document.documentElement.dataset.theme || "dark";
+      STATE.theme = current === "dark" ? "light" : "dark";
+      saveSettings();
+      applyTheme();
+    }
+
+    /*********************************************************
+     * Jalali (jalaali-js core)
+     *********************************************************/
+    function div(a,b){ return ~~(a/b); }
+    function mod(a,b){ return a - ~~(a/b)*b; }
+
+    function jalCal(jy){
+      const breaks = [-61, 9, 38, 199, 426, 686, 756, 818, 1111, 1181, 1210
+        , 1635, 2060, 2097, 2192, 2262, 2324, 2394, 2456, 3178];
+      let bl = breaks.length;
+      let gy = jy + 621;
+      let leapJ = -14;
+      let jp = breaks[0];
+      let jm, jump, leap, n, i;
+
+      if (jy < jp || jy >= breaks[bl-1]) throw new Error("Invalid Jalali year " + jy);
+
+      for (i = 1; i < bl; i += 1){
+        jm = breaks[i];
+        jump = jm - jp;
+        if (jy < jm) break;
+        leapJ = leapJ + div(jump, 33) * 8 + div(mod(jump, 33), 4);
+        jp = jm;
+      }
+      n = jy - jp;
+
+      leapJ = leapJ + div(n, 33) * 8 + div(mod(n, 33) + 3, 4);
+      if (mod(jump, 33) === 4 && jump - n === 4) leapJ += 1;
+
+      let leapG = div(gy,4) - div((div(gy,100)+1)*3,4) - 150;
+      let march = 20 + leapJ - leapG;
+
+      if (jump - n < 6) n = n - jump + div(jump + 4, 33) * 33;
+      leap = mod(mod(n + 1, 33) - 1, 4);
+      if (leap === -1) leap = 4;
+
+      return { leap, gy, march };
+    }
+
+    function isLeapJalaaliYear(jy){ return jalCal(jy).leap === 0; }
+    function jalaaliMonthLength(jy, jm){
+      if (jm <= 6) return 31;
+      if (jm <= 11) return 30;
+      return isLeapJalaaliYear(jy) ? 30 : 29;
+    }
+
+    function g2d(gy, gm, gd){
+      let d = div((gy + div(gm - 8, 6) + 100100) * 1461, 4)
+            + div(153 * mod(gm + 9, 12) + 2, 5)
+            + gd - 34840408;
+      d = d - div(div(gy + 100100 + div(gm - 8, 6), 100) * 3, 4) + 752;
+      return d;
+    }
+
+    function d2g(jdn){
+      let j = 4 * jdn + 139361631;
+      j = j + div(div(4 * jdn + 183187720, 146097) * 3, 4) * 4 - 3908;
+      let i = div(mod(j, 1461), 4) * 5 + 308;
+      let gd = div(mod(i, 153), 5) + 1;
+      let gm = mod(div(i, 153), 12) + 1;
+      let gy = div(j, 1461) - 100100 + div(8 - gm, 6);
+      return { gy, gm, gd };
+    }
+
+    function d2j(jdn){
+      let gy = d2g(jdn).gy;
+      let jy = gy - 621;
+      let r = jalCal(jy);
+      let jdn1f = g2d(gy, 3, r.march);
+      let k = jdn - jdn1f;
+      let jm, jd;
+
+      if (k >= 0){
+        if (k <= 185){
+          jm = 1 + div(k, 31);
+          jd = mod(k, 31) + 1;
+          return { jy, jm, jd };
+        } else { k -= 186; }
+      } else {
+        jy -= 1;
+        k += 179;
+        if (r.leap === 1) k += 1;
+      }
+      jm = 7 + div(k, 30);
+      jd = mod(k, 30) + 1;
+      return { jy, jm, jd };
+    }
+
+    function toJalaali(gy, gm, gd){ return d2j(g2d(gy, gm, gd)); }
+
+    /*********************************************************
+     * Month labels
+     *********************************************************/
+    const G_MONTHS_EN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const J_MONTHS_FA = ["فروردین","اردیبهشت","خرداد","تیر","مرداد","شهریور","مهر","آبان","آذر","دی","بهمن","اسفند"];
+
+    function isLeapGregorian(y){
+      return (y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0);
+    }
+    function daysInGregorianYear(y){ return isLeapGregorian(y) ? 366 : 365; }
+    function gregorianMonthLengths(y){
+      return [31, isLeapGregorian(y) ? 29 : 28, 31,30,31,30,31,31,30,31,30,31];
+    }
+
+    function startOfDay(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+    function dayIndexGregorian(date, year){
+      const msPerDay = 86400000;
+      const start = new Date(year, 0, 1);
+      return Math.floor((startOfDay(date) - start) / msPerDay);
+    }
+
+    function dayIndexJalaliFromGregorian(date){
+      const gY = date.getFullYear(), gM = date.getMonth()+1, gD = date.getDate();
+      const j = toJalaali(gY, gM, gD);
+      const jy = j.jy, jm = j.jm, jd = j.jd;
+      let idx = 0;
+      for (let m=1; m<jm; m++) idx += jalaaliMonthLength(jy, m);
+      idx += (jd - 1);
+      return { jy, jm, idx };
+    }
+
+    function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
+
+    function getCurrentYearForCalendar(cal){
+      const now = new Date();
+      if (cal === "gregorian") return now.getFullYear();
+      return toJalaali(now.getFullYear(), now.getMonth()+1, now.getDate()).jy;
+    }
+
+    function getCurrentMonthIndexForCalendar(cal){
+      const now = new Date();
+      if (cal === "gregorian") return now.getMonth();
+      const j = dayIndexJalaliFromGregorian(now);
+      return clamp(j.jm - 1, 0, 11);
+    }
+
+    function getPassedDays(cal, year){
+      const now = new Date();
+
+      if (cal === "gregorian"){
+        const cur = now.getFullYear();
+        const total = daysInGregorianYear(year);
+        if (year < cur) return { passed: total, total, rel: "past" };
+        if (year > cur) return { passed: 0, total, rel: "future" };
+        const idx = clamp(dayIndexGregorian(now, year), 0, total-1);
+        return { passed: idx + 1, total, rel: "current" };
+      }
+
+      const { jy: curJy } = dayIndexJalaliFromGregorian(now);
+      const total = isLeapJalaaliYear(year) ? 366 : 365;
+      if (year < curJy) return { passed: total, total, rel: "past" };
+      if (year > curJy) return { passed: 0, total, rel: "future" };
+
+      const { idx } = dayIndexJalaliFromGregorian(now);
+      const safeIdx = clamp(idx, 0, total-1);
+      return { passed: safeIdx + 1, total, rel: "current" };
+    }
+
+    function getMonthData(cal, year){
+      if (cal === "gregorian"){
+        return { names: G_MONTHS_EN, lengths: gregorianMonthLengths(year) };
+      }
+      const lens = [];
+      for (let m=1; m<=12; m++) lens.push(jalaaliMonthLength(year, m));
+      return { names: J_MONTHS_FA, lengths: lens };
+    }
+
+    function isCurrentDisplayedYear(cal, year){
+      return year === getCurrentYearForCalendar(cal);
+    }
+
+    /*********************************************************
+     * Pixel perfect dot sizing
+     *********************************************************/
+    const COLS = 15;
+    const ROWS = 25;
+
+    function computeDotGap({W, H, cols, rows}){
+      const ratio = 0.86;
+      const denomW = cols + (cols - 1) * ratio;
+      const denomH = rows + (rows - 1) * ratio;
+      let d = Math.min(W / denomW, H / denomH);
+      d = clamp(d, 11.0, 17.6);
+      let g = d * ratio;
+      d = Math.round(d * 2) / 2;
+      g = Math.round(g * 2) / 2;
+      return { d, g };
+    }
+
+    function applyGridMetrics(){
+      const wrap = document.getElementById("gridWrap");
+      const rect = wrap.getBoundingClientRect();
+      const innerW = Math.max(0, rect.width - 2);
+      const innerH = Math.max(0, rect.height - 6);
+      const { d, g } = computeDotGap({ W: innerW, H: innerH, cols: COLS, rows: ROWS });
+      document.documentElement.style.setProperty("--cols", COLS);
+      document.documentElement.style.setProperty("--rows", ROWS);
+      document.documentElement.style.setProperty("--dot", d + "px");
+      document.documentElement.style.setProperty("--gap", g + "px");
+    }
+
+    /*********************************************************
+     * State helpers
+     *********************************************************/
+    function selectedYear(){
+      const cal = STATE.calendar;
+      const cur = getCurrentYearForCalendar(cal);
+      if (!Number.isInteger(STATE.years[cal])) STATE.years[cal] = cur;
+      return STATE.years[cal];
+    }
+
+    function setSelectedYear(y, direction){
+      const cal = STATE.calendar;
+      STATE.years[cal] = y;
+      saveSettings();
+      render(direction);
+    }
+
+    function setCalendar(cal){
+      STATE.calendar = cal;
+      document.documentElement.dataset.lang = (cal === "jalali") ? "fa" : "en";
+
+      const cur = getCurrentYearForCalendar(cal);
+      if (!Number.isInteger(STATE.years[cal])) STATE.years[cal] = cur;
+      saveSettings();
+      render();
+    }
+
+    function updateControlsUI(){
+      document.getElementById("yearLabel").textContent = String(selectedYear());
+
+      const isYear = STATE.view === "year";
+      document.getElementById("viewYearBtn").classList.toggle("active", isYear);
+      document.getElementById("viewMonthBtn").classList.toggle("active", !isYear);
+
+      const isG = STATE.calendar === "gregorian";
+      document.getElementById("calGBtn").classList.toggle("active", isG);
+      document.getElementById("calJBtn").classList.toggle("active", !isG);
+    }
+
+    /*********************************************************
+     * iOS-like wording + pluralization
+     *********************************************************/
+    function pluralize(n, one, other){
+      return n === 1 ? one : other;
+    }
+
+    function formatDaysLeftText(left, rel, total){
+      // past: 0 days left
+      // future: 365/366 days left
+      // current: X days left
+      if (rel === "past") left = 0;
+      if (rel === "future") left = total;
+
+      const word = pluralize(left, "day", "days");
+      return `${left} ${word} left`;
+    }
+
+    function updateStats(passed, total, rel){
+      let left, pct;
+      if (rel === "past"){
+        left = 0; pct = 100;
+      } else if (rel === "future"){
+        left = total; pct = 0;
+      } else {
+        left = total - passed;
+        pct = total ? Math.floor((passed / total) * 100) : 0;
+      }
+      document.getElementById("daysLeft").textContent = formatDaysLeftText(left, rel, total);
+      document.getElementById("pct").textContent = `${pct}%`;
+    }
+
+    function animateContainer(el, direction){
+      if (!el) return;
+      el.classList.remove("anim-next","anim-prev");
+      void el.offsetWidth;
+      if (direction === "next") el.classList.add("anim-next");
+      if (direction === "prev") el.classList.add("anim-prev");
+      setTimeout(() => el && el.classList.remove("anim-next","anim-prev"), 200);
+    }
+
+    /*********************************************************
+     * Month auto-scroll to current month (current year only)
+     *********************************************************/
+    function autoScrollToCurrentMonth(listEl, cal, year){
+      if (!listEl) return;
+      if (!isCurrentDisplayedYear(cal, year)) return;
+
+      const idx = getCurrentMonthIndexForCalendar(cal);
+      const target = listEl.querySelector(`[data-month-index="${idx}"]`);
+      if (!target) return;
+
+      const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const behavior = reduce ? "auto" : "smooth";
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const top = Math.max(0, target.offsetTop - 10);
+          listEl.scrollTo({ top, behavior });
+        });
+      });
+    }
+
+    /*********************************************************
+     * Renderers
+     *********************************************************/
+    function renderYearView({ passed, total, direction }){
+      const gridWrap = document.getElementById("gridWrap");
+      gridWrap.innerHTML = "";
+
+      const yearView = document.createElement("div");
+      yearView.className = "yearView";
+
+      const dots = document.createElement("div");
+      dots.className = "dots";
+
+      const totalSlots = COLS * ROWS;
+      const frag = document.createDocumentFragment();
+
+      for (let slot=0; slot<totalSlots; slot++){
+        const d = document.createElement("div");
+        d.className = "dot";
+        if (slot >= total) d.classList.add("is-pad");
+        else if (slot >= passed) d.classList.add("is-off");
+        frag.appendChild(d);
+      }
+
+      dots.appendChild(frag);
+      yearView.appendChild(dots);
+      gridWrap.appendChild(yearView);
+
+      animateContainer(dots, direction);
+    }
+
+    function renderMonthView({ cal, year, passed, rel, direction }){
+      const gridWrap = document.getElementById("gridWrap");
+      gridWrap.innerHTML = "";
+
+      const list = document.createElement("div");
+      list.className = "monthList";
+
+      const group = document.createElement("div");
+      group.className = "group";
+
+      const { names, lengths } = getMonthData(cal, year);
+      const currentMonthIdx = (rel === "current") ? getCurrentMonthIndexForCalendar(cal) : -1;
+
+      let dayCursor = 0;
+
+      for (let i=0; i<12; i++){
+        const mLen = lengths[i];
+
+        const row = document.createElement("div");
+        row.className = "row";
+        row.dataset.monthIndex = String(i);
+        if (i === currentMonthIdx) row.classList.add("current");
+
+        const head = document.createElement("div");
+        head.className = "rowHead";
+
+        const title = document.createElement("div");
+        title.className = "rowTitle";
+        title.textContent = names[i];
+
+        const meta = document.createElement("div");
+        meta.className = "rowMeta";
+        meta.textContent = `${mLen} days`;
+
+        head.appendChild(title);
+        head.appendChild(meta);
+
+        const dots = document.createElement("div");
+        dots.className = "dots";
+
+        const frag = document.createDocumentFragment();
+
+        for (let d=0; d<mLen; d++){
+          const dot = document.createElement("div");
+          dot.className = "dot";
+          const globalDay = dayCursor + d;
+          if (globalDay >= passed) dot.classList.add("is-off");
+          frag.appendChild(dot);
+        }
+
+        // pad to complete last row
+        const rem = mLen % COLS;
+        const padCount = rem === 0 ? 0 : (COLS - rem);
+        for (let p=0; p<padCount; p++){
+          const pad = document.createElement("div");
+          pad.className = "dot is-pad";
+          frag.appendChild(pad);
+        }
+
+        dots.appendChild(frag);
+
+        row.appendChild(head);
+        row.appendChild(dots);
+
+        group.appendChild(row);
+        dayCursor += mLen;
+      }
+
+      list.appendChild(group);
+      gridWrap.appendChild(list);
+
+      animateContainer(list, direction);
+      autoScrollToCurrentMonth(list, cal, year);
+    }
+
+    function render(direction){
+      applyTheme();
+      updateControlsUI();
+
+      const cal = STATE.calendar;
+      const year = selectedYear();
+      document.documentElement.dataset.lang = (cal === "jalali") ? "fa" : "en";
+
+      const { passed, total, rel } = getPassedDays(cal, year);
+      updateStats(passed, total, rel);
+
+      if (STATE.view === "year") renderYearView({ passed, total, direction });
+      else renderMonthView({ cal, year, passed, rel, direction });
+
+      applyGridMetrics();
+    }
+
+    /*********************************************************
+     * Swipe year change
+     *********************************************************/
+    function setupSwipe(){
+      const zone = document.getElementById("gestureZone");
+      let startX=0, startY=0, startT=0, active=false;
+
+      zone.addEventListener("touchstart", (e) => {
+        if (!e.touches || e.touches.length !== 1) return;
+        const t = e.touches[0];
+        startX = t.clientX; startY = t.clientY; startT = performance.now();
+        active = true;
+      }, { passive:true });
+
+      zone.addEventListener("touchend", (e) => {
+        if (!active) return;
+        active = false;
+        const t = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0] : null;
+        if (!t) return;
+
+        const dx = t.clientX - startX;
+        const dy = t.clientY - startY;
+        const dt = performance.now() - startT;
+
+        if (Math.abs(dx) < 60) return;
+        if (Math.abs(dx) < Math.abs(dy) * 1.2) return;
+        if (dt > 650) return;
+
+        if (dx < 0) nextYear("next"); else prevYear("prev");
+      }, { passive:true });
+    }
+
+    function prevYear(direction="prev"){ setSelectedYear(selectedYear() - 1, direction); }
+    function nextYear(direction="next"){ setSelectedYear(selectedYear() + 1, direction); }
+
+    /*********************************************************
+     * Midnight refresh
+     *********************************************************/
+    function scheduleMidnightRefresh(){
+      const now = new Date();
+      const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 2);
+      const ms = next - now;
+      setTimeout(() => { render(); scheduleMidnightRefresh(); }, ms);
+    }
+
+    /*********************************************************
+     * Init
+     *********************************************************/
+    function initYears(){
+      const curG = getCurrentYearForCalendar("gregorian");
+      const curJ = getCurrentYearForCalendar("jalali");
+      if (!Number.isInteger(STATE.years.gregorian)) STATE.years.gregorian = curG;
+      if (!Number.isInteger(STATE.years.jalali)) STATE.years.jalali = curJ;
+    }
+
+    initYears();
+    applyTheme();
+
+    document.getElementById("themeBtn").addEventListener("click", toggleTheme);
+
+    document.getElementById("viewYearBtn").addEventListener("click", () => { STATE.view="year"; saveSettings(); render(); });
+    document.getElementById("viewMonthBtn").addEventListener("click", () => { STATE.view="months"; saveSettings(); render(); });
+
+    document.getElementById("calGBtn").addEventListener("click", () => setCalendar("gregorian"));
+    document.getElementById("calJBtn").addEventListener("click", () => setCalendar("jalali"));
+
+    document.getElementById("prevYearBtn").addEventListener("click", () => prevYear("prev"));
+    document.getElementById("nextYearBtn").addEventListener("click", () => nextYear("next"));
+
+    const ro = new ResizeObserver(() => applyGridMetrics());
+    ro.observe(document.getElementById("gridWrap"));
+    window.addEventListener("orientationchange", () => setTimeout(applyGridMetrics, 60));
+    window.addEventListener("resize", () => applyGridMetrics());
+
+    setupSwipe();
+
+    // respect saved calendar on boot for font behavior
+    document.documentElement.dataset.lang = (STATE.calendar === "jalali") ? "fa" : "en";
+
+    render();
+    scheduleMidnightRefresh();
+  </script>
+</body>
+</html>
