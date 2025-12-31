@@ -1,0 +1,677 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Days Dot</title>
+    
+    <meta name="application-name" content="Days Dot">
+    <meta name="apple-mobile-web-app-title" content="Days Dot">
+
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/5tBkQnDv/App-Icon-3x.png">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/5tBkQnDv/App-Icon-3x.png">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="manifest" href='data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Days%20Dot%22%2C%22short_name%22%3A%22Days%20Dot%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23050505%22%2C%22theme_color%22%3A%22%23050505%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fi.postimg.cc%2F5tBkQnDv%2FApp-Icon-3x.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Fi.postimg.cc%2F5tBkQnDv%2FApp-Icon-3x.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D'>
+
+    <style>
+        :root {
+            /* Default Defaults */
+            --bg-color: #050505;
+            --panel-bg: #1c1c1e;
+            --text-primary: #ffffff;
+            --text-secondary: #8E8E93;
+            --dot-active: #7F8CFF;
+            --dot-inactive: #2c2c2e;
+            --accent-red: #FF453A;
+            --border-color: #333;
+            --btn-hover: rgba(255, 255, 255, 0.1);
+            --shadow: 0 -4px 30px rgba(0,0,0,0.6);
+            --toggle-bg: #39393D;
+        }
+
+        /* --- THEMES --- */
+        
+        /* 1. Classic Dark */
+        [data-theme="classic"] {
+            --bg-color: #000000; --panel-bg: #1C1C1E; --text-primary: #FFFFFF; --text-secondary: #98989F;
+            --dot-active: #5E5CE6; --dot-inactive: #252525;
+        }
+
+        /* 2. Light Mode */
+        [data-theme="light"] {
+            --bg-color: #F2F2F7; --panel-bg: #FFFFFF; --text-primary: #000000; --text-secondary: #8E8E93;
+            --dot-active: #007AFF; --dot-inactive: #D1D1D6; --accent-red: #FF3B30; --border-color: #E5E5EA;
+            --btn-hover: rgba(0,0,0,0.05); --shadow: 0 -4px 30px rgba(0,0,0,0.1); --toggle-bg: #E9E9EA;
+        }
+
+        /* 3. Ocean */
+        [data-theme="ocean"] {
+            --bg-color: #001219; --panel-bg: #001f2b; --text-primary: #E0FBFC; --text-secondary: #5F9EA0;
+            --dot-active: #48CAE4; --dot-inactive: #082933; --accent-red: #FF6B6B; --border-color: #0A3D4A;
+        }
+
+        /* 4. Sunset */
+        [data-theme="sunset"] {
+            --bg-color: #1a0b2e; --panel-bg: #2d1b4e; --text-primary: #fff1f2; --text-secondary: #a78bfa;
+            --dot-active: #fb923c; --dot-inactive: #433069; --accent-red: #f43f5e; --border-color: #5b21b6;
+        }
+
+        /* 5. Forest */
+        [data-theme="forest"] {
+            --bg-color: #051909; --panel-bg: #0d2912; --text-primary: #ecfccb; --text-secondary: #84cc16;
+            --dot-active: #a3e635; --dot-inactive: #1a381d; --accent-red: #ef4444; --border-color: #14532d;
+        }
+
+        /* 6. Neon */
+        [data-theme="neon"] {
+            --bg-color: #090014; --panel-bg: #120024; --text-primary: #ff00ff; --text-secondary: #00ffff;
+            --dot-active: #f7ff00; --dot-inactive: #32004a; --accent-red: #ff0055; --border-color: #4a006a;
+        }
+
+        /* 7. Pastel */
+        [data-theme="pastel"] {
+            --bg-color: #fffaf0; --panel-bg: #fff5e6; --text-primary: #5a5a5a; --text-secondary: #a0a0a0;
+            --dot-active: #ffb7c5; --dot-inactive: #e0e0e0; --accent-red: #ffaaa5; --border-color: #ffe4d1;
+            --shadow: 0 -4px 30px rgba(0,0,0,0.05); --btn-hover: rgba(0,0,0,0.03);
+        }
+
+        /* 8. Monochrome */
+        [data-theme="mono"] {
+            --bg-color: #121212; --panel-bg: #000000; --text-primary: #ffffff; --text-secondary: #aaaaaa;
+            --dot-active: #ffffff; --dot-inactive: #333333; --accent-red: #ffffff; --border-color: #333333;
+        }
+
+        /* 9. Matrix (Cyber) */
+        [data-theme="cyber"] {
+            --bg-color: #000000; --panel-bg: #001100; --text-primary: #00ff00; --text-secondary: #008f11;
+            --dot-active: #00ff41; --dot-inactive: #002200; --accent-red: #ccff00; --border-color: #003300;
+        }
+
+        /* 10. Coffee */
+        [data-theme="coffee"] {
+            --bg-color: #2b211e; --panel-bg: #3E2F2B; --text-primary: #E6D2B5; --text-secondary: #9C8370;
+            --dot-active: #D4A373; --dot-inactive: #1F1715; --accent-red: #FF8866; --border-color: #54413B;
+        }
+
+        /* 11. Royal */
+        [data-theme="royal"] {
+            --bg-color: #0f172a; --panel-bg: #1e293b; --text-primary: #f8fafc; --text-secondary: #94a3b8;
+            --dot-active: #fbbf24; --dot-inactive: #334155; --accent-red: #f87171; --border-color: #334155;
+        }
+
+        /* 12. Berry */
+        [data-theme="berry"] {
+            --bg-color: #2D0F18; --panel-bg: #4A1A28; --text-primary: #FFE4E9; --text-secondary: #B97A8A;
+            --dot-active: #FF4D7D; --dot-inactive: #1A050A; --accent-red: #FF9E9E; --border-color: #692438;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            overflow: hidden;
+            /* Prevent overscroll on iOS */
+            overscroll-behavior: none; 
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 600px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* --- Header --- */
+        header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            flex-shrink: 0;
+            z-index: 20;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-primary);
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-btn:hover { background-color: var(--btn-hover); }
+        .icon-btn svg { width: 24px; height: 24px; fill: currentColor; }
+
+        .header-right { position: absolute; right: 20px; }
+
+        .year-wrapper { display: flex; align-items: center; gap: 15px; }
+        .nav-arrow {
+            font-size: 20px; color: var(--text-secondary); background: none; border: none;
+            cursor: pointer; padding: 5px; opacity: 0.5; transition: opacity 0.2s;
+        }
+        .nav-arrow:hover { opacity: 1; }
+
+        h1 {
+            font-family: "Times New Roman", Times, serif;
+            font-weight: 400;
+            font-size: 32px;
+            letter-spacing: 0.5px;
+            min-width: 80px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        /* --- Grid --- */
+        #main-view {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 20px;
+            scrollbar-width: none;
+            opacity: 1;
+            transition: opacity 0.2s ease-in-out;
+            /* Add bottom padding to ensure content isn't covered by footer/panel */
+            padding-bottom: 20px;
+        }
+        #main-view::-webkit-scrollbar { display: none; }
+        #main-view.fading { opacity: 0.3; }
+
+        .grid-continuous {
+            display: grid;
+            grid-template-columns: repeat(15, 1fr);
+            gap: 6px;
+            align-content: start;
+        }
+
+        .grid-months {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 20px;
+        }
+
+        .month-block { display: flex; flex-direction: column; gap: 8px; }
+        .month-label {
+            font-size: 12px; font-weight: 700; color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .month-dots { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+
+        .dot {
+            aspect-ratio: 1; border-radius: 50%; width: 100%;
+            transition: background-color 0.4s ease;
+        }
+        .dot.active { background-color: var(--dot-active); }
+        .dot.inactive { background-color: var(--dot-inactive); }
+
+        /* --- Footer --- */
+        footer {
+            padding: 20px; display: flex; justify-content: center; gap: 8px;
+            font-size: 16px; font-weight: 500; 
+            flex-shrink: 0;
+            background: linear-gradient(to top, var(--bg-color) 30%, transparent);
+            z-index: 10;
+            position: relative;
+            /* Safe area for iOS Home Indicator */
+            padding-bottom: calc(20px + env(safe-area-inset-bottom));
+        }
+        .days-left { color: var(--accent-red); }
+        .percentage { color: var(--text-secondary); }
+
+        /* --- Settings Panel --- */
+        #settings-panel {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background-color: var(--panel-bg);
+            border-top-left-radius: 24px; border-top-right-radius: 24px;
+            
+            /* Allow scrolling if content is too tall */
+            max-height: 85dvh; 
+            overflow-y: auto; 
+            
+            /* Padding accounts for Safe Area and scroll space */
+            padding: 24px 24px calc(40px + env(safe-area-inset-bottom)) 24px;
+            
+            box-shadow: var(--shadow);
+            transform: translateY(110%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 100;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        #settings-panel.open { transform: translateY(0); }
+
+        .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .settings-title { font-size: 22px; font-weight: 700; }
+        
+        .setting-group { margin-bottom: 30px; }
+        .group-label {
+            font-size: 13px; text-transform: uppercase; color: var(--text-secondary);
+            margin-bottom: 12px; font-weight: 600; letter-spacing: 0.5px;
+        }
+
+        .setting-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 0; border-bottom: 1px solid var(--border-color);
+        }
+        .setting-row:last-child { border-bottom: none; }
+        .setting-label { font-size: 17px; font-weight: 400; }
+
+        /* THEME SELECTOR */
+        .theme-picker {
+            display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px;
+            -ms-overflow-style: none; scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .theme-picker::-webkit-scrollbar { display: none; }
+
+        .theme-option {
+            width: 44px; height: 44px; border-radius: 50%;
+            border: 3px solid transparent; cursor: pointer;
+            position: relative; flex-shrink: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .theme-option.selected { border-color: var(--text-primary); }
+        
+        /* Theme Bubbles */
+        .t-classic { background: linear-gradient(135deg, #1c1c1e 50%, #5E5CE6 50%); }
+        .t-light { background: linear-gradient(135deg, #F2F2F7 50%, #007AFF 50%); }
+        .t-ocean { background: linear-gradient(135deg, #001219 50%, #48CAE4 50%); }
+        .t-sunset { background: linear-gradient(135deg, #1a0b2e 50%, #fb923c 50%); }
+        .t-forest { background: linear-gradient(135deg, #051909 50%, #a3e635 50%); }
+        .t-neon { background: linear-gradient(135deg, #120024 50%, #f7ff00 50%); }
+        .t-pastel { background: linear-gradient(135deg, #fff5e6 50%, #ffb7c5 50%); }
+        .t-mono { background: linear-gradient(135deg, #000000 50%, #ffffff 50%); }
+        .t-cyber { background: linear-gradient(135deg, #000000 50%, #00ff41 50%); }
+        .t-coffee { background: linear-gradient(135deg, #2b211e 50%, #D4A373 50%); }
+        .t-royal { background: linear-gradient(135deg, #0f172a 50%, #fbbf24 50%); }
+        .t-berry { background: linear-gradient(135deg, #4A1A28 50%, #FF4D7D 50%); }
+
+
+        /* FIXED TOGGLE SWITCH */
+        .toggle-switch {
+            position: relative; width: 52px; height: 32px;
+            display: inline-block;
+        }
+        .toggle-input { opacity: 0; width: 0; height: 0; position: absolute; }
+        .toggle-slider {
+            position: absolute; cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--dot-inactive);
+            transition: 0.3s; border-radius: 34px;
+        }
+        .toggle-slider:before {
+            position: absolute; content: "";
+            height: 24px; width: 24px;
+            left: 4px; bottom: 4px;
+            background-color: white;
+            transition: 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .toggle-input:checked + .toggle-slider { background-color: var(--dot-active); }
+        .toggle-input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+        #overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); opacity: 0; pointer-events: none;
+            transition: opacity 0.3s; z-index: 90; backdrop-filter: blur(2px);
+        }
+        #overlay.visible { opacity: 1; pointer-events: all; }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <div class="header-left"></div>
+            
+            <div class="year-wrapper">
+                <button class="nav-arrow" id="prev-year">❮</button>
+                <h1 id="year-display">2025</h1>
+                <button class="nav-arrow" id="next-year">❯</button>
+            </div>
+
+            <div class="header-right">
+                <button class="icon-btn" id="settings-btn" aria-label="Settings">
+                    <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <main id="main-view">
+            </main>
+
+        <footer>
+            <span id="days-left" class="days-left"></span>
+            <span class="percentage">·</span>
+            <span id="percent-val" class="percentage"></span>
+        </footer>
+
+        <div id="overlay"></div>
+
+        <div id="settings-panel">
+            <div class="settings-header">
+                <span class="settings-title">Appearance</span>
+                <button class="icon-btn" id="close-settings" style="background:rgba(255,255,255,0.1)">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+
+            <div class="setting-group">
+                <div class="group-label">Color Theme</div>
+                <div class="theme-picker">
+                    <div class="theme-option t-classic" data-set-theme="classic"></div>
+                    <div class="theme-option t-light" data-set-theme="light"></div>
+                    <div class="theme-option t-ocean" data-set-theme="ocean"></div>
+                    <div class="theme-option t-sunset" data-set-theme="sunset"></div>
+                    <div class="theme-option t-forest" data-set-theme="forest"></div>
+                    <div class="theme-option t-neon" data-set-theme="neon"></div>
+                    <div class="theme-option t-pastel" data-set-theme="pastel"></div>
+                    <div class="theme-option t-mono" data-set-theme="mono"></div>
+                    <div class="theme-option t-cyber" data-set-theme="cyber"></div>
+                    <div class="theme-option t-coffee" data-set-theme="coffee"></div>
+                    <div class="theme-option t-royal" data-set-theme="royal"></div>
+                    <div class="theme-option t-berry" data-set-theme="berry"></div>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <div class="group-label">View Options</div>
+                
+                <div class="setting-row">
+                    <span class="setting-label">Split by Month</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="view-toggle" class="toggle-input">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <span class="setting-label">Jalali Calendar</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="calendar-toggle" class="toggle-input">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- State Management ---
+        const state = {
+            theme: localStorage.getItem('theme') || 'classic',
+            view: localStorage.getItem('view') || 'continuous',
+            calendar: localStorage.getItem('calendar') || 'gregorian',
+            yearOffset: 0
+        };
+
+        // --- DOM Elements ---
+        const els = {
+            mainView: document.getElementById('main-view'),
+            yearDisplay: document.getElementById('year-display'),
+            daysLeft: document.getElementById('days-left'),
+            percentVal: document.getElementById('percent-val'),
+            settingsBtn: document.getElementById('settings-btn'),
+            settingsPanel: document.getElementById('settings-panel'),
+            overlay: document.getElementById('overlay'),
+            closeSettings: document.getElementById('close-settings'),
+            prevBtn: document.getElementById('prev-year'),
+            nextBtn: document.getElementById('next-year'),
+            inputs: {
+                view: document.getElementById('view-toggle'),
+                calendar: document.getElementById('calendar-toggle')
+            },
+            themeOptions: document.querySelectorAll('.theme-option')
+        };
+
+        // --- Date Logic ---
+        function getJalaliDate(date) {
+            const g_y = date.getFullYear();
+            const g_m = date.getMonth() + 1;
+            const g_d = date.getDate();
+            const g_days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            if (g_y % 4 === 0 && (g_y % 100 !== 0 || g_y % 400 === 0)) g_days_in_month[1] = 29;
+
+            let gy = g_y - 1600;
+            let gm = g_m - 1;
+            let gd = g_d - 1;
+
+            let g_day_no = 365 * gy + Math.floor((gy + 3) / 4) - Math.floor((gy + 99) / 100) + Math.floor((gy + 399) / 400);
+
+            for (let i = 0; i < gm; ++i) g_day_no += g_days_in_month[i];
+            g_day_no += gd;
+
+            let j_day_no = g_day_no - 79;
+            let j_np = Math.floor(j_day_no / 12053);
+            j_day_no = j_day_no % 12053;
+
+            let jy = 979 + 33 * j_np + 4 * Math.floor(j_day_no / 1461);
+            j_day_no %= 1461;
+
+            if (j_day_no >= 366) {
+                jy += Math.floor((j_day_no - 1) / 365);
+                j_day_no = (j_day_no - 1) % 365;
+            }
+
+            let jm, jd;
+            if (j_day_no < 186) {
+                jm = 1 + Math.floor(j_day_no / 31);
+                jd = 1 + (j_day_no % 31);
+            } else {
+                jm = 7 + Math.floor((j_day_no - 186) / 30);
+                jd = 1 + ((j_day_no - 186) % 30);
+            }
+            return { jy, jm, jd };
+        }
+
+        function isJalaliLeap(year) {
+             return (((((year - 474) % 2820) + 474) + 38) * 682) % 2816 < 682;
+        }
+
+        // --- Core UI Update ---
+        function updateUI() {
+            // Apply Theme
+            document.documentElement.setAttribute('data-theme', state.theme);
+            
+            // Update Toggle States
+            els.inputs.view.checked = state.view === 'month';
+            els.inputs.calendar.checked = state.calendar === 'jalali';
+
+            // Highlight Selected Theme in Picker
+            els.themeOptions.forEach(opt => {
+                if(opt.dataset.setTheme === state.theme) {
+                    opt.classList.add('selected');
+                } else {
+                    opt.classList.remove('selected');
+                }
+            });
+
+            const now = new Date();
+            let displayYear, totalDays, activeDotsCount, monthLengths, monthNames;
+
+            // Logic: Calculate "Today" in correct calendar system
+            if (state.calendar === 'jalali') {
+                const jDate = getJalaliDate(now);
+                
+                // Real Today's Day Number in Jalali
+                let todayDayNo = 0;
+                for(let m=1; m<jDate.jm; m++) todayDayNo += (m<=6 ? 31 : 30);
+                todayDayNo += jDate.jd;
+
+                displayYear = jDate.jy + state.yearOffset;
+                totalDays = isJalaliLeap(displayYear) ? 366 : 365;
+
+                // Month definitions
+                monthLengths = [];
+                for(let m=1; m<=12; m++) {
+                   if(m<=6) monthLengths.push(31);
+                   else if(m<=11) monthLengths.push(30);
+                   else monthLengths.push(isJalaliLeap(displayYear) ? 30 : 29);
+                }
+                monthNames = ["Farvardin", "Ordibehesht", "Khordad", "Tir", "Mordad", "Shahrivar", "Mehr", "Aban", "Azar", "Dey", "Bahman", "Esfand"];
+
+                // Determine active dots
+                if (state.yearOffset < 0) activeDotsCount = totalDays;
+                else if (state.yearOffset > 0) activeDotsCount = 0;
+                else activeDotsCount = todayDayNo;
+
+            } else {
+                // Gregorian
+                const currentRealYear = now.getFullYear();
+                
+                // Real Today's Day Number
+                const start = new Date(currentRealYear, 0, 0);
+                const diff = now - start;
+                const todayDayNo = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+                displayYear = currentRealYear + state.yearOffset;
+                const isLeap = (displayYear % 4 === 0 && displayYear % 100 !== 0) || (displayYear % 400 === 0);
+                totalDays = isLeap ? 366 : 365;
+
+                monthLengths = [31, isLeap?29:28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+                if (state.yearOffset < 0) activeDotsCount = totalDays;
+                else if (state.yearOffset > 0) activeDotsCount = 0;
+                else activeDotsCount = todayDayNo;
+            }
+
+            // Text Updates
+            els.yearDisplay.textContent = displayYear;
+            
+            // Fix stats for edge cases
+            let daysLeft = totalDays - activeDotsCount;
+            let percent = Math.floor((activeDotsCount / totalDays) * 100);
+            if(state.yearOffset > 0) { daysLeft = totalDays; percent = 0; }
+            if(state.yearOffset < 0) { daysLeft = 0; percent = 100; }
+
+            els.daysLeft.textContent = `${daysLeft}d left`;
+            els.percentVal.textContent = `${percent}%`;
+
+            // Grid Rendering
+            els.mainView.innerHTML = '';
+            
+            if (state.view === 'month') {
+                const grid = document.createElement('div');
+                grid.className = 'grid-months';
+                let dayCounter = 0;
+                monthLengths.forEach((daysInMonth, idx) => {
+                    const block = document.createElement('div');
+                    block.className = 'month-block';
+                    const label = document.createElement('div');
+                    label.className = 'month-label';
+                    label.textContent = monthNames[idx];
+                    const dotsContainer = document.createElement('div');
+                    dotsContainer.className = 'month-dots';
+                    for(let d=1; d<=daysInMonth; d++) {
+                        dayCounter++;
+                        const dot = document.createElement('div');
+                        dot.className = `dot ${dayCounter <= activeDotsCount ? 'active' : 'inactive'}`;
+                        dotsContainer.appendChild(dot);
+                    }
+                    block.appendChild(label);
+                    block.appendChild(dotsContainer);
+                    grid.appendChild(block);
+                });
+                els.mainView.appendChild(grid);
+            } else {
+                const grid = document.createElement('div');
+                grid.className = 'grid-continuous';
+                const fragment = document.createDocumentFragment();
+                for (let i = 1; i <= totalDays; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = `dot ${i <= activeDotsCount ? 'active' : 'inactive'}`;
+                    fragment.appendChild(dot);
+                }
+                grid.appendChild(fragment);
+                els.mainView.appendChild(grid);
+            }
+        }
+
+        // --- Navigation Logic ---
+        function changeYear(delta) {
+            state.yearOffset += delta;
+            els.mainView.classList.add('fading');
+            setTimeout(() => {
+                updateUI();
+                els.mainView.classList.remove('fading');
+            }, 150);
+        }
+
+        els.prevBtn.addEventListener('click', () => changeYear(-1));
+        els.nextBtn.addEventListener('click', () => changeYear(1));
+        els.yearDisplay.addEventListener('click', () => {
+            if(state.yearOffset !== 0) { state.yearOffset = 0; updateUI(); }
+        });
+
+        // Swipe
+        let touchStartX = 0;
+        let touchEndX = 0;
+        document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, false);
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX < touchStartX - 50) changeYear(1);
+            else if (touchEndX > touchStartX + 50) changeYear(-1);
+        }, false);
+
+        // --- Settings Logic ---
+        const toggleSettings = (open) => {
+            if(open) {
+                els.settingsPanel.classList.add('open');
+                els.overlay.classList.add('visible');
+            } else {
+                els.settingsPanel.classList.remove('open');
+                els.overlay.classList.remove('visible');
+            }
+        };
+
+        els.settingsBtn.addEventListener('click', () => toggleSettings(true));
+        els.closeSettings.addEventListener('click', () => toggleSettings(false));
+        els.overlay.addEventListener('click', () => toggleSettings(false));
+
+        // View Toggle
+        els.inputs.view.addEventListener('change', (e) => {
+            state.view = e.target.checked ? 'month' : 'continuous';
+            localStorage.setItem('view', state.view);
+            updateUI();
+        });
+
+        // Calendar Toggle
+        els.inputs.calendar.addEventListener('change', (e) => {
+            state.calendar = e.target.checked ? 'jalali' : 'gregorian';
+            state.yearOffset = 0; 
+            localStorage.setItem('calendar', state.calendar);
+            updateUI();
+        });
+
+        // Theme Picker Logic
+        els.themeOptions.forEach(opt => {
+            opt.addEventListener('click', () => {
+                state.theme = opt.dataset.setTheme;
+                localStorage.setItem('theme', state.theme);
+                updateUI();
+            });
+        });
+
+        // Init
+        updateUI();
+
+    </script>
+</body>
+</html>
