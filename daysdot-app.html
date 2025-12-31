@@ -17,7 +17,6 @@
 
     <style>
         :root {
-            /* Variables */
             --bg-color: #050505;
             --panel-bg: #1c1c1e;
             --text-primary: #ffffff;
@@ -46,17 +45,21 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-        body {
+        html, body {
+            height: 100%;
+            width: 100%;
+            /* Lock the body scroll to prevent rubber-banding on iOS */
+            overflow: hidden; 
+            overscroll-behavior: none;
             background-color: var(--bg-color);
+        }
+
+        body {
             color: var(--text-primary);
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            height: 100dvh; /* Dynamic Height for Mobile */
             display: flex;
             justify-content: center;
             transition: background-color 0.4s ease, color 0.4s ease;
-            overflow: hidden;
-            overscroll-behavior: none;
-            /* Prevent selecting text like a document */
             user-select: none;
             -webkit-user-select: none;
         }
@@ -70,9 +73,8 @@
             position: relative;
         }
 
-        /* --- Header: Fixed for iOS Notch --- */
+        /* --- Header --- */
         header {
-            /* Adds safe area padding so content isn't behind the notch */
             padding-top: calc(15px + env(safe-area-inset-top));
             padding-bottom: 10px;
             padding-left: 20px;
@@ -83,8 +85,6 @@
             position: relative;
             flex-shrink: 0;
             z-index: 20;
-            /* Optional: Add background if you want it opaque behind status bar */
-            /* background: var(--bg-color); */
         }
 
         .icon-btn {
@@ -97,7 +97,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            /* Ensure buttons are clickable */
             pointer-events: auto;
         }
         .icon-btn:hover { background-color: var(--btn-hover); }
@@ -126,7 +125,9 @@
         /* --- Grid --- */
         #main-view {
             flex: 1;
+            /* Allow scrolling ONLY here */
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             padding: 10px 20px 20px 20px;
             scrollbar-width: none;
             opacity: 1;
@@ -152,28 +153,39 @@
             font-size: 16px; font-weight: 500; flex-shrink: 0;
             background: linear-gradient(to top, var(--bg-color) 30%, transparent);
             z-index: 10; position: relative;
-            /* Safe area for Home Indicator */
             padding-bottom: calc(20px + env(safe-area-inset-bottom));
         }
         .days-left { color: var(--accent-red); }
         .percentage { color: var(--text-secondary); }
 
-        /* --- Settings Panel --- */
+        /* --- Settings Panel (FIXED) --- */
         #settings-panel {
-            position: absolute; bottom: 0; left: 0; width: 100%;
+            /* Position Fixed ensures it is completely outside the scroll flow */
+            position: fixed; 
+            bottom: 0; 
+            left: 0;
+            width: 100%;
+            /* Centers panel on iPad/Desktop */
+            right: 0;
+            margin: 0 auto;
+            max-width: 600px;
+            
             background-color: var(--panel-bg);
             border-top-left-radius: 24px; border-top-right-radius: 24px;
-            max-height: 85dvh; overflow-y: auto;
-            /* Safe area padding for bottom */
+            max-height: 85vh; 
+            overflow-y: auto;
             padding: 24px 24px calc(40px + env(safe-area-inset-bottom)) 24px;
             box-shadow: var(--shadow);
+            
+            /* Start hidden below screen */
             transform: translateY(110%);
             transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 100;
+            
+            z-index: 200; /* Higher than footer/header */
             border-top: 1px solid rgba(255,255,255,0.05);
-            /* Enable scrolling interactions */
             pointer-events: auto;
         }
+        
         #settings-panel.open { transform: translateY(0); }
 
         .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
@@ -189,7 +201,6 @@
         .theme-option { width: 44px; height: 44px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; position: relative; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .theme-option.selected { border-color: var(--text-primary); }
         
-        /* Theme Colors */
         .t-classic { background: linear-gradient(135deg, #1c1c1e 50%, #5E5CE6 50%); }
         .t-light { background: linear-gradient(135deg, #F2F2F7 50%, #007AFF 50%); }
         .t-ocean { background: linear-gradient(135deg, #001219 50%, #48CAE4 50%); }
@@ -210,7 +221,7 @@
         .toggle-input:checked + .toggle-slider { background-color: var(--dot-active); }
         .toggle-input:checked + .toggle-slider:before { transform: translateX(20px); }
 
-        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 90; backdrop-filter: blur(2px); }
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 150; backdrop-filter: blur(2px); }
         #overlay.visible { opacity: 1; pointer-events: all; }
     </style>
 </head>
