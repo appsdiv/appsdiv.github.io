@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Days Dot</title>
+    <meta name="application-name" content="Days Dot">
+    <meta name="apple-mobile-web-app-title" content="Days Dot">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/pLqn0sqC/daysdotapp.png">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/pLqn0sqC/daysdotapp.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Base */
+            --bg-color: #050505;
+            --panel-bg: #1c1c1e;
+            --text-primary: #ffffff;
+            --text-secondary: #8E8E93;
+            --dot-active: #7F8CFF;
+            --dot-inactive: #2c2c2e;
+            --dot-text: #000000;
+            --accent-red: #FF453A;
+            --border-color: #333;
+            --btn-hover: rgba(255, 255, 255, 0.1);
+            --shadow: 0 -4px 30px rgba(0,0,0,0.6);
+            
+            /* Status Colors */
+            --status-done: #32d74b;
+            --status-pending: #ffd60a;
+            --status-expired: #636366;
+
+            /* Dynamic Variables */
+            --dynamic-dot-size: 12px; 
+            --dynamic-gap: 4px;
+        }
+
+        /* --- THEMES (ALL RESTORED) --- */
+        /* New Requested Theme */
+        [data-theme="velvet"] { --bg-color: #2A2428; --panel-bg: #3D3539; --text-primary: #F5F1F2; --text-secondary: #A8A1A4; --dot-active: #D98BAA; --dot-inactive: #4a4246; --dot-text: #2A2428; --accent-red: #e06c75; --border-color: #524A4E; --shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        /* Originals */
+        [data-theme="classic"] { --bg-color: #000000; --panel-bg: #1C1C1E; --text-primary: #FFFFFF; --text-secondary: #98989F; --dot-active: #5E5CE6; --dot-inactive: #252525; --dot-text: #fff; }
+        [data-theme="light"] { --bg-color: #F2F2F7; --panel-bg: #FFFFFF; --text-primary: #000000; --text-secondary: #8E8E93; --dot-active: #007AFF; --dot-inactive: #D1D1D6; --dot-text: #fff; --accent-red: #FF3B30; --border-color: #E5E5EA; --btn-hover: rgba(0,0,0,0.05); --shadow: 0 -4px 30px rgba(0,0,0,0.1); }
+        [data-theme="rev-mono"] { --bg-color: #ffffff; --panel-bg: #f0f0f0; --text-primary: #000000; --text-secondary: #666666; --dot-active: #000000; --dot-inactive: #e0e0e0; --dot-text: #ffffff; --accent-red: #000000; --border-color: #e5e5e5; --btn-hover: rgba(0,0,0,0.05); --shadow: 0 -4px 30px rgba(0,0,0,0.1); }
+        [data-theme="mono"] { --bg-color: #121212; --panel-bg: #000000; --text-primary: #ffffff; --text-secondary: #aaaaaa; --dot-active: #ffffff; --dot-inactive: #333333; --dot-text: #000000; --accent-red: #ffffff; --border-color: #333333; }
+        /* Trendy & Polished */
+        [data-theme="nord"] { --bg-color: #2E3440; --panel-bg: #3B4252; --text-primary: #ECEFF4; --text-secondary: #D8DEE9; --dot-active: #88C0D0; --dot-inactive: #4C566A; --dot-text: #2E3440; --accent-red: #BF616A; --border-color: #434C5E; }
+        [data-theme="dracula"] { --bg-color: #282a36; --panel-bg: #44475a; --text-primary: #f8f8f2; --text-secondary: #6272a4; --dot-active: #bd93f9; --dot-inactive: #44475a; --dot-text: #282a36; --accent-red: #ff5555; --border-color: #6272a4; }
+        [data-theme="solarized"] { --bg-color: #002b36; --panel-bg: #073642; --text-primary: #839496; --text-secondary: #586e75; --dot-active: #2aa198; --dot-inactive: #073642; --dot-text: #002b36; --accent-red: #dc322f; --border-color: #073642; }
+        [data-theme="mint"] { --bg-color: #e0f2f1; --panel-bg: #ffffff; --text-primary: #00695c; --text-secondary: #4db6ac; --dot-active: #00bfa5; --dot-inactive: #b2dfdb; --dot-text: #ffffff; --accent-red: #ff5252; --border-color: #b2dfdb; --shadow: 0 -4px 30px rgba(0,105,92,0.1); }
+        [data-theme="peach"] { --bg-color: #fff0e6; --panel-bg: #fffcf9; --text-primary: #7d5a50; --text-secondary: #bcaaa4; --dot-active: #ffab91; --dot-inactive: #efebe9; --dot-text: #5d4037; --accent-red: #ff7043; --border-color: #ffe0b2; --shadow: 0 -4px 30px rgba(0,0,0,0.05); }
+        [data-theme="lavender"] { --bg-color: #f3e5f5; --panel-bg: #ffffff; --text-primary: #4a148c; --text-secondary: #ce93d8; --dot-active: #d1c4e9; --dot-inactive: #ede7f6; --dot-text: #4a148c; --accent-red: #ab47bc; --border-color: #e1bee7; --shadow: 0 -4px 30px rgba(74,20,140,0.1); }
+        [data-theme="midnight"] { --bg-color: #0f172a; --panel-bg: #1e293b; --text-primary: #f1f5f9; --text-secondary: #64748b; --dot-active: #38bdf8; --dot-inactive: #334155; --dot-text: #0f172a; --accent-red: #f472b6; --border-color: #334155; }
+        [data-theme="gold"] { --bg-color: #1a1a1a; --panel-bg: #262626; --text-primary: #d4af37; --text-secondary: #8a7328; --dot-active: #ffd700; --dot-inactive: #333333; --dot-text: #000000; --accent-red: #ff4500; --border-color: #444; }
+        [data-theme="forest"] { --bg-color: #051909; --panel-bg: #0d2912; --text-primary: #ecfccb; --text-secondary: #84cc16; --dot-active: #a3e635; --dot-inactive: #1a381d; --dot-text: #051909; --accent-red: #ef4444; --border-color: #14532d; }
+        [data-theme="ocean"] { --bg-color: #001219; --panel-bg: #001f2b; --text-primary: #E0FBFC; --text-secondary: #5F9EA0; --dot-active: #48CAE4; --dot-inactive: #082933; --dot-text: #001219; --accent-red: #FF6B6B; --border-color: #0A3D4A; }
+        [data-theme="sunset"] { --bg-color: #1a0b2e; --panel-bg: #2d1b4e; --text-primary: #fff1f2; --text-secondary: #a78bfa; --dot-active: #fb923c; --dot-inactive: #433069; --dot-text: #fff; --accent-red: #f43f5e; --border-color: #5b21b6; }
+        [data-theme="neon"] { --bg-color: #090014; --panel-bg: #120024; --text-primary: #ff00ff; --text-secondary: #00ffff; --dot-active: #f7ff00; --dot-inactive: #32004a; --dot-text: #000; --accent-red: #ff0055; --border-color: #4a006a; }
+        [data-theme="cherry"] { --bg-color: #2b0a0d; --panel-bg: #3d0e12; --text-primary: #ffcdd2; --text-secondary: #ef9a9a; --dot-active: #ff5252; --dot-inactive: #4a1217; --dot-text: #fff; --accent-red: #d32f2f; --border-color: #5c181f; }
+        [data-theme="slate"] { --bg-color: #27272a; --panel-bg: #3f3f46; --text-primary: #fafafa; --text-secondary: #a1a1aa; --dot-active: #d4d4d8; --dot-inactive: #52525b; --dot-text: #18181b; --accent-red: #f87171; --border-color: #52525b; }
+        [data-theme="rose"] { --bg-color: #1c0b10; --panel-bg: #291017; --text-primary: #fda4af; --text-secondary: #fb7185; --dot-active: #f43f5e; --dot-inactive: #3f1521; --dot-text: #fff; --accent-red: #e11d48; --border-color: #4c1d2e; }
+        [data-theme="blush"] { --bg-color: #fff0f5; --panel-bg: #ffffff; --text-primary: #880e4f; --text-secondary: #ec407a; --dot-active: #f8bbd0; --dot-inactive: #fce4ec; --dot-text: #880e4f; --accent-red: #d81b60; --border-color: #f8bbd0; --shadow: 0 -4px 30px rgba(136,14,79,0.05); }
+        [data-theme="indigo"] { --bg-color: #1e1b4b; --panel-bg: #312e81; --text-primary: #e0e7ff; --text-secondary: #818cf8; --dot-active: #6366f1; --dot-inactive: #3730a3; --dot-text: #fff; --accent-red: #f43f5e; --border-color: #4338ca; }
+        [data-theme="coffee"] { --bg-color: #2b211e; --panel-bg: #3E2F2B; --text-primary: #E6D2B5; --text-secondary: #9C8370; --dot-active: #D4A373; --dot-inactive: #1F1715; --dot-text: #2b211e; --accent-red: #FF8866; --border-color: #54413B; }
+        [data-theme="sky"] { --bg-color: #f0f9ff; --panel-bg: #ffffff; --text-primary: #0c4a6e; --text-secondary: #38bdf8; --dot-active: #7dd3fc; --dot-inactive: #e0f2fe; --dot-text: #0c4a6e; --accent-red: #ef4444; --border-color: #bae6fd; --shadow: 0 -4px 30px rgba(12,74,110,0.05); }
+        [data-theme="matrix"] { --bg-color: #000000; --panel-bg: #0d0d0d; --text-primary: #00ff00; --text-secondary: #008f11; --dot-active: #003b00; --dot-inactive: #0a0a0a; --dot-text: #00ff00; --accent-red: #ff0000; --border-color: #001f00; }
+        [data-theme="vapor"] { --bg-color: #240046; --panel-bg: #3c096c; --text-primary: #e0aaff; --text-secondary: #9d4edd; --dot-active: #ff9e00; --dot-inactive: #5a189a; --dot-text: #10002b; --accent-red: #ff006e; --border-color: #7b2cbf; }
+        [data-theme="graphite"] { --bg-color: #18181b; --panel-bg: #27272a; --text-primary: #f4f4f5; --text-secondary: #71717a; --dot-active: #a1a1aa; --dot-inactive: #3f3f46; --dot-text: #000; --accent-red: #ef4444; --border-color: #3f3f46; }
+        [data-theme="galaxy"] { --bg-color: #0b0f19; --panel-bg: #151b2e; --text-primary: #c7d2fe; --text-secondary: #6366f1; --dot-active: #818cf8; --dot-inactive: #1e293b; --dot-text: #0b0f19; --accent-red: #ec4899; --border-color: #312e81; }
+        [data-theme="cotton"] { --bg-color: #fdba74; --panel-bg: #fff7ed; --text-primary: #9a3412; --text-secondary: #fb923c; --dot-active: #fed7aa; --dot-inactive: #ffedd5; --dot-text: #9a3412; --accent-red: #ef4444; --border-color: #fdba74; }
+        [data-theme="lemon"] { --bg-color: #fefce8; --panel-bg: #ffffff; --text-primary: #854d0e; --text-secondary: #eab308; --dot-active: #fef08a; --dot-inactive: #fef9c3; --dot-text: #854d0e; --accent-red: #ef4444; --border-color: #fde047; --shadow: 0 -4px 30px rgba(0,0,0,0.05); }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        ::-webkit-scrollbar { display: none; }
+        
+        html, body { height: 100%; width: 100%; overflow: hidden; overscroll-behavior: none; background-color: var(--bg-color); }
+        body { color: var(--text-primary); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; justify-content: center; transition: background-color 0.4s ease, color 0.4s ease; user-select: none; -webkit-user-select: none; }
+
+        .app-container { width: 100%; max-width: 600px; height: 100%; display: flex; flex-direction: column; position: relative; }
+
+        /* --- Header --- */
+        header { padding-top: calc(15px + env(safe-area-inset-top)); padding-bottom: 10px; padding-left: 20px; padding-right: 20px; display: flex; justify-content: center; align-items: center; position: relative; flex-shrink: 0; z-index: 20; }
+        .icon-btn { background: none; border: none; cursor: pointer; color: var(--text-primary); padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; pointer-events: auto; }
+        .icon-btn:hover { background-color: var(--btn-hover); }
+        .icon-btn svg { width: 24px; height: 24px; fill: currentColor; }
+        .header-right { position: absolute; right: 20px; top: calc(15px + env(safe-area-inset-top)); }
+        .year-wrapper { display: flex; align-items: center; gap: 15px; }
+        .nav-arrow { font-size: 20px; color: var(--text-secondary); background: none; border: none; cursor: pointer; padding: 5px; opacity: 0.5; transition: opacity 0.2s; pointer-events: auto; }
+        .nav-arrow:hover { opacity: 1; }
+        h1 { font-family: "Times New Roman", Times, serif; font-weight: 400; font-size: 32px; letter-spacing: 0.5px; min-width: 80px; text-align: center; cursor: pointer; pointer-events: auto; }
+
+        /* --- Main View --- */
+        #main-view { flex: 1; display: flex; flex-direction: column; width: 100%; opacity: 1; transition: opacity 0.2s ease-in-out; overflow: hidden; }
+        #main-view.scrollable { overflow-y: auto; display: block; scroll-behavior: smooth; }
+        #main-view.centered { justify-content: center; align-items: center; }
+        #main-view.fading { opacity: 0.3; }
+
+        /* Grid */
+        .grid-continuous { display: grid; grid-template-columns: repeat(15, 1fr); gap: var(--dynamic-gap); padding: 0 10px; }
+        .grid-months { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 20px; padding: 10px 20px 40px 20px; align-content: start; }
+        .month-block { display: flex; flex-direction: column; gap: 8px; scroll-margin-top: 20px; }
+        .month-label { font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+        .month-dots { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+
+        /* Dot Styling */
+        .dot { 
+            aspect-ratio: 1; border-radius: 50%; 
+            transition: background-color 0.3s ease, transform 0.2s, box-shadow 0.3s; 
+            display: flex; justify-content: center; align-items: center; 
+            font-family: 'Courier New', Courier, monospace; font-weight: 600; line-height: 1; 
+            font-variant-numeric: tabular-nums; font-size: 0; cursor: pointer;
+            position: relative;
+            border: 2px solid transparent;
+        }
+        .grid-continuous .dot { width: var(--dynamic-dot-size); height: var(--dynamic-dot-size); }
+        .month-dots .dot { width: 100%; height: auto; }
+
+        .dot.active { background-color: var(--dot-active); color: var(--dot-text); }
+        .dot.inactive { background-color: var(--dot-inactive); color: transparent; }
+        .show-nums .dot { font-size: 55%; }
+        .show-nums .dot.inactive { color: var(--text-secondary); opacity: 0.55; }
+        .dot.today { animation: breathe-today 4s infinite ease-in-out; z-index: 2; }
+        
+        /* Status Borders */
+        .dot.status-pending { border-color: var(--status-pending); background-clip: padding-box; }
+        .dot.status-done { border-color: var(--status-done); background-clip: padding-box; }
+        .dot.status-expired { border-color: var(--status-expired); background-clip: padding-box; }
+
+        @keyframes breathe-today {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(0,0,0,0); }
+            50% { transform: scale(1.08); box-shadow: 0 0 8px var(--dot-active); }
+        }
+
+        /* --- Footer --- */
+        footer { padding: 20px; display: flex; justify-content: center; gap: 8px; font-size: 16px; font-weight: 500; flex-shrink: 0; z-index: 10; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+        .days-left { color: var(--accent-red); }
+        .percentage { color: var(--text-secondary); }
+
+        /* --- Overlay & Sheets --- */
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 150; backdrop-filter: blur(2px); }
+        #overlay.visible { opacity: 1; pointer-events: all; }
+        
+        .bottom-sheet {
+            position: fixed; bottom: 0; left: 0; right: 0; margin: 0 auto; max-width: 600px;
+            background-color: var(--panel-bg);
+            border-top-left-radius: 24px; border-top-right-radius: 24px;
+            box-shadow: var(--shadow);
+            transform: translateY(110%);
+            transition: transform 0.35s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: 200; border-top: 1px solid rgba(255,255,255,0.08); 
+            pointer-events: auto; display: flex; flex-direction: column;
+        }
+        .bottom-sheet.open { transform: translateY(0); }
+
+        /* --- Settings Panel --- */
+        #settings-panel { max-height: 85vh; padding: 24px 24px calc(40px + env(safe-area-inset-bottom)) 24px; overflow-y: auto; }
+        .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .settings-title { font-size: 22px; font-weight: 700; }
+        .setting-group { margin-bottom: 30px; }
+        .group-label { font-size: 13px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 12px; font-weight: 600; letter-spacing: 0.5px; }
+        .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border-color); }
+        .setting-row:last-child { border-bottom: none; }
+        .setting-label { font-size: 17px; }
+        .theme-picker { display: flex; gap: 14px; overflow-x: auto; padding: 10px 5px 20px 5px; scrollbar-width: none; }
+        .theme-option { width: 48px; height: 48px; border-radius: 50%; cursor: pointer; flex-shrink: 0; transition: transform 0.2s; border: 3px solid transparent; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .theme-option.selected { border-color: var(--text-primary); transform: scale(1.1); }
+        
+        /* Theme Bubbles Gradients */
+        .t-velvet { background: linear-gradient(135deg, #2A2428 50%, #D98BAA 50%); }
+        .t-classic { background: linear-gradient(135deg, #1c1c1e 50%, #5E5CE6 50%); }
+        .t-light { background: linear-gradient(135deg, #F2F2F7 50%, #007AFF 50%); }
+        .t-rev-mono { background: linear-gradient(135deg, #ffffff 50%, #000000 50%); border: 1px solid #ccc; }
+        .t-mono { background: linear-gradient(135deg, #000000 50%, #ffffff 50%); }
+        .t-nord { background: linear-gradient(135deg, #2E3440 50%, #88C0D0 50%); }
+        .t-dracula { background: linear-gradient(135deg, #282a36 50%, #bd93f9 50%); }
+        .t-solarized { background: linear-gradient(135deg, #002b36 50%, #2aa198 50%); }
+        .t-mint { background: linear-gradient(135deg, #e0f2f1 50%, #00bfa5 50%); }
+        .t-peach { background: linear-gradient(135deg, #fff0e6 50%, #ffab91 50%); }
+        .t-lavender { background: linear-gradient(135deg, #f3e5f5 50%, #d1c4e9 50%); }
+        .t-midnight { background: linear-gradient(135deg, #0f172a 50%, #38bdf8 50%); }
+        .t-gold { background: linear-gradient(135deg, #1a1a1a 50%, #ffd700 50%); }
+        .t-forest { background: linear-gradient(135deg, #051909 50%, #a3e635 50%); }
+        .t-ocean { background: linear-gradient(135deg, #001219 50%, #48CAE4 50%); }
+        .t-sunset { background: linear-gradient(135deg, #1a0b2e 50%, #fb923c 50%); }
+        .t-neon { background: linear-gradient(135deg, #120024 50%, #f7ff00 50%); }
+        .t-cherry { background: linear-gradient(135deg, #2b0a0d 50%, #ff5252 50%); }
+        .t-slate { background: linear-gradient(135deg, #27272a 50%, #d4d4d8 50%); }
+        .t-rose { background: linear-gradient(135deg, #1c0b10 50%, #f43f5e 50%); }
+        .t-blush { background: linear-gradient(135deg, #fff0f5 50%, #f8bbd0 50%); }
+        .t-indigo { background: linear-gradient(135deg, #1e1b4b 50%, #6366f1 50%); }
+        .t-coffee { background: linear-gradient(135deg, #2b211e 50%, #D4A373 50%); }
+        .t-sky { background: linear-gradient(135deg, #f0f9ff 50%, #7dd3fc 50%); }
+        .t-matrix { background: linear-gradient(135deg, #000000 50%, #00ff00 50%); }
+        .t-vapor { background: linear-gradient(135deg, #240046 50%, #ff9e00 50%); }
+        .t-graphite { background: linear-gradient(135deg, #18181b 50%, #a1a1aa 50%); }
+        .t-galaxy { background: linear-gradient(135deg, #0b0f19 50%, #818cf8 50%); }
+        .t-cotton { background: linear-gradient(135deg, #fdba74 50%, #fff7ed 50%); }
+        .t-lemon { background: linear-gradient(135deg, #fefce8 50%, #eab308 50%); }
+
+        .toggle-switch { position: relative; width: 52px; height: 32px; display: inline-block; }
+        .toggle-input { opacity: 0; width: 0; height: 0; position: absolute; }
+        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--dot-inactive); transition: 0.3s; border-radius: 34px; }
+        .toggle-slider:before { position: absolute; content: ""; height: 24px; width: 24px; left: 4px; bottom: 4px; background-color: white; transition: 0.3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .toggle-input:checked + .toggle-slider { background-color: var(--dot-active); }
+        .toggle-input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+        /* --- TODO MODAL MODERNIZED --- */
+        #todo-modal { 
+            height: 60vh; 
+            padding: 0;
+            overflow: hidden;
+            /* Font for Todo Panel */
+            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+	   .credits-footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+            opacity: 0.7;
+            letter-spacing: 0.5px;
+            padding-bottom: 10px;
+        }
+        .todo-header-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 18px 24px;
+            background-color: rgba(255,255,255,0.03);
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+        }
+        
+        .todo-nav-ctrl { display: flex; align-items: center; gap: 15px; flex: 1; }
+        .todo-date-title { 
+            font-size: 15px; 
+            font-weight: 500; 
+            color: var(--text-primary);
+            opacity: 0.9;
+            letter-spacing: 0.3px;
+            text-align: center;
+            flex: 1; /* Center evenly */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .todo-body {
+            flex: 1;
+            display: flex; flex-direction: column;
+            padding: 0 24px 20px 24px;
+            overflow: hidden;
+        }
+
+        /* Modern Input Area */
+        .todo-input-container {
+            padding-top: 20px;
+            padding-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        .todo-input-wrapper {
+            display: flex; align-items: center; gap: 10px;
+            background: rgba(128, 128, 128, 0.1);
+            padding: 6px 6px 6px 16px;
+            border-radius: 16px;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .todo-input-wrapper:focus-within { 
+            background: rgba(128, 128, 128, 0.15);
+            border-color: var(--dot-active); 
+            box-shadow: 0 0 0 2px rgba(127, 140, 255, 0.2);
+        }
+        
+        #new-task-input {
+            flex: 1;
+            background: none; border: none; outline: none;
+            color: var(--text-primary);
+            font-size: 16px;
+            padding: 8px 0;
+            font-family: inherit;
+        }
+        #new-task-input::placeholder { color: var(--text-secondary); opacity: 0.6; }
+        
+        .add-task-btn {
+            background: var(--dot-active);
+            color: var(--dot-text);
+            border: none;
+            width: 36px; height: 36px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .add-task-btn:active { transform: scale(0.92); }
+
+        .todo-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 40px;
+            padding-top: 5px;
+        }
+        .todo-empty-state { text-align: center; color: var(--text-secondary); margin-top: 40px; font-size: 14px; opacity: 0.6; }
+
+        .todo-item {
+            display: flex; align-items: flex-start; /* Align top for multi-line */
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-color);
+            animation: slideIn 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .todo-checkbox {
+            width: 24px; height: 24px;
+            border-radius: 8px;
+            border: 2px solid var(--text-secondary);
+            cursor: pointer; position: relative;
+            flex-shrink: 0;
+            transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+            margin-top: 2px; /* Visual alignment with text */
+            opacity: 0.6;
+        }
+        .todo-checkbox:hover { opacity: 1; border-color: var(--dot-active); }
+
+        .todo-item.completed .todo-checkbox {
+            background-color: var(--status-done);
+            border-color: var(--status-done);
+            opacity: 1;
+        }
+        .todo-item.completed .todo-checkbox::after {
+            content: ""; position: absolute;
+            left: 7px; top: 3px;
+            width: 6px; height: 11px;
+            border: solid #000;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .todo-text {
+            flex: 1;
+            font-size: 16px;
+            line-height: 1.6;
+            word-break: break-word; /* Crucial for long words */
+            white-space: pre-wrap; /* Crucial for long text wrapping */
+            color: var(--text-primary);
+            transition: color 0.2s;
+        }
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .todo-delete {
+            background: none; border: none; color: var(--text-secondary);
+            opacity: 0; cursor: pointer; padding: 6px;
+            transition: opacity 0.2s, color 0.2s;
+            margin-top: 0;
+        }
+        .todo-item:hover .todo-delete { opacity: 0.5; }
+        .todo-delete:hover { opacity: 1 !important; color: var(--accent-red); }
+
+        /* RTL/LTR Utils */
+        [dir="rtl"] { text-align: right; direction: rtl; }
+        [dir="ltr"] { text-align: left; direction: ltr; }
+
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="year-wrapper">
+                <button class="nav-arrow" id="prev-year">❮</button>
+                <h1 id="year-display">2025</h1>
+                <button class="nav-arrow" id="next-year">❯</button>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn" id="settings-btn" aria-label="Settings">
+                    <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <main id="main-view">
+            </main>
+
+        <footer>
+            <span id="days-left" class="days-left"></span>
+            <span class="percentage">·</span>
+            <span id="percent-val" class="percentage"></span>
+        </footer>
+
+        <div id="overlay"></div>
+
+        <div id="settings-panel" class="bottom-sheet">
+            <div class="settings-header">
+                <span class="settings-title">Settings</span>
+                <button class="icon-btn" id="close-settings" style="background:rgba(255,255,255,0.1)">✕</button>
+            </div>
+            <div class="setting-group">
+                <div class="group-label">View Options</div>
+                <div class="setting-row">
+                    <span class="setting-label">Split by Month</span>
+                    <label class="toggle-switch"><input type="checkbox" id="view-toggle" class="toggle-input"><span class="toggle-slider"></span></label>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Show Numbers</span>
+                    <label class="toggle-switch"><input type="checkbox" id="numbers-toggle" class="toggle-input"><span class="toggle-slider"></span></label>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Jalali Calendar</span>
+                    <label class="toggle-switch"><input type="checkbox" id="calendar-toggle" class="toggle-input"><span class="toggle-slider"></span></label>
+                </div>
+            </div>
+            <div class="setting-group">
+                <div class="group-label">Color Theme</div>
+                <div class="theme-picker">
+                    <div class="theme-option t-velvet" data-set-theme="velvet" title="Velvet"></div>
+                    <div class="theme-option t-classic" data-set-theme="classic" title="Classic"></div>
+                    <div class="theme-option t-light" data-set-theme="light" title="Light"></div>
+                    <div class="theme-option t-rev-mono" data-set-theme="rev-mono" title="Reversed Mono"></div>
+                    <div class="theme-option t-mono" data-set-theme="mono" title="Dark Mono"></div>
+                    <div class="theme-option t-nord" data-set-theme="nord" title="Nord"></div>
+                    <div class="theme-option t-dracula" data-set-theme="dracula" title="Dracula"></div>
+                    <div class="theme-option t-solarized" data-set-theme="solarized" title="Solarized"></div>
+                    <div class="theme-option t-mint" data-set-theme="mint" title="Mint"></div>
+                    <div class="theme-option t-peach" data-set-theme="peach" title="Peach"></div>
+                    <div class="theme-option t-lavender" data-set-theme="lavender" title="Lavender"></div>
+                    <div class="theme-option t-midnight" data-set-theme="midnight" title="Midnight"></div>
+                    <div class="theme-option t-gold" data-set-theme="gold" title="Gold"></div>
+                    <div class="theme-option t-forest" data-set-theme="forest" title="Forest"></div>
+                    <div class="theme-option t-ocean" data-set-theme="ocean" title="Ocean"></div>
+                    <div class="theme-option t-sunset" data-set-theme="sunset" title="Sunset"></div>
+                    <div class="theme-option t-neon" data-set-theme="neon" title="Neon"></div>
+                    <div class="theme-option t-cherry" data-set-theme="cherry" title="Cherry"></div>
+                    <div class="theme-option t-slate" data-set-theme="slate" title="Slate"></div>
+                    <div class="theme-option t-rose" data-set-theme="rose" title="Rose"></div>
+                    <div class="theme-option t-blush" data-set-theme="blush" title="Blush"></div>
+                    <div class="theme-option t-indigo" data-set-theme="indigo" title="Indigo"></div>
+                    <div class="theme-option t-coffee" data-set-theme="coffee" title="Coffee"></div>
+                    <div class="theme-option t-sky" data-set-theme="sky" title="Sky"></div>
+                    <div class="theme-option t-matrix" data-set-theme="matrix" title="Matrix"></div>
+                    <div class="theme-option t-vapor" data-set-theme="vapor" title="Vaporwave"></div>
+                    <div class="theme-option t-graphite" data-set-theme="graphite" title="Graphite"></div>
+                    <div class="theme-option t-galaxy" data-set-theme="galaxy" title="Galaxy"></div>
+                    <div class="theme-option t-cotton" data-set-theme="cotton" title="Cotton"></div>
+                    <div class="theme-option t-lemon" data-set-theme="lemon" title="Lemon"></div>
+                </div>
+            <div class="credits-footer">
+                created by peymaan abedinpour
+            </div>
+            </div>
+        </div>
+
+        <div id="todo-modal" class="bottom-sheet">
+            <div class="todo-header-bar">
+                <button class="nav-arrow" id="todo-prev-day">❮</button>
+                <div class="todo-date-title" id="todo-date-title">...</div>
+                <button class="nav-arrow" id="todo-next-day">❯</button>
+                <button class="icon-btn" id="close-todo" style="margin-left:10px; background:rgba(255,255,255,0.1); width: 32px; height: 32px;">✕</button>
+            </div>
+            <div class="todo-body">
+                <div class="todo-input-container">
+                    <div class="todo-input-wrapper">
+                        <input type="text" id="new-task-input" placeholder="Type a new task...">
+                        <button class="add-task-btn" id="add-task-btn">＋</button>
+                    </div>
+                </div>
+                <div class="todo-list" id="todo-list">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            theme: localStorage.getItem('theme') || 'classic',
+            view: localStorage.getItem('view') || 'continuous',
+            calendar: localStorage.getItem('calendar') || 'gregorian',
+            numbers: localStorage.getItem('numbers') === 'true',
+            yearOffset: 0,
+            activeDateKey: null, 
+            tasksCache: {} 
+        };
+
+        const els = {
+            mainView: document.getElementById('main-view'),
+            yearDisplay: document.getElementById('year-display'),
+            daysLeft: document.getElementById('days-left'),
+            percentVal: document.getElementById('percent-val'),
+            overlay: document.getElementById('overlay'),
+            // Panels
+            settingsPanel: document.getElementById('settings-panel'),
+            todoModal: document.getElementById('todo-modal'),
+            // Buttons
+            settingsBtn: document.getElementById('settings-btn'),
+            closeSettings: document.getElementById('close-settings'),
+            closeTodo: document.getElementById('close-todo'),
+            prevBtn: document.getElementById('prev-year'),
+            nextBtn: document.getElementById('next-year'),
+            // Inputs
+            inputs: {
+                view: document.getElementById('view-toggle'),
+                calendar: document.getElementById('calendar-toggle'),
+                numbers: document.getElementById('numbers-toggle')
+            },
+            themeOptions: document.querySelectorAll('.theme-option'),
+            appContainer: document.querySelector('.app-container'),
+            // Todo Elements
+            todoDateTitle: document.getElementById('todo-date-title'),
+            todoList: document.getElementById('todo-list'),
+            newTaskInput: document.getElementById('new-task-input'),
+            addTaskBtn: document.getElementById('add-task-btn'),
+            todoPrev: document.getElementById('todo-prev-day'),
+            todoNext: document.getElementById('todo-next-day')
+        };
+
+        /* --- INDEXED DB ENGINE --- */
+        const DB_NAME = 'DaysDotDB';
+        const DB_VERSION = 1;
+        let db;
+
+        const initDB = () => {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('tasks')) {
+                        db.createObjectStore('tasks', { keyPath: 'dateKey' });
+                    }
+                };
+                request.onsuccess = (e) => {
+                    db = e.target.result;
+                    loadAllTasks().then(() => {
+                        updateUI(); 
+                        resolve(db);
+                    });
+                };
+                request.onerror = (e) => reject(e);
+            });
+        };
+
+        const saveTasksToDB = (dateKey, tasks) => {
+            if(!db) return;
+            const tx = db.transaction('tasks', 'readwrite');
+            const store = tx.objectStore('tasks');
+            store.put({ dateKey, tasks });
+            state.tasksCache[dateKey] = tasks;
+            updateDotVisual(dateKey); 
+        };
+
+        const loadAllTasks = () => {
+            return new Promise((resolve) => {
+                if(!db) resolve();
+                const tx = db.transaction('tasks', 'readonly');
+                const store = tx.objectStore('tasks');
+                const request = store.getAll();
+                request.onsuccess = () => {
+                    const result = request.result;
+                    state.tasksCache = {};
+                    result.forEach(row => {
+                        state.tasksCache[row.dateKey] = row.tasks;
+                    });
+                    resolve();
+                };
+            });
+        };
+
+        /* --- LOGIC UTILS --- */
+        const isPersian = (text) => {
+            const persianRegex = /[\u0600-\u06FF]/;
+            return persianRegex.test(text);
+        };
+
+        /* --- FIT ENGINE --- */
+        function calculateFit() {
+            if (state.view === 'month') return; 
+            const availableHeight = els.mainView.clientHeight;
+            const availableWidth = els.mainView.clientWidth;
+            const cols = 15;
+            const rows = 25; 
+            const gap = 4; 
+            const totalGapH = (rows - 1) * gap;
+            const totalGapW = (cols - 1) * gap;
+            const maxDotH = (availableHeight - totalGapH - 20) / rows;
+            const maxDotW = (availableWidth - totalGapW - 20) / cols;
+            let size = Math.floor(Math.min(maxDotH, maxDotW));
+            if(size < 5) size = 5;
+            document.documentElement.style.setProperty('--dynamic-dot-size', `${size}px`);
+            document.documentElement.style.setProperty('--dynamic-gap', `${gap}px`);
+        }
+
+        /* --- DATE LOGIC --- */
+        function getJalaliDate(date) {
+            const g_y = date.getFullYear(); const g_m = date.getMonth() + 1; const g_d = date.getDate();
+            const g_days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            if (g_y % 4 === 0 && (g_y % 100 !== 0 || g_y % 400 === 0)) g_days_in_month[1] = 29;
+            let gy = g_y - 1600; let gm = g_m - 1; let gd = g_d - 1;
+            let g_day_no = 365 * gy + Math.floor((gy + 3) / 4) - Math.floor((gy + 99) / 100) + Math.floor((gy + 399) / 400);
+            for (let i = 0; i < gm; ++i) g_day_no += g_days_in_month[i];
+            g_day_no += gd;
+            let j_day_no = g_day_no - 79;
+            let j_np = Math.floor(j_day_no / 12053);
+            j_day_no = j_day_no % 12053;
+            let jy = 979 + 33 * j_np + 4 * Math.floor(j_day_no / 1461);
+            j_day_no %= 1461;
+            if (j_day_no >= 366) { jy += Math.floor((j_day_no - 1) / 365); j_day_no = (j_day_no - 1) % 365; }
+            let jm, jd;
+            if (j_day_no < 186) { jm = 1 + Math.floor(j_day_no / 31); jd = 1 + (j_day_no % 31); } 
+            else { jm = 7 + Math.floor((j_day_no - 186) / 30); jd = 1 + ((j_day_no - 186) % 30); }
+            return { jy, jm, jd };
+        }
+        function isJalaliLeap(year) { return (((((year - 474) % 2820) + 474) + 38) * 682) % 2816 < 682; }
+
+        /* --- CORE RENDERER --- */
+        function updateUI(scrollOnRender = false) {
+            document.documentElement.setAttribute('data-theme', state.theme);
+            els.inputs.view.checked = state.view === 'month';
+            els.inputs.calendar.checked = state.calendar === 'jalali';
+            els.inputs.numbers.checked = state.numbers;
+            
+            if(state.numbers) els.appContainer.classList.add('show-nums');
+            else els.appContainer.classList.remove('show-nums');
+
+            els.themeOptions.forEach(opt => {
+                if(opt.dataset.setTheme === state.theme) opt.classList.add('selected');
+                else opt.classList.remove('selected');
+            });
+
+            if (state.view === 'month') {
+                els.mainView.classList.add('scrollable');
+                els.mainView.classList.remove('centered');
+            } else {
+                els.mainView.classList.remove('scrollable');
+                els.mainView.classList.add('centered');
+            }
+
+            const now = new Date();
+            let displayYear, totalDays, activeDotsCount, todayDayNo, monthLengths, monthNames, currentMonthIndex;
+
+            if (state.calendar === 'jalali') {
+                const jDate = getJalaliDate(now);
+                todayDayNo = 0;
+                for(let m=1; m<jDate.jm; m++) todayDayNo += (m<=6 ? 31 : 30);
+                todayDayNo += jDate.jd;
+                displayYear = jDate.jy + state.yearOffset;
+                totalDays = isJalaliLeap(displayYear) ? 366 : 365;
+                monthLengths = [];
+                for(let m=1; m<=12; m++) {
+                   if(m<=6) monthLengths.push(31);
+                   else if(m<=11) monthLengths.push(30);
+                   else monthLengths.push(isJalaliLeap(displayYear) ? 30 : 29);
+                }
+                monthNames = ["Farvardin", "Ordibehesht", "Khordad", "Tir", "Mordad", "Shahrivar", "Mehr", "Aban", "Azar", "Dey", "Bahman", "Esfand"];
+                currentMonthIndex = jDate.jm - 1;
+            } else {
+                const currentRealYear = now.getFullYear();
+                const start = new Date(currentRealYear, 0, 0);
+                const diff = now - start;
+                todayDayNo = Math.floor(diff / (1000 * 60 * 60 * 24));
+                displayYear = currentRealYear + state.yearOffset;
+                const isLeap = (displayYear % 4 === 0 && displayYear % 100 !== 0) || (displayYear % 400 === 0);
+                totalDays = isLeap ? 366 : 365;
+                monthLengths = [31, isLeap?29:28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                currentMonthIndex = now.getMonth();
+            }
+
+            if (state.yearOffset < 0) activeDotsCount = totalDays;
+            else if (state.yearOffset > 0) activeDotsCount = 0;
+            else activeDotsCount = todayDayNo;
+
+            els.yearDisplay.textContent = displayYear;
+            let daysLeft = totalDays - activeDotsCount;
+            let percent = Math.floor((activeDotsCount / totalDays) * 100);
+            if(state.yearOffset > 0) { daysLeft = totalDays; percent = 0; }
+            if(state.yearOffset < 0) { daysLeft = 0; percent = 100; }
+            els.daysLeft.textContent = `${daysLeft}d left`;
+            els.percentVal.textContent = `${percent}%`;
+
+            els.mainView.innerHTML = '';
+            
+            const createDot = (num) => {
+                const dot = document.createElement('div');
+                let classes = `dot ${num <= activeDotsCount ? 'active' : 'inactive'}`;
+                const isToday = (state.yearOffset === 0 && num === todayDayNo);
+                const isPast = (state.yearOffset < 0) || (state.yearOffset === 0 && num < todayDayNo);
+                
+                if(isToday) classes += ' today';
+                dot.className = classes;
+                if(state.numbers) dot.textContent = num;
+                
+                const dateKey = `${displayYear}-d${num}`;
+                dot.dataset.key = dateKey;
+                dot.dataset.num = num;
+                dot.dataset.isPast = isPast;
+
+                applyDotStatus(dot, dateKey, isPast);
+                dot.addEventListener('click', () => openTodoModal(dateKey, num, displayYear, isPast));
+                
+                return dot;
+            };
+
+            let globalDayCount = 0;
+
+            if (state.view === 'month') {
+                const grid = document.createElement('div');
+                grid.className = 'grid-months';
+                let monthToScrollTo = null;
+
+                monthLengths.forEach((daysInMonth, idx) => {
+                    const block = document.createElement('div');
+                    block.className = 'month-block';
+                    if(state.yearOffset === 0 && idx === currentMonthIndex) {
+                        block.id = 'current-month-block';
+                        monthToScrollTo = block;
+                    }
+                    const label = document.createElement('div');
+                    label.className = 'month-label';
+                    label.textContent = monthNames[idx];
+                    const dotsContainer = document.createElement('div');
+                    dotsContainer.className = 'month-dots';
+                    
+                    for(let d=1; d<=daysInMonth; d++) {
+                        globalDayCount++;
+                        const dot = createDot(globalDayCount);
+                        if(state.numbers) dot.textContent = d; 
+                        dotsContainer.appendChild(dot);
+                    }
+                    block.appendChild(label);
+                    block.appendChild(dotsContainer);
+                    grid.appendChild(block);
+                });
+                els.mainView.appendChild(grid);
+                if(scrollOnRender && monthToScrollTo) {
+                    setTimeout(() => monthToScrollTo.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+                }
+            } else {
+                const grid = document.createElement('div');
+                grid.className = 'grid-continuous';
+                const fragment = document.createDocumentFragment();
+                for (let i = 1; i <= totalDays; i++) {
+                    const dot = createDot(i);
+                    fragment.appendChild(dot);
+                }
+                grid.appendChild(fragment);
+                els.mainView.appendChild(grid);
+                calculateFit();
+            }
+        }
+
+        /* --- VISUAL HELPERS --- */
+        function applyDotStatus(dot, dateKey, isPast) {
+            const tasks = state.tasksCache[dateKey] || [];
+            dot.classList.remove('status-done', 'status-pending', 'status-expired');
+            if (tasks.length > 0) {
+                const allDone = tasks.every(t => t.done);
+                if (allDone) dot.classList.add('status-done');
+                else {
+                    if (isPast) dot.classList.add('status-expired'); 
+                    else dot.classList.add('status-pending');
+                }
+            }
+        }
+
+        function updateDotVisual(dateKey) {
+            const dot = document.querySelector(`.dot[data-key="${dateKey}"]`);
+            if(dot) {
+                const isPast = dot.dataset.isPast === 'true';
+                applyDotStatus(dot, dateKey, isPast);
+            }
+        }
+
+        /* --- TODO MODAL LOGIC & DATE FORMATTING --- */
+        function getDetailedDateInfo(year, dayNum) {
+            const dayNamesEn = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            const dayNamesFa = ["Yekshanbe", "Doshanbe", "Seshanbe", "Chaharshanbe", "Panjshanbe", "Jomeh", "Shanbe"];
+            const monthNamesFa = ["Farvardin", "Ordibehesht", "Khordad", "Tir", "Mordad", "Shahrivar", "Mehr", "Aban", "Azar", "Dey", "Bahman", "Esfand"];
+            const monthNamesEn = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+            if(state.calendar === 'jalali') {
+                // Approximate Mapping logic for display only
+                // Note: accurate Weekday calc requires a known anchor. 
+                // Using 2025 March 21 as approx anchor or JS date conversion
+                // A simplified approach: Convert Jalali Year/DayNum to Gregorian to get the DayOfWeek Index
+                
+                // Reverse Jalali: (We need day of week, so we need a real JS Date object)
+                // This app tracks displayYear (Jalali) and dayNum (1-366)
+                // We must find the Gregorian Equivalent
+                let gYear = year + 621;
+                // Simple check if beginning of year is shifted
+                let startOfJalaliYear = new Date(gYear, 2, 21); // Approx March 21
+                // Add dayNum days
+                let actualDate = new Date(startOfJalaliYear.getTime() + (dayNum - 1) * 86400000);
+                
+                // Get Day Index (0 = Sun, etc)
+                let dayIdx = actualDate.getDay(); 
+                
+                // Calculate Month/Day for string
+                let jm = 0;
+                let tempDay = dayNum;
+                let daysInMonths = [31,31,31,31,31,31,30,30,30,30,30,29]; 
+                // (Leap handling simplified for UI string, not critical logic)
+                for(let i=0; i<12; i++){
+                    if(tempDay <= daysInMonths[i]) { jm = i; break; }
+                    tempDay -= daysInMonths[i];
+                }
+                
+                // Mapped to standard Persian week names (0=Sun=Yekshanbe in this array map)
+                return `${dayNamesFa[dayIdx]} - ${tempDay} ${monthNamesFa[jm]}`;
+
+            } else {
+                // Gregorian
+                const date = new Date(year, 0, dayNum); // Jan 1st + dayNum
+                const dName = dayNamesEn[date.getDay()];
+                const mName = monthNamesEn[date.getMonth()];
+                const dNum = date.getDate();
+                return `${dName} - ${dNum} ${mName}`;
+            }
+        }
+
+        function openTodoModal(dateKey, dayNum, year, isPast) {
+            state.activeDateKey = dateKey;
+            
+            // Generate Format: Day X • WeekDay - Day Month
+            const detailedDate = getDetailedDateInfo(year, dayNum);
+            els.todoDateTitle.textContent = `Day ${dayNum} • ${detailedDate}`;
+            
+            els.todoPrev.onclick = () => {
+                const prevNum = dayNum - 1;
+                if(prevNum > 0) {
+                    const prevKey = `${year}-d${prevNum}`;
+                    const prevDot = document.querySelector(`.dot[data-key="${prevKey}"]`);
+                    const prevPast = prevDot ? prevDot.dataset.isPast === 'true' : isPast;
+                    openTodoModal(prevKey, prevNum, year, prevPast);
+                }
+            };
+            els.todoNext.onclick = () => {
+                const nextNum = dayNum + 1;
+                const nextKey = `${year}-d${nextNum}`;
+                const nextDot = document.querySelector(`.dot[data-key="${nextKey}"]`);
+                if(nextDot) {
+                    const nextPast = nextDot.dataset.isPast === 'true';
+                    openTodoModal(nextKey, nextNum, year, nextPast);
+                }
+            };
+
+            renderTodoList();
+            togglePanel('todo', true);
+            // Auto focus input on open? Optional. 
+            // els.newTaskInput.focus(); 
+        }
+
+        function renderTodoList() {
+            els.todoList.innerHTML = '';
+            const tasks = state.tasksCache[state.activeDateKey] || [];
+
+            if (tasks.length === 0) {
+                els.todoList.innerHTML = '<div class="todo-empty-state">No tasks for this day</div>';
+                return;
+            }
+
+            tasks.forEach((task, index) => {
+                const item = document.createElement('div');
+                item.className = `todo-item ${task.done ? 'completed' : ''}`;
+                item.innerHTML = `
+                    <div class="todo-checkbox"></div>
+                    <div class="todo-text" dir="${task.dir || 'ltr'}">${task.text}</div>
+                    <button class="todo-delete">✕</button>
+                `;
+
+                item.querySelector('.todo-checkbox').addEventListener('click', () => {
+                    tasks[index].done = !tasks[index].done;
+                    saveTasksToDB(state.activeDateKey, tasks);
+                    renderTodoList();
+                });
+                
+                item.querySelector('.todo-delete').addEventListener('click', () => {
+                    tasks.splice(index, 1);
+                    saveTasksToDB(state.activeDateKey, tasks);
+                    renderTodoList();
+                });
+
+                els.todoList.appendChild(item);
+            });
+        }
+
+        els.addTaskBtn.addEventListener('click', addNewTask);
+        els.newTaskInput.addEventListener('keydown', (e) => {
+            if(e.key === 'Enter') addNewTask();
+        });
+
+        els.newTaskInput.addEventListener('input', (e) => {
+            const val = e.target.value;
+            els.newTaskInput.dir = val.length > 0 && isPersian(val) ? 'rtl' : 'ltr';
+        });
+
+        function addNewTask() {
+            const text = els.newTaskInput.value.trim();
+            if (!text) return;
+            const dir = isPersian(text) ? 'rtl' : 'ltr';
+            const newTask = { text, done: false, dir };
+            const tasks = state.tasksCache[state.activeDateKey] || [];
+            tasks.push(newTask);
+            saveTasksToDB(state.activeDateKey, tasks);
+            els.newTaskInput.value = '';
+            els.newTaskInput.dir = 'ltr'; 
+            renderTodoList();
+            // Scroll to bottom
+            els.todoList.scrollTop = els.todoList.scrollHeight;
+        }
+
+        /* --- EVENT HANDLERS --- */
+        function changeYear(delta) {
+            state.yearOffset += delta;
+            els.mainView.classList.add('fading');
+            setTimeout(() => { updateUI(); els.mainView.classList.remove('fading'); }, 150);
+        }
+
+        els.prevBtn.addEventListener('click', () => changeYear(-1));
+        els.nextBtn.addEventListener('click', () => changeYear(1));
+        els.yearDisplay.addEventListener('click', () => { if(state.yearOffset !== 0) { state.yearOffset = 0; updateUI(true); } });
+
+        let touchStartX = 0; let touchEndX = 0;
+        document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, false);
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX < touchStartX - 50) changeYear(1);
+            else if (touchEndX > touchStartX + 50) changeYear(-1);
+        }, false);
+
+        const togglePanel = (type, open) => {
+            const panel = type === 'settings' ? els.settingsPanel : els.todoModal;
+            const otherPanel = type === 'settings' ? els.todoModal : els.settingsPanel;
+            if(open) otherPanel.classList.remove('open');
+            if(open) {
+                panel.classList.add('open');
+                els.overlay.classList.add('visible');
+            } else {
+                panel.classList.remove('open');
+                if(!els.settingsPanel.classList.contains('open') && !els.todoModal.classList.contains('open')) {
+                    els.overlay.classList.remove('visible');
+                }
+            }
+        };
+
+        els.settingsBtn.addEventListener('click', () => togglePanel('settings', true));
+        els.closeSettings.addEventListener('click', () => togglePanel('settings', false));
+        els.closeTodo.addEventListener('click', () => togglePanel('todo', false));
+        els.overlay.addEventListener('click', () => {
+            togglePanel('settings', false);
+            togglePanel('todo', false);
+        });
+
+        els.inputs.view.addEventListener('change', (e) => {
+            state.view = e.target.checked ? 'month' : 'continuous';
+            localStorage.setItem('view', state.view);
+            updateUI(true);
+        });
+        
+        els.inputs.numbers.addEventListener('change', (e) => {
+            state.numbers = e.target.checked;
+            localStorage.setItem('numbers', state.numbers);
+            updateUI();
+        });
+
+        els.inputs.calendar.addEventListener('change', (e) => {
+            state.calendar = e.target.checked ? 'jalali' : 'gregorian';
+            state.yearOffset = 0; localStorage.setItem('calendar', state.calendar);
+            updateUI(true);
+        });
+        
+        els.themeOptions.forEach(opt => {
+            opt.addEventListener('click', () => {
+                state.theme = opt.dataset.setTheme;
+                localStorage.setItem('theme', state.theme);
+                updateUI();
+            });
+        });
+
+        window.addEventListener('resize', () => { 
+            if(state.view === 'continuous') requestAnimationFrame(calculateFit);
+        });
+
+        initDB();
+    </script>
+</body>
+</html>
