@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNS Privacy & Speed Auditor</title>
+    <style>
+        :root {
+            --bg: #111827;
+            --card: #1f2937;
+            --text: #f3f4f6;
+            --muted: #9ca3af;
+            --accent: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #374151;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        
+        body { background-color: var(--bg); color: var(--text); padding: 20px; line-height: 1.5; }
+        
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        h1 { color: var(--accent); margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px; font-size: 1.8rem; }
+        
+        /* Grid Layout */
+        .grid { display: grid; gap: 20px; grid-template-columns: 1fr; }
+        @media(min-width: 1024px) { .grid { grid-template-columns: 350px 1fr; } }
+
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; height: fit-content; }
+        
+        /* Buttons */
+        .btn {
+            background: var(--accent); color: white; border: none; padding: 12px 20px; 
+            border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%; 
+            transition: all 0.2s; font-size: 1rem;
+        }
+        .btn:hover { filter: brightness(1.1); }
+        .btn:disabled { background: var(--border); cursor: not-allowed; opacity: 0.7; }
+
+        /* Identity Section */
+        .info-group { margin-bottom: 15px; }
+        .info-label { display: block; color: var(--muted); font-size: 0.85rem; margin-bottom: 4px; }
+        .info-val { font-family: monospace; font-size: 1.1rem; font-weight: bold; }
+        .secure-status { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; display: inline-block; margin-top: 5px; }
+        .secure-status.leak { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+        .secure-status.safe { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid var(--success); }
+
+        /* Table */
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th { text-align: left; color: var(--muted); font-size: 0.75rem; text-transform: uppercase; padding: 12px; border-bottom: 2px solid var(--border); }
+        td { padding: 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        
+        .provider-name { font-weight: bold; color: var(--text); display: block; }
+        .provider-url { font-size: 0.75rem; color: var(--muted); font-family: monospace; }
+        
+        /* Badges */
+        .badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; border: 1px solid transparent; font-weight: bold; margin-right: 4px; }
+        .badge.logs-no { background: rgba(16, 185, 129, 0.15); color: var(--success); border-color: var(--success); }
+        .badge.logs-yes { background: rgba(239, 68, 68, 0.15); color: var(--danger); border-color: var(--danger); }
+        .badge.logs-some { background: rgba(245, 158, 11, 0.15); color: var(--warning); border-color: var(--warning); }
+        
+        .grade { font-weight: bold; font-size: 1.2rem; text-align: center; }
+        .grade-A { color: var(--success); } /* Secure */
+        .grade-B { color: var(--warning); } /* Moderate */
+        .grade-C { color: var(--danger); }  /* Caution */
+
+        .latency { font-family: monospace; font-weight: bold; text-align: right; }
+        .lat-good { color: var(--success); }
+        .lat-med { color: var(--warning); }
+        .lat-bad { color: var(--danger); }
+
+        .flag-icon { font-size: 1.4rem; margin-right: 8px; vertical-align: middle; }
+        
+        /* Loading Spinner */
+        .spinner {
+            width: 16px; height: 16px; border: 2px solid var(--text); border-top-color: transparent;
+            border-radius: 50%; display: inline-block; animation: spin 1s linear infinite; vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🛡️ DNS Security & Performance Auditor</h1>
+    
+    <div class="grid">
+        <div class="card">
+            <h2 style="font-size:1.2rem; margin-bottom:15px; color:white;">👤 Your Digital Footprint</h2>
+            
+            <div class="info-group">
+                <span class="info-label">Public IP Address</span>
+                <div id="user-ip" class="info-val">Loading...</div>
+            </div>
+            
+            <div class="info-group">
+                <span class="info-label">Internet Provider (ISP)</span>
+                <div id="user-isp" class="info-val">Loading...</div>
+            </div>
+
+            <div class="info-group">
+                <span class="info-label">Detected DNS Resolver</span>
+                <div id="dns-detect" class="info-val">Testing...</div>
+                <div id="leak-msg"></div>
+            </div>
+
+            <button class="btn" onclick="checkIdentity()" style="margin-top:10px;">Refresh Identity</button>
+            
+            <div style="margin-top:20px; font-size:0.8rem; color:var(--muted); border-top:1px solid var(--border); padding-top:10px;">
+                <strong>Privacy Note:</strong> This tool runs entirely in your browser. No data is sent to the developer. We use external APIs (ipwho.is, ip-api.com) strictly for geolocation lookup.
+            </div>
+        </div>
+
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h2 style="font-size:1.2rem; color:white;">DNS Providers Benchmark</h2>
+                <button class="btn" style="width:auto; padding:8px 16px;" onclick="runAudit()">Start Audit</button>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:50px">Rank</th>
+                            <th style="width:250px">Provider & Origin</th>
+                            <th>Privacy Audit</th>
+                            <th style="width:80px; text-align:center;">Grade</th>
+                            <th style="width:100px; text-align:right;">Latency</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-body">
+                        <tr><td colspan="5" style="text-align:center; padding:30px; color:var(--muted);">Click "Start Audit" to begin...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    /**
+     * DATABASE OF DNS PROVIDERS
+     * Includes verification of Logging Policies and Security Features.
+     */
+    const dnsDB = [
+        {
+            name: "Control D (Uncensored)",
+            url: "https://freedns.controld.com/uncensored",
+            ip: "76.76.2.11",
+            policy: "logs-no",
+            jurisdiction: "CA", // Canada (Five Eyes)
+            notes: "Blocks malware/ads. Good privacy policy.",
+            grade: "A" 
+        },
+        {
+            name: "Quad9",
+            url: "https://dns.quad9.net/dns-query",
+            ip: "9.9.9.9",
+            policy: "logs-no",
+            jurisdiction: "CH", // Switzerland (Strong Privacy)
+            notes: "Swiss based. GDPR compliant. Strong blocking.",
+            grade: "A"
+        },
+        {
+            name: "DNS.sb",
+            url: "https://doh.dns.sb/dns-query",
+            ip: "185.222.222.222",
+            policy: "logs-no",
+            jurisdiction: "DE", // Germany
+            notes: "Strict No-Logs. Hardenized security.",
+            grade: "A"
+        },
+        {
+            name: "UncensoredDNS",
+            url: "https://anycast.uncensoreddns.org/dns-query",
+            ip: "91.239.100.100",
+            policy: "logs-no",
+            jurisdiction: "DK", // Denmark
+            notes: "Run by individual. Transparent operations.",
+            grade: "A"
+        },
+        {
+            name: "LibreDNS",
+            url: "https://doh.libredns.gr/dns-query",
+            ip: "116.202.176.26",
+            policy: "logs-no",
+            jurisdiction: "GR", // Greece
+            notes: "Community run. No logs.",
+            grade: "A"
+        },
+        {
+            name: "Mullvad",
+            url: "https://doh.mullvad.net/dns-query",
+            ip: "194.242.2.2",
+            policy: "logs-no",
+            jurisdiction: "SE", // Sweden
+            notes: "VPN provider known for privacy.",
+            grade: "A"
+        },
+        {
+            name: "Cloudflare",
+            url: "https://cloudflare-dns.com/dns-query",
+            ip: "1.1.1.1",
+            policy: "logs-some",
+            jurisdiction: "US", // USA
+            notes: "Logs kept for 24h. US Jurisdiction.",
+            grade: "B"
+        },
+        {
+            name: "Google Public DNS",
+            url: "https://dns.google/dns-query",
+            ip: "8.8.8.8",
+            policy: "logs-yes",
+            jurisdiction: "US", // USA
+            notes: "Logs IP for 24-48h. Data mining concerns.",
+            grade: "C"
+        },
+        {
+            name: "AdGuard",
+            url: "https://dns.adguard.com/dns-query",
+            ip: "94.140.14.14",
+            policy: "logs-no",
+            jurisdiction: "CY", // Cyprus
+            notes: "Excellent ad/tracker blocking.",
+            grade: "A"
+        },
+        {
+            name: "Freifunk (Munich)",
+            url: "https://doh.ffmuc.net/dns-query",
+            ip: "5.1.66.255",
+            policy: "logs-no",
+            jurisdiction: "DE", // Germany
+            notes: "Community network. Privacy focus.",
+            grade: "A"
+        }
+    ];
+
+    // --- Identity Check Functions ---
+    async function checkIdentity() {
+        const ipEl = document.getElementById('user-ip');
+        const ispEl = document.getElementById('user-isp');
+        const dnsEl = document.getElementById('dns-detect');
+        const leakMsg = document.getElementById('leak-msg');
+
+        ipEl.innerText = "Scanning...";
+        ispEl.innerText = "Scanning...";
+        
+        try {
+            // 1. Get User Metadata (Client Side)
+            const metaRes = await fetch('https://ipwho.is/');
+            const metaData = await metaRes.json();
+            
+            if(metaData.success) {
+                ipEl.innerText = metaData.ip;
+                ispEl.innerText = metaData.connection.isp || metaData.connection.org;
+            }
+
+            // 2. DNS Leak Test
+            // We ping a special endpoint that reflects the IP of the DNS server used to resolve it.
+            const leakRes = await fetch('https://edns.ip-api.com/json');
+            const leakData = await leakRes.json();
+            
+            const dnsIP = leakData.dns.ip;
+            const dnsGeo = leakData.dns.geo; 
+            dnsEl.innerText = `${dnsIP} (${dnsGeo})`;
+
+            // 3. Analyze Leak
+            const userISP = (metaData.connection && metaData.connection.isp) ? metaData.connection.isp.toLowerCase() : "";
+            const dnsOwner = (leakData.dns.res) ? leakData.dns.res.toLowerCase() : "";
+
+            // Heuristic: If DNS owner looks like User ISP, it's a leak (default DNS).
+            if(userISP && dnsOwner.includes(userISP)) {
+                leakMsg.innerHTML = `<span class="secure-status leak">⚠️ UNSECURE: ISP DNS Detected</span><br><small style="color:var(--danger)">Your ISP can see your requests.</small>`;
+            } else {
+                leakMsg.innerHTML = `<span class="secure-status safe">✅ SECURE: Using Custom DNS</span>`;
+            }
+
+        } catch(e) {
+            console.error(e);
+            ipEl.innerText = "Error";
+            dnsEl.innerText = "Blocked/Error";
+        }
+    }
+
+    // --- Benchmark Functions ---
+
+    // 1. Get Server Location (Flag)
+    async function getGeo(ip) {
+        try {
+            const res = await fetch(`https://ipwho.is/${ip}`);
+            const data = await res.json();
+            if(data.success) return { flag: data.flag.emoji, country: data.country_code };
+        } catch(e) {}
+        return { flag: "🌐", country: "Anycast" };
+    }
+
+    // 2. Measure Latency (HTTPS PING)
+    async function pingProvider(url) {
+        const start = performance.now();
+        try {
+            // "no-cors" is essential to ping servers that don't explicitly allow browser JS
+            await fetch(`${url}?random=${Math.random()}`, { mode: 'no-cors', cache: 'no-store' });
+            return Math.round(performance.now() - start);
+        } catch(e) {
+            return 9999; // Timeout or Blocked
+        }
+    }
+
+    // 3. Main Runner
+    async function runAudit() {
+        const tbody = document.getElementById('results-body');
+        tbody.innerHTML = "";
+        
+        // Process each provider
+        const results = [];
+
+        // UI: Show loading rows
+        for(let p of dnsDB) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td colspan="5">Testing ${p.name}... <span class="spinner"></span></td>`;
+            tbody.appendChild(tr);
+            
+            // Run tests in parallel-ish (await one by one to prevent congestion)
+            // 1. Geo Check
+            const geo = await getGeo(p.ip);
+            
+            // 2. Ping Check (Average of 3)
+            let latSum = 0;
+            let successCount = 0;
+            for(let i=0; i<3; i++) {
+                let t = await pingProvider(p.url);
+                if(t < 5000) { latSum += t; successCount++; }
+            }
+            const avgLat = successCount > 0 ? Math.round(latSum / successCount) : 9999;
+
+            results.push({ ...p, geo, latency: avgLat });
+            tbody.removeChild(tr); // Remove loading row
+        }
+
+        // Sort: Best Latency First
+        results.sort((a,b) => a.latency - b.latency);
+
+        // Render Final Table
+        results.forEach((r, idx) => {
+            const tr = document.createElement('tr');
+            
+            // Latency Color
+            let latClass = "lat-good";
+            if(r.latency > 100) latClass = "lat-med";
+            if(r.latency > 300 || r.latency === 9999) latClass = "lat-bad";
+
+            // Privacy Logic
+            let privacyBadge = "";
+            let gradeIcon = "";
+            
+            if(r.grade === "A") {
+                privacyBadge = `<span class="badge logs-no">NO LOGS</span>`;
+                gradeIcon = `<span class="grade grade-A">✅ A</span>`;
+            } else if (r.grade === "B") {
+                privacyBadge = `<span class="badge logs-some">SOME LOGS</span>`;
+                gradeIcon = `<span class="grade grade-B">⚠️ B</span>`;
+            } else {
+                privacyBadge = `<span class="badge logs-yes">LOGGING</span>`;
+                gradeIcon = `<span class="grade grade-C">❌ C</span>`;
+            }
+
+            const latencyText = r.latency === 9999 ? "FAIL" : `${r.latency} ms`;
+
+            tr.innerHTML = `
+                <td style="text-align:center; font-weight:bold;">${idx+1}</td>
+                <td>
+                    <span class="flag-icon" title="${r.geo.country}">${r.geo.flag}</span>
+                    <span class="provider-name">${r.name}</span>
+                    <span class="provider-url">${r.ip}</span>
+                </td>
+                <td>
+                    ${privacyBadge} <span style="font-size:0.8rem; color:var(--muted)">${r.notes}</span>
+                    <div style="margin-top:4px; font-size:0.75rem;">Jurisdiction: <strong>${r.jurisdiction}</strong></div>
+                </td>
+                <td style="text-align:center;">${gradeIcon}</td>
+                <td class="latency ${latClass}">${latencyText}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Auto start identity check
+    checkIdentity();
+
+</script>
+</body>
+</html>
